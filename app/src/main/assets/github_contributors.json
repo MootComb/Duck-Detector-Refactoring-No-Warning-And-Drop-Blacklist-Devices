@@ -7,7 +7,7 @@
       "asm",
       "kotlin"
     ],
-    "contributions": 78,
+    "contributions": 79,
     "name": "eltavine",
     "avatarAssetPath": "github_contributors/avatars/eltavine.jpg",
     "summaryKey": "author_summary_eltavine",
@@ -155,6 +155,14 @@
     "login": "Y-0x"
   },
   {
+    "profileUrl": "https://github.com/juanma0511",
+    "contributionKeys": [],
+    "contributions": 1,
+    "name": "juanma0511",
+    "avatarAssetPath": "github_contributors/avatars/juanma0511.jpg",
+    "login": "juanma0511"
+  },
+  {
     "profileUrl": "https://github.com/SQMY-dor",
     "contributionKeys": [
       "ui",
@@ -225,14 +233,6 @@
     "name": "jiugjk",
     "avatarAssetPath": "github_contributors/avatars/jiugjk.jpg",
     "login": "jiugjk"
-  },
-  {
-    "profileUrl": "https://github.com/juanma0511",
-    "contributionKeys": [],
-    "contributions": 1,
-    "name": "juanma0511",
-    "avatarAssetPath": "github_contributors/avatars/juanma0511.jpg",
-    "login": "juanma0511"
   },
   {
     "profileUrl": "https://github.com/Xiaobocai08",
