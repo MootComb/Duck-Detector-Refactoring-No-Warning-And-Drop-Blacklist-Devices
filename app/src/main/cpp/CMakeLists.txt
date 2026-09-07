@@ -99,6 +99,7 @@ set(NATIVE_ROOT_SOURCES
     nativeroot/probes/prctl_probe.cpp
     nativeroot/probes/kernelpatch_nr_supercall_latency_probe.cpp
     nativeroot/probes/devpts_abnormal_permission_probe.cpp
+    nativeroot/probes/permission_boundary_probe.cpp
     nativeroot/probes/ksu_supercall_probe.cpp
     nativeroot/probes/susfs_probe.cpp
     nativeroot/probes/self_process_ioc_probe.cpp

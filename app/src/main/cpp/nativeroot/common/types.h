@@ -68,6 +68,9 @@ namespace duckdetector::nativeroot {
         int devpts_abnormal_permission_checked_count = 0;
         int devpts_abnormal_permission_denied_count = 0;
         std::string devpts_abnormal_permission_detail;
+        bool permission_boundary_detected = false;
+        bool permission_boundary_available = false;
+        std::string permission_boundary_detail;
         bool ksu_supercall_attempted = false;
         bool ksu_supercall_probe_hit = false;
         bool ksu_supercall_blocked = false;

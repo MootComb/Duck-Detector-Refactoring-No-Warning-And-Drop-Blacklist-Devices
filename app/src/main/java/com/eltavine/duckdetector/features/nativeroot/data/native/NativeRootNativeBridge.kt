@@ -89,6 +89,9 @@ class NativeRootNativeBridge {
             )
 
             "DEVPTS_ABNORMAL_PERMISSION_DETAIL" -> copy(devptsAbnormalPermissionDetail = value.decodeValue())
+            "PERMISSION_BOUNDARY_FOUND" -> copy(permissionBoundaryDetected = value.asBool())
+            "PERMISSION_BOUNDARY_AVAILABLE" -> copy(permissionBoundaryAvailable = value.asBool())
+            "PERMISSION_BOUNDARY_DETAIL" -> copy(permissionBoundaryDetail = value.decodeValue())
             "KSU_SUPERCALL_ATTEMPTED" -> copy(ksuSupercallAttempted = value.asBool())
             "KSU_SUPERCALL_HIT" -> copy(ksuSupercallProbeHit = value.asBool())
             "KSU_SUPERCALL_BLOCKED" -> copy(ksuSupercallBlocked = value.asBool())

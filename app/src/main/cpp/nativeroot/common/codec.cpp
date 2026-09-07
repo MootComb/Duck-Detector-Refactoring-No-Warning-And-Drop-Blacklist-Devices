@@ -85,6 +85,9 @@ namespace duckdetector::nativeroot {
         output << "DEVPTS_ABNORMAL_PERMISSION_CHECKED=" << snapshot.devpts_abnormal_permission_checked_count << '\n';
         output << "DEVPTS_ABNORMAL_PERMISSION_DENIED=" << snapshot.devpts_abnormal_permission_denied_count << '\n';
         output << "DEVPTS_ABNORMAL_PERMISSION_DETAIL=" << escape_value(snapshot.devpts_abnormal_permission_detail) << '\n';
+        output << "PERMISSION_BOUNDARY_FOUND=" << (snapshot.permission_boundary_detected ? '1' : '0') << '\n';
+        output << "PERMISSION_BOUNDARY_AVAILABLE=" << (snapshot.permission_boundary_available ? '1' : '0') << '\n';
+        output << "PERMISSION_BOUNDARY_DETAIL=" << escape_value(snapshot.permission_boundary_detail) << '\n';
         output << "KSU_SUPERCALL_ATTEMPTED=" << (snapshot.ksu_supercall_attempted ? '1' : '0')
                << '\n';
         output << "KSU_SUPERCALL_HIT=" << (snapshot.ksu_supercall_probe_hit ? '1' : '0') << '\n';

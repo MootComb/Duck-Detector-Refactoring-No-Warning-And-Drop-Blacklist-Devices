@@ -23,6 +23,7 @@
 #include "nativeroot/probes/kernel_probe.h"
 #include "nativeroot/probes/kernelpatch_nr_supercall_latency_probe.h"
 #include "nativeroot/probes/devpts_abnormal_permission_probe.h"
+#include "nativeroot/probes/permission_boundary_probe.h"
 #include "nativeroot/probes/ksu_supercall_probe.h"
 #include "nativeroot/probes/path_probe.h"
 #include "nativeroot/probes/process_probe.h"
@@ -61,6 +62,7 @@ namespace duckdetector::nativeroot {
         const ProbeResult ksu_supercall_probe = run_ksu_supercall_probe();
         const ProbeResult kernelpatch_supercall_latency_probe = run_kernelpatch_supercall_latency_check();
         const ProbeResult devpts_abnormal_permission_probe = run_devpts_permission_check();
+        const ProbeResult permission_boundary_probe = run_permission_boundary_check();
         const ProbeResult path_probe = run_path_probe();
         const ProbeResult process_probe = run_process_probe();
         const ProbeResult kernel_probe = run_kernel_probe();
@@ -79,6 +81,9 @@ namespace duckdetector::nativeroot {
         snapshot.devpts_abnormal_permission_checked_count = devpts_abnormal_permission_probe.checked_count;
         snapshot.devpts_abnormal_permission_denied_count = devpts_abnormal_permission_probe.denied_count;
         snapshot.devpts_abnormal_permission_detail = devpts_abnormal_permission_probe.extra_text;
+        snapshot.permission_boundary_detected = permission_boundary_probe.flags.root || permission_boundary_probe.flags.magisk;
+        snapshot.permission_boundary_available = permission_boundary_probe.checked_count > 0;
+        snapshot.permission_boundary_detail = permission_boundary_probe.extra_text;
         snapshot.ksu_supercall_attempted = ksu_supercall_probe.checked_count > 0;
         snapshot.ksu_supercall_probe_hit = ksu_supercall_probe.flags.kernel_su;
         snapshot.ksu_supercall_blocked = ksu_supercall_probe.denied_count > 0;
@@ -115,6 +120,7 @@ namespace duckdetector::nativeroot {
         append_probe_findings(snapshot, ksu_supercall_probe, dedupe);
         append_probe_findings(snapshot, kernelpatch_supercall_latency_probe, dedupe);
         append_probe_findings(snapshot, devpts_abnormal_permission_probe, dedupe);
+        append_probe_findings(snapshot, permission_boundary_probe, dedupe);
         append_probe_findings(snapshot, path_probe, dedupe);
         append_probe_findings(snapshot, process_probe, dedupe);
         append_probe_findings(snapshot, kernel_probe, dedupe);

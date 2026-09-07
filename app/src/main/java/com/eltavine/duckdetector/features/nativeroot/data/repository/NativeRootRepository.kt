@@ -255,6 +255,26 @@ class NativeRootRepository(
                 },
             ),
             NativeRootMethodResult(
+                label = "permission boundary check",
+                summary = when {
+                    snapshot.permissionBoundaryDetected -> "Detected"
+                    !snapshot.permissionBoundaryAvailable -> "Unavailable"
+                    else -> "Clean"
+                },
+                outcome = when {
+                    snapshot.permissionBoundaryDetected -> NativeRootMethodOutcome.DETECTED
+                    !snapshot.permissionBoundaryAvailable -> NativeRootMethodOutcome.SUPPORT
+                    else -> NativeRootMethodOutcome.CLEAN
+                },
+                detail = buildString {
+                    append("Checks SELinux MAC and sandbox permission boundaries (Netlink RTM_GETLINK, RTM_GETNEIGH).")
+                    append("\nUnder AOSP sepolicy, untrusted_app is strictly forbidden from querying physical hardware MAC or ARP neighbor tables on API 30+.")
+                    append("\nIf physical Wi-Fi/Ethernet MAC is exposed, or valid unicast LAN ARP entries are leaked (via Magisk sepolicy injection, policy reload corruption, or exploit bypass), it indicates a permission boundary breach.")
+                    append("\nTest Result:\n")
+                    append(snapshot.permissionBoundaryDetail)
+                },
+            ),
+            NativeRootMethodResult(
                 label = "prctlProbe",
                 summary = when {
                     snapshot.prctlProbeHit && snapshot.kernelSuVersion > 0L -> "v${snapshot.kernelSuVersion}"
