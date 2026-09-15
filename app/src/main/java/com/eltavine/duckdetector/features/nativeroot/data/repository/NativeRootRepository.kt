@@ -120,6 +120,11 @@ class NativeRootRepository(
                 tempRootArtifactResult = tempRootArtifactResult,
             ),
             kernelPatchSideChannel = snapshot.kernelPatchSideChannel,
+            kernelPatchSuperkey = snapshot.kernelPatchSuperkey,
+            kernelPatchSuperkeyAvailable = snapshot.kernelPatchSuperkeyAvailable,
+            kernelPatchSuperkeyCheckedCount = snapshot.kernelPatchSuperkeyCheckedCount,
+            kernelPatchSuperkeyHitCount = snapshot.kernelPatchSuperkeyHitCount,
+            kernelPatchSuperkeyDetail = snapshot.kernelPatchSuperkeyDetail,
             ksuSupercallAttempted = snapshot.ksuSupercallAttempted,
             ksuSupercallProbeHit = snapshot.ksuSupercallProbeHit,
             ksuSupercallBlocked = snapshot.ksuSupercallBlocked,
@@ -222,6 +227,28 @@ class NativeRootRepository(
                     append("Therefore, it can repeatedly ping __NR_supercall using only \\0 and 128 bytes of \"A\" and compare the time difference to detect KernelPatch. \n")
                     append("This problem already fix in KernelPatch commit 84169d5d6be12e589ccac81d71dcebb80b22043a \n")
                     append("Test Result: ${snapshot.kernelPatchSideChannelDetail}")
+                },
+            ),
+            NativeRootMethodResult(
+                label = "kernelpatch superkey",
+                summary = when {
+                    snapshot.kernelPatchSuperkey -> "Detected"
+                    !snapshot.kernelPatchSuperkeyAvailable -> "Unavailable"
+                    else -> "Clean"
+                },
+                outcome = when {
+                    snapshot.kernelPatchSuperkey -> NativeRootMethodOutcome.DETECTED
+                    !snapshot.kernelPatchSuperkeyAvailable -> NativeRootMethodOutcome.SUPPORT
+                    else -> NativeRootMethodOutcome.CLEAN
+                },
+                detail = buildString {
+                    append("Passes __NR_supercall an untouched anonymous page together with a length the kernel rejects before it derives a user pointer, ")
+                    append("so a stock kernel never reads arg0 and the page keeps its empty PTE.\n")
+                    append("KernelPatch reads arg0 to compare it against the superkey ahead of the syscall body, which faults the page in; mincore then reports it resident.\n")
+                    append("This is a state check, so it does not depend on timing or CPU frequency.\n")
+                    append("A positive residency hit is conclusive on any kernel version, but a negative result is only treated as Clean inside the probe's conservative faulting-uaccess scope (kernel <= 6.6). Kernel 6.7+, or an unparseable kernel release, is reported as Unavailable instead of turning a known nofault blind spot into a false Clean verdict.\n")
+                    append("A run with a failed page mapping, no control page, a resident control page, a pre-resident attempt, an incomplete attempt set, or a failed residency read is also reported as Unavailable rather than Clean.\n")
+                    append("Test Result: ${snapshot.kernelPatchSuperkeyDetail}")
                 },
             ),
             NativeRootMethodResult(
