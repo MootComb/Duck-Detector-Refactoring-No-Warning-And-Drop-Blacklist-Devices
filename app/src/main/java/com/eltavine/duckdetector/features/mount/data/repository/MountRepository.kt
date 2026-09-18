@@ -25,6 +25,10 @@ import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbe
 import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbeResult
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextMountMarker
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeManager
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeResult
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeState
 import com.eltavine.duckdetector.features.mount.domain.MountFinding
 import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
@@ -33,6 +37,11 @@ import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
 import com.eltavine.duckdetector.features.mount.domain.MountMethodResult
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextExposure
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextNamespaceAssessment
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextState
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
 import com.eltavine.duckdetector.features.virtualization.data.service.VirtualizationIsolatedProbeManager
@@ -46,6 +55,8 @@ class MountRepository(
     private val shellTmpConcealmentProbe: ShellTmpConcealmentProbe = ShellTmpConcealmentProbe(),
     private val isolatedProbeManager: VirtualizationIsolatedProbeManager =
         VirtualizationIsolatedProbeManager(context?.applicationContext),
+    private val zygoteNextProbeManager: ZygoteNextProbeManager =
+        ZygoteNextProbeManager(context?.applicationContext),
 ) {
 
     suspend fun scan(): MountReport = withContext(Dispatchers.Default) {
@@ -56,21 +67,32 @@ class MountRepository(
     }
 
     private suspend fun scanInternal(): MountReport {
-        val snapshot = nativeBridge.collectSnapshot()
+        val snapshotResult = runCatching(nativeBridge::collectSnapshot)
         val procMountView = isolatedProbeManager.collectProcMountView()
+        val zygoteNext = zygoteNextProbeManager.collect().toMountReport()
+        val snapshot = snapshotResult.getOrElse { throwable ->
+            return buildFailedReport(
+                message = throwable.message ?: "Native mount snapshot failed.",
+                procMountView = procMountView,
+                zygoteNext = zygoteNext,
+            )
+        }
         val preloadResult = sanitizePreloadResult(
             result = preloadResultProvider(),
             snapshot = snapshot,
         )
         val shellTmpResult = shellTmpConcealmentProbe.run()
         if (!snapshot.available) {
-            return MountReport.failed("Native mount snapshot was unavailable.")
-                .withProcMountView(procMountView)
+            return buildFailedReport(
+                message = "Native mount snapshot was unavailable.",
+                procMountView = procMountView,
+                zygoteNext = zygoteNext,
+            )
         }
 
-        val findings = buildFindings(snapshot, preloadResult, shellTmpResult)
+        val findings = buildFindings(snapshot, preloadResult, shellTmpResult, zygoteNext)
         val impacts = buildImpacts(snapshot, findings)
-        val methods = buildMethods(snapshot, preloadResult, shellTmpResult)
+        val methods = buildMethods(snapshot, preloadResult, shellTmpResult, zygoteNext)
 
         return MountReport(
             stage = MountStage.READY,
@@ -94,6 +116,19 @@ class MountRepository(
             findings = findings,
             impacts = impacts,
             methods = methods,
+            zygoteNext = zygoteNext,
+        ).withProcMountView(procMountView)
+    }
+
+    private fun buildFailedReport(
+        message: String,
+        procMountView: VirtualizationRemoteSnapshot,
+        zygoteNext: MountZygoteNextReport,
+    ): MountReport {
+        return MountReport.failed(message).copy(
+            findings = buildZygoteNextFindings(zygoteNext),
+            methods = listOf(buildZygoteNextMethod(zygoteNext)),
+            zygoteNext = zygoteNext,
         ).withProcMountView(procMountView)
     }
 
@@ -158,6 +193,7 @@ class MountRepository(
         snapshot: MountNativeSnapshot,
         preloadResult: EarlyMountPreloadResult,
         shellTmpResult: ShellTmpConcealmentProbeResult,
+        zygoteNext: MountZygoteNextReport,
     ): List<MountFinding> {
         val mapped = snapshot.findings.mapIndexed { index, finding ->
             MountFinding(
@@ -214,7 +250,7 @@ class MountRepository(
             }
         }
 
-        val runtimeAndInformational = mapped + informational
+        val runtimeAndInformational = mapped + informational + buildZygoteNextFindings(zygoteNext)
         val withShellTmp = runtimeAndInformational + shellTmpResult.findings
         val preloadFindings = buildPreloadFindings(preloadResult)
         val merged = mergePreloadFindings(
@@ -227,6 +263,43 @@ class MountRepository(
                 .thenBy { groupPriority(it.group) }
                 .thenBy { it.label },
         )
+    }
+
+    private fun buildZygoteNextFindings(
+        zygoteNext: MountZygoteNextReport,
+    ): List<MountFinding> {
+        return buildList {
+            if (zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.PRIVATE_ANOMALY ||
+                zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.INCONSISTENT
+            ) {
+                add(
+                    MountFinding(
+                        id = "zygote_next_namespace_anomaly",
+                        label = "Zygote next namespace anomaly",
+                        value = zygoteNext.namespaceAssessment.name,
+                        group = MountFindingGroup.CONSISTENCY,
+                        severity = MountFindingSeverity.WARNING,
+                        detail = zygoteNext.namespaceAssessmentDetail,
+                    ),
+                )
+            }
+            if (zygoteNext.exposure == MountZygoteNextExposure.ROOT_MOUNT_EXPOSURE) {
+                add(
+                    MountFinding(
+                        id = "zygote_next_root_mount_exposure",
+                        label = "Root mount exposure",
+                        value = "ROOT_MOUNT_EXPOSURE",
+                        group = MountFindingGroup.RUNTIME,
+                        severity = MountFindingSeverity.DANGER,
+                        detail = zygoteNext.dangerousMarkers.joinToString("\n") { marker ->
+                            "${marker.labels.joinToString("+")}: ${marker.mountPoint} " +
+                                "[${marker.fileSystemType}; root=${marker.mountRoot}; source=${marker.source}]"
+                        },
+                        detailMonospace = true,
+                    ),
+                )
+            }
+        }
     }
 
     private fun buildImpacts(
@@ -295,6 +368,7 @@ class MountRepository(
         snapshot: MountNativeSnapshot,
         preloadResult: EarlyMountPreloadResult,
         shellTmpResult: ShellTmpConcealmentProbeResult,
+        zygoteNext: MountZygoteNextReport,
     ): List<MountMethodResult> {
         val pathDanger = listOf(
             snapshot.busyboxDetected,
@@ -342,6 +416,7 @@ class MountRepository(
                 },
                 detail = "Transparent NativeActivity launcher runs early namespace and mount checks before MainActivity starts.",
             ),
+            buildZygoteNextMethod(zygoteNext),
             MountMethodResult(
                 label = "Path probes",
                 summary = when {
@@ -447,6 +522,116 @@ class MountRepository(
                 detail = "Mount-ID and mount-root cross-checks using statx where the kernel exposes those fields.",
             ),
         )
+    }
+
+    private fun buildZygoteNextMethod(
+        zygoteNext: MountZygoteNextReport,
+    ): MountMethodResult {
+        return MountMethodResult(
+            label = "Zygote next mount view",
+            summary = when (zygoteNext.state) {
+                MountZygoteNextState.PENDING -> "Pending"
+                MountZygoteNextState.UNSUPPORTED -> "Requires Android 17"
+                MountZygoteNextState.UNAVAILABLE -> "Unavailable"
+                MountZygoteNextState.READY -> when {
+                    zygoteNext.exposure == MountZygoteNextExposure.ROOT_MOUNT_EXPOSURE ->
+                        "ROOT_MOUNT_EXPOSURE: ${zygoteNext.dangerousMarkers.size} root mount(s)"
+
+                    zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.PRIVATE_ANOMALY ->
+                        "Private namespace anomaly"
+
+                    zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.INCONSISTENT ->
+                        "Evidence inconsistent"
+
+                    !zygoteNext.hasInitNamespaceCoverage -> "Coverage unverified"
+                    else -> "Clean"
+                }
+            },
+            outcome = when (zygoteNext.state) {
+                MountZygoteNextState.PENDING,
+                MountZygoteNextState.UNSUPPORTED,
+                MountZygoteNextState.UNAVAILABLE -> MountMethodOutcome.SUPPORT
+
+                MountZygoteNextState.READY -> when {
+                    zygoteNext.leakDetected -> MountMethodOutcome.DANGER
+                    zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.PRIVATE_ANOMALY ||
+                        zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.INCONSISTENT -> MountMethodOutcome.WARNING
+
+                    !zygoteNext.hasInitNamespaceCoverage -> MountMethodOutcome.SUPPORT
+                    else -> MountMethodOutcome.CLEAN
+                }
+            },
+            detail = buildZygoteNextMethodDetail(zygoteNext),
+        )
+    }
+
+    private fun ZygoteNextProbeResult.toMountReport(): MountZygoteNextReport {
+        return MountZygoteNextReport(
+            state = when (state) {
+                ZygoteNextProbeState.UNSUPPORTED -> MountZygoteNextState.UNSUPPORTED
+                ZygoteNextProbeState.UNAVAILABLE -> MountZygoteNextState.UNAVAILABLE
+                ZygoteNextProbeState.READY -> MountZygoteNextState.READY
+            },
+            sdkInt = sdkInt,
+            mainNamespaceInode = mainProcess.mountNamespaceInode,
+            mainUid = mainProcess.uid,
+            mainPropagation = mainProcess.rootPropagation,
+            mainRootMountId = mainProcess.rootMountId,
+            mainMinimumMountId = mainProcess.minimumMountId,
+            mainMaximumMountId = mainProcess.maximumMountId,
+            mainMountCount = mainProcess.mountCount,
+            mainMountIdsByPoint = mainProcess.mountIdsByPoint,
+            mainMarkers = mainProcess.markers.map { it.toMountMarker() },
+            isolatedNamespaceInode = isolatedProcess.mountNamespaceInode,
+            isolatedParentPid = isolatedProcess.parentPid,
+            isolatedUid = isolatedProcess.uid,
+            isolatedPropagation = isolatedProcess.rootPropagation,
+            isolatedRootMountId = isolatedProcess.rootMountId,
+            isolatedMinimumMountId = isolatedProcess.minimumMountId,
+            isolatedMaximumMountId = isolatedProcess.maximumMountId,
+            isolatedMountCount = isolatedProcess.mountCount,
+            isolatedMountIdsByPoint = isolatedProcess.mountIdsByPoint,
+            isolatedMarkers = isolatedProcess.markers.map { it.toMountMarker() },
+            errorDetail = errorDetail,
+        )
+    }
+
+    private fun ZygoteNextMountMarker.toMountMarker(): MountZygoteNextMarker {
+        return MountZygoteNextMarker(
+            labels = labels,
+            mountPoint = mountPoint,
+            mountRoot = mountRoot,
+            fileSystemType = fileSystemType,
+            source = source,
+            rawLine = rawLine,
+        )
+    }
+
+    private fun buildZygoteNextMethodDetail(report: MountZygoteNextReport): String {
+        return when (report.state) {
+            MountZygoteNextState.PENDING -> "Waiting for the Android 17 native isolated service."
+            MountZygoteNextState.UNSUPPORTED,
+            MountZygoteNextState.UNAVAILABLE -> report.errorDetail
+
+            MountZygoteNextState.READY -> buildString {
+                append("Compares the classic app mount view with an Android 17 zygote_next native isolated process. ")
+                append(report.namespaceAssessmentDetail)
+                append(' ')
+                append("main={propagation=")
+                append(report.mainPropagation.ifBlank { "unclassified" })
+                append(", mounts=${report.mainMountCount}, ids=")
+                append(report.mainMinimumMountId)
+                append("..")
+                append(report.mainMaximumMountId)
+                append("}; isolated={propagation=")
+                append(report.isolatedPropagation.ifBlank { "unclassified" })
+                append(", mounts=${report.isolatedMountCount}, ids=")
+                append(report.isolatedMinimumMountId)
+                append("..")
+                append(report.isolatedMaximumMountId)
+                append("}. Shared propagation plus lower root/minimum and anchor mount IDs is the stock route signature; root-managed mount records are the direct exposure signal.")
+            }
+        }
     }
 
     private fun shouldRenderMonospace(finding: MountNativeFinding): Boolean {
