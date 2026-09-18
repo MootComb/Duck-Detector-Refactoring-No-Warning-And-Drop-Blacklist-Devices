@@ -119,6 +119,26 @@ namespace ducktee::trickystore {
                 ducktee::common::SyscallBackend::Asm,
         };
 
+        class ScopedThreadAffinityRestore {
+        public:
+            ScopedThreadAffinityRestore() = default;
+            ScopedThreadAffinityRestore(const ScopedThreadAffinityRestore &) = delete;
+            ScopedThreadAffinityRestore &operator=(const ScopedThreadAffinityRestore &) = delete;
+
+            ~ScopedThreadAffinityRestore() {
+                if (armed_) {
+                    (void) ducktee::common::restore_current_thread_affinity();
+                }
+            }
+
+            void arm(bool affinity_bound) {
+                armed_ = affinity_bound;
+            }
+
+        private:
+            bool armed_ = false;
+        };
+
         struct IoctlBackendObservation {
             ducktee::common::SyscallBackend backend = ducktee::common::SyscallBackend::Libc;
             long result = -1;
@@ -854,8 +874,10 @@ namespace ducktee::trickystore {
 
         MethodSnapshot run_single_ioctl_honeypot_probe(const int attempt) {
             MethodSnapshot snapshot;
+            ScopedThreadAffinityRestore affinity_restore;
             ducktee::common::LocalTimerSelection timer;
             (void) ducktee::common::select_preferred_local_timer(true, &timer);
+            affinity_restore.arm(timer.affinity_status == "bound_cpu0");
             snapshot.timer_source = timer.source_label;
             snapshot.timer_fallback_reason = timer.fallback_reason;
             snapshot.affinity_status = timer.affinity_status;

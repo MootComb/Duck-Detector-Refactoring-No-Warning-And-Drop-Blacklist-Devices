@@ -45,6 +45,7 @@ set(CUSTOM_ROM_SOURCES
 )
 
 set(KERNEL_CHECK_SOURCES
+    kernelcheck/arm64_cpu_identity_probe.cpp
     kernelcheck/native_bridge.cpp
 )
 

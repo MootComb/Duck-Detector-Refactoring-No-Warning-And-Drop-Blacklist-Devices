@@ -123,6 +123,13 @@ Java_com_eltavine_duckdetector_features_tee_data_native_TeeRegisterTimerNativeBr
     return ducktee::common::bind_current_thread_to_cpu0() ? JNI_TRUE : JNI_FALSE;
 }
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_eltavine_duckdetector_features_tee_data_native_TeeRegisterTimerNativeBridge_nativeRestoreCurrentThreadAffinity(
+        JNIEnv *,
+        jobject) {
+    return ducktee::common::restore_current_thread_affinity() ? JNI_TRUE : JNI_FALSE;
+}
+
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_eltavine_duckdetector_features_tee_data_native_TeeRegisterTimerNativeBridge_nativeSelectPreferredTimer(
         JNIEnv *env,

@@ -25,7 +25,7 @@ class UpdateManifestParserTest {
     private val parser = UpdateManifestParser()
 
     @Test
-    fun `parses a valid master Nightly manifest`() {
+    fun `parses a valid legacy master Nightly manifest`() {
         val manifest = parser.parse(validUpdateManifestJson())
 
         assertEquals(1, manifest.schemaVersion)
@@ -34,6 +34,20 @@ class UpdateManifestParserTest {
         assertEquals(TEST_HEAD_SHA, manifest.commit.sha)
         assertEquals(500, manifest.versionCode)
         assertEquals("Duck.Detector-test.apk", manifest.apk.name)
+    }
+
+    @Test
+    fun `parses a valid main Nightly manifest`() {
+        val manifest = parser.parse(validUpdateManifestJson(branch = "main"))
+
+        assertEquals("main", manifest.branch)
+    }
+
+    @Test
+    fun `rejects an unexpected Nightly branch`() {
+        assertThrows(UpdateManifestValidationException::class.java) {
+            parser.parse(validUpdateManifestJson(branch = "development"))
+        }
     }
 
     @Test

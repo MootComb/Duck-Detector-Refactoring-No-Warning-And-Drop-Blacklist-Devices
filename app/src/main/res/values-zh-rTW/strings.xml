@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">建置雜湊：%1$s</string>
     <string name="about_copy_toast">建置資訊已複製</string>
     <string name="update_settings_label">檢查更新</string>
-    <string name="update_status_idle">冷啟動後會檢查 GitHub Master Nightly；輕觸可立即檢查</string>
+    <string name="update_status_idle">冷啟動後會檢查 GitHub Main Nightly；輕觸可立即檢查</string>
     <string name="update_status_checking">正在檢查 GitHub…</string>
     <string name="update_status_current">目前已是最新 Nightly 建置</string>
     <string name="update_status_available">有新的 Nightly 建置；輕觸查看詳情</string>

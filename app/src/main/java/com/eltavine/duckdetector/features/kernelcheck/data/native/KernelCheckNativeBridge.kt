@@ -57,6 +57,12 @@ class KernelCheckNativeBridge {
             suspiciousCmdline = entries.firstOrNull { it.first == "CMDLINE" }?.second == "1",
             kptrExposed = entries.firstOrNull { it.first == "KPTR" }?.second == "1",
             findings = entries.filter { it.first == "FINDING" }.map { it.second.decodeValue() },
+            cpuIdentityStatus = Arm64CpuIdentityPayloadCodec.parseStatus(
+                entries.firstOrNull { it.first == "CPU_IDENTITY_STATUS" }?.second,
+            ),
+            cpuIdentityObservations = entries
+                .filter { it.first == "CPU_IDENTITY" }
+                .mapNotNull { Arm64CpuIdentityPayloadCodec.parseObservation(it.second) },
         )
     }
 

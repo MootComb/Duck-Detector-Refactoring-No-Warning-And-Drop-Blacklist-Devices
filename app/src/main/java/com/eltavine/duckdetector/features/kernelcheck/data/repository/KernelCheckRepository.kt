@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.kernelcheck.data.repository
 
 import com.eltavine.duckdetector.features.kernelcheck.data.native.KernelCheckNativeBridge
 import com.eltavine.duckdetector.features.kernelcheck.data.native.KernelCheckNativeSnapshot
+import com.eltavine.duckdetector.features.kernelcheck.data.rules.Arm64CpuIdentityConsistencyEvaluator
 import com.eltavine.duckdetector.features.kernelcheck.data.utils.KernelIdentityConsistencyUtils
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
@@ -38,6 +39,8 @@ class KernelCheckRepository(
     private val nativeBridge: KernelCheckNativeBridge = KernelCheckNativeBridge(),
     private val identityConsistencyUtils: KernelIdentityConsistencyUtils =
         KernelIdentityConsistencyUtils(),
+    private val cpuIdentityEvaluator: Arm64CpuIdentityConsistencyEvaluator =
+        Arm64CpuIdentityConsistencyEvaluator(),
 ) {
 
     suspend fun scan(): KernelCheckReport = withContext(Dispatchers.IO) {
@@ -172,6 +175,12 @@ class KernelCheckRepository(
             dangerFindings += identityMismatch
         }
 
+        val cpuIdentityAssessment = cpuIdentityEvaluator.evaluate(
+            status = nativeSnapshot.cpuIdentityStatus,
+            observations = nativeSnapshot.cpuIdentityObservations,
+        )
+        cpuIdentityAssessment.finding?.let(dangerFindings::add)
+
         val cmdlineMatches = nativeSnapshot.findings.details("CMDLINE|CRITICAL|")
             .ifEmpty { detectCriticalCmdlineFallback(procCmdline) }
         if (cmdlineMatches.isNotEmpty()) {
@@ -214,6 +223,7 @@ class KernelCheckRepository(
             cveAssessment = cveAssessment,
             nativeAvailable = nativeSnapshot.available,
             comparedIdentityFields = identityConsistencyUtils.comparedFields(identityReads),
+            cpuIdentityMethod = cpuIdentityAssessment.method,
         )
 
         return KernelCheckReport(
@@ -258,6 +268,7 @@ class KernelCheckRepository(
         cveAssessment: CvePatchAssessment,
         nativeAvailable: Boolean,
         comparedIdentityFields: List<Pair<KernelIdentityField, List<KernelIdentityRead>>>,
+        cpuIdentityMethod: KernelCheckMethodResult,
     ): List<KernelCheckMethodResult> {
         val dangerById = dangerFindings.associateBy { it.id }
         val infoById = infoFindings.associateBy { it.id }
@@ -274,6 +285,7 @@ class KernelCheckRepository(
                 dangerById[KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID],
                 comparedIdentityFields,
             ),
+            cpuIdentityMethod,
             buildNativeMethod(
                 "cmdlineCheck",
                 dangerById["suspicious_cmdline"],

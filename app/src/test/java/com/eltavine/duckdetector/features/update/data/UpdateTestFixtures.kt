@@ -26,13 +26,14 @@ internal fun validUpdateManifestJson(
     versionCode: Int = 500,
     commitSha: String = TEST_HEAD_SHA,
     builtAtUtc: String = "2026-08-08T12:30:00Z",
+    branch: String = "master",
     downloadUrl: String =
         "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/nightly/Duck.Detector-test.apk",
 ): String {
     return JSONObject()
         .put("schemaVersion", 1)
         .put("channel", "nightly")
-        .put("branch", "master")
+        .put("branch", branch)
         .put("versionName", "2026.08.08-${commitSha.take(12)}")
         .put("versionCode", versionCode)
         .put(

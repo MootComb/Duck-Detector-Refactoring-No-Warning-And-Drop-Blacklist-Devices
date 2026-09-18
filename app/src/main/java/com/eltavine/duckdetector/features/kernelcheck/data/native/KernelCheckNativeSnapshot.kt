@@ -27,4 +27,6 @@ data class KernelCheckNativeSnapshot(
     val suspiciousCmdline: Boolean = false,
     val kptrExposed: Boolean = false,
     val findings: List<String> = emptyList(),
+    val cpuIdentityStatus: Arm64CpuIdentityProbeStatus = Arm64CpuIdentityProbeStatus.UNKNOWN,
+    val cpuIdentityObservations: List<Arm64CpuIdentityObservation> = emptyList(),
 )

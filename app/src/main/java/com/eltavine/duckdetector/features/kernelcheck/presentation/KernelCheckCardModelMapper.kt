@@ -87,6 +87,9 @@ class KernelCheckCardModelMapper {
                 report.errorMessage ?: "Kernel Check failed before evidence could be assembled."
 
             KernelCheckStage.READY -> when {
+                report.hasCpuIdentityMismatch ->
+                    "A logical CPU's cached ARM64 identity disagrees with MIDR_EL1 observed while pinned to that same CPU, which is a high-confidence sign of runtime CPU identity rewriting."
+
                 report.hasIdentityMismatch ->
                     "The kernel identity read through uname disagrees with the identity exported through /proc or with the value captured when this app's runtime started, which points at active kernel version spoofing."
 
@@ -318,6 +321,10 @@ class KernelCheckCardModelMapper {
                         text = "The kernel identity differs between the sources that export it, so the version this device reports to apps is being rewritten rather than simply being unusual.",
                         status = DetectorStatus.danger(),
                     ).takeIf { report.hasIdentityMismatch },
+                    KernelCheckImpactItemModel(
+                        text = "A same-CPU cached/MIDR_EL1 mismatch indicates that the kernel's cached processor identity was changed independently of its ARM64 register-emulation path.",
+                        status = DetectorStatus.danger(),
+                    ).takeIf { report.hasCpuIdentityMismatch },
                     KernelCheckImpactItemModel(
                         text = "Modified or community-built kernels can change trust posture, boot state, and device integrity behavior.",
                         status = DetectorStatus.danger(),
@@ -633,6 +640,7 @@ class KernelCheckCardModelMapper {
             "customKernel",
             "kernelVersionCheck",
             "identityConsistency",
+            "arm64CpuIdentity",
             "cmdlineCheck",
             "cvePatchCheck",
             "kptrRestrict",

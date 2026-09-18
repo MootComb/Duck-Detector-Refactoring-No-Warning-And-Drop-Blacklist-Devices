@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">Mã băm build: %1$s</string>
     <string name="about_copy_toast">Đã sao chép thông tin build</string>
     <string name="update_settings_label">Kiểm tra cập nhật</string>
-    <string name="update_status_idle">Kiểm tra GitHub Master Nightly sau khi khởi động lạnh; chạm để kiểm tra ngay</string>
+    <string name="update_status_idle">Kiểm tra GitHub Main Nightly sau khi khởi động lạnh; chạm để kiểm tra ngay</string>
     <string name="update_status_checking">Đang kiểm tra GitHub…</string>
     <string name="update_status_current">Bạn đang dùng bản Nightly mới nhất</string>
     <string name="update_status_available">Có bản Nightly mới; chạm để xem chi tiết</string>

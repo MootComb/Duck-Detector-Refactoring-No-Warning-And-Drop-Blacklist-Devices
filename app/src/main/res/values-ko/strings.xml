@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">빌드 해시: %1$s</string>
     <string name="about_copy_toast">빌드 정보가 복사되었습니다</string>
     <string name="update_settings_label">업데이트 확인</string>
-    <string name="update_status_idle">콜드 스타트 후 GitHub Master Nightly를 확인합니다. 지금 확인하려면 탭하세요</string>
+    <string name="update_status_idle">콜드 스타트 후 GitHub Main Nightly를 확인합니다. 지금 확인하려면 탭하세요</string>
     <string name="update_status_checking">GitHub 확인 중…</string>
     <string name="update_status_current">최신 Nightly 빌드입니다</string>
     <string name="update_status_available">새 Nightly 빌드가 있습니다. 자세히 보려면 탭하세요</string>

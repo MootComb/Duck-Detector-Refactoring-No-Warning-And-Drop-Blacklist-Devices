@@ -16,6 +16,8 @@
 
 #include <jni.h>
 
+#include "kernelcheck/arm64_cpu_identity_probe.h"
+
 #include <algorithm>
 #include <cctype>
 #include <cstring>
@@ -46,6 +48,7 @@ namespace {
         bool suspicious_cmdline = false;
         bool kptr_exposed = false;
         std::vector<std::string> findings;
+        duckdetector::kernelcheck::CpuIdentityProbeResult cpu_identity;
     };
 
     constexpr CmdlineCheck kCmdlineChecks[] = {
@@ -230,6 +233,7 @@ namespace {
         read_uts_identity(snapshot);
         check_cmdline(snapshot);
         check_kptr(snapshot);
+        snapshot.cpu_identity = duckdetector::kernelcheck::collect_arm64_cpu_identity();
         return snapshot;
     }
 
@@ -256,6 +260,7 @@ Java_com_eltavine_duckdetector_features_kernelcheck_data_native_KernelCheckNativ
     output << "SYSCTL_VERSION=" << escape_value(snapshot.sysctl_version) << "\n";
     output << "CMDLINE=" << (snapshot.suspicious_cmdline ? "1" : "0") << "\n";
     output << "KPTR=" << (snapshot.kptr_exposed ? "1" : "0") << "\n";
+    output << duckdetector::kernelcheck::encode_arm64_cpu_identity(snapshot.cpu_identity);
 
     for (const std::string &finding: snapshot.findings) {
         output << "FINDING=" << escape_value(finding) << "\n";

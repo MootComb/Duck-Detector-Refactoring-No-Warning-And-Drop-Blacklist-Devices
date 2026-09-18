@@ -50,7 +50,7 @@ class TimingSideChannelProbe(
         }
         fun describeFailure(throwable: Throwable): String = binderClient.describeThrowable(throwable)
 
-        return runCatching {
+        val result = runCatching {
             val sessionResult = binderClient.openSession(useStrongBox = useStrongBox)
             gatewayFailures = sessionResult.capturedFailures
             val session = sessionResult.session
@@ -226,6 +226,8 @@ class TimingSideChannelProbe(
                 detail = describeFailure(throwable),
             )
         }
+        registerTimerBridge.restoreCurrentThreadAffinity()
+        return result
     }
 
     private fun warmUpPair(

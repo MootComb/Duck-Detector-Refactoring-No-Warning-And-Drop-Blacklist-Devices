@@ -38,6 +38,8 @@ class KernelCheckNativeBridgeTest {
             SYSCTL_VERSION=#1 SMP PREEMPT Fri Aug 2 10:00:00 UTC 2024
             CMDLINE=0
             KPTR=0
+            CPU_IDENTITY_STATUS=COMPLETED
+            CPU_IDENTITY=0${'\t'}1${'\t'}SYSFS${'\t'}410fd050${'\t'}410fd050
             FINDING=CMDLINE|GOOD|verifiedbootstate=green (verified)
             """.trimIndent(),
         )
@@ -49,6 +51,8 @@ class KernelCheckNativeBridgeTest {
         assertEquals("#1 SMP PREEMPT Fri Aug 2 10:00:00 UTC 2024", snapshot.sysctlVersion)
         assertFalse(snapshot.suspiciousCmdline)
         assertEquals(1, snapshot.findings.size)
+        assertEquals(Arm64CpuIdentityProbeStatus.COMPLETED, snapshot.cpuIdentityStatus)
+        assertEquals(1, snapshot.cpuIdentityObservations.size)
     }
 
     @Test

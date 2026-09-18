@@ -48,6 +48,13 @@ namespace ducktee::common {
 #if defined(__aarch64__)
         extern "C" unsigned long long tee_arm64_read_cntvct();
         extern "C" unsigned long long tee_arm64_read_cntfrq();
+
+        struct SavedThreadAffinity {
+            cpu_set_t mask{};
+            unsigned int bind_depth = 0;
+        };
+
+        thread_local SavedThreadAffinity g_saved_thread_affinity;
 #endif
 
         SyscallCallResult make_unavailable_result() {
@@ -355,10 +362,47 @@ namespace ducktee::common {
 #else
         const auto tid = getpid();
 #endif
-        cpu_set_t mask;
-        CPU_ZERO(&mask);
-        CPU_SET(0, &mask);
-        return sched_setaffinity(tid, sizeof(mask), &mask) == 0;
+        cpu_set_t cpu0_mask;
+        CPU_ZERO(&cpu0_mask);
+        CPU_SET(0, &cpu0_mask);
+
+        if (g_saved_thread_affinity.bind_depth == 0 &&
+            sched_getaffinity(tid, sizeof(g_saved_thread_affinity.mask),
+                              &g_saved_thread_affinity.mask) != 0) {
+            return false;
+        }
+        if (sched_setaffinity(tid, sizeof(cpu0_mask), &cpu0_mask) != 0) {
+            return false;
+        }
+        ++g_saved_thread_affinity.bind_depth;
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    bool restore_current_thread_affinity() {
+#if defined(__aarch64__)
+        if (g_saved_thread_affinity.bind_depth == 0) {
+            return false;
+        }
+        if (g_saved_thread_affinity.bind_depth > 1) {
+            --g_saved_thread_affinity.bind_depth;
+            return true;
+        }
+
+#if defined(__NR_gettid)
+        const auto tid = static_cast<pid_t>(syscall(__NR_gettid));
+#else
+        const auto tid = getpid();
+#endif
+        if (sched_setaffinity(tid, sizeof(g_saved_thread_affinity.mask),
+                              &g_saved_thread_affinity.mask) != 0) {
+            return false;
+        }
+        g_saved_thread_affinity.bind_depth = 0;
+        CPU_ZERO(&g_saved_thread_affinity.mask);
+        return true;
 #else
         return false;
 #endif
@@ -386,10 +430,6 @@ namespace ducktee::common {
         if (arm64_cntvct_self_check(&failure_reason)) {
             out->kind = LocalTimerKind::Arm64Cntvct;
             out->source_label = "arm64_cntvct";
-            if (affinity_attempted && !affinity_ok) {
-                affinity_ok = bind_current_thread_to_cpu0();
-                out->affinity_status = affinity_ok ? "bound_cpu0" : "bind_failed";
-            }
             return true;
         }
 

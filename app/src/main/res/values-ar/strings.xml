@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">مُعرف البناء: %1$s</string>
     <string name="about_copy_toast">تم نسخ معلومات البناء</string>
     <string name="update_settings_label">التحقق من التحديثات</string>
-    <string name="update_status_idle">يتم فحص GitHub Master Nightly بعد التشغيل البارد؛ اضغط للفحص الآن</string>
+    <string name="update_status_idle">يتم فحص GitHub Main Nightly بعد التشغيل البارد؛ اضغط للفحص الآن</string>
     <string name="update_status_checking">جارٍ التحقق من GitHub…</string>
     <string name="update_status_current">لديك أحدث إصدار Nightly</string>
     <string name="update_status_available">يتوفر إصدار Nightly أحدث؛ اضغط للتفاصيل</string>

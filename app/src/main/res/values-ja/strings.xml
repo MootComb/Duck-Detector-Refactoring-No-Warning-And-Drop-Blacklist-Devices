@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">ビルドハッシュ: %1$s</string>
     <string name="about_copy_toast">ビルド情報をコピーしました</string>
     <string name="update_settings_label">更新を確認</string>
-    <string name="update_status_idle">コールドスタート後に GitHub Master Nightly を確認します。タップして今すぐ確認</string>
+    <string name="update_status_idle">コールドスタート後に GitHub Main Nightly を確認します。タップして今すぐ確認</string>
     <string name="update_status_checking">GitHub を確認しています…</string>
     <string name="update_status_current">最新の Nightly ビルドです</string>
     <string name="update_status_available">新しい Nightly ビルドがあります。タップして詳細を表示</string>

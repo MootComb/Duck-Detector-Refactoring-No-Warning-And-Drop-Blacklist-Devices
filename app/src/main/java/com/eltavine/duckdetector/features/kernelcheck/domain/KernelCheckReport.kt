@@ -123,6 +123,9 @@ data class KernelCheckReport(
     val hasIdentityMismatch: Boolean
         get() = dangerFindings.any { it.id == IDENTITY_MISMATCH_FINDING_ID }
 
+    val hasCpuIdentityMismatch: Boolean
+        get() = dangerFindings.any { it.id == CPU_IDENTITY_MISMATCH_FINDING_ID }
+
     val hasInfoIndicators: Boolean
         get() = infoFindings.isNotEmpty()
 
@@ -135,6 +138,7 @@ data class KernelCheckReport(
 
     companion object {
         const val IDENTITY_MISMATCH_FINDING_ID = "kernel_identity_mismatch"
+        const val CPU_IDENTITY_MISMATCH_FINDING_ID = "arm64_cpu_identity_mismatch"
 
         private val IDENTITY_FINDING_IDS = setOf(
             "emoji",
@@ -145,6 +149,7 @@ data class KernelCheckReport(
             "custom_kernel",
             "non_release_kernel_version",
             IDENTITY_MISMATCH_FINDING_ID,
+            CPU_IDENTITY_MISMATCH_FINDING_ID,
         )
 
         private val BOOT_FINDING_IDS = setOf(

@@ -87,6 +87,8 @@ namespace ducktee::common {
 
     bool bind_current_thread_to_cpu0();
 
+    bool restore_current_thread_affinity();
+
     bool select_preferred_local_timer(
             bool request_cpu0_affinity,
             LocalTimerSelection *out

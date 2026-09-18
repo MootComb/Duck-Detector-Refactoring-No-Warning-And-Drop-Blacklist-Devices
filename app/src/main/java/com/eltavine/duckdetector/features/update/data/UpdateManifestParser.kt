@@ -40,7 +40,7 @@ class UpdateManifestParser {
             throw UpdateManifestValidationException("Unexpected update channel: $channel")
         }
         val branch = root.requireNonBlankString("branch")
-        if (branch != EXPECTED_BRANCH) {
+        if (branch !in EXPECTED_BRANCHES) {
             throw UpdateManifestValidationException("Unexpected update branch: $branch")
         }
 
@@ -109,7 +109,7 @@ class UpdateManifestParser {
     private companion object {
         private const val SUPPORTED_SCHEMA_VERSION = 1
         private const val EXPECTED_CHANNEL = "nightly"
-        private const val EXPECTED_BRANCH = "master"
+        private val EXPECTED_BRANCHES = setOf("main", "master")
         private const val EXPECTED_DOWNLOAD_HOST = "github.com"
         private const val EXPECTED_DOWNLOAD_PATH_PREFIX =
             "/eltavine/Duck-Detector-Refactoring/releases/download/nightly/"

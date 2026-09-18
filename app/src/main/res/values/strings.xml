@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">Build Hash: %1$s</string>
     <string name="about_copy_toast">Build info copied</string>
     <string name="update_settings_label">Check for updates</string>
-    <string name="update_status_idle">Checks Master Nightly on GitHub after a cold start; tap to check now</string>
+    <string name="update_status_idle">Checks Main Nightly on GitHub after a cold start; tap to check now</string>
     <string name="update_status_checking">Checking GitHub…</string>
     <string name="update_status_current">You have the latest Nightly build</string>
     <string name="update_status_available">A newer Nightly build is available; tap for details</string>

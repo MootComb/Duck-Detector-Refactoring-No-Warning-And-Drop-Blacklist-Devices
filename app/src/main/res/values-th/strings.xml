@@ -61,7 +61,7 @@ limitations under the License.
     <string name="about_clipboard_build_hash_line">แฮชบิลด์: %1$s</string>
     <string name="about_copy_toast">คัดลอกข้อมูลบิลด์แล้ว</string>
     <string name="update_settings_label">ตรวจสอบอัปเดต</string>
-    <string name="update_status_idle">ตรวจสอบ GitHub Master Nightly หลัง cold start; แตะเพื่อตรวจตอนนี้</string>
+    <string name="update_status_idle">ตรวจสอบ GitHub Main Nightly หลัง cold start; แตะเพื่อตรวจตอนนี้</string>
     <string name="update_status_checking">กำลังตรวจสอบ GitHub…</string>
     <string name="update_status_current">คุณใช้ Nightly รุ่นล่าสุดแล้ว</string>
     <string name="update_status_available">มี Nightly รุ่นใหม่; แตะเพื่อดูรายละเอียด</string>

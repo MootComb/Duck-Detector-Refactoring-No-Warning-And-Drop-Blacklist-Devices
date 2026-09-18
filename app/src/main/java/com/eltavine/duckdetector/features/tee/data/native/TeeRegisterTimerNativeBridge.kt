@@ -47,6 +47,15 @@ class TeeRegisterTimerNativeBridge {
         }.getOrDefault(false)
     }
 
+    fun restoreCurrentThreadAffinity(): Boolean {
+        if (!nativeLoaded) {
+            return false
+        }
+        return runCatching {
+            nativeRestoreCurrentThreadAffinity()
+        }.getOrDefault(false)
+    }
+
     fun selectPreferredTimer(requestCpu0Affinity: Boolean = true): TeeRegisterTimerSelection {
         if (!nativeLoaded) {
             return TeeRegisterTimerSelection(
@@ -94,6 +103,8 @@ class TeeRegisterTimerNativeBridge {
     private external fun nativeReadRegisterTimerNs(): Long
 
     private external fun nativeBindCurrentThreadToCpu0(): Boolean
+
+    private external fun nativeRestoreCurrentThreadAffinity(): Boolean
 
     private external fun nativeSelectPreferredTimer(requestCpu0Affinity: Boolean): String
 
