@@ -15,6 +15,7 @@
  */
 
 #include "virtualization/snapshot_builder.h"
+#include "common/payload_codec.h"
 #include "virtualization/egl_probe.h"
 
 #include <dirent.h>
@@ -63,18 +64,7 @@ namespace duckdetector::virtualization {
         }
 
         std::string encode_value(const std::string &value) {
-            std::string encoded = value;
-            std::size_t pos = 0;
-            while ((pos = encoded.find('\n', pos)) != std::string::npos) {
-                encoded.replace(pos, 1, "\\n");
-                pos += 2;
-            }
-            pos = 0;
-            while ((pos = encoded.find('\r', pos)) != std::string::npos) {
-                encoded.replace(pos, 1, "\\r");
-                pos += 2;
-            }
-            return encoded;
+            return common::escape_payload_value(value);
         }
 
         bool contains_token(const std::string &text, const std::vector<std::string> &tokens) {
@@ -575,11 +565,15 @@ namespace duckdetector::virtualization {
         output << "TRANSLATION_HITS=" << snapshot.translationHitCount << '\n';
         output << "RUNTIME_HITS=" << snapshot.runtimeArtifactHitCount << '\n';
         for (const auto &finding: snapshot.findings) {
+            // The value column carries device text - a property value, an emulator device node, a
+            // mapped library path, a mount point, a driver renderer string - and a path may legally
+            // contain a tab or a newline. Escaping only the last column let such a value shift the
+            // columns after it, or end the record and turn its remainder into bogus keys.
             output << "FINDING="
-                   << finding.group << '\t'
-                   << finding.severity << '\t'
-                   << finding.label << '\t'
-                   << finding.value << '\t'
+                   << encode_value(finding.group) << '\t'
+                   << encode_value(finding.severity) << '\t'
+                   << encode_value(finding.label) << '\t'
+                   << encode_value(finding.value) << '\t'
                    << encode_value(finding.detail) << '\n';
         }
         return output.str();

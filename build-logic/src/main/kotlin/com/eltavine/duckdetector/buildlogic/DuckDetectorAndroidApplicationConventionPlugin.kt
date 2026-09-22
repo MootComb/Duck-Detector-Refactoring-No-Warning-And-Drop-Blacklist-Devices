@@ -143,10 +143,20 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 }
             }
 
-            if (lintBaseline.exists()) {
-                lint {
+            lint {
+                if (lintBaseline.exists()) {
                     baseline = lintBaseline
                 }
+
+                // Translations are contributed after the strings they cover, so a locale that has
+                // not caught up yet is a known state of this project rather than a defect. Keeping
+                // these reported but non-blocking is what lets every other lint error stay fatal and
+                // gate CI, instead of the whole check being switched off because of untranslated UI.
+                warning += setOf(
+                    "ImpliedQuantity",
+                    "MissingQuantity",
+                    "MissingTranslation",
+                )
             }
         }
 
@@ -162,6 +172,15 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 "generateGithubContributorsAsset",
                 GenerateGithubContributorsAssetTask::class.java,
             ) {
+                refreshEnabled.set(
+                    providers.gradleProperty("duckdetector.githubContributors.refresh")
+                        .map(String::toBoolean)
+                        .orElse(
+                            providers.environmentVariable("DUCKDETECTOR_GITHUB_CONTRIBUTORS_REFRESH")
+                                .map(String::toBoolean)
+                        )
+                        .orElse(false)
+                )
                 endpointUrl.set(
                     providers.gradleProperty("duckdetector.githubContributors.url")
                         .orElse(GITHUB_CONTRIBUTORS_API_URL)

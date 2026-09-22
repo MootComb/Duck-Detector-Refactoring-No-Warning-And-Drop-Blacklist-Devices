@@ -16,17 +16,38 @@
 
 package com.eltavine.duckdetector.features.tee.data.native
 
-class TeeNativeBridge {
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-    fun collectSnapshot(leafDer: ByteArray?): NativeTeeSnapshot {
-        return runCatching {
-            decodeSnapshot(
+class TeeNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    fun collectSnapshot(leafDer: ByteArray?): NativeTeeSnapshot = collector.collect(
+        // All three entry points are read together: a snapshot built from only some of them would
+        // report the unread probes as "nothing detected".
+        readPayload = {
+            RawPayloads(
                 environmentRaw = nativeCollectEnvironment(),
                 trickyRaw = nativeInspectTrickyStore(),
                 derRaw = leafDer?.let(::nativeInspectLeafDer).orEmpty(),
             )
-        }.getOrDefault(NativeTeeSnapshot())
-    }
+        },
+        parse = { payloads ->
+            decodeSnapshot(
+                environmentRaw = payloads.environmentRaw,
+                trickyRaw = payloads.trickyRaw,
+                derRaw = payloads.derRaw,
+            )
+        },
+        unavailable = { status -> NativeTeeSnapshot(collection = status) },
+    )
+
+    private data class RawPayloads(
+        val environmentRaw: String,
+        val trickyRaw: String,
+        val derRaw: String,
+    )
 
     internal fun decodeSnapshot(
         environmentRaw: String,
@@ -37,13 +58,13 @@ class TeeNativeBridge {
         val tricky = parseKeyValueLines(trickyRaw)
         val der = parseKeyValueLines(derRaw)
         return NativeTeeSnapshot(
-            tracingDetected = env["TRACING"] == "1",
+            tracingDetected = NativePayloadCodec.decodeFlag(env["TRACING"]),
             suspiciousMappings = env.filterKeys { it == "MAPPING" || it.startsWith("MAPPING_") }.values.toList(),
-            trickyStoreDetected = tricky["DETECTED"] == "1",
-            gotHookDetected = tricky["GOT_HOOK"] == "1",
-            syscallMismatchDetected = tricky["SYSCALL_MISMATCH"] == "1",
-            inlineHookDetected = tricky["INLINE_HOOK"] == "1",
-            honeypotDetected = tricky["HONEYPOT"] == "1",
+            trickyStoreDetected = NativePayloadCodec.decodeFlag(tricky["DETECTED"]),
+            gotHookDetected = NativePayloadCodec.decodeFlag(tricky["GOT_HOOK"]),
+            syscallMismatchDetected = NativePayloadCodec.decodeFlag(tricky["SYSCALL_MISMATCH"]),
+            inlineHookDetected = NativePayloadCodec.decodeFlag(tricky["INLINE_HOOK"]),
+            honeypotDetected = NativePayloadCodec.decodeFlag(tricky["HONEYPOT"]),
             trickyStoreTimerSource = tricky["TIMER_SOURCE"] ?: "unknown",
             trickyStoreTimerFallbackReason = tricky["TIMER_FALLBACK"]?.takeIf { it.isNotBlank() },
             trickyStoreAffinityStatus = tricky["AFFINITY"] ?: "not_requested",
@@ -55,8 +76,8 @@ class TeeNativeBridge {
             trickyStoreTimingMedianRatioPercent = tricky["MEDIAN_RATIO_PERCENT"]?.toIntOrNull(),
             trickyStoreMethods = tricky.filterKeys { it == "METHOD" || it.startsWith("METHOD_") }.values.toList(),
             trickyStoreDetails = tricky["DETAILS"] ?: "Native trickystore probe unavailable",
-            leafDerPrimaryDetected = der["PRIMARY"] == "1",
-            leafDerSecondaryDetected = der["SECONDARY"] == "1",
+            leafDerPrimaryDetected = NativePayloadCodec.decodeFlag(der["PRIMARY"]),
+            leafDerSecondaryDetected = NativePayloadCodec.decodeFlag(der["SECONDARY"]),
             leafDerFindings = der.filterKeys { it == "FINDING" || it.startsWith("FINDING_") }.values.toList(),
             pageSize = env["PAGE_SIZE"]?.toIntOrNull(),
             timingSummary = env["TIMING"],
@@ -71,7 +92,7 @@ class TeeNativeBridge {
                 .filter { it.isNotEmpty() && it.contains('=') }
                 .forEach { line ->
                     val key = line.substringBefore('=')
-                    val value = line.substringAfter('=')
+                    val value = NativePayloadCodec.decodeValue(line.substringAfter('='))
                     val index = indexedKeys.getOrDefault(key, 0)
                     indexedKeys[key] = index + 1
                     if (index == 0) {
@@ -88,10 +109,4 @@ class TeeNativeBridge {
     private external fun nativeInspectTrickyStore(): String
 
     private external fun nativeInspectLeafDer(leafDer: ByteArray): String
-
-    companion object {
-        init {
-            runCatching { System.loadLibrary("duckdetector") }
-        }
-    }
 }

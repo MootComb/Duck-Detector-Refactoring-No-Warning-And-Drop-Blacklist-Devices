@@ -59,7 +59,7 @@ class MountRepository(
         ZygoteNextProbeManager(context?.applicationContext),
 ) {
 
-    suspend fun scan(): MountReport = withContext(Dispatchers.Default) {
+    suspend fun scan(): MountReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->
                 MountReport.failed(throwable.message ?: "Mount scan failed.")
@@ -84,7 +84,7 @@ class MountRepository(
         val shellTmpResult = shellTmpConcealmentProbe.run()
         if (!snapshot.available) {
             return buildFailedReport(
-                message = "Native mount snapshot was unavailable.",
+                message = snapshot.collection.explain("Native mount snapshot was unavailable"),
                 procMountView = procMountView,
                 zygoteNext = zygoteNext,
             )

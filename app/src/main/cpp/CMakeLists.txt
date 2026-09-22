@@ -4,6 +4,10 @@ project("duckdetector" LANGUAGES C CXX ASM)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(COMMON_SOURCES
+    common/payload_codec.cpp
+)
+
 set(TEE_COMMON_SOURCES
     tee/common/jni_bridge.cpp
     tee/common/result_codec.cpp
@@ -164,6 +168,7 @@ elseif(ANDROID_ABI STREQUAL "x86_64")
 endif()
 
 add_library(duckdetector SHARED
+    ${COMMON_SOURCES}
     ${TEE_COMMON_SOURCES}
     ${TEE_KEYSTORE_SOURCES}
     ${TEE_TRICKYSTORE_SOURCES}
@@ -193,7 +198,11 @@ if(ipo_supported)
     set_property(TARGET duckdetector PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 endif()
 
+# Warnings stay warnings rather than errors: the probes deliberately do unusual things with
+# syscalls and raw memory, so a blanket -Werror would block builds on diagnostics that need to be
+# judged case by case. Surfacing them is the point.
 target_compile_options(duckdetector PRIVATE
+    $<$<COMPILE_LANGUAGE:C,CXX>:-Wall -Wextra>
     $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:C>>:-O2 -ffunction-sections -fdata-sections -fvisibility=hidden>
     $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CXX>>:-O2 -ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden>
 )
@@ -217,12 +226,19 @@ target_link_libraries(duckdetector
 # Android 17 native isolated services are loaded by zygote_next without ART. The framework's
 # default contract loads libmain.so and calls ANativeService_onCreate.
 add_library(main SHARED
+    ${COMMON_SOURCES}
     mount/zygotenext/native_service.cpp
 )
 
 target_compile_options(main PRIVATE
+    -Wall
+    -Wextra
     -fvisibility=hidden
     -fvisibility-inlines-hidden
+)
+
+target_include_directories(main PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(main

@@ -16,7 +16,13 @@
 
 package com.eltavine.duckdetector.features.systemproperties.data.native
 
-class SystemPropertiesNativeBridge {
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
+
+class SystemPropertiesNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
 
     fun collectSnapshot(
         propertyNames: Collection<String>,
@@ -24,9 +30,13 @@ class SystemPropertiesNativeBridge {
         if (propertyNames.isEmpty()) {
             return SystemPropertiesNativeSnapshot()
         }
-        return runCatching {
-            parse(nativeCollectSnapshot(propertyNames.distinct().sorted().toTypedArray()))
-        }.getOrDefault(SystemPropertiesNativeSnapshot())
+        return collector.collect(
+            readPayload = {
+                nativeCollectSnapshot(propertyNames.distinct().sorted().toTypedArray())
+            },
+            parse = ::parse,
+            unavailable = { status -> SystemPropertiesNativeSnapshot(collection = status) },
+        )
     }
 
     internal fun parse(
@@ -35,6 +45,8 @@ class SystemPropertiesNativeBridge {
         if (raw.isBlank()) {
             return SystemPropertiesNativeSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var available = false
         val libcProperties = linkedMapOf<String, String>()
@@ -56,7 +68,7 @@ class SystemPropertiesNativeBridge {
                 val key = line.substringBefore('=')
                 val value = line.substringAfter('=')
                 when (key) {
-                    "AVAILABLE" -> available = value != "0"
+                    "AVAILABLE" -> available = NativePayloadCodec.decodeFlag(value)
                     "PROP" -> {
                         val parts = value.split('|', limit = 2)
                         if (parts.size == 2) {
@@ -80,10 +92,10 @@ class SystemPropertiesNativeBridge {
 
                     "RAW_CMDLINE" -> rawCmdline = value.decodeValue()
                     "RAW_BOOTCONFIG" -> rawBootconfig = value.decodeValue()
-                    "PROP_AREA_AVAILABLE" -> propAreaAvailable = value != "0"
+                    "PROP_AREA_AVAILABLE" -> propAreaAvailable = NativePayloadCodec.decodeFlag(value)
                     "PROP_AREA_CONTEXTS" -> propAreaContextCount = value.toIntOrNull() ?: 0
                     "PROP_AREA_HOLES" -> propAreaHoleCount = value.toIntOrNull() ?: 0
-                    "RO_HANDLE_AVAILABLE" -> readOnlyPropertyHandleAvailable = value != "0"
+                    "RO_HANDLE_AVAILABLE" -> readOnlyPropertyHandleAvailable = NativePayloadCodec.decodeFlag(value)
                     "RO_HANDLE_CHECKED" -> readOnlyPropertyHandleCheckedCount = value.toIntOrNull() ?: 0
                     "PROP_AREA_FINDING" -> {
                         val parts = value.split('|', limit = 3)
@@ -117,16 +129,7 @@ class SystemPropertiesNativeBridge {
         )
     }
 
-    private fun String.decodeValue(): String {
-        return replace("\\n", "\n")
-            .replace("\\r", "\r")
-    }
+    private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
     private external fun nativeCollectSnapshot(propertyNames: Array<String>): String
-
-    companion object {
-        init {
-            runCatching { System.loadLibrary("duckdetector") }
-        }
-    }
 }

@@ -1862,6 +1862,94 @@ class TeeReportReducerTest {
     }
 
     @Test
+    fun `strongbox keeps availability visible when an informational note is present`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                strongBox = StrongBoxBehaviorResult(
+                    requested = true,
+                    advertised = true,
+                    available = true,
+                    keyInfoLevel = "StrongBox",
+                    detail = "note",
+                    warnings = listOf(
+                        "StrongBox signing returned in 1900us, under the 2000us this probe expects of a discrete secure element.",
+                        "StrongBox accepted RSA-4096, which is atypical for current hardware-backed implementations.",
+                    ),
+                ),
+            ),
+        )
+
+        val item = report.sections.single { it.title == "Checks" }.items
+            .single { it.title == "StrongBox" }
+        assertTrue(item.body.contains("Available"))
+        assertTrue(item.body.contains("StrongBox"))
+        assertTrue(item.body.contains("1900us"))
+        // Showing only the first note used to drop the rest.
+        assertTrue(item.body.contains("RSA-4096"))
+        assertEquals(TeeSignalLevel.INFO, item.level)
+    }
+
+    @Test
+    fun `strongbox informational notes do not raise suspicion on their own`() {
+        val onlyNotes = StrongBoxBehaviorResult(
+            requested = true,
+            advertised = true,
+            available = true,
+            detail = "note",
+            warnings = listOf("StrongBox signing returned in 1900us, under the 2000us this probe expects of a discrete secure element."),
+        )
+        val hardFailure = StrongBoxBehaviorResult(
+            requested = true,
+            advertised = true,
+            available = true,
+            detail = "note",
+            hardFailures = listOf("StrongBox key generation succeeded, but attestation tier came back as TEE."),
+        )
+
+        assertFalse(onlyNotes.suspicious)
+        assertTrue(hardFailure.suspicious)
+    }
+
+    @Test
+    fun `strongbox names why it could not confirm instead of only reporting not confirmed`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                strongBox = StrongBoxBehaviorResult(
+                    requested = true,
+                    advertised = true,
+                    available = false,
+                    detail = "note",
+                    keyInfoUnavailableDetail = "StrongBox reported itself unavailable during key generation.",
+                ),
+            ),
+        )
+
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "StrongBox" &&
+                    it.body.contains("Not confirmed") &&
+                    it.body.contains("reported itself unavailable")
+        })
+    }
+
+    @Test
+    fun `strongbox says only not confirmed when no reason was recorded`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                strongBox = StrongBoxBehaviorResult(
+                    requested = true,
+                    advertised = true,
+                    available = false,
+                    detail = "note",
+                ),
+            ),
+        )
+
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "StrongBox" && it.body.contains("Not confirmed")
+        })
+    }
+
+    @Test
     fun `strongbox heuristic warning stays informational`() {
         val report = reducer.reduce(
             baseArtifacts(

@@ -112,7 +112,7 @@ class VirtualizationRepository(
     },
 ) {
 
-    suspend fun scan(): VirtualizationReport = withContext(Dispatchers.Default) {
+    suspend fun scan(): VirtualizationReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->
                 VirtualizationReport.failed(throwable.message ?: "Virtualization scan failed.")
@@ -844,11 +844,12 @@ class VirtualizationRepository(
                 summary = when {
                     hostAppResult.findings.isNotEmpty() -> "${hostAppResult.findings.size} corroborating app(s)"
                     hostAppResult.packageVisibility == InstalledPackageVisibility.RESTRICTED -> "Scoped"
+                    hostAppResult.packageVisibility == InstalledPackageVisibility.UNKNOWN -> "Unavailable"
                     else -> "Clean"
                 },
                 outcome = when {
                     hostAppResult.findings.isNotEmpty() -> VirtualizationMethodOutcome.INFO
-                    hostAppResult.packageVisibility == InstalledPackageVisibility.RESTRICTED -> VirtualizationMethodOutcome.SUPPORT
+                    hostAppResult.packageVisibility != InstalledPackageVisibility.FULL -> VirtualizationMethodOutcome.SUPPORT
                     else -> VirtualizationMethodOutcome.CLEAN
                 },
                 detail = hostAppResult.issues.joinToString(separator = "\n").ifBlank {

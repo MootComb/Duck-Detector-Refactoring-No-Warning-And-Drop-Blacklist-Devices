@@ -16,23 +16,32 @@
 
 package com.eltavine.duckdetector.features.zygisk.data.native
 
-class ZygiskNativeBridge {
+import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
+
+class ZygiskNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    private val nativeLoaded: Boolean
+        get() = DuckDetectorNativeLibrary.isLoaded
 
     fun isNativeAvailable(): Boolean = nativeLoaded
 
-    fun collectSnapshot(): ZygiskNativeSnapshot {
-        if (!nativeLoaded) {
-            return ZygiskNativeSnapshot()
-        }
-        return runCatching {
-            parse(nativeCollectSnapshot())
-        }.getOrDefault(ZygiskNativeSnapshot())
-    }
+    fun collectSnapshot(): ZygiskNativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parse,
+        unavailable = { status -> ZygiskNativeSnapshot(collection = status) },
+    )
 
     internal fun parse(raw: String): ZygiskNativeSnapshot {
         if (raw.isBlank()) {
             return ZygiskNativeSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var snapshot = ZygiskNativeSnapshot()
         val traces = mutableListOf<ZygiskNativeTrace>()
@@ -92,51 +101,9 @@ class ZygiskNativeBridge {
         }
     }
 
-    private fun String.asBool(): Boolean {
-        return this == "1" || equals("true", ignoreCase = true)
-    }
+    private fun String.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
 
-    private fun String.decodeValue(): String {
-        return buildString(length) {
-            var index = 0
-            while (index < this@decodeValue.length) {
-                val current = this@decodeValue[index]
-                if (current == '\\' && index + 1 < this@decodeValue.length) {
-                    when (this@decodeValue[index + 1]) {
-                        'n' -> {
-                            append('\n')
-                            index += 2
-                            continue
-                        }
-
-                        'r' -> {
-                            append('\r')
-                            index += 2
-                            continue
-                        }
-
-                        't' -> {
-                            append('\t')
-                            index += 2
-                            continue
-                        }
-
-                        '\\' -> {
-                            append('\\')
-                            index += 2
-                            continue
-                        }
-                    }
-                }
-                append(current)
-                index += 1
-            }
-        }
-    }
+    private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
     private external fun nativeCollectSnapshot(): String
-
-    companion object {
-        private val nativeLoaded = runCatching { System.loadLibrary("duckdetector") }.isSuccess
-    }
 }

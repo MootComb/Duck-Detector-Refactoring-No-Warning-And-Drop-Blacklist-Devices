@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.virtualization.data.native
 
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+
 enum class VirtualizationRemoteProfile {
     REGULAR,
     ISOLATED,
@@ -103,10 +105,10 @@ data class VirtualizationRemoteSnapshot(
                             val parts = line.removePrefix("FINDING=").split('\t')
                             if (parts.size >= 5) {
                                 findings += VirtualizationNativeFinding(
-                                    group = parts[0],
-                                    severity = parts[1],
-                                    label = parts[2],
-                                    value = parts[3],
+                                    group = parts[0].decodeValue(),
+                                    severity = parts[1].decodeValue(),
+                                    label = parts[2].decodeValue(),
+                                    value = parts[3].decodeValue(),
                                     detail = parts[4].decodeValue(),
                                 )
                             }
@@ -190,10 +192,7 @@ data class VirtualizationRemoteSnapshot(
             )
         }
 
-        private fun String.decodeValue(): String {
-            return replace("\\n", "\n")
-                .replace("\\r", "\r")
-        }
+        private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
         private fun String.decodeList(): List<String> {
             if (isBlank()) {
@@ -205,9 +204,7 @@ data class VirtualizationRemoteSnapshot(
                 .distinct()
         }
 
-        private fun String.asBool(): Boolean {
-            return this == "1" || equals("true", ignoreCase = true)
-        }
+        private fun String.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
 
         private const val LIST_SEPARATOR = "\u001f"
     }

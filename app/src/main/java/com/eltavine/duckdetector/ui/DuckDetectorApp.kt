@@ -54,6 +54,8 @@ import com.eltavine.duckdetector.core.notifications.ScanProgressNotifier
 import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationConsentStore
 import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
 import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibilityChecker
+import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewPrefs
 import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewStore
 import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirective
@@ -181,21 +183,13 @@ fun DuckDetectorApp() {
         key1 = appContext,
     ) {
         value = withContext(Dispatchers.IO) {
-            val installedPackages =
-                InstalledPackageVisibilityChecker.getInstalledPackages(appContext)
-            val installedPackageCount = installedPackages.size
-            val visibility = InstalledPackageVisibilityChecker.detect(
-                context = appContext,
-                installedPackageCount = installedPackageCount,
-            )
+            val inventoryResult = InstalledPackageVisibilityChecker.inspect(appContext)
+            val inventory = (inventoryResult as? InstalledPackageInventoryResult.Available)
+                ?.inventory
             StartupPackageVisibilityState(
-                visibility = visibility,
-                visiblePackageCount = installedPackageCount,
-                suspiciouslyLowInventory = InstalledPackageVisibilityChecker
-                    .hasSuspiciouslyLowInventory(
-                        visibility = visibility,
-                        installedPackageCount = installedPackageCount,
-                    ),
+                visibility = inventory?.visibility ?: InstalledPackageVisibility.UNKNOWN,
+                visiblePackageCount = inventory?.visiblePackageCount ?: 0,
+                suspiciouslyLowInventory = inventory?.suspiciouslyLowInventory ?: false,
             )
         }
     }
@@ -216,7 +210,7 @@ fun DuckDetectorApp() {
             packageVisibilityLoaded = packageVisibilityState != null &&
                     packageVisibilityReviewPrefs != null,
             packageVisibility = packageVisibilityState?.visibility
-                ?: com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility.UNKNOWN,
+                ?: InstalledPackageVisibility.UNKNOWN,
             packageVisibilityReviewAcknowledged =
                 packageVisibilityReviewPrefs?.restrictedInventoryAcknowledged == true,
         )

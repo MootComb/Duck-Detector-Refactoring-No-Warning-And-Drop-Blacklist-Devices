@@ -69,6 +69,22 @@ class VirtualizationNativeBridgeTest {
     }
 
     @Test
+    fun `keeps the finding columns aligned when a mapped path carries a separator`() {
+        val snapshot = bridge.parseSnapshot(
+            "AVAILABLE=1\n" +
+                "FINDING=TRANSLATION\tWARNING\tMapped translation library\t" +
+                "/data/local/tmp/lib\\ttab\\nnewline.so\tmapped twice",
+        )
+
+        val finding = snapshot.findings.single()
+        assertEquals("TRANSLATION", finding.group)
+        assertEquals("WARNING", finding.severity)
+        assertEquals("Mapped translation library", finding.label)
+        assertEquals("/data/local/tmp/lib\ttab\nnewline.so", finding.value)
+        assertEquals("mapped twice", finding.detail)
+    }
+
+    @Test
     fun `parses trap summary`() {
         val result = bridge.parseTrap(
             """
@@ -88,6 +104,53 @@ class VirtualizationNativeBridgeTest {
         assertEquals(3, result.completedAttempts)
         assertEquals(2, result.suspiciousAttempts)
         assertEquals(2, result.attempts.size)
+    }
+
+    @Test
+    fun `a trap whose attempts all failed to measure is neither suspicious nor clean`() {
+        // What the arm64 counter trap reports when cntfrq_el0 reads zero: the attempts are
+        // recorded so the reason stays visible, but none of them completed a comparison. That
+        // has to stay apart from a run that compared and agreed, which is what clean means.
+        val result = bridge.parseTrap(
+            """
+            AVAILABLE=1
+            SUPPORTED=1
+            COMPLETED_ATTEMPTS=0
+            SUSPICIOUS_ATTEMPTS=0
+            DETAIL=comparison unavailable
+            ATTEMPT=0	freq=0 (cntfrq_el0 unprogrammed, comparison unavailable)
+            ATTEMPT=0	freq=0 (cntfrq_el0 unprogrammed, comparison unavailable)
+            ATTEMPT=0	freq=0 (cntfrq_el0 unprogrammed, comparison unavailable)
+            """.trimIndent(),
+        )
+
+        assertTrue(result.supported)
+        assertEquals(3, result.attempts.size)
+        assertFalse(result.suspicious)
+        assertFalse(result.clean)
+    }
+
+    @Test
+    fun `a trap that measured only once stays short of a clean verdict`() {
+        // Partial measurement, which the timing trap produces when some attempts resolve no
+        // elapsed time. One agreeing attempt is not enough to call the run clean, so this has
+        // to stay apart from a run where every attempt measured and agreed.
+        val result = bridge.parseTrap(
+            """
+            AVAILABLE=1
+            SUPPORTED=1
+            COMPLETED_ATTEMPTS=1
+            SUSPICIOUS_ATTEMPTS=0
+            DETAIL=partially measured
+            ATTEMPT=0	mean=0ns (no elapsed time resolved, uniformity unavailable)
+            ATTEMPT=0	mean=0ns (no elapsed time resolved, uniformity unavailable)
+            ATTEMPT=0	mean=214ns cv=0.19 unique_us_buckets=1
+            """.trimIndent(),
+        )
+
+        assertEquals(1, result.completedAttempts)
+        assertFalse(result.suspicious)
+        assertFalse(result.clean)
     }
 
     @Test
@@ -114,6 +177,33 @@ class VirtualizationNativeBridgeTest {
         assertEquals(1, result.hitCount)
         assertEquals("openat2", result.suspiciousItems.first().label)
         assertEquals(2, result.items.first().attempts.size)
+    }
+
+    @Test
+    fun `a pack item whose attempts never completed is neither suspicious nor clean`() {
+        // What an item reports when every attempt found the wrapper pair disagreeing, leaving
+        // no stable baseline for the inline svc to be compared against. The attempts stay
+        // visible so the reason survives, but nothing was measured, so the item must not count
+        // as clean any more than it counts as a hit.
+        val result = bridge.parseSacrificialSyscallPack(
+            """
+            AVAILABLE=1
+            SUPPORTED=1
+            DISABLED=0
+            DETAIL=pack detail
+            ITEM=memfd_create	1	0	0	no stable baseline
+            ATTEMPT=memfd_create	0	wrapper pair disagreed
+            ATTEMPT=memfd_create	0	wrapper pair disagreed
+            ATTEMPT=memfd_create	0	wrapper pair disagreed
+            """.trimIndent(),
+        )
+
+        val item = result.items.single()
+        assertEquals(3, item.attempts.size)
+        assertEquals(0, item.completedAttempts)
+        assertFalse(item.suspicious)
+        assertFalse(item.clean)
+        assertEquals(0, result.hitCount)
     }
 
     @Test

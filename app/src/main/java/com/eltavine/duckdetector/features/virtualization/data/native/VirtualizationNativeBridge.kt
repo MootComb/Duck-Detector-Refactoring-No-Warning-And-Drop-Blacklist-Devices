@@ -16,68 +16,61 @@
 
 package com.eltavine.duckdetector.features.virtualization.data.native
 
-open class VirtualizationNativeBridge {
+import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
+import com.eltavine.duckdetector.core.native.NativeCollectionStatus
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-    open fun isNativeAvailable(): Boolean = isLoaded
+open class VirtualizationNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
 
-    open fun collectSnapshot(): VirtualizationNativeSnapshot {
-        if (!isLoaded) {
-            return VirtualizationNativeSnapshot()
-        }
-        return runCatching {
-            parseSnapshot(nativeCollectSnapshot())
-        }.getOrDefault(VirtualizationNativeSnapshot())
-    }
+    open fun isNativeAvailable(): Boolean = DuckDetectorNativeLibrary.isLoaded
 
-    open fun runTimingTrap(): VirtualizationTrapResult {
-        if (!isLoaded) {
-            return VirtualizationTrapResult()
-        }
-        return runCatching {
-            parseTrap(nativeRunTimingTrap())
-        }.getOrDefault(VirtualizationTrapResult())
-    }
+    open fun collectSnapshot(): VirtualizationNativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parseSnapshot,
+        unavailable = { status -> VirtualizationNativeSnapshot(collection = status) },
+    )
 
-    open fun runSyscallParityTrap(): VirtualizationTrapResult {
-        if (!isLoaded) {
-            return VirtualizationTrapResult()
-        }
-        return runCatching {
-            parseTrap(nativeRunSyscallParityTrap())
-        }.getOrDefault(VirtualizationTrapResult())
-    }
+    open fun runTimingTrap(): VirtualizationTrapResult = collectTrap(::nativeRunTimingTrap)
 
-    open fun runAsmCounterTrap(): VirtualizationTrapResult {
-        if (!isLoaded) {
-            return VirtualizationTrapResult()
-        }
-        return runCatching {
-            parseTrap(nativeRunAsmCounterTrap())
-        }.getOrDefault(VirtualizationTrapResult())
-    }
+    open fun runSyscallParityTrap(): VirtualizationTrapResult =
+        collectTrap(::nativeRunSyscallParityTrap)
 
-    open fun runAsmRawSyscallTrap(): VirtualizationTrapResult {
-        if (!isLoaded) {
-            return VirtualizationTrapResult()
-        }
-        return runCatching {
-            parseTrap(nativeRunAsmRawSyscallTrap())
-        }.getOrDefault(VirtualizationTrapResult())
-    }
+    open fun runAsmCounterTrap(): VirtualizationTrapResult = collectTrap(::nativeRunAsmCounterTrap)
 
-    open fun runSacrificialSyscallPack(): SacrificialSyscallPackResult {
-        if (!isLoaded) {
-            return SacrificialSyscallPackResult()
-        }
-        return runCatching {
-            parseSacrificialSyscallPack(nativeRunSacrificialSyscallPack())
-        }.getOrDefault(SacrificialSyscallPackResult())
-    }
+    open fun runAsmRawSyscallTrap(): VirtualizationTrapResult =
+        collectTrap(::nativeRunAsmRawSyscallTrap)
+
+    open fun runSacrificialSyscallPack(): SacrificialSyscallPackResult = collector.collect(
+        readPayload = ::nativeRunSacrificialSyscallPack,
+        parse = ::parseSacrificialSyscallPack,
+        unavailable = { status ->
+            SacrificialSyscallPackResult(detail = status.explain("Syscall pack did not run"))
+        },
+    )
+
+    /**
+     * All five traps read one payload and differ only in which entry point they call, so they share
+     * the failure handling too. A trap that never ran reports why in [VirtualizationTrapResult.detail]
+     * instead of returning zero suspicious attempts, which would read as a passing trap.
+     */
+    private fun collectTrap(readPayload: () -> String): VirtualizationTrapResult = collector.collect(
+        readPayload = readPayload,
+        parse = ::parseTrap,
+        unavailable = { status ->
+            VirtualizationTrapResult(detail = status.explain("Trap did not run"))
+        },
+    )
 
     internal fun parseSnapshot(raw: String): VirtualizationNativeSnapshot {
         if (raw.isBlank()) {
             return VirtualizationNativeSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var snapshot = VirtualizationNativeSnapshot()
         val findings = mutableListOf<VirtualizationNativeFinding>()
@@ -91,10 +84,10 @@ open class VirtualizationNativeBridge {
                         val parts = line.removePrefix("FINDING=").split('\t')
                         if (parts.size >= 5) {
                             findings += VirtualizationNativeFinding(
-                                group = parts[0],
-                                severity = parts[1],
-                                label = parts[2],
-                                value = parts[3],
+                                group = parts[0].decodeValue(),
+                                severity = parts[1].decodeValue(),
+                                label = parts[2].decodeValue(),
+                                value = parts[3].decodeValue(),
                                 detail = parts[4].decodeValue(),
                             )
                         }
@@ -157,6 +150,8 @@ open class VirtualizationNativeBridge {
         if (raw.isBlank()) {
             return SacrificialSyscallPackResult()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var available = false
         var supported = false
@@ -240,6 +235,8 @@ open class VirtualizationNativeBridge {
             return VirtualizationTrapResult()
         }
 
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
+
         var available = false
         var supported = false
         var completedAttempts = 0
@@ -284,15 +281,9 @@ open class VirtualizationNativeBridge {
         )
     }
 
-    private fun String.decodeValue(): String {
-        return replace("\\n", "\n")
-            .replace("\\r", "\r")
-    }
+    private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
-    private fun String?.asBool(): Boolean {
-        val value = this.orEmpty()
-        return value == "1" || value.equals("true", ignoreCase = true)
-    }
+    private fun String?.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
 
     private external fun nativeCollectSnapshot(): String
     private external fun nativeRunTimingTrap(): String
@@ -300,13 +291,6 @@ open class VirtualizationNativeBridge {
     private external fun nativeRunAsmCounterTrap(): String
     private external fun nativeRunAsmRawSyscallTrap(): String
     private external fun nativeRunSacrificialSyscallPack(): String
-
-    companion object {
-        private val isLoaded: Boolean = runCatching {
-            System.loadLibrary("duckdetector")
-            true
-        }.getOrDefault(false)
-    }
 }
 
 data class VirtualizationNativeSnapshot(
@@ -326,6 +310,11 @@ data class VirtualizationNativeSnapshot(
     val translationHitCount: Int = 0,
     val runtimeArtifactHitCount: Int = 0,
     val findings: List<VirtualizationNativeFinding> = emptyList(),
+    /**
+     * Why this snapshot is or is not usable. [available] alone cannot distinguish "the probe ran and
+     * found nothing" from "the probe never ran", so the reason is carried here.
+     */
+    val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
 ) {
     val artifactKeys: Set<String>
         get() = findings.mapTo(linkedSetOf()) { "${it.group}:${it.label}:${it.value}" }

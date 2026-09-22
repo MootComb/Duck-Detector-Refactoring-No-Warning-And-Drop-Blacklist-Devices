@@ -16,6 +16,11 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.native
 
+import com.eltavine.duckdetector.core.native.NativeCollectionStatus
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
+
 data class CgroupProcessLeakNativePath(
     val path: String,
     val uid: Int,
@@ -50,20 +55,29 @@ data class CgroupProcessLeakNativeSnapshot(
     val procDeniedCount: Int = 0,
     val paths: List<CgroupProcessLeakNativePath> = emptyList(),
     val entries: List<CgroupProcessLeakNativeEntry> = emptyList(),
+    /**
+     * Why this snapshot is or is not usable. [available] alone cannot distinguish "the probe ran and
+     * found nothing" from "the probe never ran", so the reason is carried here.
+     */
+    val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
 )
 
-class CgroupProcessLeakNativeBridge {
+class CgroupProcessLeakNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
 
-    fun collectSnapshot(): CgroupProcessLeakNativeSnapshot {
-        return runCatching {
-            parse(nativeCollectSnapshot())
-        }.getOrDefault(CgroupProcessLeakNativeSnapshot())
-    }
+    fun collectSnapshot(): CgroupProcessLeakNativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parse,
+        unavailable = { status -> CgroupProcessLeakNativeSnapshot(collection = status) },
+    )
 
     internal fun parse(raw: String): CgroupProcessLeakNativeSnapshot {
         if (raw.isBlank()) {
             return CgroupProcessLeakNativeSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var available = false
         var pathCheckCount = 0
@@ -87,7 +101,7 @@ class CgroupProcessLeakNativeBridge {
                             paths += CgroupProcessLeakNativePath(
                                 path = parts[0].decodeValue(),
                                 uid = uid,
-                                accessible = accessible == "1",
+                                accessible = NativePayloadCodec.decodeFlag(accessible),
                                 pidCount = pidCount,
                             )
                         }
@@ -163,7 +177,7 @@ class CgroupProcessLeakNativeBridge {
                         val key = line.substringBefore('=')
                         val value = line.substringAfter('=')
                         when (key) {
-                            "AVAILABLE" -> available = value == "1"
+                            "AVAILABLE" -> available = NativePayloadCodec.decodeFlag(value)
                             "PATH_CHECKS" -> pathCheckCount = value.toIntOrNull() ?: pathCheckCount
                             "PATH_ACCESSIBLE" -> accessiblePathCount =
                                 value.toIntOrNull() ?: accessiblePathCount
@@ -232,10 +246,4 @@ class CgroupProcessLeakNativeBridge {
     }
 
     private external fun nativeCollectSnapshot(): String
-
-    companion object {
-        init {
-            runCatching { System.loadLibrary("duckdetector") }
-        }
-    }
 }

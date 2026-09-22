@@ -16,18 +16,27 @@
 
 package com.eltavine.duckdetector.features.su.data.native
 
-class SuNativeBridge {
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-    fun collectSnapshot(): SuNativeSnapshot {
-        return runCatching {
-            parse(nativeCollectSnapshot())
-        }.getOrDefault(SuNativeSnapshot())
-    }
+class SuNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    fun collectSnapshot(): SuNativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parse,
+        unavailable = { status -> SuNativeSnapshot(collection = status) },
+    )
 
     internal fun parse(raw: String): SuNativeSnapshot {
         if (raw.isBlank()) {
             return SuNativeSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
+
         val entries = raw.lineSequence()
             .map { it.trim() }
             .filter { it.isNotEmpty() && it.contains('=') }
@@ -35,9 +44,11 @@ class SuNativeBridge {
             .toList()
 
         return SuNativeSnapshot(
-            available = entries.firstOrNull { it.first == "AVAILABLE" }?.second != "0",
+            available = NativePayloadCodec.decodeFlag(entries.firstOrNull { it.first == "AVAILABLE" }?.second),
             selfContext = entries.firstOrNull { it.first == "SELF_CONTEXT" }?.second.orEmpty(),
-            selfContextAbnormal = entries.firstOrNull { it.first == "SELF_ABNORMAL" }?.second == "1",
+            selfContextAbnormal = NativePayloadCodec.decodeFlag(
+                entries.firstOrNull { it.first == "SELF_ABNORMAL" }?.second,
+            ),
             suspiciousProcesses = entries.filter { it.first == "PROC" }.map { it.second },
             checkedProcesses = entries.firstOrNull { it.first == "PROC_CHECKED" }?.second?.toIntOrNull()
                 ?: 0,
@@ -47,10 +58,4 @@ class SuNativeBridge {
     }
 
     private external fun nativeCollectSnapshot(): String
-
-    companion object {
-        init {
-            runCatching { System.loadLibrary("duckdetector") }
-        }
-    }
 }

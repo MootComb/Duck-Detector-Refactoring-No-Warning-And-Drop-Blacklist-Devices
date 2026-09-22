@@ -33,7 +33,7 @@ class MemoryRepository(
     private val nativeBridge: MemoryNativeBridge = MemoryNativeBridge(),
 ) {
 
-    suspend fun scan(): MemoryReport = withContext(Dispatchers.Default) {
+    suspend fun scan(): MemoryReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->
                 MemoryReport.failed(throwable.message ?: "Memory scan failed.")
@@ -43,7 +43,9 @@ class MemoryRepository(
     private fun scanInternal(): MemoryReport {
         val snapshot = sanitizeSnapshot(nativeBridge.collectSnapshot())
         if (!snapshot.available) {
-            return MemoryReport.failed("Native memory snapshot was unavailable.")
+            return MemoryReport.failed(
+                snapshot.collection.explain("Native memory snapshot was unavailable"),
+            )
         }
 
         val findings = snapshot.findings.mapIndexed { index, finding ->

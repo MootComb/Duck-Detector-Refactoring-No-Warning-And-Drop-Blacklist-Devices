@@ -16,23 +16,33 @@
 
 package com.eltavine.duckdetector.features.selinux.data.native
 
-open class SelinuxNativeAuditBridge {
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-    open fun collectSnapshot(): SelinuxNativeAuditSnapshot {
-        if (!nativeLoaded) {
-            return SelinuxNativeAuditSnapshot(
-                failureReason = "duckdetector native library unavailable.",
+open class SelinuxNativeAuditBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    open fun collectSnapshot(): SelinuxNativeAuditSnapshot = collector.collect(
+        readPayload = ::nativeCollectAuditSnapshot,
+        parse = ::parse,
+        unavailable = { status ->
+            // Previously an unloadable library produced a fixed reason while a probe that threw
+            // produced no reason at all, which read as a successful scan that found no denials.
+            SelinuxNativeAuditSnapshot(
+                failureReason = status.explain("Native SELinux audit snapshot was unavailable"),
+                collection = status,
             )
-        }
-        return runCatching {
-            parse(nativeCollectAuditSnapshot())
-        }.getOrDefault(SelinuxNativeAuditSnapshot())
-    }
+        },
+    )
 
     internal fun parse(raw: String): SelinuxNativeAuditSnapshot {
         if (raw.isBlank()) {
             return SelinuxNativeAuditSnapshot()
         }
+
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
 
         var snapshot = SelinuxNativeAuditSnapshot()
         val callbackLines = mutableListOf<String>()
@@ -72,51 +82,9 @@ open class SelinuxNativeAuditBridge {
         }
     }
 
-    private fun String.asBool(): Boolean {
-        return this == "1" || equals("true", ignoreCase = true)
-    }
+    private fun String.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
 
-    private fun String.decodeValue(): String {
-        return buildString(length) {
-            var index = 0
-            while (index < this@decodeValue.length) {
-                val current = this@decodeValue[index]
-                if (current == '\\' && index + 1 < this@decodeValue.length) {
-                    when (this@decodeValue[index + 1]) {
-                        'n' -> {
-                            append('\n')
-                            index += 2
-                            continue
-                        }
-
-                        'r' -> {
-                            append('\r')
-                            index += 2
-                            continue
-                        }
-
-                        't' -> {
-                            append('\t')
-                            index += 2
-                            continue
-                        }
-
-                        '\\' -> {
-                            append('\\')
-                            index += 2
-                            continue
-                        }
-                    }
-                }
-                append(current)
-                index += 1
-            }
-        }
-    }
+    private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
     private external fun nativeCollectAuditSnapshot(): String
-
-    companion object {
-        private val nativeLoaded = runCatching { System.loadLibrary("duckdetector") }.isSuccess
-    }
 }

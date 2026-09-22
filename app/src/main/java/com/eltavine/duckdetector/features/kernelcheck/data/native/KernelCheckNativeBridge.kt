@@ -16,14 +16,19 @@
 
 package com.eltavine.duckdetector.features.kernelcheck.data.native
 
-class KernelCheckNativeBridge {
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-    fun collectSnapshot(
-    ): KernelCheckNativeSnapshot {
-        return runCatching {
-            parse(nativeCollectSnapshot())
-        }.getOrDefault(KernelCheckNativeSnapshot())
-    }
+class KernelCheckNativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    fun collectSnapshot(): KernelCheckNativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parse,
+        unavailable = { status -> KernelCheckNativeSnapshot(collection = status) },
+    )
 
     internal fun parse(
         raw: String,
@@ -32,6 +37,8 @@ class KernelCheckNativeBridge {
             return KernelCheckNativeSnapshot()
         }
 
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
+
         val entries = raw.lineSequence()
             .map { it.trim() }
             .filter { it.isNotEmpty() && it.contains('=') }
@@ -39,7 +46,7 @@ class KernelCheckNativeBridge {
             .toList()
 
         return KernelCheckNativeSnapshot(
-            available = entries.firstOrNull { it.first == "AVAILABLE" }?.second != "0",
+            available = NativePayloadCodec.decodeFlag(entries.firstOrNull { it.first == "AVAILABLE" }?.second),
             procVersion = entries.firstOrNull { it.first == "PROC_VERSION" }?.second?.decodeValue()
                 .orEmpty(),
             procCmdline = entries.firstOrNull { it.first == "PROC_CMDLINE" }?.second?.decodeValue()
@@ -54,8 +61,8 @@ class KernelCheckNativeBridge {
             sysctlVersion = entries.firstOrNull { it.first == "SYSCTL_VERSION" }
                 ?.second?.decodeValue()
                 .orEmpty(),
-            suspiciousCmdline = entries.firstOrNull { it.first == "CMDLINE" }?.second == "1",
-            kptrExposed = entries.firstOrNull { it.first == "KPTR" }?.second == "1",
+            suspiciousCmdline = NativePayloadCodec.decodeFlag(entries.firstOrNull { it.first == "CMDLINE" }?.second),
+            kptrExposed = NativePayloadCodec.decodeFlag(entries.firstOrNull { it.first == "KPTR" }?.second),
             findings = entries.filter { it.first == "FINDING" }.map { it.second.decodeValue() },
             cpuIdentityStatus = Arm64CpuIdentityPayloadCodec.parseStatus(
                 entries.firstOrNull { it.first == "CPU_IDENTITY_STATUS" }?.second,
@@ -66,16 +73,7 @@ class KernelCheckNativeBridge {
         )
     }
 
-    private fun String.decodeValue(): String {
-        return replace("\\n", "\n")
-            .replace("\\r", "\r")
-    }
+    private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
     private external fun nativeCollectSnapshot(): String
-
-    companion object {
-        init {
-            runCatching { System.loadLibrary("duckdetector") }
-        }
-    }
 }
