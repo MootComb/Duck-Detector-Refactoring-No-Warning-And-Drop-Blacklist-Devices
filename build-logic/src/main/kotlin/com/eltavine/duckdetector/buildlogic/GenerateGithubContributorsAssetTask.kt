@@ -106,28 +106,67 @@ abstract class GenerateGithubContributorsAssetTask : DefaultTask() {
         avatarDirectory: java.io.File,
     ) {
         val existingMetadata = readExistingMetadata(contributorsFile)
-        val contributors = fetchContributorsWithRetries()
+        val remoteContributors = fetchContributorsWithRetries()
+        // Manual contributors precede remote records so distinctBy keeps the local entry if
+        // GitHub later returns the same login. The merged list is then sorted by the normal
+        // contribution/card order instead of being appended ad hoc.
+        // 手动贡献者放在远端记录之前，使 distinctBy 在 GitHub 之后返回同一 login 时保留本地
+        // 条目；合并后的列表仍按正常贡献量与卡片顺序排序，而不是临时追加。
+        val contributors = (
+                LOCAL_CONTRIBUTORS.map { local ->
+                    ContributorRecord(
+                        login = local.login,
+                        name = local.name,
+                        profileUrl = local.profileUrl,
+                        avatarUrl = null,
+                        avatarFileName = local.avatarFileName,
+                        avatarAssetPath = local.avatarAssetPath,
+                        contributions = local.contributions,
+                        codeVolume = 0,
+                        summaryKey = local.summaryKey,
+                        contributionKeys = local.contributionKeys,
+                    )
+                } + remoteContributors.map { contributor ->
+                    val assetFileName = sanitizeAssetFileName(contributor.login) + ".jpg"
+                    val metadata = existingMetadata[contributor.login]
+                    ContributorRecord(
+                        login = contributor.login,
+                        name = contributor.name,
+                        profileUrl = contributor.profileUrl,
+                        avatarUrl = contributor.avatarUrl,
+                        avatarFileName = assetFileName,
+                        avatarAssetPath = "$GITHUB_CONTRIBUTORS_AVATAR_DIRECTORY/$assetFileName",
+                        contributions = contributor.contributions,
+                        codeVolume = contributor.codeVolume,
+                        summaryKey = metadata?.summaryKey,
+                        contributionKeys = metadata?.contributionKeys ?: emptyList(),
+                    )
+                }
+                )
+            .distinctBy { it.login }
+            .sortedWith(
+                compareByDescending<ContributorRecord> { it.contributions }
+                    .thenByDescending { it.codeVolume }
+                    .thenBy { it.login.lowercase() },
+            )
         val payload = JSONArray()
         val expectedAvatarFiles = linkedSetOf<String>()
 
         contributors.forEach { contributor ->
-            val assetFileName = sanitizeAssetFileName(contributor.login) + ".jpg"
-            val assetPath = "$GITHUB_CONTRIBUTORS_AVATAR_DIRECTORY/$assetFileName"
-            expectedAvatarFiles += assetFileName
+            expectedAvatarFiles += contributor.avatarFileName
             contributor.avatarUrl?.let { avatarUrl ->
                 val avatarBytes = fetchBytes(avatarUrl)
-                avatarDirectory.resolve(assetFileName).writeBytes(avatarBytes)
+                avatarDirectory.resolve(contributor.avatarFileName).writeBytes(avatarBytes)
             }
-            val metadata = existingMetadata[contributor.login]
             payload.put(
                 JSONObject()
                     .put("login", contributor.login)
                     .put("name", contributor.name)
                     .put("profileUrl", contributor.profileUrl)
-                    .put("avatarAssetPath", contributor.avatarUrl?.let { assetPath })
+                    .put("avatarAssetPath", contributor.avatarAssetPath)
                     .put("contributions", contributor.contributions)
-                    .put("summaryKey", metadata?.summaryKey)
-                    .put("contributionKeys", JSONArray(metadata?.contributionKeys ?: emptyList<String>()))
+                    .put("summaryKey", contributor.summaryKey)
+                    .put("contributionKeys", JSONArray(contributor.contributionKeys))
             )
         }
 
@@ -327,6 +366,43 @@ private data class GitHubContributor(
     val avatarUrl: String?,
     val contributions: Int,
     val codeVolume: Int,
+)
+
+private data class LocalContributor(
+    val login: String,
+    val name: String,
+    val profileUrl: String,
+    val avatarFileName: String,
+    val avatarAssetPath: String,
+    val contributions: Int,
+    val summaryKey: String,
+    val contributionKeys: List<String>,
+)
+
+private val LOCAL_CONTRIBUTORS = listOf(
+    LocalContributor(
+        login = "SakanyaNotBot",
+        name = "无影",
+        profileUrl = "https://github.com/SakanyaNotBot",
+        avatarFileName = "sakanyanotbot.jpg",
+        avatarAssetPath = "github_contributors/avatars/sakanyanotbot.jpg",
+        contributions = 1,
+        summaryKey = "author_summary_wuying",
+        contributionKeys = listOf("security"),
+    ),
+)
+
+private data class ContributorRecord(
+    val login: String,
+    val name: String,
+    val profileUrl: String,
+    val avatarUrl: String?,
+    val avatarFileName: String,
+    val avatarAssetPath: String,
+    val contributions: Int,
+    val codeVolume: Int,
+    val summaryKey: String?,
+    val contributionKeys: List<String>,
 )
 
 private data class ContributorMetadata(

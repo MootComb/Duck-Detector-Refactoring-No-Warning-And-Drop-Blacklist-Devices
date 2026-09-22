@@ -16,9 +16,14 @@
 
 package com.eltavine.duckdetector.features.nativeroot.ui.card
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.Toast
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,7 +40,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -44,6 +52,7 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootCardModel
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootDetailRowModel
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootHeaderFactModel
@@ -237,10 +246,31 @@ private fun NativeRootDetailSection(
 private fun NativeRootDetailRow(
     row: NativeRootDetailRowModel,
 ) {
+    val context = LocalContext.current
+    val clipboardLabel = stringResource(R.string.native_root_diagnostic_clipboard_label)
+    val copiedToast = stringResource(R.string.tee_diagnostic_copied_toast)
+    val rowModifier = if (row.hiddenCopyText != null) {
+        Modifier.combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = {},
+            onDoubleClick = {
+                // Keep diagnostics hidden from the visible UI but one double tap away when a
+                // device report has to be shared with maintainers.
+                // 将诊断隐藏在可见 UI 之外；需要分享设备报告时双击即可复制。
+                context.getSystemService(ClipboardManager::class.java)
+                    ?.setPrimaryClip(ClipData.newPlainText(clipboardLabel, row.hiddenCopyText))
+                Toast.makeText(context, copiedToast, Toast.LENGTH_SHORT).show()
+            },
+        )
+    } else {
+        Modifier
+    }
     DetectorDetailRowBlock(
         label = row.label,
         value = row.value,
         status = row.status,
+        modifier = rowModifier,
         detail = row.detail,
         detailMonospace = row.detailMonospace,
     )

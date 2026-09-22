@@ -472,6 +472,7 @@ private fun summaryResIdForKey(summaryKey: String?): Int {
         "author_summary_mirin" -> R.string.author_summary_mirin
         "author_summary_aviraxp" -> R.string.author_summary_aviraxp
         "author_summary_5ec1cff" -> R.string.author_summary_5ec1cff
+        "author_summary_wuying" -> R.string.author_summary_wuying
         else -> R.string.author_summary_default
     }
 }

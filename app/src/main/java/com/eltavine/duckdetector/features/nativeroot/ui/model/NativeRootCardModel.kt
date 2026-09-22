@@ -45,6 +45,7 @@ data class NativeRootDetailRowModel(
     val value: String,
     val status: DetectorStatus,
     val detail: String? = null,
+    val hiddenCopyText: String? = null,
     val detailMonospace: Boolean = false,
 )
 

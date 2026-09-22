@@ -145,6 +145,51 @@ class NativeRootCardModelMapperTest {
     }
 
     @Test
+    fun `throne hunt failure exposes stage counters and hidden diagnostics`() {
+        val report = NativeRootReport.loading().copy(
+            stage = NativeRootStage.READY,
+            methods = listOf(
+                NativeRootMethodResult(
+                    label = "ksuThroneHunt",
+                    summary = "STIMULUS_FAILED",
+                    outcome = NativeRootMethodOutcome.SUPPORT,
+                    detail = "PM binder diagnostic",
+                ),
+            ),
+            ksuThroneHuntAvailable = false,
+            ksuThroneHuntWatchDenied = false,
+            ksuThroneHuntPackageDirectory = "/data/app/package",
+            ksuThroneHuntOpenCount = 0,
+            ksuThroneHuntAccessCount = 0,
+            ksuThroneHuntStimulusApplied = false,
+            ksuThroneHuntCollectionOutcome = "COLLECTED",
+            ksuThroneHuntCollectionDetail = "",
+            ksuThroneHuntFailureStage = "STIMULUS_FAILED",
+            ksuThroneHuntBaselineHitCount = 2,
+            ksuThroneHuntRawEventCount = 5,
+            ksuThroneHuntInvalidEventCount = 1,
+            ksuThroneHuntWatchDescriptor = 12,
+            ksuThroneHuntStimulusDetail = "setMimeGroup failed: binder unavailable",
+            ksuThroneHuntDiagnosticDetail = "round detail",
+        )
+
+        val model = mapper.map(report)
+        val throneRow = model.scanRows.single { it.label == "Throne hunt" }
+        val counterRow = model.scanRows.single { it.label == "Throne hunt counters" }
+        val methodRow = model.methodRows.single { it.label == "ksuThroneHunt" }
+
+        assertEquals("STIMULUS_FAILED", throneRow.value)
+        assertTrue(counterRow.value.contains("raw=5"))
+        assertTrue(counterRow.value.contains("invalid=1"))
+        assertTrue(counterRow.value.contains("baseline=2"))
+        assertTrue(methodRow.hiddenCopyText!!.contains("failureStage=STIMULUS_FAILED"))
+        assertTrue(methodRow.hiddenCopyText.contains("setMimeGroup failed: binder unavailable"))
+        assertTrue(methodRow.hiddenCopyText.contains("watchDescriptor=12"))
+        assertTrue(methodRow.hiddenCopyText.contains("--- detail ---"))
+        assertTrue(methodRow.hiddenCopyText.contains("round detail"))
+    }
+
+    @Test
     fun `mount drift and manager fingerprint land in runtime method and scan rows`() {
         val report = NativeRootReport(
             stage = NativeRootStage.READY,

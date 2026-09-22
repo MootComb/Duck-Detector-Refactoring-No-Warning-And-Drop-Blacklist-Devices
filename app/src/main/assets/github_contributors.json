@@ -259,5 +259,14 @@
     "avatarAssetPath": "github_contributors/avatars/aviraxp.jpg",
     "summaryKey": "author_summary_aviraxp",
     "login": "aviraxp"
+  },
+  {
+    "profileUrl": "https://github.com/SakanyaNotBot",
+    "contributionKeys": ["security"],
+    "contributions": 1,
+    "name": "无影",
+    "avatarAssetPath": "github_contributors/avatars/sakanyanotbot.jpg",
+    "summaryKey": "author_summary_wuying",
+    "login": "SakanyaNotBot"
   }
 ]
