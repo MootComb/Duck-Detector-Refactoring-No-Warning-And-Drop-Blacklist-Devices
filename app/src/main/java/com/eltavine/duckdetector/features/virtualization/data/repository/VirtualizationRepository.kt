@@ -125,7 +125,8 @@ class VirtualizationRepository(
         val serviceResult = serviceProbe.probe()
         val dexPathResult = dexPathProbe.probe()
         val uidIdentityResult = uidIdentityProbe.probe()
-        val nativeSnapshot = nativeBridge.collectSnapshot()
+        // Only this main-process snapshot feeds eglAvailable and the Graphics renderer method.
+        val nativeSnapshot = nativeBridge.collectSnapshot(probeRenderer = true)
         val preloadResult = preloadResultProvider()
         val remoteSnapshot = probeManager.collect()
         val isolatedSnapshot = isolatedProbeManager.collect()

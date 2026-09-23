@@ -28,11 +28,20 @@ open class VirtualizationNativeBridge(
 
     open fun isNativeAvailable(): Boolean = DuckDetectorNativeLibrary.isLoaded
 
-    open fun collectSnapshot(): VirtualizationNativeSnapshot = collector.collect(
-        readPayload = ::nativeCollectSnapshot,
-        parse = ::parseSnapshot,
-        unavailable = { status -> VirtualizationNativeSnapshot(collection = status) },
-    )
+    /**
+     * [probeRenderer] runs the EGL renderer probe, which loads the vendor GLES driver into the
+     * calling process. Android 16 AOSP sepolicy denies ordinary isolated apps GPU device access.
+     * Issue #141 reports an EGL initialization crash in an isolated helper; its exact cause is
+     * unconfirmed. Only a main-process caller that uses the renderer result should pass `true`.
+     * With `false` the egl* fields stay at their defaults, which do not mean the renderer was
+     * unavailable.
+     */
+    open fun collectSnapshot(probeRenderer: Boolean): VirtualizationNativeSnapshot =
+        collector.collect(
+            readPayload = { nativeCollectSnapshot(probeRenderer) },
+            parse = ::parseSnapshot,
+            unavailable = { status -> VirtualizationNativeSnapshot(collection = status) },
+        )
 
     open fun runTimingTrap(): VirtualizationTrapResult = collectTrap(::nativeRunTimingTrap)
 
@@ -285,7 +294,7 @@ open class VirtualizationNativeBridge(
 
     private fun String?.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
 
-    private external fun nativeCollectSnapshot(): String
+    private external fun nativeCollectSnapshot(probeRenderer: Boolean): String
     private external fun nativeRunTimingTrap(): String
     private external fun nativeRunSyscallParityTrap(): String
     private external fun nativeRunAsmCounterTrap(): String

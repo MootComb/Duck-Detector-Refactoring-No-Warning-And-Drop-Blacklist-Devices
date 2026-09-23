@@ -32,10 +32,12 @@ namespace {
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_eltavine_duckdetector_features_virtualization_data_native_VirtualizationNativeBridge_nativeCollectSnapshot(
         JNIEnv *env,
-        jobject
+        jobject,
+        jboolean probe_renderer
 ) {
     return to_jstring(env, duckdetector::virtualization::encode_snapshot(
-            duckdetector::virtualization::collect_snapshot()));
+            duckdetector::virtualization::collect_snapshot(
+                    {.probeRenderer = probe_renderer == JNI_TRUE})));
 }
 
 extern "C" JNIEXPORT jstring JNICALL
