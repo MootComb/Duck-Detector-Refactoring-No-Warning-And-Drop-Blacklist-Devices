@@ -48,7 +48,18 @@ namespace duckdetector::virtualization {
         std::vector<SnapshotFinding> findings;
     };
 
-    Snapshot collect_snapshot();
+    struct SnapshotOptions {
+        // EGL initialization enters the vendor GLES driver. Android 16 sepolicy denies ordinary
+        // isolated apps gpu_device access (isolated_app_all.te, except isolated_compute_app).
+        // Issue #141 reports SIGSEGV in libEGL initialization in an isolated helper; it is
+        // consistent with an invalid extension-string pointer, but its origin is unconfirmed.
+        // Enable only for main-process callers that consume renderer evidence. When off, egl*
+        // fields keep their defaults and do not mean the renderer was unavailable.
+        // https://android.googlesource.com/platform/system/sepolicy/+/refs/tags/android-16.0.0_r1/private/isolated_app_all.te
+        bool probeRenderer = false;
+    };
+
+    Snapshot collect_snapshot(const SnapshotOptions &options);
 
     std::string encode_snapshot(const Snapshot &snapshot);
 

@@ -6,9 +6,37 @@
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/stargazers"><img src="https://img.shields.io/github/stars/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub Stars"></a>
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/network/members"><img src="https://img.shields.io/github/forks/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub Forks"></a>
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly"><img src="https://img.shields.io/badge/release-nightly-2F81F7?style=flat-square&logo=github" alt="Nightly 版本"></a>
+  <!-- 首个正式版本发布后，将此占位徽章替换为动态版本徽章。 -->
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/badge/stable-not%20yet%20released-lightgrey?style=flat-square" alt="正式版本尚未发布"></a>
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/github/downloads/eltavine/Duck-Detector-Refactoring/total?style=flat-square" alt="版本下载量"></a>
   <a href="https://t.me/duck_detector"><img src="https://img.shields.io/badge/Telegram-Channel-2CA5E0?logo=telegram&logoColor=white&style=flat-square" alt="Telegram 频道"></a>
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/blob/main/LICENSE"><img src="https://img.shields.io/github/license/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="开源协议"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/build.yml?branch=main&amp;style=flat-square&amp;label=build&amp;logo=githubactions&amp;logoColor=white" alt="主分支构建工作流状态"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/ci.yml?query=event%3Apull_request"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/ci.yml?event=pull_request&amp;style=flat-square&amp;label=PR%20checks&amp;logo=githubactions&amp;logoColor=white" alt="拉取请求 CI：单元测试、Lint 与原生构建"></a>
+  <a href="#兼容性"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="支持 Android 10 及以上版本"></a>
+  <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="使用 Kotlin 构建"></a>
+  <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose 界面"></a>
+  <a href="app/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK 原生探针"></a>
+</p>
+
+<p align="center">
+  <a href="#兼容性"><img src="https://img.shields.io/badge/ABI-arm64--v8a%20%7C%20armeabi--v7a%20%7C%20x86%20%7C%20x86__64-555555?style=flat-square" alt="支持 ABI：arm64-v8a、armeabi-v7a、x86、x86_64；部分探针仅支持 arm64-v8a"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/issues"><img src="https://img.shields.io/github/issues/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="待处理 Issues"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/pulls"><img src="https://img.shields.io/github/issues-pr/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="待合并 Pull Requests"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/graphs/contributors"><img src="https://img.shields.io/github/contributors/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="贡献者数量"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/commits/main"><img src="https://img.shields.io/github/last-commit/eltavine/Duck-Detector-Refactoring/main?style=flat-square" alt="主分支最近提交时间"></a>
+  <a href="CODING_STANDARDS.md"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square" alt="欢迎贡献：阅读编码规范"></a>
+</p>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/44818?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-44818" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/44818" alt="eltavine/Duck-Detector-Refactoring | Trendshift" width="250" height="55"></a>
+  <a href="https://trendshift.io/repositories/44818?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-44818" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/44818/daily?language=Kotlin" alt="eltavine/Duck-Detector-Refactoring | Trendshift Kotlin 每日排名" width="250" height="55"></a>
 </p>
 
 <p align="center">

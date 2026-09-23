@@ -439,6 +439,16 @@ class VirtualizationRepositoryTest {
         )
     }
 
+    @Test
+    fun `main process scan requests renderer evidence`() = runBlocking {
+        // Helpers pass probeRenderer = false (#141), so eglAvailable has to come from this call.
+        val rendererRequests = mutableListOf<Boolean>()
+
+        repository(rendererRequests = rendererRequests).scanInternal()
+
+        assertEquals(listOf(true), rendererRequests)
+    }
+
     private fun repository(
         propertySignals: List<VirtualizationSignal> = emptyList(),
         buildSignals: List<VirtualizationSignal> = emptyList(),
@@ -460,6 +470,7 @@ class VirtualizationRepositoryTest {
         ),
         processInfo: VirtualizationProcessInfo = VirtualizationProcessInfo(),
         syscallPackResult: SacrificialSyscallPackResult = SacrificialSyscallPackResult(),
+        rendererRequests: MutableList<Boolean> = mutableListOf(),
     ): VirtualizationRepository {
         return VirtualizationRepository(
             propertyProbe = object : VirtualizationPropertyProbe() {
@@ -478,7 +489,10 @@ class VirtualizationRepositoryTest {
                 override fun probe(): UidIdentityProbeResult = uidIdentityResult
             },
             nativeBridge = object : VirtualizationNativeBridge() {
-                override fun collectSnapshot(): VirtualizationNativeSnapshot = nativeSnapshot
+                override fun collectSnapshot(probeRenderer: Boolean): VirtualizationNativeSnapshot {
+                    rendererRequests += probeRenderer
+                    return nativeSnapshot
+                }
             },
             hostAppProbe = object : VirtualizationHostAppProbe() {
                 override fun probe(): VirtualizationHostAppProbeResult = hostAppResult

@@ -530,7 +530,7 @@ namespace duckdetector::virtualization {
 
     }  // namespace
 
-    Snapshot collect_snapshot() {
+    Snapshot collect_snapshot(const SnapshotOptions &options) {
         Snapshot snapshot;
         snapshot.available = true;
         std::set<std::string> dedupe;
@@ -542,7 +542,9 @@ namespace duckdetector::virtualization {
         scan_mountinfo(snapshot, dedupe);
         scan_fd_targets(snapshot, dedupe);
         scan_cmdline(snapshot, dedupe);
-        scan_renderer(snapshot, dedupe);
+        if (options.probeRenderer) {
+            scan_renderer(snapshot, dedupe);
+        }
 
         return snapshot;
     }
