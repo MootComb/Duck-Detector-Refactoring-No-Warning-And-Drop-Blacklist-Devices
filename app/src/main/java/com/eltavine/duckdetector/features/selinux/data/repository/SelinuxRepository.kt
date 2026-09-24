@@ -494,14 +494,18 @@ class SelinuxRepository(
                 nativeTrack = nativeTrack,
                 javaTrack = javaTrack,
             ),
+            // A policy baseline difference cannot identify who introduced the rule. Keep the
+            // oracle evidence, but do not turn either verdict into a security classification.
+            // AOSP Android 14: https://android.googlesource.com/platform/system/sepolicy/+/refs/tags/android-14.0.0_r1/public/fsck_untrusted.te
+            // ROM exception: https://github.com/LineageOS/android_system_sepolicy/commit/85839045447fee9db99258f66f9fa2c65473b10d
             aggregateDirtyPolicyRuleMethod(
-                label = "Dirty sepolicy rule: fsck_untrusted sys_admin",
+                label = "SELinux policy observation: fsck_untrusted sys_admin",
                 nativeAllowed = nativeTrack.fsckSysAdminAllowed,
                 javaAllowed = javaTrack.fsckSysAdminAllowed,
-                detail = "Observed edge: fsck_untrusted -> fsck_untrusted:capability sys_admin. This should stay denied on stock policy because it represents a DirtySepolicy neverallow-style violation.",
+                detail = "Observed edge: fsck_untrusted -> fsck_untrusted:capability sys_admin. Informational only: AOSP Android 14 forbids this permission, but device or ROM policies may differ. An allowed result alone does not establish root or policy tampering and does not contribute to the dirty-policy warning.",
                 nativeTrack = nativeTrack,
                 javaTrack = javaTrack,
-            ),
+            ).copy(isSecure = null),
             aggregateDirtyPolicyRuleMethod(
                 label = "Dirty sepolicy rule: shell -> su transition",
                 nativeAllowed = nativeTrack.shellSuTransitionAllowed,

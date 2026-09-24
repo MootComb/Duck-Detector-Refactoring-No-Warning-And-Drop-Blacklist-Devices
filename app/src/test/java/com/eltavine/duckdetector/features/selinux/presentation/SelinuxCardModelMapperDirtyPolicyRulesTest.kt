@@ -17,6 +17,9 @@
 package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
@@ -215,6 +218,54 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
             },
         )
         assertTrue(model.methodRows.none { it.label.startsWith("Droidspaces checker: ") })
+    }
+
+    @Test
+    fun `fsck observation stays informational and does not raise an overall warning`() {
+        listOf(true to "Allowed", false to "Denied", null to "Unavailable").forEach { (allowed, status) ->
+            val model = mapper.map(baseReport(*fsckPolicyMethods(allowed).toTypedArray()))
+            val row = model.methodRows.single { it.label == "SELinux policy observation: fsck_untrusted sys_admin" }
+
+            assertEquals(status, row.value)
+            assertEquals(DetectorStatus.info(InfoKind.SUPPORT), row.status)
+            assertTrue(row.detail.orEmpty().contains("Informational only"))
+            assertEquals(DetectorStatus.allClear(), model.status)
+            assertEquals("Enforcing", model.verdict)
+            assertTrue(!model.summary.contains("dirty sepolicy", ignoreCase = true))
+            assertTrue(model.impactItems.none { it.text.contains("trusted DirtySepolicy-style access rule was allowed") })
+        }
+    }
+
+    @Test
+    fun `fsck observation does not suppress or replace another dirty policy warning`() {
+        val model = mapper.map(baseReport(*fsckPolicyMethods(true, magiskAllowed = true).toTypedArray()))
+
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("Enforcing with dirty sepolicy rule", model.verdict)
+        assertTrue(model.summary.contains("untrusted_app -> magisk binder as allowed"))
+        assertTrue(model.impactItems.any { it.text.contains("untrusted_app -> magisk binder") })
+        assertTrue(model.impactItems.none { it.text.contains("fsck_untrusted") })
+        assertEquals(
+            DetectorStatus.info(InfoKind.SUPPORT),
+            model.methodRows.single { it.label == "SELinux policy observation: fsck_untrusted sys_admin" }.status,
+        )
+    }
+
+    private fun fsckPolicyMethods(allowed: Boolean?, magiskAllowed: Boolean = false): List<SelinuxCheckResult> {
+        return SelinuxRepository().buildDirtyPolicyMethods(
+            SelinuxContextValiditySnapshot(
+                dirtyPolicyAvailable = true,
+                dirtyPolicyProbeAttempted = true,
+                dirtyPolicyCarrierContext = "u:r:app_zygote:s0:c1,c2",
+                dirtyPolicyCarrierMatchesExpected = true,
+                dirtyPolicyControlsPassed = true,
+                dirtyPolicyStable = true,
+                dirtyPolicyAccessControlAllowed = true,
+                dirtyPolicyNegativeControlRejected = true,
+                dirtyPolicyFsckSysAdminAllowed = allowed,
+                dirtyPolicyMagiskBinderCallAllowed = magiskAllowed,
+            ),
+        )
     }
 
     private fun baseReport(vararg methods: SelinuxCheckResult): SelinuxReport {

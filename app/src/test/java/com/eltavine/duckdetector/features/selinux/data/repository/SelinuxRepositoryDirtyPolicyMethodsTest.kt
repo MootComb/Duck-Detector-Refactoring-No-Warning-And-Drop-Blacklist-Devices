@@ -82,7 +82,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
         assertEquals(17, methods.size)
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: system_server execmem" && it.status == "Allowed" && it.isSecure == false })
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: system_server execmem" && it.dirtyPolicyTrusted })
-        assertTrue(methods.any { it.method == "Dirty sepolicy rule: fsck_untrusted sys_admin" && it.status == "Denied" && it.isSecure == true })
+        assertTrue(methods.any { it.method == "SELinux policy observation: fsck_untrusted sys_admin" && it.status == "Denied" && it.isSecure == null })
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: shell -> su transition" && it.status == "Unavailable" && it.isSecure == null })
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: adbd -> adbroot binder" && it.status == "Allowed" && it.isSecure == false })
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: untrusted_app -> magisk binder" && it.status == "Allowed" && it.isSecure == false })
@@ -111,6 +111,51 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
                     it.details.orEmpty().contains("Observed edge: untrusted_app -> lsposed_file:file read.")
             },
         )
+    }
+
+    @Test
+    fun `fsck observation preserves verdicts and trust without a security classification`() {
+        val cases = listOf(
+            Triple(true, true, "Allowed"),
+            Triple(false, false, "Denied"),
+            Triple(null, null, "Unavailable"),
+            Triple(true, false, "Unavailable"),
+            Triple(false, true, "Unavailable"),
+            Triple(true, null, "Allowed"),
+            Triple(null, true, "Allowed"),
+        )
+        cases.forEach { (nativeAllowed, javaAllowed, expectedStatus) ->
+            val methods = repository.buildDirtyPolicyMethods(
+                SelinuxContextValiditySnapshot(
+                    dirtyPolicyAvailable = true,
+                    dirtyPolicyProbeAttempted = true,
+                    dirtyPolicyCarrierMatchesExpected = true,
+                    dirtyPolicyControlsPassed = true,
+                    dirtyPolicyStable = true,
+                    dirtyPolicyAccessControlAllowed = true,
+                    dirtyPolicyNegativeControlRejected = true,
+                    dirtyPolicyFsckSysAdminAllowed = nativeAllowed,
+                    javaDirtyPolicyAvailable = true,
+                    javaDirtyPolicyProbeAttempted = true,
+                    javaDirtyPolicyCarrierMatchesExpected = true,
+                    javaDirtyPolicyControlsPassed = true,
+                    javaDirtyPolicyStable = true,
+                    javaDirtyPolicyAccessControlAllowed = true,
+                    javaDirtyPolicyNegativeControlRejected = true,
+                    javaDirtyPolicyFsckSysAdminAllowed = javaAllowed,
+                ),
+            )
+            val method = methods.single { it.method == "SELinux policy observation: fsck_untrusted sys_admin" }
+            assertEquals(expectedStatus, method.status)
+            assertEquals(null, method.isSecure)
+            assertEquals(expectedStatus == "Allowed", method.dirtyPolicyTrusted)
+            assertTrue(method.details.orEmpty().contains("Informational only"))
+            assertTrue(method.details.orEmpty().contains("Native dedicated="))
+            assertTrue(method.details.orEmpty().contains("Java dedicated="))
+            if (nativeAllowed != null && javaAllowed != null && nativeAllowed != javaAllowed) {
+                assertTrue(method.details.orEmpty().contains("tracks disagreed"))
+            }
+        }
     }
 
     @Test
@@ -176,7 +221,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
         )
 
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: system_server execmem" && it.status == "Allowed" && it.isSecure == false })
-        assertTrue(methods.any { it.method == "Dirty sepolicy rule: fsck_untrusted sys_admin" && it.status == "Denied" && it.isSecure == true })
+        assertTrue(methods.any { it.method == "SELinux policy observation: fsck_untrusted sys_admin" && it.status == "Denied" && it.isSecure == null })
         assertTrue(methods.any { it.method == "Droidspaces checker: magisk -> droidspacesd dyntransition" && it.status == "Allowed" && it.isSecure == false })
         assertTrue(methods.none { it.dirtyPolicyTrusted })
         assertTrue(methods.any { it.details.orEmpty().contains("reason=Dirty policy oracle self-test failed.") })
