@@ -196,14 +196,17 @@ jobs:
             exit 1
           fi
 
-          echo "metadata_json=$metadata_json" >> "$GITHUB_OUTPUT"
-
           apk_path=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['apk_path'])")
           apk_name=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['apk_name'])")
+          version_name=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['version_name'])")
+          version_code=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['version_code'])")
 
           {
+            echo "metadata_json=$metadata_json"
             echo "apk_path=$apk_path"
             echo "apk_name=$apk_name"
+            echo "version_name=$version_name"
+            echo "version_code=$version_code"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload APK artifact
@@ -213,56 +216,42 @@ jobs:
           path: ${{ steps.metadata.outputs.apk_path }}
           if-no-files-found: error
 
-      - name: Prepare release asset
-        id: release_asset
-        run: |
-          echo "asset_path=${{ steps.metadata.outputs.apk_path }}" >> "$GITHUB_OUTPUT"
-
-      - name: Delete old Nightly assets
-        if: github.ref_name == 'main' || github.ref_name == 'master'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          OWNER="${{ github.repository_owner }}"
-          REPO="${GITHUB_REPOSITORY#*/}"
-          echo "Find nightly release..."
-          RELEASE_JSON=$(gh api repos/$OWNER/$REPO/releases/tags/nightly 2>/dev/null || true)
-          RELEASE_ID=$(echo "$RELEASE_JSON" | jq -r '.id // empty')
-          if [ -z "$RELEASE_ID" ]; then
-            echo "Nightly release doesn't exist, skip deletion"
-            exit 0
-          fi
-          echo "Release ID: $RELEASE_ID"
-          echo "Get and delete all old assets (paginated)..."
-          ASSET_IDS=$(gh api --paginate repos/$OWNER/$REPO/releases/$RELEASE_ID/assets --jq '.[].id')
-          for ASSET_ID in $ASSET_IDS; do
-            echo "Delete asset $ASSET_ID"
-            gh api -X DELETE repos/$OWNER/$REPO/releases/assets/$ASSET_ID
-          done
-
-      - name: Prepare nightly release note
+      - name: Generate release tag
+        id: tag
         if: github.ref_name == 'main' || github.ref_name == 'master'
         shell: bash
         run: |
-          cat <<EOF > nightly-release-note.md
-          Nightly APK build
+          set -euo pipefail
+          VERSION_NAME="${{ steps.metadata.outputs.version_name }}"
+          TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+          TAG="v${VERSION_NAME}-${TIMESTAMP}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Generated tag: $TAG"
 
+      - name: Prepare release note
+        if: github.ref_name == 'main' || github.ref_name == 'master'
+        shell: bash
+        run: |
+          cat <<EOF > release-note.md
+          Automated APK build
+
+          Version: ${{ steps.metadata.outputs.version_name }} (${{ steps.metadata.outputs.version_code }})
           Commit: ${GITHUB_SHA}
           Branch: ${GITHUB_REF_NAME}
+          Build time: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           EOF
 
-      - name: Update nightly APK release
-        id: nightly_release
+      - name: Create new APK release
+        id: new_release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
-          tag_name: nightly
-          name: Nightly APK Build
-          body_path: nightly-release-note.md
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "Release ${{ steps.tag.outputs.tag }}"
+          body_path: release-note.md
           prerelease: false
-          overwrite_files: true
+          draft: false
           files: |
-            ${{ steps.release_asset.outputs.asset_path }}
+            ${{ steps.metadata.outputs.apk_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
