@@ -32,6 +32,33 @@ permissions:
   contents: read
 
 jobs:
+  contracts:
+    name: Architecture and cross-language contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Every checker ships a fixture-based self-test so that a regression in the checker
+      # itself cannot quietly turn a violation into a pass.
+      - name: Self-test contract checkers
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 .github/scripts/test-jni-contracts.py
+          python3 .github/scripts/test-source-file-length.py
+
+      - name: Verify JNI bindings
+        run: python3 .github/scripts/check-jni-contracts.py
+
+      - name: Verify source file length
+        run: python3 .github/scripts/check-source-file-length.py
+
   verify:
     name: Unit tests, lint, and native build
     runs-on: ubuntu-24.04
