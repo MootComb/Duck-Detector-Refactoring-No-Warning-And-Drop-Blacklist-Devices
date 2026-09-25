@@ -103,7 +103,8 @@ internal object KernelIdentityRules {
     private fun extractKernelReleaseMajor(
         source: String,
     ): String? {
-        // Genuine `uname -a` output on Android is "Linux localhost <release> ...". Requiring
+        // Genuine `uname -a` output on Android is "Linux localhost <release> ...", because init sets
+        // the UTS nodename with `hostname localhost` (system/core rootdir/init.rc). Requiring
         // that exact prefix anchors extraction to a real uname invocation and rejects the
         // /proc/version fallback ("Linux version <release> ...") and any other reformatted or
         // spoofed identity string, instead of guessing the release field from its position alone.
