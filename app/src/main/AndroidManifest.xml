@@ -44,7 +44,7 @@ limitations under the License.
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DuckDetector"
-        android:zygotePreloadName="com.eltavine.duckdetector.features.selinux.data.service.AppZygotePreload"
+        android:zygotePreloadName="com.eltavine.duckdetector.AppZygotePreload"
         tools:targetApi="tiramisu">
         <activity
             android:name="android.app.NativeActivity"

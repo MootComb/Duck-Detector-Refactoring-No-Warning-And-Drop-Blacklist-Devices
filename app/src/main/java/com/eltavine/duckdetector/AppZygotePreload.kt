@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector
 
 import android.app.ZygotePreload
 import android.content.pm.ApplicationInfo
 import com.eltavine.duckdetector.features.nativeroot.data.service.ThroneHuntWatchInstaller
+import com.eltavine.duckdetector.features.selinux.data.service.SelinuxContextValidityPreload
 
 class AppZygotePreload : ZygotePreload {
 
