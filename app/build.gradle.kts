@@ -67,6 +67,8 @@ dependencies {
     implementation(project(":feature:lsposed:ui"))
     implementation(project(":feature:nativeroot:data"))
     implementation(project(":feature:nativeroot:ui"))
+    implementation(project(":feature:bootloader:data"))
+    implementation(project(":feature:bootloader:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

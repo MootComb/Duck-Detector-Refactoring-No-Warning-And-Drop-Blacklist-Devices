@@ -77,6 +77,10 @@
         ":core:report",
         ":core:scan",
         ":core:ui",
+        ":feature:bootloader:data",
+        ":feature:bootloader:domain",
+        ":feature:bootloader:presentation",
+        ":feature:bootloader:ui",
         ":feature:customrom:data",
         ":feature:customrom:domain",
         ":feature:customrom:presentation",
@@ -215,6 +219,45 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":core:evidence"
+      ]
+    },
+    ":feature:bootloader:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:attestation:data",
+        ":capability:attestation:domain",
+        ":capability:systemproperties:data",
+        ":capability:systemproperties:domain",
+        ":core:native",
+        ":feature:bootloader:domain"
+      ]
+    },
+    ":feature:bootloader:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain"
+      ]
+    },
+    ":feature:bootloader:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:bootloader:domain"
+      ]
+    },
+    ":feature:bootloader:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:bootloader:domain",
+        ":feature:bootloader:presentation"
       ]
     },
     ":feature:customrom:data": {

@@ -17,12 +17,6 @@ limitations under the License.
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     tools:locale="en">
-    <string name="app_name">Duck Detector</string>
-    <string name="dashboard_info_card">Info Card</string>
-    <string name="dashboard_system_time">System Time</string>
-    <string name="dashboard_additional">Additional</string>
-    <string name="dashboard_detectors">Detectors</string>
-    <string name="card_action_view_details">View details</string>
-    <string name="card_action_review_evidence">Review evidence</string>
-    <string name="card_action_certificate_chain">Certificate chain</string>
+    <string name="bootloader_widevine_consistency_review">Widevine consistency needs review</string>
+    <string name="bootloader_widevine_consistency_conflict">Critical Widevine consistency conflict</string>
 </resources>
