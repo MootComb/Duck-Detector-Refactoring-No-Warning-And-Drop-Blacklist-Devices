@@ -20,6 +20,8 @@ import java.io.EOFException
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InterruptedIOException
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.UndeclaredThrowableException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.security.GeneralSecurityException
@@ -80,6 +82,7 @@ public object FailureName {
         is VirtualMachineError -> "VirtualMachineError"
         is AssertionError -> "AssertionError"
         is Error -> "Error"
+        is InvocationTargetException -> "InvocationTargetException"
         is ClassNotFoundException -> "ClassNotFoundException"
         is NoSuchMethodException -> "NoSuchMethodException"
         is NoSuchFieldException -> "NoSuchFieldException"
@@ -101,6 +104,7 @@ public object FailureName {
         is NoSuchElementException -> "NoSuchElementException"
         is SecurityException -> "SecurityException"
         is ProviderException -> "ProviderException"
+        is UndeclaredThrowableException -> "UndeclaredThrowableException"
         is RuntimeException -> "RuntimeException"
         is FileNotFoundException -> "FileNotFoundException"
         is EOFException -> "EOFException"
