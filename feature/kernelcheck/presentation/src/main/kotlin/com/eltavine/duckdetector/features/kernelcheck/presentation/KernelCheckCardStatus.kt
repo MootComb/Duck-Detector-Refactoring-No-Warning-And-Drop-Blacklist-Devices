@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.presentation
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
@@ -41,7 +42,7 @@ internal fun methodStatus(result: KernelCheckMethodResult): DetectorStatus {
         KernelCheckMethodOutcome.CLEAN -> DetectorStatus.allClear()
         KernelCheckMethodOutcome.DETECTED -> DetectorStatus.danger()
         KernelCheckMethodOutcome.INFO -> {
-            if (result.label == "cvePatchCheck") {
+            if (result.method == KernelCheckMethod.CVE_PATCH_CHECK) {
                 DetectorStatus.info(InfoKind.SUPPORT)
             } else {
                 DetectorStatus.warning()

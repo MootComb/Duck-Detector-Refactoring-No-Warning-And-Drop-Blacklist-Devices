@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityField
@@ -359,23 +360,9 @@ internal fun placeholderMethodRows(
     status: DetectorStatus,
     value: String,
 ): List<KernelCheckDetailRowModel> {
-    return listOf(
-        "emojiScan",
-        "chineseScan",
-        "scriptScan",
-        "telegramScan",
-        "mentionScan",
-        "customKernel",
-        "kernelVersionCheck",
-        "identityConsistency",
-        "arm64CpuIdentity",
-        "cmdlineCheck",
-        "cvePatchCheck",
-        "kptrRestrict",
-        "nativeLibrary",
-    ).map { label ->
+    return KernelCheckMethod.entries.map { method ->
         KernelCheckDetailRowModel(
-            label = label,
+            label = method.label,
             value = value,
             status = status,
         )

@@ -77,12 +77,32 @@ data class KernelIdentityRead(
     val value: String,
 )
 
+/** The methods a kernel check reports, in report order; [label] is the key each method is listed under. */
+enum class KernelCheckMethod(val label: String) {
+    EMOJI_SCAN("emojiScan"),
+    CHINESE_SCAN("chineseScan"),
+    SCRIPT_SCAN("scriptScan"),
+    TELEGRAM_SCAN("telegramScan"),
+    MENTION_SCAN("mentionScan"),
+    CUSTOM_KERNEL("customKernel"),
+    KERNEL_VERSION_CHECK("kernelVersionCheck"),
+    IDENTITY_CONSISTENCY("identityConsistency"),
+    ARM64_CPU_IDENTITY("arm64CpuIdentity"),
+    CMDLINE_CHECK("cmdlineCheck"),
+    CVE_PATCH_CHECK("cvePatchCheck"),
+    KPTR_RESTRICT("kptrRestrict"),
+    NATIVE_LIBRARY("nativeLibrary"),
+}
+
 data class KernelCheckMethodResult(
-    val label: String,
+    val method: KernelCheckMethod,
     val summary: String,
     val outcome: KernelCheckMethodOutcome,
     val detail: String? = null,
-)
+) {
+    val label: String
+        get() = method.label
+}
 
 data class KernelCheckReport(
     val stage: KernelCheckStage,

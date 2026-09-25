@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.data.repository
 import com.eltavine.duckdetector.features.kernelcheck.data.probes.CvePatchAssessment
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
@@ -39,32 +40,32 @@ internal object KernelCheckMethods {
         val infoById = infoFindings.associateBy { it.id }
 
         return listOf(
-            buildNamingMethod("emojiScan", dangerById["emoji"]),
-            buildNamingMethod("chineseScan", dangerById["chinese_chars"]),
-            buildNamingMethod("scriptScan", dangerById["non_latin_scripts"]),
-            buildNamingMethod("telegramScan", dangerById["telegram_ref"]),
-            buildNamingMethod("mentionScan", dangerById["at_mention"]),
-            buildNamingMethod("customKernel", dangerById["custom_kernel"]),
-            buildNamingMethod("kernelVersionCheck", dangerById["non_release_kernel_version"]),
+            buildNamingMethod(KernelCheckMethod.EMOJI_SCAN, dangerById["emoji"]),
+            buildNamingMethod(KernelCheckMethod.CHINESE_SCAN, dangerById["chinese_chars"]),
+            buildNamingMethod(KernelCheckMethod.SCRIPT_SCAN, dangerById["non_latin_scripts"]),
+            buildNamingMethod(KernelCheckMethod.TELEGRAM_SCAN, dangerById["telegram_ref"]),
+            buildNamingMethod(KernelCheckMethod.MENTION_SCAN, dangerById["at_mention"]),
+            buildNamingMethod(KernelCheckMethod.CUSTOM_KERNEL, dangerById["custom_kernel"]),
+            buildNamingMethod(KernelCheckMethod.KERNEL_VERSION_CHECK, dangerById["non_release_kernel_version"]),
             buildIdentityConsistencyMethod(
                 dangerById[KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID],
                 comparedIdentityFields,
             ),
             cpuIdentityMethod,
             buildNativeMethod(
-                "cmdlineCheck",
+                KernelCheckMethod.CMDLINE_CHECK,
                 dangerById["suspicious_cmdline"],
                 nativeAvailable,
                 "Normal"
             ),
-            buildCveMethod("cvePatchCheck", cveAssessment),
+            buildCveMethod(KernelCheckMethod.CVE_PATCH_CHECK, cveAssessment),
             buildInfoMethod(
-                "kptrRestrict",
+                KernelCheckMethod.KPTR_RESTRICT,
                 infoById["kptr_exposed"],
                 unavailable = !nativeAvailable
             ),
             KernelCheckMethodResult(
-                label = "nativeLibrary",
+                method = KernelCheckMethod.NATIVE_LIBRARY,
                 summary = if (nativeAvailable) "Loaded" else "Unavailable",
                 outcome = if (nativeAvailable) KernelCheckMethodOutcome.CLEAN else KernelCheckMethodOutcome.SUPPORT,
             ),
@@ -72,11 +73,11 @@ internal object KernelCheckMethods {
     }
 
     private fun buildNamingMethod(
-        label: String,
+        method: KernelCheckMethod,
         finding: KernelCheckFinding?,
     ): KernelCheckMethodResult {
         return KernelCheckMethodResult(
-            label = label,
+            method = method,
             summary = finding?.value ?: "Clean",
             outcome = if (finding != null) {
                 KernelCheckMethodOutcome.DETECTED
@@ -93,14 +94,14 @@ internal object KernelCheckMethods {
     ): KernelCheckMethodResult {
         return when {
             finding != null -> KernelCheckMethodResult(
-                label = "identityConsistency",
+                method = KernelCheckMethod.IDENTITY_CONSISTENCY,
                 summary = finding.value,
                 outcome = KernelCheckMethodOutcome.DETECTED,
                 detail = finding.detail,
             )
 
             comparedFields.isNotEmpty() -> KernelCheckMethodResult(
-                label = "identityConsistency",
+                method = KernelCheckMethod.IDENTITY_CONSISTENCY,
                 summary = "${comparedFields.sumOf { (_, reads) -> reads.size }} reads agree",
                 outcome = KernelCheckMethodOutcome.CLEAN,
                 detail = comparedFields.joinToString(separator = "\n") { (field, fieldReads) ->
@@ -109,7 +110,7 @@ internal object KernelCheckMethods {
             )
 
             else -> KernelCheckMethodResult(
-                label = "identityConsistency",
+                method = KernelCheckMethod.IDENTITY_CONSISTENCY,
                 summary = "Unavailable",
                 outcome = KernelCheckMethodOutcome.SUPPORT,
                 detail = "No kernel identity field had two readable sources, so nothing could be cross-checked.",
@@ -118,27 +119,27 @@ internal object KernelCheckMethods {
     }
 
     private fun buildNativeMethod(
-        label: String,
+        method: KernelCheckMethod,
         finding: KernelCheckFinding?,
         nativeAvailable: Boolean,
         cleanSummary: String,
     ): KernelCheckMethodResult {
         return when {
             finding != null -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = finding.value,
                 outcome = KernelCheckMethodOutcome.DETECTED,
                 detail = finding.detail,
             )
 
             nativeAvailable -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = cleanSummary,
                 outcome = KernelCheckMethodOutcome.CLEAN,
             )
 
             else -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = "Unavailable",
                 outcome = KernelCheckMethodOutcome.SUPPORT,
             )
@@ -146,11 +147,11 @@ internal object KernelCheckMethods {
     }
 
     private fun buildCveMethod(
-        label: String,
+        method: KernelCheckMethod,
         assessment: CvePatchAssessment,
     ): KernelCheckMethodResult {
         return KernelCheckMethodResult(
-            label = label,
+            method = method,
             summary = assessment.state.label,
             outcome = when (assessment.state) {
                 KernelCheckCvePatchState.UNPATCHED,
@@ -164,26 +165,26 @@ internal object KernelCheckMethods {
     }
 
     private fun buildInfoMethod(
-        label: String,
+        method: KernelCheckMethod,
         finding: KernelCheckFinding?,
         unavailable: Boolean = false,
     ): KernelCheckMethodResult {
         return when {
             finding != null -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = finding.value,
                 outcome = KernelCheckMethodOutcome.INFO,
                 detail = finding.detail,
             )
 
             unavailable -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = "Unavailable",
                 outcome = KernelCheckMethodOutcome.SUPPORT,
             )
 
             else -> KernelCheckMethodResult(
-                label = label,
+                method = method,
                 summary = "OK",
                 outcome = KernelCheckMethodOutcome.CLEAN,
             )

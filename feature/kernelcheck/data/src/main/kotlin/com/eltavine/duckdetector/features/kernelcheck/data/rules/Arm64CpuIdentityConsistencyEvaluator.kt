@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdenti
 import com.eltavine.duckdetector.features.kernelcheck.data.native.CachedCpuIdentitySource
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
@@ -62,14 +63,14 @@ class Arm64CpuIdentityConsistencyEvaluator {
 
         val method = when {
             finding != null -> KernelCheckMethodResult(
-                label = METHOD_LABEL,
+                method = KernelCheckMethod.ARM64_CPU_IDENTITY,
                 summary = finding.value,
                 outcome = KernelCheckMethodOutcome.DETECTED,
                 detail = detail,
             )
 
             hasCompleteCoverage -> KernelCheckMethodResult(
-                label = METHOD_LABEL,
+                method = KernelCheckMethod.ARM64_CPU_IDENTITY,
                 summary = "${comparable.size} CPU(s) agree",
                 outcome = KernelCheckMethodOutcome.CLEAN,
                 detail = detail,
@@ -157,7 +158,7 @@ class Arm64CpuIdentityConsistencyEvaluator {
         detail: String,
     ): KernelCheckMethodResult {
         return KernelCheckMethodResult(
-            label = METHOD_LABEL,
+            method = KernelCheckMethod.ARM64_CPU_IDENTITY,
             summary = summary,
             outcome = KernelCheckMethodOutcome.SUPPORT,
             detail = detail,
@@ -176,8 +177,6 @@ class Arm64CpuIdentityConsistencyEvaluator {
         }
 
     private companion object {
-        const val METHOD_LABEL = "arm64CpuIdentity"
-
         // Architecture[19:16] is omitted because /proc/cpuinfo reports a fixed architecture value.
         const val PROC_IDENTITY_FIELD_MASK = 0xfff0_ffffL
         const val UINT32_MASK = 0xffff_ffffL
