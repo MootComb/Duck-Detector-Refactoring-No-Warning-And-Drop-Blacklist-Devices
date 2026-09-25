@@ -109,6 +109,15 @@ jobs:
 
           ./gradlew --stacktrace :sdk:aar:publish :sdk:aar:verifySdkAar
 
+      # A separate build that depends only on the published AAR, as another application would:
+      # it proves the POM resolves, the public API links and the services and native libraries merge.
+      - name: Build an application from the SDK AAR alone
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace -p samples/sdk-consumer assembleDebug
+
       # Gating. lintDebug reports zero errors, so any new one fails the pull request. Translation
       # completeness is reported as a warning instead (see the lint block in the convention plugin),
       # because a locale that has not caught up with a new string must not block unrelated work.
