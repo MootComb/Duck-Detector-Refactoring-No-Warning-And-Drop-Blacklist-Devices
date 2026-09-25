@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.core.notifications
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewVerdict
 import kotlin.math.roundToInt
 
 data class ScanProgressNotificationSnapshot(
@@ -56,23 +57,24 @@ class ScanProgressNotificationFormatter {
             ScanProgressNotificationModel(
                 title = overview.headline,
                 text = overview.summary,
-                subText = overview.title.takeIf { it.isNotBlank() && it != "Security overview" },
-                shortCriticalText = shortCriticalTextFor(overview.headline),
+                subText = overview.title.takeIf { overview.titleDescribesCompletedScan },
+                shortCriticalText = shortCriticalTextFor(overview),
                 progressPercent = progressPercent,
             )
         }
     }
 
     private fun shortCriticalTextFor(
-        headline: String,
+        overview: DashboardOverviewModel,
     ): String? {
-        return when (headline) {
-            "Danger",
-            "Warning",
-            "Info",
-            "OK" -> headline
+        return when (overview.verdict) {
+            OverviewVerdict.DANGER,
+            OverviewVerdict.WARNING,
+            OverviewVerdict.INFO,
+            OverviewVerdict.OK -> overview.headline
 
-            else -> null
+            OverviewVerdict.READY,
+            OverviewVerdict.PENDING -> null
         }
     }
 }

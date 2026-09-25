@@ -19,7 +19,9 @@ package com.eltavine.duckdetector.core.notifications
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewMetricModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewVerdict
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ScanProgressNotificationFormatterTest {
@@ -36,6 +38,8 @@ class ScanProgressNotificationFormatterTest {
                     title = "Security overview",
                     headline = "Danger",
                     summary = "Start with Mount and TEE.",
+                    verdict = OverviewVerdict.DANGER,
+                    completedScan = false,
                 ),
                 scanning = true,
             ),
@@ -57,6 +61,8 @@ class ScanProgressNotificationFormatterTest {
                     title = "Scan time 4.2s",
                     headline = "OK",
                     summary = "Use the detector cards below to inspect local evidence in detail.",
+                    verdict = OverviewVerdict.OK,
+                    completedScan = true,
                 ),
                 scanning = false,
             ),
@@ -72,15 +78,63 @@ class ScanProgressNotificationFormatterTest {
         assertEquals(100, model.progressPercent)
     }
 
+    @Test
+    fun `pending verdicts carry no short critical text`() {
+        listOf(OverviewVerdict.READY to "Ready", OverviewVerdict.PENDING to "Pending").forEach { (verdict, headline) ->
+            val model = formatter.format(
+                ScanProgressNotificationSnapshot(
+                    totalDetectorCount = 15,
+                    readyDetectorCount = 15,
+                    dashboardOverview = overview(
+                        title = "Security overview",
+                        headline = headline,
+                        summary = "summary",
+                        verdict = verdict,
+                        completedScan = false,
+                    ),
+                    scanning = false,
+                ),
+            )
+
+            assertNull(model.shortCriticalText)
+            assertNull(model.subText)
+        }
+    }
+
+    @Test
+    fun `sub text follows the completed scan flag rather than the title wording`() {
+        val model = formatter.format(
+            ScanProgressNotificationSnapshot(
+                totalDetectorCount = 15,
+                readyDetectorCount = 15,
+                dashboardOverview = overview(
+                    title = "Any reworded overview title",
+                    headline = "Warning",
+                    summary = "summary",
+                    verdict = OverviewVerdict.WARNING,
+                    completedScan = false,
+                ),
+                scanning = false,
+            ),
+        )
+
+        assertNull(model.subText)
+        assertEquals("Warning", model.shortCriticalText)
+    }
+
     private fun overview(
         title: String,
         headline: String,
         summary: String,
+        verdict: OverviewVerdict,
+        completedScan: Boolean,
     ) = DashboardOverviewModel(
         title = title,
         headline = headline,
         summary = summary,
         status = DetectorStatus.allClear(),
+        verdict = verdict,
+        titleDescribesCompletedScan = completedScan,
         metrics = listOf(
             DashboardOverviewMetricModel(
                 label = "Ready",

@@ -32,12 +32,25 @@ data class DashboardOverviewMetricModel(
     val status: DetectorStatus,
 )
 
+/** The overall outcome that [DashboardOverviewModel.headline] describes in words. */
+enum class OverviewVerdict {
+    DANGER,
+    WARNING,
+    INFO,
+    READY,
+    PENDING,
+    OK,
+}
+
 data class DashboardOverviewModel(
     val title: String,
     val headline: String,
     val summary: String,
     val status: DetectorStatus,
     val metrics: List<DashboardOverviewMetricModel>,
+    val verdict: OverviewVerdict,
+    /** True when [title] reports the completion time and duration of a finished scan. */
+    val titleDescribesCompletedScan: Boolean,
     val showTitleIcon: Boolean = false,
 )
 
@@ -74,42 +87,57 @@ fun buildDashboardOverview(
         .take(2)
         .map { it.title }
 
-    val overviewStatus = when {
-        dangerCount > 0 -> DetectorStatus.danger()
-        warningCount > 0 -> DetectorStatus.warning()
-        infoErrorCount > 0 -> DetectorStatus.info(InfoKind.ERROR)
-        readyCount == 0 -> DetectorStatus.info(InfoKind.SUPPORT)
-        pendingCount > 0 -> DetectorStatus.info(InfoKind.SUPPORT)
-        else -> DetectorStatus.allClear()
+    val verdict = when {
+        dangerCount > 0 -> OverviewVerdict.DANGER
+        warningCount > 0 -> OverviewVerdict.WARNING
+        infoErrorCount > 0 -> OverviewVerdict.INFO
+        readyCount == 0 -> OverviewVerdict.READY
+        pendingCount > 0 -> OverviewVerdict.PENDING
+        else -> OverviewVerdict.OK
     }
 
-    val headline = when {
-        dangerCount > 0 -> "Danger"
-        warningCount > 0 -> "Warning"
-        infoErrorCount > 0 -> "Info"
-        readyCount == 0 -> "Ready"
-        pendingCount > 0 -> "Pending"
-        else -> "OK"
+    val overviewStatus = when (verdict) {
+        OverviewVerdict.DANGER -> DetectorStatus.danger()
+        OverviewVerdict.WARNING -> DetectorStatus.warning()
+        OverviewVerdict.INFO -> DetectorStatus.info(InfoKind.ERROR)
+        OverviewVerdict.READY,
+        OverviewVerdict.PENDING -> DetectorStatus.info(InfoKind.SUPPORT)
+
+        OverviewVerdict.OK -> DetectorStatus.allClear()
     }
 
-    val summary = when {
-        dangerCount > 0 -> "Start with ${focusTitles.joinToString(separator = " and ")}."
-        warningCount > 0 -> "Review ${focusTitles.joinToString(separator = " and ")} next."
-        infoErrorCount > 0 -> "${focusTitles.joinToString(separator = " and ")} need more context before treating results as clean."
-        readyCount == 0 -> "Detector cards will populate as local checks complete."
-        pendingCount > 0 -> "Additional modules are still collecting their local evidence."
-        else -> "Use the detector cards below to inspect local evidence in detail."
+    val headline = when (verdict) {
+        OverviewVerdict.DANGER -> "Danger"
+        OverviewVerdict.WARNING -> "Warning"
+        OverviewVerdict.INFO -> "Info"
+        OverviewVerdict.READY -> "Ready"
+        OverviewVerdict.PENDING -> "Pending"
+        OverviewVerdict.OK -> "OK"
     }
+
+    val summary = when (verdict) {
+        OverviewVerdict.DANGER -> "Start with ${focusTitles.joinToString(separator = " and ")}."
+        OverviewVerdict.WARNING -> "Review ${focusTitles.joinToString(separator = " and ")} next."
+        OverviewVerdict.INFO -> "${focusTitles.joinToString(separator = " and ")} need more context before treating results as clean."
+        OverviewVerdict.READY -> "Detector cards will populate as local checks complete."
+        OverviewVerdict.PENDING -> "Additional modules are still collecting their local evidence."
+        OverviewVerdict.OK -> "Use the detector cards below to inspect local evidence in detail."
+    }
+
+    val titleDescribesCompletedScan =
+        scanDurationMillis != null && scanCompletedAtEpochMillis != null && pendingCount == 0
 
     return DashboardOverviewModel(
-        title = if (scanDurationMillis != null && scanCompletedAtEpochMillis != null && pendingCount == 0) {
-            "Scanned at ${formatDetectedTimeLocal(scanCompletedAtEpochMillis)}\nTotal time ${formatScanDuration(scanDurationMillis)}"
+        title = if (titleDescribesCompletedScan) {
+            "Scanned at ${formatDetectedTimeLocal(requireNotNull(scanCompletedAtEpochMillis))}\nTotal time ${formatScanDuration(requireNotNull(scanDurationMillis))}"
         } else {
             "Security overview"
         },
         headline = headline,
         summary = summary,
         status = overviewStatus,
+        verdict = verdict,
+        titleDescribesCompletedScan = titleDescribesCompletedScan,
         metrics = listOf(
             DashboardOverviewMetricModel(
                 label = "Danger",
