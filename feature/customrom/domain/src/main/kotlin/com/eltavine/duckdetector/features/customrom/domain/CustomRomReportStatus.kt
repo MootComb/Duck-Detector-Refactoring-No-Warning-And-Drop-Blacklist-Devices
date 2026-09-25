@@ -35,5 +35,6 @@ fun CustomRomReport.hasReducedCoverage(): Boolean {
     return !nativeAvailable ||
             !propertyAreaAvailable ||
             !symbolScanAvailable ||
+            !serviceScanAvailable ||
             packageVisibility != CustomRomPackageVisibility.FULL
 }

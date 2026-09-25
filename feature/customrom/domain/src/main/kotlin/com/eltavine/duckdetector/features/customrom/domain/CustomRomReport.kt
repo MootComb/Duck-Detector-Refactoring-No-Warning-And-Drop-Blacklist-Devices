@@ -79,6 +79,7 @@ data class CustomRomReport(
     val checkedPackageCount: Int,
     val checkedServiceCount: Int,
     val listedServiceCount: Int,
+    val serviceScanAvailable: Boolean = true,
     val methods: List<CustomRomMethodResult>,
     val errorMessage: String? = null,
     val propertyAreaContextCount: Int = 0,

@@ -134,9 +134,17 @@ internal fun buildRuntimeRows(report: CustomRomReport): List<CustomRomDetailRowM
                 add(
                     CustomRomDetailRowModel(
                         label = "Services",
-                        value = "Clean",
-                        status = DetectorStatus.allClear(),
-                        detail = "Listed ${report.listedServiceCount} services.",
+                        value = if (report.serviceScanAvailable) "Clean" else "Unavailable",
+                        status = if (report.serviceScanAvailable) {
+                            DetectorStatus.allClear()
+                        } else {
+                            DetectorStatus.info(InfoKind.SUPPORT)
+                        },
+                        detail = if (report.serviceScanAvailable) {
+                            "Listed ${report.listedServiceCount} services."
+                        } else {
+                            "ServiceManager could not be fully queried, so service absence is inconclusive."
+                        },
                     ),
                 )
             } else {

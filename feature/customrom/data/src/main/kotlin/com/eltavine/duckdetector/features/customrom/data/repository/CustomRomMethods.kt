@@ -31,6 +31,7 @@ internal fun buildMethods(
     packageVisibility: CustomRomPackageVisibility,
     serviceFindings: List<CustomRomFinding>,
     listedServiceCount: Int,
+    serviceScanAvailable: Boolean,
     reflectionFindings: List<CustomRomFinding>,
     platformFileFindings: List<CustomRomFinding>,
     resourceInjectionFindings: List<CustomRomFinding>,
@@ -119,10 +120,24 @@ internal fun buildMethods(
         ),
         CustomRomMethodResult(
             label = "serviceScan",
-            summary = if (serviceFindings.isNotEmpty()) "${serviceFindings.size} service(s)" else "Clean",
-            outcome = if (serviceFindings.isNotEmpty()) CustomRomMethodOutcome.DETECTED else CustomRomMethodOutcome.CLEAN,
+            summary = when {
+                serviceFindings.isNotEmpty() -> "${serviceFindings.size} service(s)"
+                serviceScanAvailable -> "Clean"
+                else -> "Unavailable"
+            },
+            outcome = when {
+                serviceFindings.isNotEmpty() -> CustomRomMethodOutcome.DETECTED
+                serviceScanAvailable -> CustomRomMethodOutcome.CLEAN
+                else -> CustomRomMethodOutcome.SUPPORT
+            },
             detail = buildString {
-                append("Listed services: $listedServiceCount")
+                append(
+                    if (serviceScanAvailable) {
+                        "Listed services: $listedServiceCount"
+                    } else {
+                        "ServiceManager could not be fully queried from this process."
+                    },
+                )
                 if (serviceFindings.isNotEmpty()) {
                     appendLine()
                     append(

@@ -63,7 +63,9 @@ class CustomRomRepository(
             .orEmpty()
         val packageVisibility = packageInventory.toCustomRomVisibility()
         val packageFindings = detectPackageFindings(installedPackages, isPixel)
-        val (serviceFindings, listedServiceCount) = detectServiceFindings(isPixel)
+        val serviceScan = detectServiceFindings(isPixel)
+        val serviceFindings = serviceScan.findings
+        val listedServiceCount = serviceScan.listedCount
         val reflectionFindings = detectReflectionFindings(isPixel)
         val nativeSnapshot = nativeBridge.collectSnapshot()
         val checkedModificationPropertyCount = modificationProbe.checkedPropertyCount
@@ -114,6 +116,7 @@ class CustomRomRepository(
             packageVisibility = packageVisibility,
             serviceFindings = serviceFindings,
             listedServiceCount = listedServiceCount,
+            serviceScanAvailable = serviceScan.available,
             reflectionFindings = reflectionFindings,
             platformFileFindings = platformFileFindings,
             resourceInjectionFindings = resourceInjectionFindings,
@@ -152,6 +155,7 @@ class CustomRomRepository(
             checkedPackageCount = CustomRomCatalog.packageSignatures.size,
             checkedServiceCount = CustomRomCatalog.specificServices.size,
             listedServiceCount = listedServiceCount,
+            serviceScanAvailable = serviceScan.available,
             methods = methods,
             propertyAreaContextCount = nativeSnapshot.propertyAreaContextCount,
             propertyAreaAnomalyCount = nativeSnapshot.propertyAreaAnomalyCount,
@@ -228,13 +232,10 @@ class CustomRomRepository(
         }.distinct()
     }
 
-    private fun detectServiceFindings(
-        isPixel: Boolean,
-    ): Pair<List<CustomRomFinding>, Int> {
+    private fun detectServiceFindings(isPixel: Boolean): ServiceScan {
         val findings = linkedSetOf<CustomRomFinding>()
-        var listedServiceCount = 0
 
-        runCatching {
+        val lookedUpServices = runCatching {
             CustomRomCatalog.specificServices.forEach { signature ->
                 val binder = HiddenServiceManager.getService(signature.serviceName).getOrThrow()
                 if (binder != null && !shouldSkip(signature.romName, isPixel)) {
@@ -245,27 +246,34 @@ class CustomRomRepository(
                     )
                 }
             }
+        }.isSuccess
 
-            runCatching {
-                val serviceNames = HiddenServiceManager.listServices().getOrThrow()
-                listedServiceCount = serviceNames.size
-                serviceNames.forEach { serviceName ->
-                    val lower = serviceName.lowercase()
-                    CustomRomCatalog.servicePatterns.forEach { (pattern, romName) ->
-                        if (lower.contains(pattern) && !shouldSkip(romName, isPixel)) {
-                            findings += CustomRomFinding(
-                                romName = romName,
-                                signal = serviceName,
-                                detail = "ServiceManager.listServices",
-                            )
-                        }
-                    }
+        val serviceNames = HiddenServiceManager.listServices().getOrNull()
+        serviceNames?.forEach { serviceName ->
+            val lower = serviceName.lowercase()
+            CustomRomCatalog.servicePatterns.forEach { (pattern, romName) ->
+                if (lower.contains(pattern) && !shouldSkip(romName, isPixel)) {
+                    findings += CustomRomFinding(
+                        romName = romName,
+                        signal = serviceName,
+                        detail = "ServiceManager.listServices",
+                    )
                 }
             }
         }
 
-        return findings.toList() to listedServiceCount
+        return ServiceScan(
+            findings = findings.toList(),
+            listedCount = serviceNames?.size ?: 0,
+            available = lookedUpServices && serviceNames != null,
+        )
     }
+
+    private data class ServiceScan(
+        val findings: List<CustomRomFinding>,
+        val listedCount: Int,
+        val available: Boolean,
+    )
 
     private fun detectReflectionFindings(
         isPixel: Boolean,
@@ -293,28 +301,8 @@ class CustomRomRepository(
         }.distinct()
     }
 
-    private fun detectBootloaderFinding(): List<CustomRomModificationFinding> {
-        val lockState = propertyReader.read("ro.boot.flash.locked")
-            ?.trim()
-            .orEmpty()
-
-        if (lockState == "1") {
-            return emptyList()
-        }
-
-        return listOf(
-            CustomRomModificationFinding(
-                category = "Bootloader",
-                signal = "ro.boot.flash.locked",
-                summary = "Unlocked bootloader",
-                detail = if (lockState.isBlank()) {
-                    "ro.boot.flash.locked is empty or unavailable"
-                } else {
-                    "ro.boot.flash.locked=$lockState"
-                },
-            ),
-        )
-    }
+    private fun detectBootloaderFinding(): List<CustomRomModificationFinding> =
+        listOfNotNull(bootloaderUnlockFinding(propertyReader.read("ro.boot.flash.locked")))
 
     private fun shouldSkip(
         romName: String,

@@ -73,7 +73,7 @@ internal fun buildImpactItems(report: CustomRomReport): List<CustomRomImpactItem
                 } else if (report.hasReducedCoverage()) {
                     add(
                         CustomRomImpactItemModel(
-                            text = "No custom ROM signature surfaced from available probes, but package visibility, property-area, or native symbol coverage was incomplete.",
+                            text = "No custom ROM signature surfaced from available probes, but package visibility, service, property-area, or native symbol coverage was incomplete.",
                             status = DetectorStatus.info(InfoKind.SUPPORT),
                         ),
                     )
