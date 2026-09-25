@@ -27,6 +27,7 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodResu
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
+import com.eltavine.duckdetector.features.bootloader.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardAssessment
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderDetailRowModel
@@ -498,19 +499,6 @@ class BootloaderCardModelMapper {
 
     private fun badgeValue(value: String): String {
         return if (value.length > 18) value.take(17) + "…" else value
-    }
-
-    private fun BootloaderReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            BootloaderStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            BootloaderStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            BootloaderStage.READY -> when {
-                dangerFindings.isNotEmpty() -> DetectorStatus.danger()
-                warningFindings.isNotEmpty() -> DetectorStatus.warning()
-                evidenceMode == BootloaderEvidenceMode.UNAVAILABLE -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
-            }
-        }
     }
 
     private fun BootloaderReport.toCardAssessment(): BootloaderCardAssessment {
