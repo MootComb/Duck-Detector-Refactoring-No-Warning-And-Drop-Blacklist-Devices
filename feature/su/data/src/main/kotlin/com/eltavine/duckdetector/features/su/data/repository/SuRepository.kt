@@ -30,10 +30,12 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SuRepository(
-    private val nativeBridge: SuNativeBridge = SuNativeBridge(),
-    private val pathState: (String) -> PathState = PathStat::of,
+class SuRepository internal constructor(
+    private val nativeBridge: SuNativeBridge,
+    private val pathState: (String) -> PathState,
 ) : DetectorScanner<SuReport> {
+
+    constructor(nativeBridge: SuNativeBridge = SuNativeBridge()) : this(nativeBridge, PathStat::of)
 
     override suspend fun scan(): SuReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
