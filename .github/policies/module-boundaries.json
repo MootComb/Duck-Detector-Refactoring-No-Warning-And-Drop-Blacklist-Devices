@@ -591,7 +591,9 @@
     },
     ":feature:playintegrityfix:domain": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":feature:playintegrityfix:presentation": {
       "kind": "jvm",

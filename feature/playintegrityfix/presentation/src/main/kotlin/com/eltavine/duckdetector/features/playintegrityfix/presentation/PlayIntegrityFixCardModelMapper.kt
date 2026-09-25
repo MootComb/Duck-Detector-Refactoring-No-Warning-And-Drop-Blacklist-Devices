@@ -25,6 +25,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityF
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixSignal
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixSignalSeverity
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixStage
+import com.eltavine.duckdetector.features.playintegrityfix.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixDetailRowModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFactModel
@@ -530,19 +531,6 @@ class PlayIntegrityFixCardModelMapper {
             PlayIntegrityFixMethodOutcome.DETECTED -> DetectorStatus.danger()
             PlayIntegrityFixMethodOutcome.WARNING -> DetectorStatus.warning()
             PlayIntegrityFixMethodOutcome.SUPPORT -> DetectorStatus.info(InfoKind.SUPPORT)
-        }
-    }
-
-    private fun PlayIntegrityFixReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            PlayIntegrityFixStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            PlayIntegrityFixStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            PlayIntegrityFixStage.READY -> when {
-                dangerSignalCount > 0 -> DetectorStatus.danger()
-                warningSignalCount > 0 -> DetectorStatus.warning()
-                !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
-            }
         }
     }
 

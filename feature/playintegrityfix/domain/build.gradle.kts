@@ -17,3 +17,7 @@
 plugins {
     id("duckdetector.jvm.library")
 }
+
+dependencies {
+    api(project(":core:evidence"))
+}
