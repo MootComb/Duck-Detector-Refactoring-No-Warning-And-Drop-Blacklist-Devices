@@ -21,8 +21,8 @@ import com.eltavine.duckdetector.features.virtualization.data.native.Virtualizat
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeSnapshot
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
-import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbeResult
-import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbeResult
+import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathObservation
+import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityObservation
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -68,9 +68,9 @@ class VirtualizationProbePayloadBuilderTest(
         assertTrue(snapshot.nativeAvailable)
         assertEquals(profile, snapshot.profile)
         assertEquals(environment.packageName, snapshot.packageName)
-        assertEquals(environment.probeUidIdentity().uid, snapshot.uid)
-        assertEquals(environment.probeUidIdentity().packagesForUid, snapshot.packagesForUid)
-        assertEquals(environment.probeDexPath().classPathEntries, snapshot.classPathEntries)
+        assertEquals(environment.observeUidIdentity().uid, snapshot.uid)
+        assertEquals(environment.observeUidIdentity().packagesForUid, snapshot.packagesForUid)
+        assertEquals(environment.observeDexPath().classPathEntries, snapshot.classPathEntries)
         assertEquals(environment.codePath, snapshot.codePath)
         assertEquals(nativeSnapshot.mountNamespaceInode, snapshot.mountNamespaceInode)
         assertEquals(nativeSnapshot.apexMountKey, snapshot.apexMountKey)
@@ -153,12 +153,12 @@ class VirtualizationProbePayloadBuilderTest(
         override val filesDir: String get() = readStorage("files")
         override val cacheDir: String get() = readStorage("cache")
 
-        override fun probeDexPath() = DexPathProbeResult(
+        override fun observeDexPath() = DexPathObservation(
             classPathEntries = listOf("/data/app/duck/base.apk"),
             sourceDir = "/data/app/duck/base.apk",
         )
 
-        override fun probeUidIdentity() = UidIdentityProbeResult(
+        override fun observeUidIdentity() = UidIdentityObservation(
             uid = if (profile == VirtualizationRemoteProfile.ISOLATED) 99001 else 10123,
             packageName = packageName,
             packagesForUid = if (profile == VirtualizationRemoteProfile.ISOLATED) {

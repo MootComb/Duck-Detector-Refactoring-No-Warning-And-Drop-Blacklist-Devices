@@ -37,34 +37,21 @@ data class UidIdentityProbeResult(
 )
 
 open class UidIdentityProbe(
-    private val context: Context? = null,
-    private val uidProvider: () -> Int = { Process.myUid() },
-    private val processNameProvider: () -> String = { Application.getProcessName() },
+    context: Context? = null,
+    uidProvider: () -> Int = { Process.myUid() },
+    processNameProvider: () -> String = { Application.getProcessName() },
 ) {
+    private val collector = UidIdentityCollector(context, uidProvider, processNameProvider)
 
     open fun probe(): UidIdentityProbeResult {
-        val appContext = context?.applicationContext ?: return UidIdentityProbeResult()
-        val packageManager = appContext.packageManager
-        val uid = runCatching(uidProvider).getOrDefault(-1)
-        val applicationUid = runCatching { appContext.applicationInfo.uid }.getOrDefault(-1)
-        val packageName = appContext.packageName
-        val processName = runCatching(processNameProvider).getOrDefault("")
-        val packagesForUid = runCatching {
-            packageManager.getPackagesForUid(uid)?.toList().orEmpty()
-        }.getOrDefault(emptyList())
-            .map { it.orEmpty() }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .sorted()
-        val uidName = runCatching { packageManager.getNameForUid(uid).orEmpty() }.getOrDefault("")
-
+        val observation = collector.collect() ?: return UidIdentityProbeResult()
         return evaluate(
-            uid = uid,
-            applicationUid = applicationUid,
-            packageName = packageName,
-            processName = processName,
-            uidName = uidName,
-            packagesForUid = packagesForUid,
+            uid = observation.uid,
+            applicationUid = observation.applicationUid,
+            packageName = observation.packageName,
+            processName = observation.processName,
+            uidName = observation.uidName,
+            packagesForUid = observation.packagesForUid,
         )
     }
 

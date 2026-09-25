@@ -19,11 +19,11 @@ package com.eltavine.duckdetector.features.virtualization.data.service
 import android.content.Context
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbe
-import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbeResult
+import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathCollector
+import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathObservation
 import com.eltavine.duckdetector.features.virtualization.data.probes.ProcMountViewScanner
-import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbe
-import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbeResult
+import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityCollector
+import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityObservation
 
 internal object VirtualizationProbePayloadBuilder {
 
@@ -44,8 +44,8 @@ internal object VirtualizationProbePayloadBuilder {
         nativeBridge: VirtualizationNativeBridge,
     ): String {
         return runCatching {
-            val dexPathResult = environment.probeDexPath()
-            val uidIdentityResult = environment.probeUidIdentity()
+            val dexPath = environment.observeDexPath()
+            val uidIdentity = environment.observeUidIdentity()
             // Helpers do not consume EGL fields or renderer findings. Issue #141 reports a crash
             // during EGL initialization in an isolated helper; the exact pointer corruption
             // mechanism is unconfirmed. Android 16 policy denies ordinary isolated apps GPU access.
@@ -57,19 +57,19 @@ internal object VirtualizationProbePayloadBuilder {
                 appendLine("AVAILABLE=1")
                 appendLine("PROFILE=${profile.name}")
                 appendLine("NATIVE_AVAILABLE=${if (snapshot.available) 1 else 0}")
-                appendLine("UID=${uidIdentityResult.uid}")
+                appendLine("UID=${uidIdentity.uid}")
                 appendLine("PACKAGE_NAME=${environment.packageName.encodeValue()}")
-                appendLine("PROCESS_NAME=${uidIdentityResult.processName.encodeValue()}")
-                appendLine("UID_NAME=${uidIdentityResult.uidName.encodeValue()}")
+                appendLine("PROCESS_NAME=${uidIdentity.processName.encodeValue()}")
+                appendLine("UID_NAME=${uidIdentity.uidName.encodeValue()}")
                 appendLine(
-                    "PACKAGES_FOR_UID=${uidIdentityResult.packagesForUid.encodeList()}",
+                    "PACKAGES_FOR_UID=${uidIdentity.packagesForUid.encodeList()}",
                 )
                 appendLine(
-                    "CLASS_PATH_ENTRIES=${dexPathResult.classPathEntries.encodeList()}",
+                    "CLASS_PATH_ENTRIES=${dexPath.classPathEntries.encodeList()}",
                 )
-                appendLine("SOURCE_DIR=${dexPathResult.sourceDir.encodeValue()}")
+                appendLine("SOURCE_DIR=${dexPath.sourceDir.encodeValue()}")
                 appendLine(
-                    "SPLIT_SOURCE_DIRS=${dexPathResult.splitSourceDirs.encodeList()}",
+                    "SPLIT_SOURCE_DIRS=${dexPath.splitSourceDirs.encodeList()}",
                 )
                 appendLine(
                     "MOUNT_NAMESPACE_INODE=${snapshot.mountNamespaceInode.encodeValue()}",
@@ -133,8 +133,8 @@ internal object VirtualizationProbePayloadBuilder {
     // Keep platform reads lazy: isolated helpers must never touch app-private storage, and read
     // failures must remain inside buildSnapshotPayload's error boundary.
     internal interface SnapshotEnvironment {
-        fun probeDexPath(): DexPathProbeResult
-        fun probeUidIdentity(): UidIdentityProbeResult
+        fun observeDexPath(): DexPathObservation
+        fun observeUidIdentity(): UidIdentityObservation
         val packageName: String
         val filesDir: String
         val cacheDir: String
@@ -147,12 +147,13 @@ internal object VirtualizationProbePayloadBuilder {
     ) : SnapshotEnvironment {
         private val appContext: Context by lazy { context.applicationContext }
 
-        override fun probeDexPath(): DexPathProbeResult = DexPathProbe(
+        override fun observeDexPath(): DexPathObservation = DexPathCollector(
             context = appContext,
             classLoaderProvider = { classLoader },
-        ).probe()
+        ).collect() ?: DexPathObservation()
 
-        override fun probeUidIdentity(): UidIdentityProbeResult = UidIdentityProbe(appContext).probe()
+        override fun observeUidIdentity(): UidIdentityObservation =
+            UidIdentityCollector(appContext).collect() ?: UidIdentityObservation()
 
         override val packageName: String get() = appContext.packageName
         override val filesDir: String get() = appContext.filesDir.absolutePath
