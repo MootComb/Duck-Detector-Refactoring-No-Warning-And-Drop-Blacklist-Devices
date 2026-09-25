@@ -193,6 +193,8 @@ object SystemPropertiesCatalog {
             dangerousValues = listOf("unencrypted"),
             expectedSafeValue = "encrypted",
         ),
+        // PersistentDataBlockService (frameworks/base) set this property through Android 15 and no
+        // longer does from Android 16, so on 16 and later any value was written by something else.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
             SystemPropertyRule(
                 property = "sys.oem_unlock_allowed",
