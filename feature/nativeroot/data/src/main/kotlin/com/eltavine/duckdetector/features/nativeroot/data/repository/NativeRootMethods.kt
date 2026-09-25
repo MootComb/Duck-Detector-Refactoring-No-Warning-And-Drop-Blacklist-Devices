@@ -172,9 +172,9 @@ internal fun buildMethods(
                 else -> NativeRootMethodOutcome.CLEAN
             },
             detail = buildString {
-                append("Checks SELinux MAC and sandbox permission boundaries (Netlink RTM_GETLINK, RTM_GETNEIGH).")
-                append("\nUnder AOSP sepolicy, untrusted_app is strictly forbidden from querying physical hardware MAC or ARP neighbor tables on API 30+.")
-                append("\nIf physical Wi-Fi/Ethernet MAC is exposed, or valid unicast LAN ARP entries are leaked (via Magisk sepolicy injection, policy reload corruption, or exploit bypass), it indicates a permission boundary breach.")
+                append("Checks SELinux's netlink boundaries for RTM_GETLINK and RTM_GETNEIGH.")
+                append("\nAOSP policy denies RTM_GETLINK to apps targeting SDK 30 or later on Android 11 and 12 and to every app from Android 13, and denies RTM_GETNEIGH from Android 13 to apps targeting SDK 32 or later; CTS checks both. Where a denial does not apply to this process, that check is not applicable.")
+                append("\nAn answered request that exposes a physical MAC or a LAN neighbour shows SELinux did not enforce the denial, which modified policy, a permissive domain or a kernel without Android's netlink patches can cause.")
                 append("\nTest Result:\n")
                 append(snapshot.permissionBoundaryDetail)
             },

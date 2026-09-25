@@ -21,6 +21,11 @@
 
 namespace duckdetector::nativeroot {
 
+    // Set in ProbeResult::aux_flags when a netlink request that the restriction
+    // applies to got an answer: an EACCES denial or a dump. Checks that were not
+    // applicable or failed before the kernel decided leave it unset.
+    constexpr long kBoundaryAuxEvaluated = 1L << 0;
+
     ProbeResult run_permission_boundary_check();
 
 }  // namespace duckdetector::nativeroot

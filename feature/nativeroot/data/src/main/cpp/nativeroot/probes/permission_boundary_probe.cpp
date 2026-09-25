@@ -21,6 +21,7 @@
 #include <cstring>
 #include <string>
 
+#include <android/api-level.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <linux/neighbour.h>
@@ -136,6 +137,28 @@ namespace duckdetector::nativeroot {
             return buf;
         }
 
+        // RTM_GETLINK needs nlmsg_readpriv once the loaded policy carries
+        // POLICYDB_CONFIG_ANDROID_NETLINK_ROUTE, which libsepol writes from Android 11
+        // (external/selinux libsepol/src/write.c; security/selinux/nlmsgtab.c in ACK). Android 11
+        // and 12 still granted it to apps targeting SDK 29 or lower (system/sepolicy
+        // untrusted_app_29.te and older). From Android 13 no untrusted app holds it
+        // (app_neverallows.te), and CTS expects EACCES (SELinuxTargetSdkTestBase).
+        bool getlink_restricted(const int api_level, const int target_sdk) {
+            if (api_level < 30) return false;
+            return api_level >= 33 || target_sdk >= 30;
+        }
+
+        // RTM_GETNEIGH needs nlmsg_getneigh only once libsepol writes
+        // POLICYDB_CONFIG_ANDROID_NETLINK_GETNEIGH, which starts with Android 13, and sepolicy still
+        // grants it to apps targeting SDK 31 or lower (untrusted_app_30.te and older), as CTS expects.
+        bool getneigh_restricted(const int api_level, const int target_sdk) {
+            return api_level >= 33 && target_sdk >= 32;
+        }
+
+        std::string scope_label(const int api_level, const int target_sdk) {
+            return "API " + std::to_string(api_level) + ", targetSdk " + std::to_string(target_sdk);
+        }
+
         // Validate IPv4 unicast host address:
         // Filter out 0.0.0.0, 127.0.0.0/8 (loopback), 224.0.0.0/4 (multicast), and 255.255.255.255 (broadcast).
         bool is_valid_unicast_ipv4(const struct in_addr &in) {
@@ -162,21 +185,22 @@ namespace duckdetector::nativeroot {
          * or if Magisk/root sepolicy injection widens netlink permissions, the kernel drops the
          * POLICYDB_CONFIG_ANDROID_NETLINK_ROUTE restriction.
          *
-         * Clean devices: socket creation or sendto fails with EACCES, or MAC is securely masked.
-         * Bypassed devices: sendto succeeds and physical interface MAC addresses are exposed.
+         * Enforced: sendto fails with EACCES. Only a process the restriction applies to is checked.
+         * Not enforced: sendto succeeds; exposing a physical interface MAC is the finding.
          */
-        void check_netlink_link_boundary(ProbeResult &result) {
+        void check_netlink_link_boundary(ProbeResult &result, const int api_level, const int target_sdk) {
             result.checked_count++;
-            const int api_level = android_get_device_api_level();
-            if (api_level < 30) {
-                append_line(result.extra_text, "Netlink link boundary: skipped (API " + std::to_string(api_level) + " < 30).");
+            if (!getlink_restricted(api_level, target_sdk)) {
+                append_line(result.extra_text, "Netlink link boundary: not applicable, Android lets this process send RTM_GETLINK (" +
+                                               scope_label(api_level, target_sdk) + ").");
                 return;
             }
 
             errno = 0;
             const ScopedFd sock = create_netlink_route_socket();
             if (!sock.valid()) {
-                append_line(result.extra_text, "Netlink link boundary: socket creation blocked by SELinux (clean).");
+                append_line(result.extra_text, "Netlink link boundary: not evaluated, socket creation failed (errno=" +
+                                               std::to_string(errno) + ").");
                 return;
             }
 
@@ -195,9 +219,16 @@ namespace duckdetector::nativeroot {
             const ssize_t sent = sendto(sock.get(), &req, req.hdr.nlmsg_len, 0, nullptr, 0);
             const int send_err = errno;
             if (sent != static_cast<ssize_t>(req.hdr.nlmsg_len)) {
-                append_line(result.extra_text, "Netlink link boundary: securely blocked by SELinux (errno=" + std::to_string(send_err) + ").");
+                if (send_err == EACCES) {
+                    result.aux_flags |= kBoundaryAuxEvaluated;
+                    append_line(result.extra_text, "Netlink link boundary: enforced, SELinux denied RTM_GETLINK (EACCES).");
+                } else {
+                    append_line(result.extra_text, "Netlink link boundary: not evaluated, sendto failed (errno=" +
+                                                   std::to_string(send_err) + ").");
+                }
                 return;
             }
+            result.aux_flags |= kBoundaryAuxEvaluated;
 
             // Receive and parse RTM_NEWLINK response to detect hardware MAC leakage
             char buffer[8192];
@@ -258,8 +289,6 @@ namespace duckdetector::nativeroot {
 
         done_link_recv:
             if (mac_leak_detected) {
-                result.flags.root = true;
-                result.flags.magisk = true;
                 result.hit_count++;
 
                 Finding finding;
@@ -267,14 +296,14 @@ namespace duckdetector::nativeroot {
                 finding.label = "AF_NETLINK MAC Leak";
                 finding.value = "Hardware MAC Exposed (" + leaked_ifname + ")";
                 finding.severity = Severity::kDanger;
-                finding.detail = "SELinux permission boundary breach: physical MAC leaked on " + leaked_ifname +
-                                 " (" + leaked_mac + ") on API " + std::to_string(api_level) +
-                                 " (AOSP neverallow rule bypassed by Magisk sepolicy injection or policy corruption).";
+                finding.detail = "SELinux answered RTM_GETLINK and exposed the physical MAC of " + leaked_ifname +
+                                 " (" + leaked_mac + ") although AOSP policy and CTS require a denial for this process (" +
+                                 scope_label(api_level, target_sdk) + ").";
                 result.findings.push_back(finding);
-                append_line(result.extra_text, "Netlink link boundary: hardware MAC leak detected on " + leaked_ifname +
-                                               " (" + leaked_mac + ") (SELinux bypass detected).");
+                append_line(result.extra_text, "Netlink link boundary: not enforced, physical MAC exposed on " + leaked_ifname +
+                                               " (" + leaked_mac + ").");
             } else {
-                append_line(result.extra_text, "Netlink link boundary: clean (physical interface MAC securely masked or unavailable).");
+                append_line(result.extra_text, "Netlink link boundary: not enforced, RTM_GETLINK was answered but exposed no physical interface MAC.");
             }
         }
 
@@ -291,21 +320,22 @@ namespace duckdetector::nativeroot {
          * (see change 3009995), causing the kernel to stop checking getneigh permissions and allowing
          * sandboxed untrusted apps to dump the entire LAN ARP table.
          *
-         * Clean devices: socket creation or sendto fails with EACCES, or returns no valid unicast neighbors.
-         * Bypassed devices: sendto succeeds and valid LAN gateway/neighbor ARP entries (IP -> MAC) are returned.
+         * Enforced: sendto fails with EACCES. Only a process the restriction applies to is checked.
+         * Not enforced: sendto succeeds; returning a unicast LAN neighbour (IP -> MAC) is the finding.
          */
-        void check_netlink_neigh_boundary(ProbeResult &result) {
+        void check_netlink_neigh_boundary(ProbeResult &result, const int api_level, const int target_sdk) {
             result.checked_count++;
-            const int api_level = android_get_device_api_level();
-            if (api_level < 30) {
-                append_line(result.extra_text, "Netlink neigh boundary: skipped (API " + std::to_string(api_level) + " < 30).");
+            if (!getneigh_restricted(api_level, target_sdk)) {
+                append_line(result.extra_text, "Netlink neigh boundary: not applicable, Android lets this process send RTM_GETNEIGH (" +
+                                               scope_label(api_level, target_sdk) + ").");
                 return;
             }
 
             errno = 0;
             const ScopedFd sock = create_netlink_route_socket();
             if (!sock.valid()) {
-                append_line(result.extra_text, "Netlink neigh boundary: socket creation blocked by SELinux (clean).");
+                append_line(result.extra_text, "Netlink neigh boundary: not evaluated, socket creation failed (errno=" +
+                                               std::to_string(errno) + ").");
                 return;
             }
 
@@ -323,9 +353,16 @@ namespace duckdetector::nativeroot {
             const ssize_t sent = sendto(sock.get(), &req, req.hdr.nlmsg_len, 0, nullptr, 0);
             const int send_err = errno;
             if (sent != static_cast<ssize_t>(req.hdr.nlmsg_len)) {
-                append_line(result.extra_text, "Netlink neigh boundary: securely blocked by SELinux (errno=" + std::to_string(send_err) + ").");
+                if (send_err == EACCES) {
+                    result.aux_flags |= kBoundaryAuxEvaluated;
+                    append_line(result.extra_text, "Netlink neigh boundary: enforced, SELinux denied RTM_GETNEIGH (EACCES).");
+                } else {
+                    append_line(result.extra_text, "Netlink neigh boundary: not evaluated, sendto failed (errno=" +
+                                                   std::to_string(send_err) + ").");
+                }
                 return;
             }
+            result.aux_flags |= kBoundaryAuxEvaluated;
 
             char buffer[8192];
             ssize_t len = 0;
@@ -358,7 +395,6 @@ namespace duckdetector::nativeroot {
                     unsigned char mac_bytes[6]{};
                     bool has_mac = false;
                     char ip_str[INET_ADDRSTRLEN]{};
-                    bool has_ip = false;
                     bool is_unicast_ip = false;
 
                     for (; RTA_OK(rta, rta_len); rta = RTA_NEXT(rta, rta_len)) {
@@ -367,7 +403,6 @@ namespace duckdetector::nativeroot {
                             std::memcpy(&in, RTA_DATA(rta), sizeof(in));
                             if (is_valid_unicast_ipv4(in)) {
                                 if (inet_ntop(AF_INET, &in, ip_str, sizeof(ip_str))) {
-                                    has_ip = true;
                                     is_unicast_ip = true;
                                 }
                             }
@@ -388,8 +423,6 @@ namespace duckdetector::nativeroot {
 
         done_neigh_recv:
             if (neigh_leak_detected) {
-                result.flags.root = true;
-                result.flags.magisk = true;
                 result.hit_count++;
 
                 Finding finding;
@@ -397,14 +430,14 @@ namespace duckdetector::nativeroot {
                 finding.label = "AF_NETLINK Neighbor Leak";
                 finding.value = "Hardware ARP/Neighbor Exposed";
                 finding.severity = Severity::kDanger;
-                finding.detail = "SELinux permission boundary breach: ARP/neighbor entry leaked (" +
-                                 leaked_ip + " -> " + leaked_mac + ") on API " + std::to_string(api_level) +
-                                 " (AOSP netlink_route_socket getneigh restriction bypassed).";
+                finding.detail = "SELinux answered RTM_GETNEIGH and exposed a LAN neighbour (" +
+                                 leaked_ip + " -> " + leaked_mac + ") although AOSP policy and CTS require a denial for this process (" +
+                                 scope_label(api_level, target_sdk) + ").";
                 result.findings.push_back(finding);
-                append_line(result.extra_text, "Netlink neigh boundary: neighbor table leak detected (" +
-                                               leaked_ip + " " + leaked_mac + ") (SELinux bypass detected).");
+                append_line(result.extra_text, "Netlink neigh boundary: not enforced, LAN neighbour exposed (" +
+                                               leaked_ip + " " + leaked_mac + ").");
             } else {
-                append_line(result.extra_text, "Netlink neigh boundary: clean (no unicast ARP entries leaked).");
+                append_line(result.extra_text, "Netlink neigh boundary: not enforced, RTM_GETNEIGH was answered but exposed no unicast neighbour.");
             }
         }
 
@@ -412,10 +445,11 @@ namespace duckdetector::nativeroot {
 
     ProbeResult run_permission_boundary_check() {
         ProbeResult result;
-        result.extra_text = "";
+        const int api_level = android_get_device_api_level();
+        const int target_sdk = android_get_application_target_sdk_version();
 
-        check_netlink_link_boundary(result);
-        check_netlink_neigh_boundary(result);
+        check_netlink_link_boundary(result, api_level, target_sdk);
+        check_netlink_neigh_boundary(result, api_level, target_sdk);
 
         return result;
     }

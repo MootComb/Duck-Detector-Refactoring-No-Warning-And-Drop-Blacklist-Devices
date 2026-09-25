@@ -91,8 +91,9 @@ namespace duckdetector::nativeroot {
         snapshot.devpts_abnormal_permission_checked_count = devpts_abnormal_permission_probe.checked_count;
         snapshot.devpts_abnormal_permission_denied_count = devpts_abnormal_permission_probe.denied_count;
         snapshot.devpts_abnormal_permission_detail = devpts_abnormal_permission_probe.extra_text;
-        snapshot.permission_boundary_detected = permission_boundary_probe.flags.root || permission_boundary_probe.flags.magisk;
-        snapshot.permission_boundary_available = permission_boundary_probe.checked_count > 0;
+        snapshot.permission_boundary_detected = permission_boundary_probe.hit_count > 0;
+        snapshot.permission_boundary_available =
+                (permission_boundary_probe.aux_flags & kBoundaryAuxEvaluated) != 0;
         snapshot.permission_boundary_detail = permission_boundary_probe.extra_text;
         snapshot.ksu_supercall_attempted = ksu_supercall_probe.checked_count > 0;
         snapshot.ksu_supercall_probe_hit = ksu_supercall_probe.flags.kernel_su;
