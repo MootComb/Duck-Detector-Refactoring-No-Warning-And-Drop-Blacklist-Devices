@@ -42,13 +42,13 @@ import com.eltavine.duckdetector.core.evidence.FailureName
  * the JVM type it extends; everything else is named by [FailureName]. Every type listed exists at
  * the minimum SDK, since a type check against a class missing on an older release is unsafe.
  *
- * Only public SDK types can be listed. A hidden platform failure such as
- * `android.os.ServiceSpecificException` is not visible to the compiler, so it is recognised by the
- * hidden API layer that observes it, which then reports it under a literal name.
+ * Hidden platform failures such as `android.os.ServiceSpecificException` are not visible to the
+ * compiler, so [HiddenPlatformFailure] recognises them first; an exact identity is more specific
+ * than any type check.
  */
 public object PlatformFailureName {
 
-    public fun of(failure: Throwable): String = when (failure) {
+    public fun of(failure: Throwable): String = HiddenPlatformFailure.nameOf(failure) ?: when (failure) {
         is DeadSystemException -> "DeadSystemException"
         is DeadObjectException -> "DeadObjectException"
         is TransactionTooLargeException -> "TransactionTooLargeException"

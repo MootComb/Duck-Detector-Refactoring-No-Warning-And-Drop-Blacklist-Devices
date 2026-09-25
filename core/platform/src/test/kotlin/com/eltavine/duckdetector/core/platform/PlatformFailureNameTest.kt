@@ -78,6 +78,24 @@ class PlatformFailureNameTest {
     }
 
     @Test
+    fun `hidden platform failures are named from their runtime identity`() {
+        assertEquals("ServiceSpecificException", PlatformFailureName.of(android.os.ServiceSpecificException(7)))
+        assertEquals("ParcelableException", PlatformFailureName.of(android.os.ParcelableException(Throwable())))
+        assertEquals("DeadSystemRuntimeException", PlatformFailureName.of(android.os.DeadSystemRuntimeException()))
+        assertEquals(
+            "ServiceSpecificException: No key found",
+            PlatformFailureName.describe(android.os.ServiceSpecificException(7, "No key found")),
+        )
+    }
+
+    @Test
+    fun `hidden identity is the full class name, not the simple name`() {
+        class ServiceSpecificException : RuntimeException()
+
+        assertEquals("RuntimeException", PlatformFailureName.of(ServiceSpecificException()))
+    }
+
+    @Test
     fun `wording follows the shared rule`() {
         assertEquals("RemoteException", PlatformFailureName.describe(RemoteException()))
         assertEquals("IllegalStateException: gone", PlatformFailureName.describe(IllegalStateException("gone")))
