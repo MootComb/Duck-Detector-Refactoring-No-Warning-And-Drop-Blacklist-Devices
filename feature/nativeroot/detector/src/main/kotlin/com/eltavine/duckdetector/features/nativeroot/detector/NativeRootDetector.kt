@@ -17,11 +17,13 @@
 package com.eltavine.duckdetector.features.nativeroot.detector
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.nativeroot.data.repository.NativeRootRepository
+import com.eltavine.duckdetector.features.nativeroot.data.service.ThroneHuntWatchInstaller
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootCardModelMapper
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
@@ -45,4 +47,16 @@ public object NativeRootDetector : Detector<NativeRootReport, NativeRootCardMode
     override fun describe(report: NativeRootReport): NativeRootCardModel = NativeRootCardModelMapper().map(report)
 
     override fun export(model: NativeRootCardModel): DetectorReport = model.toDetectorReport()
+
+    /**
+     * KernelSU's pkg_observer reacts to a /data/system/packages.list rewrite by running
+     * track_throne -> search_manager("/data/app", 2), which opens and iterates every package
+     * directory inode. Watching this package's own directory from app_zygote is what makes that
+     * kernel-side traversal observable, so the watch is installed there rather than in the child.
+     * Without the app zygote preload the throne-hunt carrier reports its collection as failed,
+     * because the dedicated app_zygote preload state is unavailable.
+     */
+    override fun appZygotePreload(appInfo: ApplicationInfo) {
+        ThroneHuntWatchInstaller.publish(ThroneHuntWatchInstaller.install(appInfo))
+    }
 }

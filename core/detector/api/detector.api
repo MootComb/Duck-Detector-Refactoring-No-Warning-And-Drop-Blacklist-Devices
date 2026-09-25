@@ -4,6 +4,12 @@ public interface com.eltavine.duckdetector.core.detector.Detector<R, M extends c
   public abstract R loadingReport();
   public abstract M describe(R);
   public abstract com.eltavine.duckdetector.core.report.DetectorReport export(M);
+  public default void appZygotePreload(android.content.pm.ApplicationInfo);
+  public static void access$appZygotePreload$jd(com.eltavine.duckdetector.core.detector.Detector, android.content.pm.ApplicationInfo);
+}
+
+public final class com.eltavine.duckdetector.core.detector.Detector$DefaultImpls {
+  public static <R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> void appZygotePreload(com.eltavine.duckdetector.core.detector.Detector<R, M>, android.content.pm.ApplicationInfo);
 }
 
 public final class com.eltavine.duckdetector.core.detector.DetectorRunKt {

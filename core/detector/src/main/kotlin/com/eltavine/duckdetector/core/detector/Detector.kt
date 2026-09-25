@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.core.detector
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorHeadline
 import com.eltavine.duckdetector.core.report.DetectorReport
@@ -48,6 +49,13 @@ public interface Detector<R : Any, M : DetectorHeadline> {
 
     /** The structured report the export renders for [model]. */
     public fun export(model: M): DetectorReport
+
+    /**
+     * Work this detector must do in the app zygote, before any isolated process forks from it. The
+     * SDK's zygote preload runs every detector's in catalog order. It runs without a Context, so
+     * most detectors have none.
+     */
+    public fun appZygotePreload(appInfo: ApplicationInfo) {}
 }
 
 /** Collects one fresh report; each detector's data layer implements it. */

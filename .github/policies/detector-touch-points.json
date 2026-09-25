@@ -65,11 +65,6 @@
       "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
       "detectors": ["su"],
       "reason": "Shows a consumer using one detector's typed object through the SDK."
-    },
-    {
-      "path": "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DuckDetectorZygotePreload.kt",
-      "detectors": ["nativeroot"],
-      "reason": "The app zygote preload installs Native Root's throne-hunt watch before the SELinux context validity capture."
     }
   ]
 }

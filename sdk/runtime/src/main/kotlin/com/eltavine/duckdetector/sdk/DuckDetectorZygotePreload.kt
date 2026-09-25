@@ -19,20 +19,21 @@ package com.eltavine.duckdetector.sdk
 import android.app.ZygotePreload
 import android.content.pm.ApplicationInfo
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityPreload
-import com.eltavine.duckdetector.features.nativeroot.detector.NativeRootZygotePreload
 
 /**
  * The detection work that has to run in the app zygote, before any isolated process forks from it.
  *
  * Name this class in `android:zygotePreloadName`, or delegate to it from the host's own
- * [ZygotePreload]. It installs Native Root's throne-hunt watch and then captures the SELinux
- * context validity evidence that the SELinux and LSPosed detectors read from their app zygote
- * carriers. Without it, both carriers report their app zygote evidence as unavailable.
+ * [ZygotePreload]. It runs every detector's app zygote preload in catalog order and then captures
+ * the SELinux context validity evidence that the SELinux and LSPosed detectors read from their app
+ * zygote carriers. Without it, both carriers report their app zygote evidence as unavailable.
  */
 public class DuckDetectorZygotePreload : ZygotePreload {
     private val selinuxContextValidity = SelinuxContextValidityPreload()
 
     override fun doPreload(appInfo: ApplicationInfo) {
-        selinuxContextValidity.preload(appInfo) { NativeRootZygotePreload.installThroneHuntWatch(appInfo) }
+        selinuxContextValidity.preload(appInfo) {
+            DetectorCatalog.all.forEach { detector -> detector.appZygotePreload(appInfo) }
+        }
     }
 }

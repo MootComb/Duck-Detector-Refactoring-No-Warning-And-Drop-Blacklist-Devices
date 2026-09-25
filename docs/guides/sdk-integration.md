@@ -76,7 +76,7 @@ Name the SDK's preload in the application element, or delegate to it from your o
 <application android:zygotePreloadName="com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload">
 ```
 
-It installs Native Root's throne-hunt watch and captures the SELinux context validity evidence before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
+It runs each detector's app zygote work, such as Native Root's throne-hunt watch, and then captures the SELinux context validity evidence, before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
 
 ### Throne-hunt anchor
 

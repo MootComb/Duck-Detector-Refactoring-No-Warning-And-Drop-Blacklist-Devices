@@ -28,10 +28,6 @@ Each detector still collects its own platform evidence during its scan, even whe
 
 The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. When the consent changes, the shell finds the TEE session by `TeeDetector.id` and rescans it. This is composition-root wiring rather than a detection rule, but these files are the only places where the app names a detector, each recorded as a touch point exception. If another feature needs startup consent, replace this with a typed consent contract in `:core`.
 
-## The SDK's app zygote preload names Native Root
-
-`DuckDetectorZygotePreload` in `:sdk:runtime` calls `NativeRootZygotePreload.installThroneHuntWatch` directly, before the SELinux context validity capture. It is the one place where the SDK names a detector outside `DetectorCatalog`, recorded as a touch point exception. If a second detector needs app zygote work, give `Detector` an optional preload hook that the SDK runs in catalog order, keeping the order the carriers depend on.
-
 ## Public API dumps come from javap
 
 `DuckDetectorPublicApiPlugin` records the SDK contract modules' public API with javap, because Kotlin's ABI validation fails on libraries built with AGP's built-in Kotlin: its dump task has no class files to read. javap cannot tell Kotlin `internal` declarations from public ones, which is safe only while the contract modules declare nothing internal. When Kotlin's ABI validation supports these libraries, switch to it and regenerate the dumps in one change.
