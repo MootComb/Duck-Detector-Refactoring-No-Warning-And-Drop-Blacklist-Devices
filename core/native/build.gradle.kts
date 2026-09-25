@@ -21,3 +21,7 @@ plugins {
 kotlin {
     explicitApi()
 }
+
+dependencies {
+    api(project(":core:evidence"))
+}

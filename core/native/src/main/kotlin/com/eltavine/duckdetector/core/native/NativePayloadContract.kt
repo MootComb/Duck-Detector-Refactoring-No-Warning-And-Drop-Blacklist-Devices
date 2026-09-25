@@ -16,10 +16,14 @@
 
 package com.eltavine.duckdetector.core.native
 
+import com.eltavine.duckdetector.core.evidence.NamedFailure
+
 /** Thrown when a payload arrived without a key the parser depends on. */
 public class NativePayloadContractViolation(
     message: String,
-) : IllegalArgumentException(message)
+) : IllegalArgumentException(message), NamedFailure {
+    override val failureName: String = "NativePayloadContractViolation"
+}
 
 /**
  * Checks that a line-oriented `KEY=value` payload still carries the keys its parser depends on.

@@ -71,6 +71,16 @@ class NativeCollectionStatusTest {
     }
 
     @Test
+    fun `failed names a contract violation by its declared name`() {
+        val status = NativeCollectionStatus.failed(
+            outcome = NativeCollectionOutcome.PAYLOAD_REJECTED,
+            cause = NativePayloadContractViolation("missing required key MOUNT_VERSION"),
+        )
+
+        assertEquals("NativePayloadContractViolation: missing required key MOUNT_VERSION", status.detail)
+    }
+
+    @Test
     fun `explain appends the detail when one was captured`() {
         val status = NativeCollectionStatus.failed(
             outcome = NativeCollectionOutcome.LIBRARY_UNAVAILABLE,

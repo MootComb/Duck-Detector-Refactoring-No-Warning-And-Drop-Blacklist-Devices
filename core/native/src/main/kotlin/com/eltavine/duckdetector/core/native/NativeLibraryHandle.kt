@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.core.native
 
+import com.eltavine.duckdetector.core.evidence.FailureName
+
 /**
  * Load state of the shared native library, injectable so that collection failure paths can be
  * exercised on the JVM where no `.so` exists.
@@ -45,10 +47,6 @@ public object DuckDetectorNativeLibrary : NativeLibraryHandle {
     override val isLoaded: Boolean = loadResult.isSuccess
 
     override val loadFailureDetail: String = loadResult.exceptionOrNull()
-        ?.let { cause ->
-            val description = cause.message?.takeIf(String::isNotBlank)
-                ?: cause::class.java.simpleName
-            "$LIBRARY_NAME could not be loaded: $description"
-        }
+        ?.let { cause -> "$LIBRARY_NAME could not be loaded: ${FailureName.messageOrName(cause)}" }
         .orEmpty()
 }

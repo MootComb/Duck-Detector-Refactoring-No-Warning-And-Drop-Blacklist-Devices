@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.core.native
 
+import com.eltavine.duckdetector.core.evidence.FailureName
+
 /**
  * Why a native snapshot does or does not carry usable evidence.
  *
@@ -80,11 +82,9 @@ public data class NativeCollectionStatus(
             outcome: NativeCollectionOutcome,
             cause: Throwable,
         ): NativeCollectionStatus {
-            val type = cause::class.java.simpleName
-            val message = cause.message?.takeIf(String::isNotBlank)
             return NativeCollectionStatus(
                 outcome = outcome,
-                detail = if (message == null) type else "$type: $message",
+                detail = FailureName.describe(cause),
             )
         }
     }
