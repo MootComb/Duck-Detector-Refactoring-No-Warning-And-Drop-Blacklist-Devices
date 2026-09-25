@@ -26,7 +26,6 @@
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateGrantClient.kt": 817,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/TimingSideChannelProbe.kt": 603,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/VintfKeyMintVersionProbe.kt": 630,
-    "app/src/main/java/com/eltavine/duckdetector/features/virtualization/data/repository/VirtualizationRepository.kt": 1032,
     "app/src/main/java/com/eltavine/duckdetector/ui/DuckDetectorApp.kt": 1012,
     "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyScreen.kt": 681,
     "app/src/test/java/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducerTest.kt": 2631,
