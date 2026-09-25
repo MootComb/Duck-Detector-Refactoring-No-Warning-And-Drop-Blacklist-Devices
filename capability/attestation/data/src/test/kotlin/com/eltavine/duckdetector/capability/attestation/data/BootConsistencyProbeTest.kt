@@ -83,7 +83,6 @@ class BootConsistencyProbeTest {
             ),
         )
 
-        assertFalse(result.verifiedStateUnlockedMismatch)
         assertFalse(result.hasHardAnomaly)
         assertTrue(result.detail.contains("approved test devices", ignoreCase = true))
     }

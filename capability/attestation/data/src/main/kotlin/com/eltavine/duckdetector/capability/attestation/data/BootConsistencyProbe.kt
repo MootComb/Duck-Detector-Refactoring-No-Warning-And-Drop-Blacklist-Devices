@@ -63,7 +63,6 @@ public class BootConsistencyProbe(
             vbmetaDigestMissingWhileAttestedHashPresent = vbmetaDigestMissingWhileAttestedHashPresent,
             verifiedBootHashAllZeros = verifiedBootHashAllZeros,
             verifiedBootKeyAllZeros = verifiedBootKeyAllZeros,
-            verifiedStateUnlockedMismatch = false,
             runtimeComparisonPerformed = runtimeComparisonPerformed,
             runtimePropsAvailable = property.available,
             runtimeVbmetaDigest = runtimeVbmetaDigest,
@@ -137,7 +136,6 @@ public data class BootConsistencyResult(
     val vbmetaDigestMissingWhileAttestedHashPresent: Boolean = false,
     val verifiedBootHashAllZeros: Boolean = false,
     val verifiedBootKeyAllZeros: Boolean = false,
-    val verifiedStateUnlockedMismatch: Boolean = false,
     val runtimeComparisonPerformed: Boolean = false,
     val runtimePropsAvailable: Boolean = false,
     val runtimeVbmetaDigest: String? = null,
@@ -147,8 +145,7 @@ public data class BootConsistencyResult(
         get() = vbmetaDigestMismatch ||
                 vbmetaDigestMissingWhileAttestedHashPresent ||
                 verifiedBootHashAllZeros ||
-                verifiedBootKeyAllZeros ||
-                verifiedStateUnlockedMismatch
+                verifiedBootKeyAllZeros
 }
 
 private enum class ParsedBootState {

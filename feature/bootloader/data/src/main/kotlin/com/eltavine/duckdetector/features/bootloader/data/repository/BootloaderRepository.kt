@@ -212,7 +212,6 @@ class BootloaderRepository(
             bootConsistency.vbmetaDigestMissingWhileAttestedHashPresent,
             bootConsistency.verifiedBootHashAllZeros,
             bootConsistency.verifiedBootKeyAllZeros,
-            bootConsistency.verifiedStateUnlockedMismatch,
         ).count { it }
         return bootCount + sourceSignals.size + consistencySignals.size +
             widevineEvidence.anomalyCount

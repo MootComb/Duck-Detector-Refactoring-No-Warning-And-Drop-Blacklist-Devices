@@ -72,16 +72,6 @@ internal fun buildConsistencyFindings(
             detail = bootConsistency.detail,
         )
     }
-    if (bootConsistency.verifiedStateUnlockedMismatch) {
-        findings += BootloaderFinding(
-            id = "verified_state_unlocked_mismatch",
-            label = "Verified state coherence",
-            value = "Impossible pair",
-            group = BootloaderFindingGroup.CONSISTENCY,
-            severity = BootloaderFindingSeverity.DANGER,
-            detail = bootConsistency.detail,
-        )
-    }
     if (!bootConsistency.hasHardAnomaly) {
         findings += BootloaderFinding(
             id = "boot_consistency_clean",
