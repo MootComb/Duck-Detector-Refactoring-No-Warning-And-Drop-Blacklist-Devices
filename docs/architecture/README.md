@@ -13,6 +13,7 @@ inside one feature unit:     data -> domain
 inside one capability unit:  data -> domain
 
 :core:report, :core:scan -> :core:evidence
+:core:detector -> :core:evidence + :core:report
 :core:ui -> :core:evidence + :core:report + :core:scan
 ```
 
@@ -23,8 +24,9 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:core:evidence` | `DetectorId`, `DetectorStatus`, `DetectionSeverity` | Android, reports, scans, UI |
 | `:core:native` | Native library handle, payload codec and snapshot collection status shared by every JNI bridge | Android, detector semantics, specific native units |
 | `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity, and the hidden `SystemProperties` and `ServiceManager` access | Detector semantics, verdicts, UI |
-| `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks | Android, rendering, specific detectors |
+| `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks; `DetectorHeadline`, which every card model states; `DetectorResult` | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
+| `:core:detector` | The headless detector contract: `Detector` (identity, scanner, loading report, card model, export), the `DetectorScanner` port and `run`, which returns a `DetectorResult` without any UI | Compose, specific detectors, probes |
 | `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings, and the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with | Detector rules, probes, specific detectors |
 | `:capability:<unit>:domain` | Evidence types a capability shares with several features | Android, feature interpretation, UI |
 | `:capability:<unit>:data` | Collection of shared evidence: package inventory, early preload capture, system property reads, helper processes, SELinux policy carriers, attestation | Feature verdicts, presentation, other capabilities |

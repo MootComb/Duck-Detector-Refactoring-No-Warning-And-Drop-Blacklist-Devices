@@ -138,11 +138,10 @@
     },
     ":core:detector": {
       "kind": "android-library",
-      "ui": true,
+      "ui": false,
       "allowed_project_dependencies": [
         ":core:evidence",
-        ":core:report",
-        ":core:scan"
+        ":core:report"
       ]
     },
     ":core:evidence": {

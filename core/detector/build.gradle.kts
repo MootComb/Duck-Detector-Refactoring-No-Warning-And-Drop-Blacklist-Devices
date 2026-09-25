@@ -16,11 +16,16 @@
 
 plugins {
     id("duckdetector.android.library")
-    id("duckdetector.android.compose")
 }
 
 android {
     namespace = "com.eltavine.duckdetector.core.detector"
+
+    // The mockable android.jar throws from every constructor by default, so tests could not
+    // create the Context a detector receives.
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -30,6 +35,4 @@ kotlin {
 dependencies {
     api(project(":core:evidence"))
     api(project(":core:report"))
-    api(project(":core:scan"))
-    implementation(libs.androidx.ui)
 }
