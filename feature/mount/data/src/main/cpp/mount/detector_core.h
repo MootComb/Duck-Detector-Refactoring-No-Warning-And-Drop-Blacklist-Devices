@@ -70,6 +70,7 @@ namespace duckdetector::mount {
         bool bindMountDetected = false;
         bool mountOptionsAnomaly = false;
         bool statxMountRootAnomaly = false;
+        bool statxMountRootAttribute = false;
         bool overlayfsKernelSupport = false;
         bool systemFsTypeAnomaly = false;
         bool tmpfsSizeAnomaly = false;

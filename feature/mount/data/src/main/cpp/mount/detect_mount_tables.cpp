@@ -345,7 +345,7 @@ namespace duckdetector::mount::detail {
                 const bool isMountRoot =
                         mountRootFlagKnown && (stx.stx_attributes & kStatxMountRootMask) != 0;
                 if (isMountRoot) {
-                    snapshot.statxMountRootAnomaly = true;
+                    snapshot.statxMountRootAttribute = true;
                     add_finding(
                             snapshot,
                             dedupe,

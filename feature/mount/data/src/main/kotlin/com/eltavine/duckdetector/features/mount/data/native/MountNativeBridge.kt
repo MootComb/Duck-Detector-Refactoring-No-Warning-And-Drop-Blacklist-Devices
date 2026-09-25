@@ -117,6 +117,7 @@ open class MountNativeBridge(
             "BIND_MOUNT_DETECTED" -> copy(bindMountDetected = value.asBool())
             "MOUNT_OPTIONS_ANOMALY" -> copy(mountOptionsAnomaly = value.asBool())
             "STATX_MOUNT_ROOT_ANOMALY" -> copy(statxMountRootAnomaly = value.asBool())
+            "STATX_MOUNT_ROOT_ATTRIBUTE" -> copy(statxMountRootAttribute = value.asBool())
             "OVERLAYFS_KERNEL_SUPPORT" -> copy(overlayfsKernelSupport = value.asBool())
             "SYSTEM_FS_TYPE_ANOMALY" -> copy(systemFsTypeAnomaly = value.asBool())
             "TMPFS_SIZE_ANOMALY" -> copy(tmpfsSizeAnomaly = value.asBool())

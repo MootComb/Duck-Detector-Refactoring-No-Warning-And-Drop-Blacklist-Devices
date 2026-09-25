@@ -64,6 +64,7 @@ data class MountNativeSnapshot(
     val bindMountDetected: Boolean = false,
     val mountOptionsAnomaly: Boolean = false,
     val statxMountRootAnomaly: Boolean = false,
+    val statxMountRootAttribute: Boolean = false,
     val overlayfsKernelSupport: Boolean = false,
     val systemFsTypeAnomaly: Boolean = false,
     val tmpfsSizeAnomaly: Boolean = false,

@@ -126,6 +126,7 @@ namespace duckdetector::mount {
         out << "BIND_MOUNT_DETECTED=" << flag(snapshot.bindMountDetected) << '\n';
         out << "MOUNT_OPTIONS_ANOMALY=" << flag(snapshot.mountOptionsAnomaly) << '\n';
         out << "STATX_MOUNT_ROOT_ANOMALY=" << flag(snapshot.statxMountRootAnomaly) << '\n';
+        out << "STATX_MOUNT_ROOT_ATTRIBUTE=" << flag(snapshot.statxMountRootAttribute) << '\n';
         out << "OVERLAYFS_KERNEL_SUPPORT=" << flag(snapshot.overlayfsKernelSupport) << '\n';
         out << "SYSTEM_FS_TYPE_ANOMALY=" << flag(snapshot.systemFsTypeAnomaly) << '\n';
         out << "TMPFS_SIZE_ANOMALY=" << flag(snapshot.tmpfsSizeAnomaly) << '\n';

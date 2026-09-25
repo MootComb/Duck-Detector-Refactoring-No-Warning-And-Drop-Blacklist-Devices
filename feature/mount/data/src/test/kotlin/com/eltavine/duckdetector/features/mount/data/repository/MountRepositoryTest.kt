@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRem
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
+import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -86,6 +87,29 @@ class MountRepositoryTest {
             assertTrue(mountIdFindings.single().detail.orEmpty().contains("Startup preload:"))
             assertTrue(mountIdFindings.single().detail.orEmpty().contains("Runtime mountinfo:"))
         }
+
+    @Test
+    fun `warning level path and statx signals keep their rows at warning`() = runBlocking {
+        val report = MountRepository(
+            nativeBridge = FakeMountNativeBridge(
+                snapshot = cleanSnapshot().copy(busyboxDetected = true, statxMountRootAttribute = true),
+            ),
+            preloadResultProvider = { EarlyMountPreloadResult.empty() },
+        ).scan()
+
+        assertEquals(MountMethodOutcome.WARNING, report.methods.single { it.label == "Path probes" }.outcome)
+        assertEquals(MountMethodOutcome.WARNING, report.methods.single { it.label == "statx cross-check" }.outcome)
+    }
+
+    @Test
+    fun `statx mount id contradiction stays danger`() = runBlocking {
+        val report = MountRepository(
+            nativeBridge = FakeMountNativeBridge(snapshot = cleanSnapshot().copy(statxMountRootAnomaly = true)),
+            preloadResultProvider = { EarlyMountPreloadResult.empty() },
+        ).scan()
+
+        assertEquals(MountMethodOutcome.DANGER, report.methods.single { it.label == "statx cross-check" }.outcome)
+    }
 
     @Test
     fun `no preload result keeps current mount behavior unchanged`() = runBlocking {

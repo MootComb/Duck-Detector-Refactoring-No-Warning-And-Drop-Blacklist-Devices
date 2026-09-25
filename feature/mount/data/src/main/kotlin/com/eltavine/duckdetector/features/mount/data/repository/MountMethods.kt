@@ -33,7 +33,6 @@ internal fun buildMethods(
     zygoteNext: MountZygoteNextReport,
 ): List<MountMethodResult> {
     val pathDanger = listOf(
-        snapshot.busyboxDetected,
         snapshot.dataAdbDetected,
         snapshot.debugRamdiskDetected,
         snapshot.hybridMountDetected,
@@ -83,11 +82,13 @@ internal fun buildMethods(
             label = "Path probes",
             summary = when {
                 pathDanger > 0 -> "$pathDanger hit(s)"
+                snapshot.busyboxDetected -> "Busybox"
                 snapshot.permissionTotal > 0 -> "Clean"
                 else -> "Partial"
             },
             outcome = when {
                 pathDanger > 0 -> MountMethodOutcome.DANGER
+                snapshot.busyboxDetected -> MountMethodOutcome.WARNING
                 snapshot.permissionTotal > 0 -> MountMethodOutcome.CLEAN
                 else -> MountMethodOutcome.SUPPORT
             },
@@ -174,11 +175,13 @@ internal fun buildMethods(
             summary = when {
                 !snapshot.statxSupported -> "Unsupported"
                 snapshot.statxMntIdMismatch || snapshot.statxMountRootAnomaly -> "Anomaly"
+                snapshot.statxMountRootAttribute -> "Mount root"
                 else -> "Clean"
             },
             outcome = when {
                 !snapshot.statxSupported -> MountMethodOutcome.SUPPORT
                 snapshot.statxMntIdMismatch || snapshot.statxMountRootAnomaly -> MountMethodOutcome.DANGER
+                snapshot.statxMountRootAttribute -> MountMethodOutcome.WARNING
                 else -> MountMethodOutcome.CLEAN
             },
             detail = "Mount-ID and mount-root cross-checks using statx where the kernel exposes those fields.",
