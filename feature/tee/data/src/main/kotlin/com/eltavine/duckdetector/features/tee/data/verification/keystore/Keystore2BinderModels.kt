@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.IBinder
 import android.os.Parcel
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 
 data class GenerateKeyReplyCaptureResult(
     val available: Boolean,
@@ -151,5 +152,5 @@ internal fun capturedThrowableFingerprint(
     val frames = root.stackTrace
         .take(6)
         .joinToString("|") { frame -> "${frame.className}.${frame.methodName}:${frame.lineNumber}" }
-    return "${root.javaClass.name}|$summary|$frames"
+    return "${PlatformFailureName.of(root)}|$summary|$frames"
 }
