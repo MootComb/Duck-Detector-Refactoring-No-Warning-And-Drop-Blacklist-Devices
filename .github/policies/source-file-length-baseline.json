@@ -8,7 +8,6 @@
     "app/src/main/cpp/tee/trickystore/trickystore_probe.cpp": 1113,
     "app/src/main/cpp/virtualization/honeypot_traps.cpp": 921,
     "app/src/main/java/com/eltavine/duckdetector/core/startup/legal/AgreementScreen.kt": 788,
-    "app/src/main/java/com/eltavine/duckdetector/features/bootloader/data/repository/BootloaderRepository.kt": 1342,
     "app/src/main/java/com/eltavine/duckdetector/features/dashboard/ui/DashboardScreen.kt": 873,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducer.kt": 3251,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/repository/TeeRepository.kt": 662,
