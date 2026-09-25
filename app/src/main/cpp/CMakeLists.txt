@@ -162,6 +162,7 @@ set(VIRTUALIZATION_SOURCES
     virtualization/snapshot_builder.cpp
     virtualization/honeypot_traps.cpp
     virtualization/native_bridge.cpp
+    virtualization/sacrificial_syscall_pack.cpp
 )
 
 set(TEE_ASM_SOURCES)
