@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.legal
+package com.eltavine.duckdetector.startup.legal
 
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory

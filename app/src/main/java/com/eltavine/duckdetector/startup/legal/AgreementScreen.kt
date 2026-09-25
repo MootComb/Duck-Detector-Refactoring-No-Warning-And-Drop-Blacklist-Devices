@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.legal
+package com.eltavine.duckdetector.startup.legal
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring

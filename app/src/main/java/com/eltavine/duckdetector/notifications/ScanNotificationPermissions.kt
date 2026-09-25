@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.notifications
+package com.eltavine.duckdetector.notifications
 
 import android.Manifest
 import android.app.NotificationManager

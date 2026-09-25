@@ -7,7 +7,7 @@
     "app/src/main/cpp/selinux/context_validity_probe.cpp": 1114,
     "app/src/main/cpp/tee/trickystore/trickystore_probe.cpp": 1113,
     "app/src/main/cpp/virtualization/honeypot_traps.cpp": 921,
-    "app/src/main/java/com/eltavine/duckdetector/core/startup/legal/AgreementScreen.kt": 788,
+    "app/src/main/java/com/eltavine/duckdetector/startup/legal/AgreementScreen.kt": 788,
     "app/src/main/java/com/eltavine/duckdetector/ui/DuckDetectorApp.kt": 1012,
     "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyScreen.kt": 681,
     "feature/dashboard/ui/src/main/kotlin/com/eltavine/duckdetector/features/dashboard/ui/DashboardScreen.kt": 873,

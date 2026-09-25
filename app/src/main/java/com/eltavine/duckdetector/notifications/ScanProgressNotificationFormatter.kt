@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.notifications
+package com.eltavine.duckdetector.notifications
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.packagevisibility.preferences
+package com.eltavine.duckdetector.notifications.preferences
 
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -27,18 +27,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-data class PackageVisibilityReviewPrefs(
-    val restrictedInventoryAcknowledged: Boolean,
-)
+interface ScanNotificationPrefsStore {
+    val prefs: Flow<ScanNotificationPrefs>
 
-class PackageVisibilityReviewStore private constructor(
+    suspend fun markNotificationsPrompted()
+
+    suspend fun markLiveUpdatesPrompted()
+}
+
+class ScanNotificationConsentStore private constructor(
     context: Context,
-) {
+) : ScanNotificationPrefsStore {
+
     private val dataStore = PreferenceDataStoreFactory.create(
-        produceFile = { context.preferencesDataStoreFile("package_visibility_review_prefs") },
+        produceFile = { context.preferencesDataStoreFile("scan_notification_prefs") },
     )
 
-    val prefs: Flow<PackageVisibilityReviewPrefs> = dataStore.data
+    override val prefs: Flow<ScanNotificationPrefs> = dataStore.data
         .catch { throwable ->
             if (throwable is IOException) {
                 emit(emptyPreferences())
@@ -47,32 +52,45 @@ class PackageVisibilityReviewStore private constructor(
             }
         }
         .map { prefs ->
-            PackageVisibilityReviewPrefs(
-                restrictedInventoryAcknowledged =
-                    prefs[KEY_RESTRICTED_INVENTORY_ACKNOWLEDGED] ?: false,
+            ScanNotificationPrefs(
+                notificationsPrompted = prefs[KEY_NOTIFICATIONS_PROMPTED] ?: false,
+                liveUpdatesPrompted = prefs[KEY_LIVE_UPDATES_PROMPTED] ?: false,
             )
         }
 
-    suspend fun acknowledgeRestrictedInventory() {
+    override suspend fun markNotificationsPrompted() {
         dataStore.edit { prefs ->
-            prefs[KEY_RESTRICTED_INVENTORY_ACKNOWLEDGED] = true
+            prefs[KEY_NOTIFICATIONS_PROMPTED] = true
+        }
+    }
+
+    override suspend fun markLiveUpdatesPrompted() {
+        dataStore.edit { prefs ->
+            prefs[KEY_LIVE_UPDATES_PROMPTED] = true
         }
     }
 
     companion object {
         @Volatile
-        private var instance: PackageVisibilityReviewStore? = null
+        private var instance: ScanNotificationConsentStore? = null
 
-        private val KEY_RESTRICTED_INVENTORY_ACKNOWLEDGED =
-            booleanPreferencesKey("restricted_inventory_acknowledged")
+        private val KEY_NOTIFICATIONS_PROMPTED =
+            booleanPreferencesKey("scan_notifications_prompted")
+        private val KEY_LIVE_UPDATES_PROMPTED =
+            booleanPreferencesKey("scan_live_updates_prompted")
 
-        fun getInstance(context: Context): PackageVisibilityReviewStore {
+        fun getInstance(context: Context): ScanNotificationConsentStore {
             return instance ?: synchronized(this) {
                 instance
-                    ?: PackageVisibilityReviewStore(context.applicationContext).also { created ->
+                    ?: ScanNotificationConsentStore(context.applicationContext).also { created ->
                         instance = created
                     }
             }
         }
     }
 }
+
+data class ScanNotificationPrefs(
+    val notificationsPrompted: Boolean,
+    val liveUpdatesPrompted: Boolean,
+)

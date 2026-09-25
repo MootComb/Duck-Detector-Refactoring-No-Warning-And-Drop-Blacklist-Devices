@@ -51,19 +51,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.notifications.ScanNotificationPermissions
-import com.eltavine.duckdetector.core.notifications.ScanProgressNotificationSnapshot
-import com.eltavine.duckdetector.core.notifications.ScanProgressNotifier
-import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationConsentStore
-import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.notifications.ScanNotificationPermissions
+import com.eltavine.duckdetector.notifications.ScanProgressNotificationSnapshot
+import com.eltavine.duckdetector.notifications.ScanProgressNotifier
+import com.eltavine.duckdetector.notifications.preferences.ScanNotificationConsentStore
+import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
 import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
-import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewPrefs
-import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewStore
-import com.eltavine.duckdetector.core.startup.legal.AgreementAcceptancePrefs
-import com.eltavine.duckdetector.core.startup.legal.AgreementAcceptanceStore
-import com.eltavine.duckdetector.core.startup.legal.AgreementScreen
+import com.eltavine.duckdetector.packagevisibility.preferences.PackageVisibilityReviewPrefs
+import com.eltavine.duckdetector.packagevisibility.preferences.PackageVisibilityReviewStore
+import com.eltavine.duckdetector.startup.legal.AgreementAcceptancePrefs
+import com.eltavine.duckdetector.startup.legal.AgreementAcceptanceStore
+import com.eltavine.duckdetector.startup.legal.AgreementScreen
 import com.eltavine.duckdetector.core.ui.components.AlphaBuildBanner
 import com.eltavine.duckdetector.core.ui.components.AlphaBuildWarningOverlay
 import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirective
@@ -380,7 +380,7 @@ private fun AppReadyShell(
     onSelectDestination: (AppDestination) -> Unit,
     networkPrefs: TeeNetworkPrefs,
     consentStore: TeeNetworkConsentStore,
-    notificationPermissionState: com.eltavine.duckdetector.core.notifications.ScanNotificationPermissionState,
+    notificationPermissionState: com.eltavine.duckdetector.notifications.ScanNotificationPermissionState,
     canShowUpdateDialog: Boolean,
 ) {
     val context = LocalContext.current
