@@ -59,9 +59,9 @@ class ModuleBoundaryPolicyTest {
     fun `leaves undeclared layers, wrong depths and unlisted modules unclassified`() {
         val policy = PolicyFixtures.policy()
 
-        assertNull(policy.classify(":feature:su:widgets"))
-        assertNull(policy.classify(":feature:su"))
-        assertNull(policy.classify(":feature:su:ui:extra"))
+        assertNull(policy.classify(":feature:example:widgets"))
+        assertNull(policy.classify(":feature:example"))
+        assertNull(policy.classify(":feature:example:ui:extra"))
         assertNull(policy.classify(":core:ghost"))
         assertNull(policy.classify(":tools:lint"))
     }

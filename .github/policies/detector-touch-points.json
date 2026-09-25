@@ -62,16 +62,6 @@
       "reason": "Tests the startup policy state, which carries the TEE network consent."
     },
     {
-      "path": "build-logic/src/test/kotlin/com/eltavine/duckdetector/buildlogic/boundaries/ModuleBoundaryPolicyTest.kt",
-      "detectors": ["su"],
-      "reason": "Boundary policy fixtures use real module paths as examples."
-    },
-    {
-      "path": "build-logic/src/test/kotlin/com/eltavine/duckdetector/buildlogic/boundaries/ModuleBoundaryValidatorTest.kt",
-      "detectors": ["su", "tee"],
-      "reason": "Boundary policy fixtures use real module paths as examples."
-    },
-    {
       "path": "capability/helperprocess/data/src/main/kotlin/com/eltavine/duckdetector/capability/helperprocess/data/VirtualizationProbeProtocol.kt",
       "detectors": ["virtualization"],
       "reason": "The Binder descriptor keeps the name it had before the helper process capability was extracted (follow-ups: historical names in the helper process capability)."

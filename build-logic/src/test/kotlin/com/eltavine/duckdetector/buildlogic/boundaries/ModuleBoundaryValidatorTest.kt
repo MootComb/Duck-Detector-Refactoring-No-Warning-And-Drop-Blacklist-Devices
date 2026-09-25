@@ -59,8 +59,8 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects member dependencies that point back up the direction`() {
         assertPolicyError(
-            policy(withMember(":core:scan", "jvm", ":feature:su:domain")),
-            ":core:scan may not depend on :feature:su:domain: dependencies point from",
+            policy(withMember(":core:scan", "jvm", ":feature:example:domain")),
+            ":core:scan may not depend on :feature:example:domain: dependencies point from",
         )
     }
 
@@ -72,8 +72,8 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects members inside layered groups, because their layer rule governs them`() {
         assertPolicyError(
-            policy(withMember(":feature:su:ui", "android-library", ui = true)),
-            ":feature:su:ui belongs to layered group :feature",
+            policy(withMember(":feature:example:ui", "android-library", ui = true)),
+            ":feature:example:ui belongs to layered group :feature",
         )
     }
 
@@ -157,10 +157,10 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `accepts own-unit layers, templated outside modules and UI artifacts in UI modules`() {
         val facts = facts(
-            ":feature:su:ui",
+            ":feature:example:ui",
             ModuleKind.ANDROID_LIBRARY,
             compose = true,
-            projects = mapOf("implementation" to setOf(":feature:su:presentation", ":core:ui")),
+            projects = mapOf("implementation" to setOf(":feature:example:presentation", ":core:ui")),
             externals = mapOf("implementation" to setOf("androidx.compose.material3:material3")),
         )
         assertEquals(emptyList<String>(), ModuleBoundaryValidator.validateProject(policy(), facts))
@@ -169,10 +169,10 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects own-unit layers the template does not allow in any configuration`() {
         val facts = facts(
-            ":feature:su:ui",
+            ":feature:example:ui",
             ModuleKind.ANDROID_LIBRARY,
             compose = true,
-            projects = mapOf("testImplementation" to setOf(":feature:su:data")),
+            projects = mapOf("testImplementation" to setOf(":feature:example:data")),
         )
         assertProjectError(facts, "'ui' layers may only depend on [domain, presentation] of their own unit")
     }
@@ -180,7 +180,7 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects outside modules the layer template does not use`() {
         val facts = facts(
-            ":feature:su:domain",
+            ":feature:example:domain",
             ModuleKind.JVM,
             projects = mapOf("api" to setOf(":core:scan")),
         )
@@ -190,9 +190,9 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects dependencies between isolated units even when the layer matches`() {
         val facts = facts(
-            ":feature:su:data",
+            ":feature:example:data",
             ModuleKind.ANDROID_LIBRARY,
-            projects = mapOf("implementation" to setOf(":feature:tee:domain")),
+            projects = mapOf("implementation" to setOf(":feature:sample:domain")),
         )
         assertProjectError(facts, "units of :feature are isolated from each other")
     }
@@ -202,14 +202,14 @@ class ModuleBoundaryValidatorTest {
         val facts = facts(
             ":capability:probe:android",
             ModuleKind.ANDROID_LIBRARY,
-            projects = mapOf("implementation" to setOf(":feature:su:domain")),
+            projects = mapOf("implementation" to setOf(":feature:example:domain")),
         )
         assertProjectError(facts, "dependencies point from :app to :feature to :capability to :core")
     }
 
     @Test
     fun `checks member dependencies against their patterns`() {
-        val allowed = facts(":app", ModuleKind.ANDROID_APPLICATION, compose = true, projects = mapOf("implementation" to setOf(":feature:su:ui")))
+        val allowed = facts(":app", ModuleKind.ANDROID_APPLICATION, compose = true, projects = mapOf("implementation" to setOf(":feature:example:ui")))
         val denied = facts(":app", ModuleKind.ANDROID_APPLICATION, compose = true, projects = mapOf("implementation" to setOf(":capability:probe:android")))
 
         assertEquals(emptyList<String>(), ModuleBoundaryValidator.validateProject(policy(), allowed))
@@ -218,19 +218,19 @@ class ModuleBoundaryValidatorTest {
 
     @Test
     fun `rejects modules whose plugin does not match their kind`() {
-        assertProjectError(facts(":feature:su:domain", ModuleKind.ANDROID_LIBRARY), "classified as jvm but applies android-library")
+        assertProjectError(facts(":feature:example:domain", ModuleKind.ANDROID_LIBRARY), "classified as jvm but applies android-library")
         assertProjectError(facts(":core:scan", null), "applies no recognised module plugin")
     }
 
     @Test
     fun `rejects the Compose compiler and UI artifacts outside UI modules`() {
         assertProjectError(
-            facts(":feature:su:data", ModuleKind.ANDROID_LIBRARY, compose = true),
-            ":feature:su:data is not a UI module but applies the Compose compiler",
+            facts(":feature:example:data", ModuleKind.ANDROID_LIBRARY, compose = true),
+            ":feature:example:data is not a UI module but applies the Compose compiler",
         )
         assertProjectError(
             facts(
-                ":feature:su:data",
+                ":feature:example:data",
                 ModuleKind.ANDROID_LIBRARY,
                 externals = mapOf("implementation" to setOf("androidx.compose.runtime:runtime")),
             ),
@@ -241,7 +241,7 @@ class ModuleBoundaryValidatorTest {
     @Test
     fun `rejects Android artifacts in pure JVM modules`() {
         val facts = facts(
-            ":feature:su:presentation",
+            ":feature:example:presentation",
             ModuleKind.JVM,
             externals = mapOf("implementation" to setOf("androidx.lifecycle:lifecycle-viewmodel")),
         )
@@ -252,7 +252,7 @@ class ModuleBoundaryValidatorTest {
     fun `rejects unclassified projects and dependencies on unclassified modules`() {
         assertProjectError(facts(":feature:ghost:widgets", ModuleKind.ANDROID_LIBRARY), "not classified")
         assertProjectError(
-            facts(":feature:su:data", ModuleKind.ANDROID_LIBRARY, projects = mapOf("implementation" to setOf(":core:ghost"))),
+            facts(":feature:example:data", ModuleKind.ANDROID_LIBRARY, projects = mapOf("implementation" to setOf(":core:ghost"))),
             "depends on :core:ghost through 'implementation', which the boundary policy does not classify",
         )
     }
