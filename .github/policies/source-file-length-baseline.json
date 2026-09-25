@@ -9,7 +9,6 @@
     "app/src/main/cpp/virtualization/honeypot_traps.cpp": 921,
     "app/src/main/java/com/eltavine/duckdetector/core/startup/legal/AgreementScreen.kt": 788,
     "app/src/main/java/com/eltavine/duckdetector/features/bootloader/data/repository/BootloaderRepository.kt": 1342,
-    "app/src/main/java/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt": 600,
     "app/src/main/java/com/eltavine/duckdetector/features/customrom/presentation/CustomRomCardModelMapper.kt": 889,
     "app/src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt": 769,
     "app/src/main/java/com/eltavine/duckdetector/features/dashboard/ui/DashboardScreen.kt": 873,
