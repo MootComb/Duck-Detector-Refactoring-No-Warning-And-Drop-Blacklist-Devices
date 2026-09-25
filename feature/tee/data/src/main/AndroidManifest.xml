@@ -18,6 +18,12 @@ limitations under the License.
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- The SOTER environment check asks PackageManager for this service. On Android 11 and later,
+         package visibility filtering would otherwise hide it, and a hidden package reads as absent. -->
+    <queries>
+        <package android:name="com.tencent.soter.soterserver" />
+    </queries>
+
     <application>
         <service
             android:name="com.eltavine.duckdetector.features.tee.data.verification.keystore.TeeGrantDomainGranteeService"
