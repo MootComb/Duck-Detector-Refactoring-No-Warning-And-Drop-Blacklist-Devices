@@ -47,6 +47,18 @@ gradlePlugin {
             id = "duckdetector.android.application"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidApplicationConventionPlugin"
         }
+        register("duckDetectorAndroidLibrary") {
+            id = "duckdetector.android.library"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidLibraryConventionPlugin"
+        }
+        register("duckDetectorAndroidCompose") {
+            id = "duckdetector.android.compose"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidComposeConventionPlugin"
+        }
+        register("duckDetectorJvmLibrary") {
+            id = "duckdetector.jvm.library"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorJvmLibraryConventionPlugin"
+        }
         register("duckDetectorAndroidApkArtifacts") {
             id = "duckdetector.android.apk-artifacts"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorApkArtifactsConventionPlugin"
