@@ -18,7 +18,6 @@
     "app/src/main/java/com/eltavine/duckdetector/features/selinux/data/repository/SelinuxRepository.kt": 1376,
     "app/src/main/java/com/eltavine/duckdetector/features/selinux/data/service/AppZygotePreload.kt": 645,
     "app/src/main/java/com/eltavine/duckdetector/features/selinux/presentation/SelinuxCardModelMapper.kt": 1138,
-    "app/src/main/java/com/eltavine/duckdetector/features/systemproperties/data/repository/SystemPropertiesRepository.kt": 603,
     "app/src/main/java/com/eltavine/duckdetector/features/systemproperties/presentation/SystemPropertiesCardModelMapper.kt": 751,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducer.kt": 3251,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/repository/TeeRepository.kt": 662,

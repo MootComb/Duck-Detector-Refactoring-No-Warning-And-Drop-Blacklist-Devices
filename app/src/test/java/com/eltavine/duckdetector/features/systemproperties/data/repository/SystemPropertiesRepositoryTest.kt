@@ -44,7 +44,7 @@ class SystemPropertiesRepositoryTest {
         )
 
         val signals = repository.buildPropAreaSignals(snapshot)
-        val method = repository.buildPropAreaMethod(
+        val method = buildPropAreaMethod(
             propAreaAvailable = snapshot.propAreaAvailable,
             propAreaContextCount = snapshot.propAreaContextCount,
             propAreaHoleCount = snapshot.propAreaHoleCount,
@@ -74,7 +74,7 @@ class SystemPropertiesRepositoryTest {
         )
 
         val signals = repository.buildPropAreaSignals(snapshot)
-        val method = repository.buildPropAreaMethod(
+        val method = buildPropAreaMethod(
             propAreaAvailable = snapshot.propAreaAvailable,
             propAreaContextCount = snapshot.propAreaContextCount,
             propAreaHoleCount = snapshot.propAreaHoleCount,
@@ -90,7 +90,7 @@ class SystemPropertiesRepositoryTest {
         val snapshot = SystemPropertiesNativeSnapshot()
 
         val signals = repository.buildPropAreaSignals(snapshot)
-        val method = repository.buildPropAreaMethod(
+        val method = buildPropAreaMethod(
             propAreaAvailable = snapshot.propAreaAvailable,
             propAreaContextCount = snapshot.propAreaContextCount,
             propAreaHoleCount = snapshot.propAreaHoleCount,
