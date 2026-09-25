@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.native
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
 import com.eltavine.duckdetector.core.native.NativeCollectionStatus
@@ -22,11 +22,11 @@ import com.eltavine.duckdetector.core.native.NativePayloadCodec
 import com.eltavine.duckdetector.core.native.NativePayloadContract
 import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-open class VirtualizationNativeBridge(
+public open class VirtualizationNativeBridge(
     private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
 ) {
 
-    open fun isNativeAvailable(): Boolean = DuckDetectorNativeLibrary.isLoaded
+    public open fun isNativeAvailable(): Boolean = DuckDetectorNativeLibrary.isLoaded
 
     /**
      * [probeRenderer] runs the EGL renderer probe, which loads the vendor GLES driver into the
@@ -36,24 +36,24 @@ open class VirtualizationNativeBridge(
      * With `false` the egl* fields stay at their defaults, which do not mean the renderer was
      * unavailable.
      */
-    open fun collectSnapshot(probeRenderer: Boolean): VirtualizationNativeSnapshot =
+    public open fun collectSnapshot(probeRenderer: Boolean): VirtualizationNativeSnapshot =
         collector.collect(
             readPayload = { nativeCollectSnapshot(probeRenderer) },
             parse = ::parseSnapshot,
             unavailable = { status -> VirtualizationNativeSnapshot(collection = status) },
         )
 
-    open fun runTimingTrap(): VirtualizationTrapResult = collectTrap(::nativeRunTimingTrap)
+    public open fun runTimingTrap(): VirtualizationTrapResult = collectTrap(::nativeRunTimingTrap)
 
-    open fun runSyscallParityTrap(): VirtualizationTrapResult =
+    public open fun runSyscallParityTrap(): VirtualizationTrapResult =
         collectTrap(::nativeRunSyscallParityTrap)
 
-    open fun runAsmCounterTrap(): VirtualizationTrapResult = collectTrap(::nativeRunAsmCounterTrap)
+    public open fun runAsmCounterTrap(): VirtualizationTrapResult = collectTrap(::nativeRunAsmCounterTrap)
 
-    open fun runAsmRawSyscallTrap(): VirtualizationTrapResult =
+    public open fun runAsmRawSyscallTrap(): VirtualizationTrapResult =
         collectTrap(::nativeRunAsmRawSyscallTrap)
 
-    open fun runSacrificialSyscallPack(): SacrificialSyscallPackResult = collector.collect(
+    public open fun runSacrificialSyscallPack(): SacrificialSyscallPackResult = collector.collect(
         readPayload = ::nativeRunSacrificialSyscallPack,
         parse = ::parseSacrificialSyscallPack,
         unavailable = { status ->
@@ -155,7 +155,7 @@ open class VirtualizationNativeBridge(
         return snapshot.copy(findings = findings)
     }
 
-    fun parseSacrificialSyscallPack(raw: String): SacrificialSyscallPackResult {
+    public fun parseSacrificialSyscallPack(raw: String): SacrificialSyscallPackResult {
         if (raw.isBlank()) {
             return SacrificialSyscallPackResult()
         }
@@ -302,7 +302,7 @@ open class VirtualizationNativeBridge(
     private external fun nativeRunSacrificialSyscallPack(): String
 }
 
-data class VirtualizationNativeSnapshot(
+public data class VirtualizationNativeSnapshot(
     val available: Boolean = false,
     val eglAvailable: Boolean = false,
     val eglVendor: String = "",
@@ -329,7 +329,7 @@ data class VirtualizationNativeSnapshot(
         get() = findings.mapTo(linkedSetOf()) { "${it.group}:${it.label}:${it.value}" }
 }
 
-data class VirtualizationNativeFinding(
+public data class VirtualizationNativeFinding(
     val group: String,
     val severity: String,
     val label: String,
@@ -337,7 +337,7 @@ data class VirtualizationNativeFinding(
     val detail: String,
 )
 
-data class VirtualizationTrapResult(
+public data class VirtualizationTrapResult(
     val available: Boolean = false,
     val supported: Boolean = false,
     val completedAttempts: Int = 0,
@@ -352,12 +352,12 @@ data class VirtualizationTrapResult(
         get() = supported && completedAttempts >= 2 && suspiciousAttempts == 0
 }
 
-data class VirtualizationTrapAttempt(
+public data class VirtualizationTrapAttempt(
     val suspicious: Boolean,
     val detail: String,
 )
 
-data class SacrificialSyscallPackResult(
+public data class SacrificialSyscallPackResult(
     val available: Boolean = false,
     val supported: Boolean = false,
     val disabled: Boolean = false,
@@ -371,7 +371,7 @@ data class SacrificialSyscallPackResult(
         get() = suspiciousItems.size
 }
 
-data class VirtualizationSyscallPackItem(
+public data class VirtualizationSyscallPackItem(
     val label: String,
     val supported: Boolean = false,
     val completedAttempts: Int = 0,

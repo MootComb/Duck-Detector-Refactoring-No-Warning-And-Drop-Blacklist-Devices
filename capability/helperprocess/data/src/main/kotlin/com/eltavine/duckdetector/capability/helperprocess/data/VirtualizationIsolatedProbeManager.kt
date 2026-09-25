@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.service
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.content.Context
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
 
-open class VirtualizationIsolatedProbeManager(
+public open class VirtualizationIsolatedProbeManager(
     context: Context? = null,
 ) : VirtualizationProbeManager(
     context = context,

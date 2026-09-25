@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":capability:helperprocess:data"))
     implementation(project(":capability:systemproperties:data"))
     implementation(project(":capability:earlypreload:data"))
     implementation(project(":capability:packageinventory:data"))

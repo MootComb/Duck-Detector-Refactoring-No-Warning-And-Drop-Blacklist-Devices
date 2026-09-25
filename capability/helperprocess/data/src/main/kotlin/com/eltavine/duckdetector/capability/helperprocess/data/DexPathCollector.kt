@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.probes
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.content.Context
 import dalvik.system.BaseDexClassLoader
 import java.io.File
 import java.lang.reflect.Field
 
-data class DexPathObservation(
+public data class DexPathObservation(
     val classPathEntries: List<String> = emptyList(),
     val sourceDir: String = "",
     val splitSourceDirs: List<String> = emptyList(),
 )
 
-open class DexPathCollector(
+public open class DexPathCollector(
     private val context: Context? = null,
     private val classLoaderProvider: () -> ClassLoader? = {
         context?.applicationContext?.classLoader ?: Thread.currentThread().contextClassLoader
     },
 ) {
 
-    open fun collect(): DexPathObservation? {
+    public open fun collect(): DexPathObservation? {
         val appContext = context?.applicationContext ?: return null
         val sourceDir = runCatching { appContext.applicationInfo.sourceDir }.getOrDefault("")
         val splitSourceDirs = runCatching {
@@ -50,7 +50,7 @@ open class DexPathCollector(
         )
     }
 
-    fun observe(
+    public fun observe(
         entries: List<String>,
         sourceDir: String,
         splitSourceDirs: List<String>,

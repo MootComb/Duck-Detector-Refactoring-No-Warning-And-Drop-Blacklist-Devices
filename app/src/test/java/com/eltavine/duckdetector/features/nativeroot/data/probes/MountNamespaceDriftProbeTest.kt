@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

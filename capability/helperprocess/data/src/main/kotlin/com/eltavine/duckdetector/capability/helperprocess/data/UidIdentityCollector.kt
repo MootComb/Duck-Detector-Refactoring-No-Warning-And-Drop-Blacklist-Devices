@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.probes
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.app.Application
 import android.content.Context
 import android.os.Process
 
-data class UidIdentityObservation(
+public data class UidIdentityObservation(
     val uid: Int = -1,
     val applicationUid: Int = -1,
     val packageName: String = "",
@@ -29,13 +29,13 @@ data class UidIdentityObservation(
     val packagesForUid: List<String> = emptyList(),
 )
 
-open class UidIdentityCollector(
+public open class UidIdentityCollector(
     private val context: Context? = null,
     private val uidProvider: () -> Int = { Process.myUid() },
     private val processNameProvider: () -> String = { Application.getProcessName() },
 ) {
 
-    open fun collect(): UidIdentityObservation? {
+    public open fun collect(): UidIdentityObservation? {
         val appContext = context?.applicationContext ?: return null
         val packageManager = appContext.packageManager
         val uid = runCatching(uidProvider).getOrDefault(-1)

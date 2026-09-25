@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.service
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.app.Service
 import android.content.Intent
@@ -22,10 +22,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.Parcel
 import android.os.Process
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
 
-abstract class BaseVirtualizationProbeService : Service() {
+public abstract class BaseVirtualizationProbeService : Service() {
 
     protected abstract val profile: VirtualizationRemoteProfile
 
@@ -75,7 +73,7 @@ abstract class BaseVirtualizationProbeService : Service() {
                     val payload = if (profile == VirtualizationRemoteProfile.REGULAR) {
                         nativeBridge.runSacrificialSyscallPack()
                     } else {
-                        com.eltavine.duckdetector.features.virtualization.data.native.SacrificialSyscallPackResult(
+                        com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult(
                             available = true,
                             supported = false,
                             detail = "Sacrificial syscall pack is only allowed from the regular helper process.",
@@ -146,10 +144,10 @@ abstract class BaseVirtualizationProbeService : Service() {
     }
 }
 
-class VirtualizationProbeService : BaseVirtualizationProbeService() {
+public class VirtualizationProbeService : BaseVirtualizationProbeService() {
     override val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR
 }
 
-class VirtualizationIsolatedProbeService : BaseVirtualizationProbeService() {
+public class VirtualizationIsolatedProbeService : BaseVirtualizationProbeService() {
     override val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.ISOLATED
 }

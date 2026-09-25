@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.service
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.content.Context
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathCollector
-import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathObservation
-import com.eltavine.duckdetector.features.virtualization.data.probes.ProcMountViewScanner
-import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityCollector
-import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityObservation
 
 internal object VirtualizationProbePayloadBuilder {
 

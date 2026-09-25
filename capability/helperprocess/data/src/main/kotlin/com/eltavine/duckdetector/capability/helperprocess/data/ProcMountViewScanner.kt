@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.probes
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import java.io.File
 
@@ -33,7 +33,7 @@ import java.io.File
  * This class is intentionally free of Android framework dependencies so it can run inside the
  * isolated helper process and be unit-tested on the JVM.
  */
-data class ProcMountViewScanResult(
+internal data class ProcMountViewScanResult(
     val available: Boolean,
     val distinctViewCount: Int,
     val expectedViewCount: Int,
@@ -119,7 +119,7 @@ internal data class ParsedProcMount(
     }
 }
 
-class ProcMountViewScanner(
+internal class ProcMountViewScanner(
     private val procDirectoryProvider: () -> File = { File("/proc") },
     private val mountInfoLineReader: (pid: String) -> List<String> = { pid ->
         readMountInfoLines(File("/proc", pid))

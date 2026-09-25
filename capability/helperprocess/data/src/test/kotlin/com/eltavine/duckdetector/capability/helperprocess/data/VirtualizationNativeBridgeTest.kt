@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.native
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

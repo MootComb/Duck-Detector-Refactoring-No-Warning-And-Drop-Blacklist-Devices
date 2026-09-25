@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.service
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.app.Service
 import android.content.ComponentName
@@ -23,10 +23,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.os.Build
-import com.eltavine.duckdetector.features.virtualization.data.native.SacrificialSyscallPackResult
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -34,19 +30,19 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
-open class VirtualizationProbeManager(
+public open class VirtualizationProbeManager(
     private val context: Context? = null,
     private val serviceClass: Class<out Service> = VirtualizationProbeService::class.java,
     private val expectedProfile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR,
     private val nativeBridge: VirtualizationNativeBridge = VirtualizationNativeBridge(),
 ) {
 
-    open suspend fun collect(): VirtualizationRemoteSnapshot = collectRemote(
+    public open suspend fun collect(): VirtualizationRemoteSnapshot = collectRemote(
         timeoutMs = DETECTION_TIMEOUT_MS,
         payloadCollector = VirtualizationProbeProxy::collectSnapshot,
     )
 
-    open suspend fun collectProcMountView(): VirtualizationRemoteSnapshot = collectRemote(
+    public open suspend fun collectProcMountView(): VirtualizationRemoteSnapshot = collectRemote(
         timeoutMs = PROC_MOUNT_VIEW_TIMEOUT_MS,
         payloadCollector = VirtualizationProbeProxy::collectProcMountView,
     )
@@ -70,7 +66,7 @@ open class VirtualizationProbeManager(
         )
     }
 
-    open suspend fun runSacrificialSyscallPack(): SacrificialSyscallPackResult {
+    public open suspend fun runSacrificialSyscallPack(): SacrificialSyscallPackResult {
         val appContext = context?.applicationContext ?: return SacrificialSyscallPackResult()
         return withTimeoutOrNull(DETECTION_TIMEOUT_MS) {
             performRemoteCall(
@@ -226,7 +222,7 @@ open class VirtualizationProbeManager(
         }
     }
 
-    companion object {
+    public companion object {
         private const val ISOLATED_INSTANCE_NAME = "duck_mount_view"
         private const val DETECTION_TIMEOUT_MS = 6_000L
         private const val PROC_MOUNT_VIEW_TIMEOUT_MS = 15_000L

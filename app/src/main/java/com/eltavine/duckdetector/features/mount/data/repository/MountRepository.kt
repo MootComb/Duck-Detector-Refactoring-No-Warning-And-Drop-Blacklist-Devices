@@ -42,9 +42,9 @@ import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextNamespaceAssessment
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextState
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
-import com.eltavine.duckdetector.features.virtualization.data.service.VirtualizationIsolatedProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

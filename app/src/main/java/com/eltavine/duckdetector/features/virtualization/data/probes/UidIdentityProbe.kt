@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.virtualization.data.probes
 import android.app.Application
 import android.content.Context
 import android.os.Process
+import com.eltavine.duckdetector.capability.helperprocess.data.UidIdentityCollector
 import com.eltavine.duckdetector.features.virtualization.data.rules.VirtualizationHostAppsCatalog
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalGroup

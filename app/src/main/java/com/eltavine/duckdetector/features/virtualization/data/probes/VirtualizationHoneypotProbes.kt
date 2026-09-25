@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.virtualization.data.probes
 
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationTrapResult
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeBridge
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
 
 open class NativeTimingTrapProbe(
     private val nativeBridge: VirtualizationNativeBridge = VirtualizationNativeBridge(),

@@ -22,9 +22,9 @@ import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.domain.MountStage
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
-import com.eltavine.duckdetector.features.virtualization.data.service.VirtualizationIsolatedProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

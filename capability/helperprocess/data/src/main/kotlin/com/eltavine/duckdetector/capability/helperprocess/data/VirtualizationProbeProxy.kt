@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.service
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.os.IBinder
 import android.os.Parcel
 
-class VirtualizationProbeProxy(
+internal class VirtualizationProbeProxy(
     private val remote: IBinder,
 ) {
 

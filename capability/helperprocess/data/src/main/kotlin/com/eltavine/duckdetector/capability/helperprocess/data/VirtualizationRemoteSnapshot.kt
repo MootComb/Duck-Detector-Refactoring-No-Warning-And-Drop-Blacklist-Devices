@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.virtualization.data.native
+package com.eltavine.duckdetector.capability.helperprocess.data
 
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
 
-enum class VirtualizationRemoteProfile {
+public enum class VirtualizationRemoteProfile {
     REGULAR,
     ISOLATED,
 }
 
-data class VirtualizationRemoteSnapshot(
+public data class VirtualizationRemoteSnapshot(
     val available: Boolean = false,
     val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR,
     val nativeAvailable: Boolean = false,
@@ -57,8 +57,8 @@ data class VirtualizationRemoteSnapshot(
     val artifactKeys: Set<String>
         get() = findings.mapTo(linkedSetOf()) { "${it.group}:${it.label}:${it.value}" }
 
-    companion object {
-        fun parse(raw: String): VirtualizationRemoteSnapshot {
+    public companion object {
+        public fun parse(raw: String): VirtualizationRemoteSnapshot {
             if (raw.isBlank()) {
                 return VirtualizationRemoteSnapshot()
             }

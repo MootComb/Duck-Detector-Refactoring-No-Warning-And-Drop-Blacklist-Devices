@@ -22,9 +22,9 @@ import android.system.Os
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationRemoteSnapshot
-import com.eltavine.duckdetector.features.virtualization.data.service.VirtualizationIsolatedProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import java.io.File
 
 data class MountNamespaceDriftProbeResult(
