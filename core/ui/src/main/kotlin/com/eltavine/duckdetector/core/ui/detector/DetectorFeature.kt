@@ -27,12 +27,16 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * A detector as the application composes it.
  *
- * This is the whole integration surface of a detector: the application lists its features
- * explicitly and everything central (coordination, dashboard, export, notifications) works on
- * sessions, so adding or changing a detector touches only that detector and the list.
+ * This is the whole integration surface of a detector: the application's generated card list
+ * collects every feature, and everything central (coordination, dashboard, export, notifications,
+ * the startup policy and settings) works on sessions and consent cards, so adding or changing a
+ * detector touches only that detector and its catalog entry.
  */
 public interface DetectorFeature {
     public val id: DetectorId
+
+    /** How the application asks for each of the detector's consents; most detectors have none. */
+    public val consentCards: List<ConsentCard> get() = emptyList()
 
     /** Binds the detector's state holder to the current composition's owner and returns its session. */
     @Composable

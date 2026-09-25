@@ -56,6 +56,9 @@ public interface Detector<R : Any, M : DetectorHeadline> {
      * most detectors have none.
      */
     public fun appZygotePreload(appInfo: ApplicationInfo) {}
+
+    /** The choices this detector asks the user to make, such as whether it may use the network. */
+    public val consents: List<DetectorConsent> get() = emptyList()
 }
 
 /** Collects one fresh report; each detector's data layer implements it. */

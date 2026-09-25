@@ -1,3 +1,27 @@
+public final class com.eltavine.duckdetector.core.detector.ConsentDecision extends java.lang.Enum<com.eltavine.duckdetector.core.detector.ConsentDecision> {
+  public static final com.eltavine.duckdetector.core.detector.ConsentDecision UNDECIDED;
+  public static final com.eltavine.duckdetector.core.detector.ConsentDecision GRANTED;
+  public static final com.eltavine.duckdetector.core.detector.ConsentDecision DECLINED;
+  public static com.eltavine.duckdetector.core.detector.ConsentDecision[] values();
+  public static com.eltavine.duckdetector.core.detector.ConsentDecision valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<com.eltavine.duckdetector.core.detector.ConsentDecision> getEntries();
+}
+
+public final class com.eltavine.duckdetector.core.detector.ConsentId {
+  public final java.lang.String getValue();
+  public static java.lang.String toString-impl(java.lang.String);
+  public java.lang.String toString();
+  public static int hashCode-impl(java.lang.String);
+  public int hashCode();
+  public static boolean equals-impl(java.lang.String, java.lang.Object);
+  public boolean equals(java.lang.Object);
+  public static java.lang.String constructor-impl(java.lang.String);
+  public static final com.eltavine.duckdetector.core.detector.ConsentId box-impl(java.lang.String);
+  public final java.lang.String unbox-impl();
+  public static final boolean equals-impl0(java.lang.String, java.lang.String);
+  public static final kotlin.text.Regex access$getFORMAT$cp();
+}
+
 public interface com.eltavine.duckdetector.core.detector.Detector<R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> {
   public abstract java.lang.String getId-YyyATdw();
   public abstract com.eltavine.duckdetector.core.detector.DetectorScanner<R> createScanner(android.content.Context);
@@ -5,11 +29,20 @@ public interface com.eltavine.duckdetector.core.detector.Detector<R, M extends c
   public abstract M describe(R);
   public abstract com.eltavine.duckdetector.core.report.DetectorReport export(M);
   public default void appZygotePreload(android.content.pm.ApplicationInfo);
+  public default java.util.List<com.eltavine.duckdetector.core.detector.DetectorConsent> getConsents();
   public static void access$appZygotePreload$jd(com.eltavine.duckdetector.core.detector.Detector, android.content.pm.ApplicationInfo);
+  public static java.util.List access$getConsents$jd(com.eltavine.duckdetector.core.detector.Detector);
 }
 
 public final class com.eltavine.duckdetector.core.detector.Detector$DefaultImpls {
   public static <R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> void appZygotePreload(com.eltavine.duckdetector.core.detector.Detector<R, M>, android.content.pm.ApplicationInfo);
+  public static <R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> java.util.List<com.eltavine.duckdetector.core.detector.DetectorConsent> getConsents(com.eltavine.duckdetector.core.detector.Detector<R, M>);
+}
+
+public interface com.eltavine.duckdetector.core.detector.DetectorConsent {
+  public abstract java.lang.String getId-AjMgUOQ();
+  public abstract kotlinx.coroutines.flow.Flow<com.eltavine.duckdetector.core.detector.ConsentDecision> decisions(android.content.Context);
+  public abstract java.lang.Object decide(android.content.Context, boolean, kotlin.coroutines.Continuation<? super kotlin.Unit>);
 }
 
 public final class com.eltavine.duckdetector.core.detector.DetectorRunKt {

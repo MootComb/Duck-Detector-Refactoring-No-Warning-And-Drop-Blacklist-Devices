@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 public class CardDetectorFeature<R : Any, M : DetectorHeadline>(
     private val detector: Detector<R, M>,
+    override val consentCards: List<ConsentCard> = emptyList(),
     private val card: @Composable (M) -> Unit,
 ) : DetectorFeature {
     override val id: DetectorId = detector.id
