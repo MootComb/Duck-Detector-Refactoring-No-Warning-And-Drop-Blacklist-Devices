@@ -16,7 +16,7 @@ inside one capability unit:  data -> domain
 :core:detector -> :core:evidence + :core:report + :core:scan
 ```
 
-Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, and pure JVM modules depend neither on Android modules nor on Android artifacts. Each module's exact dependency list is declared in [`module-boundaries.json`](../../.github/policies/module-boundaries.json) ([ADR 0001](../adr/0001-gradle-module-boundaries.md)).
+Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, pure JVM modules depend neither on Android modules nor on Android artifacts, and only UI modules may use Compose. [`module-boundaries.json`](../../.github/policies/module-boundaries.json) states each layer's rule once as a template and lists only the core modules and `:app` individually. Settings include every module by discovering its directory, so a new unit needs no central entry ([ADR 0001](../adr/0001-gradle-module-boundaries.md), [ADR 0007](../adr/0007-derived-module-classification.md)).
 
 | Module | Responsibility | Forbidden knowledge |
 |---|---|---|
@@ -54,7 +54,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 
 | Guard | Enforces | Self-test |
 |---|---|---|
-| `DuckDetectorModuleBoundariesPlugin` with `module-boundaries.json` | Module classification, plugin kind, allowed project dependencies, layer templates, direction, isolation, JVM purity and acyclicity; evaluated while configuring every build | `./gradlew :build-logic:test` |
+| `DuckDetectorModuleBoundariesPlugin` with `module-boundaries.json` | Classification by layer template or member entry, plugin kind, allowed project dependencies, direction, isolation, JVM purity, UI isolation (Compose only in UI modules) and acyclicity; evaluated while configuring every build | `./gradlew :build-logic:test` |
 | `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit, include direction, per-unit CMake targets, JNI exports owned by the unit's module | `test-native-boundaries.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
@@ -92,7 +92,7 @@ Native code under `app/src/main/cpp` is split into units, one directory each ([A
 
 ## Extension rules
 
-1. Add a detector as `:feature:<name>:{domain,data,presentation,ui}`, implement `DetectorFeature` in its ui layer, classify the modules in `module-boundaries.json`, and add one entry to `DetectorFeatures`. Central code must not change.
+1. Add a detector as `:feature:<name>:{domain,data,presentation,ui}`, implement `DetectorFeature` in its ui layer, and add one entry to `DetectorFeatures`. Settings and the boundary policy pick up the new modules from their directories. Central code must not change.
 2. Put judgement rules in the feature's domain layer and keep them pure JVM; the data layer collects and the presentation layer projects.
 3. Share evidence acquisition only through a capability used by at least two features. The capability must not interpret the evidence for any of them.
 4. Never add a dependency between two feature units or two capability units. If they need the same evidence, extract a capability; if they need the same contract, it belongs in `:core`.

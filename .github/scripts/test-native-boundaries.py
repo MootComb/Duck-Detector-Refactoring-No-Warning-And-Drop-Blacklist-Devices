@@ -116,8 +116,8 @@ class NativeBoundaryCheckerTest(unittest.TestCase):
 
     def run_checker(self) -> subprocess.CompletedProcess[str]:
         self.write(".github/policies/native-boundaries.json", json.dumps(self.policy))
-        self.write(".github/policies/module-boundaries.json",
-                   json.dumps({"schema_version": 1, "members": {name: {} for name in self.modules}}))
+        for module in self.modules:
+            self.write(module.strip(":").replace(":", "/") + "/build.gradle.kts", "")
         self.write(f"{NATIVE}/CMakeLists.txt", self.cmake)
         return subprocess.run([sys.executable, CHECKER, "--repo-root", self.root],
                               capture_output=True, text=True, check=False)
@@ -188,9 +188,9 @@ class NativeBoundaryCheckerTest(unittest.TestCase):
                                          "may_include": []}
         self.assert_rejected(f"unit gamma: {NATIVE}/gamma does not exist", "unit_gamma is not declared")
 
-    def test_rejects_owner_missing_from_module_policy(self) -> None:
+    def test_rejects_owner_that_is_not_a_module(self) -> None:
         self.policy["units"]["alpha"]["owner"] = ":feature:unknown:data"
-        self.assert_rejected("owner :feature:unknown:data is not a module")
+        self.assert_rejected("owner :feature:unknown:data is not a module of this build")
 
     def test_rejects_may_include_of_unknown_unit(self) -> None:
         self.policy["units"]["alpha"]["may_include"] = ["common", "delta"]

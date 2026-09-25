@@ -17,7 +17,10 @@
 package com.eltavine.duckdetector.buildlogic.boundaries
 
 import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -25,17 +28,42 @@ import org.junit.Test
 class ModuleBoundaryPolicyTest {
 
     @Test
-    fun `parses members, kinds and rules`() {
+    fun `parses members, layer templates and rules`() {
         val policy = PolicyFixtures.policy()
 
         assertEquals(":app", policy.compositionRoot)
-        assertEquals(ModuleKind.JVM, policy.members.getValue(":feature:su:domain").kind)
-        assertEquals(
-            setOf(":feature:su:domain", ":capability:probe:android"),
-            policy.members.getValue(":feature:su:data").allowedProjectDependencies,
-        )
-        assertEquals(setOf("domain", "presentation"), policy.groupLayers.getValue(":feature").getValue("ui").mayDependOn)
+        assertEquals(ModuleKind.JVM, policy.members.getValue(":core:scan").kind)
+        assertTrue(policy.members.getValue(":core:ui").ui)
+        assertEquals(setOf(":core:evidence"), policy.members.getValue(":core:scan").allowedProjectDependencies)
+        val ui = policy.groupLayers.getValue(":feature").getValue("ui")
+        assertEquals(setOf("domain", "presentation"), ui.mayDependOn)
+        assertEquals(setOf(":core:evidence", ":core:scan", ":core:ui"), ui.mayUse)
+        assertTrue(ui.ui)
         assertEquals(listOf(":app", ":feature", ":capability", ":core"), policy.dependencyDirection)
+        assertEquals(listOf("androidx.compose.*:*"), policy.uiOnlyDependencies)
+    }
+
+    @Test
+    fun `classifies layered modules from their path without a member entry`() {
+        val policy = PolicyFixtures.policy()
+
+        val data = requireNotNull(policy.classify(":feature:brandnew:data"))
+        assertEquals(ModuleKind.ANDROID_LIBRARY, data.kind)
+        assertFalse(data.ui)
+        assertEquals(setOf("domain"), data.layer?.mayDependOn)
+        assertTrue(requireNotNull(policy.classify(":feature:brandnew:ui")).ui)
+        assertNull(requireNotNull(policy.classify(":core:scan")).layer)
+    }
+
+    @Test
+    fun `leaves undeclared layers, wrong depths and unlisted modules unclassified`() {
+        val policy = PolicyFixtures.policy()
+
+        assertNull(policy.classify(":feature:su:widgets"))
+        assertNull(policy.classify(":feature:su"))
+        assertNull(policy.classify(":feature:su:ui:extra"))
+        assertNull(policy.classify(":core:ghost"))
+        assertNull(policy.classify(":tools:lint"))
     }
 
     @Test
@@ -45,18 +73,33 @@ class ModuleBoundaryPolicyTest {
 
     @Test
     fun `rejects missing rule keys`() {
-        assertRejected("missing=[isolated_groups]") { it.getJSONObject("rules").remove("isolated_groups") }
+        assertRejected("missing=[ui_only_dependencies]") { it.getJSONObject("rules").remove("ui_only_dependencies") }
     }
 
     @Test
-    fun `rejects unsupported schema version`() {
-        assertRejected("unsupported schema_version 2") { it.put("schema_version", 2) }
+    fun `rejects the previous schema version`() {
+        assertRejected("unsupported schema_version 1") { it.put("schema_version", 1) }
     }
 
     @Test
     fun `rejects unknown module kind`() {
         assertRejected("unknown kind 'kotlin-multiplatform'") {
             it.getJSONObject("members").getJSONObject(":core:evidence").put("kind", "kotlin-multiplatform")
+        }
+    }
+
+    @Test
+    fun `rejects a ui flag that is not a boolean`() {
+        assertRejected("member :core:ui.ui must be true or false") {
+            it.getJSONObject("members").getJSONObject(":core:ui").put("ui", "yes")
+        }
+    }
+
+    @Test
+    fun `rejects layer rules without may_use`() {
+        assertRejected("layer :feature:domain has unexpected shape (missing=[may_use]") {
+            it.getJSONObject("rules").getJSONObject("group_layers").getJSONObject(":feature")
+                .getJSONObject("domain").remove("may_use")
         }
     }
 
@@ -84,7 +127,7 @@ class ModuleBoundaryPolicyTest {
         assertTrue(error.message!!, error.message!!.contains("not valid JSON"))
     }
 
-    private fun assertRejected(expectedMessage: String, mutate: (org.json.JSONObject) -> Unit) {
+    private fun assertRejected(expectedMessage: String, mutate: (JSONObject) -> Unit) {
         val error = assertThrows(ModuleBoundaryPolicyException::class.java) {
             ModuleBoundaryPolicy.parse(PolicyFixtures.policyJson(mutate = mutate))
         }

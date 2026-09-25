@@ -27,8 +27,8 @@ import org.gradle.api.provider.Provider
  * Makes `.github/policies/module-boundaries.json` part of the build contract.
  *
  * Applied to the root project it validates the policy and that every module is classified;
- * applied to a module it rejects any declared project dependency the policy does not allow,
- * so a forbidden edge fails Gradle configuration rather than waiting for review.
+ * applied to a module it rejects any declared project dependency or artifact its rule does not
+ * allow, so a forbidden edge fails Gradle configuration rather than waiting for review.
  */
 class DuckDetectorModuleBoundariesPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -101,10 +101,18 @@ class DuckDetectorModuleBoundariesPlugin : Plugin<Project> {
                 }
             }
         }
-        return ProjectFacts(path, kind, projectDependencies, externalDependencies)
+        return ProjectFacts(
+            path = path,
+            appliedKind = kind,
+            appliesCompose = pluginManager.hasPlugin(COMPOSE_COMPILER_PLUGIN),
+            projectDependencies = projectDependencies,
+            externalDependencies = externalDependencies,
+        )
     }
 
     private companion object {
+        const val COMPOSE_COMPILER_PLUGIN = "org.jetbrains.kotlin.plugin.compose"
+
         val CODE_CLASSPATHS = listOf(
             "compileClasspath",
             "runtimeClasspath",

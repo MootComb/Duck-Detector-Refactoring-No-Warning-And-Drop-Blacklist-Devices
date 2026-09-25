@@ -1,6 +1,6 @@
 # ADR 0001: Enforce feature isolation with Gradle module boundaries
 
-- Status: Accepted
+- Status: Accepted; point 5 amended by [ADR 0007](./0007-derived-module-classification.md)
 - Date: 2026-09-25
 
 ## Context

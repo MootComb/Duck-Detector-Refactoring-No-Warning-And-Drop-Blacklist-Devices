@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "rules": {
     "composition_root": ":app",
     "dependency_direction": [
@@ -16,37 +16,94 @@
       ":feature": {
         "domain": {
           "kind": "jvm",
-          "may_depend_on": []
+          "ui": false,
+          "may_depend_on": [],
+          "may_use": [
+            ":core:evidence",
+            ":capability:*:domain"
+          ]
         },
         "data": {
           "kind": "android-library",
+          "ui": false,
           "may_depend_on": [
             "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:native",
+            ":core:platform",
+            ":core:detector",
+            ":capability:*:domain",
+            ":capability:*:data"
           ]
         },
         "presentation": {
           "kind": "jvm",
+          "ui": false,
           "may_depend_on": [
             "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:scan",
+            ":capability:*:domain"
+          ]
+        },
+        "detector": {
+          "kind": "android-library",
+          "ui": false,
+          "may_depend_on": [
+            "domain",
+            "data",
+            "presentation"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:detector",
+            ":capability:*:domain"
           ]
         },
         "ui": {
           "kind": "android-library",
+          "ui": true,
           "may_depend_on": [
             "domain",
-            "presentation"
+            "presentation",
+            "detector"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:scan",
+            ":core:detector",
+            ":core:ui",
+            ":capability:*:domain"
           ]
         }
       },
       ":capability": {
         "domain": {
           "kind": "jvm",
-          "may_depend_on": []
+          "ui": false,
+          "may_depend_on": [],
+          "may_use": [
+            ":core:evidence",
+            ":core:native"
+          ]
         },
         "data": {
           "kind": "android-library",
+          "ui": false,
           "may_depend_on": [
             "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:native",
+            ":core:platform"
           ]
         }
       }
@@ -57,162 +114,31 @@
       "com.google.android.*:*",
       "org.jetbrains.compose.*:*",
       "org.jetbrains.kotlinx:kotlinx-coroutines-android"
+    ],
+    "ui_only_dependencies": [
+      "androidx.compose:*",
+      "androidx.compose.*:*",
+      "androidx.activity:activity-compose",
+      "androidx.lifecycle:lifecycle-*-compose",
+      "androidx.browser:browser",
+      "br.com.devsrsouza.compose.icons:*",
+      "com.google.android.material:material",
+      "com.mikepenz:aboutlibraries-compose*"
     ]
   },
   "members": {
     ":app": {
       "kind": "android-application",
+      "ui": true,
       "allowed_project_dependencies": [
-        ":capability:attestation:data",
-        ":capability:attestation:domain",
-        ":capability:earlypreload:data",
-        ":capability:helperprocess:data",
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":capability:selinuxpolicy:data",
-        ":capability:systemproperties:data",
-        ":core:detector",
-        ":core:evidence",
-        ":core:native",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:bootloader:data",
-        ":feature:bootloader:domain",
-        ":feature:bootloader:presentation",
-        ":feature:bootloader:ui",
-        ":feature:customrom:data",
-        ":feature:customrom:domain",
-        ":feature:customrom:presentation",
-        ":feature:customrom:ui",
-        ":feature:dangerousapps:data",
-        ":feature:dangerousapps:domain",
-        ":feature:dangerousapps:presentation",
-        ":feature:dangerousapps:ui",
-        ":feature:dashboard:presentation",
-        ":feature:dashboard:ui",
-        ":feature:deviceinfo:data",
-        ":feature:deviceinfo:domain",
-        ":feature:deviceinfo:presentation",
-        ":feature:deviceinfo:ui",
-        ":feature:kernelcheck:data",
-        ":feature:kernelcheck:domain",
-        ":feature:kernelcheck:presentation",
-        ":feature:kernelcheck:ui",
-        ":feature:lsposed:data",
-        ":feature:lsposed:domain",
-        ":feature:lsposed:presentation",
-        ":feature:lsposed:ui",
-        ":feature:memory:data",
-        ":feature:memory:domain",
-        ":feature:memory:presentation",
-        ":feature:memory:ui",
-        ":feature:mount:data",
-        ":feature:mount:domain",
-        ":feature:mount:presentation",
-        ":feature:mount:ui",
-        ":feature:nativeroot:data",
-        ":feature:nativeroot:domain",
-        ":feature:nativeroot:presentation",
-        ":feature:nativeroot:ui",
-        ":feature:playintegrityfix:data",
-        ":feature:playintegrityfix:domain",
-        ":feature:playintegrityfix:presentation",
-        ":feature:playintegrityfix:ui",
-        ":feature:selinux:data",
-        ":feature:selinux:domain",
-        ":feature:selinux:presentation",
-        ":feature:selinux:ui",
-        ":feature:settings:presentation",
-        ":feature:settings:ui",
-        ":feature:su:data",
-        ":feature:su:domain",
-        ":feature:su:presentation",
-        ":feature:su:ui",
-        ":feature:systemproperties:data",
-        ":feature:systemproperties:domain",
-        ":feature:systemproperties:presentation",
-        ":feature:systemproperties:ui",
-        ":feature:tee:data",
-        ":feature:tee:domain",
-        ":feature:tee:presentation",
-        ":feature:tee:ui",
-        ":feature:update:data",
-        ":feature:update:domain",
-        ":feature:update:presentation",
-        ":feature:update:ui",
-        ":feature:virtualization:data",
-        ":feature:virtualization:domain",
-        ":feature:virtualization:presentation",
-        ":feature:virtualization:ui",
-        ":feature:zygisk:data",
-        ":feature:zygisk:domain",
-        ":feature:zygisk:presentation",
-        ":feature:zygisk:ui"
-      ]
-    },
-    ":capability:attestation:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:evidence",
-        ":core:platform"
-      ]
-    },
-    ":capability:attestation:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": []
-    },
-    ":capability:earlypreload:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native"
-      ]
-    },
-    ":capability:helperprocess:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":core:platform"
-      ]
-    },
-    ":capability:packageinventory:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:domain",
-        ":core:native",
-        ":core:platform"
-      ]
-    },
-    ":capability:packageinventory:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":capability:selinuxpolicy:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":core:platform"
-      ]
-    },
-    ":capability:systemproperties:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:systemproperties:domain",
-        ":core:native",
-        ":core:platform"
-      ]
-    },
-    ":capability:systemproperties:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:native"
+        ":capability:*:*",
+        ":core:*",
+        ":feature:*:*"
       ]
     },
     ":core:detector": {
       "kind": "android-library",
+      "ui": true,
       "allowed_project_dependencies": [
         ":core:evidence",
         ":core:report",
@@ -221,664 +147,42 @@
     },
     ":core:evidence": {
       "kind": "jvm",
+      "ui": false,
       "allowed_project_dependencies": []
     },
     ":core:native": {
       "kind": "jvm",
+      "ui": false,
       "allowed_project_dependencies": [
         ":core:evidence"
       ]
     },
     ":core:platform": {
       "kind": "android-library",
+      "ui": false,
       "allowed_project_dependencies": [
         ":core:evidence"
       ]
     },
     ":core:report": {
       "kind": "jvm",
+      "ui": false,
       "allowed_project_dependencies": [
         ":core:evidence"
       ]
     },
     ":core:scan": {
       "kind": "jvm",
+      "ui": false,
       "allowed_project_dependencies": [
         ":core:evidence"
       ]
     },
     ":core:ui": {
       "kind": "android-library",
+      "ui": true,
       "allowed_project_dependencies": [
         ":core:evidence"
-      ]
-    },
-    ":feature:bootloader:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:attestation:data",
-        ":capability:attestation:domain",
-        ":capability:systemproperties:data",
-        ":capability:systemproperties:domain",
-        ":core:native",
-        ":feature:bootloader:domain"
-      ]
-    },
-    ":feature:bootloader:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:evidence"
-      ]
-    },
-    ":feature:bootloader:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:bootloader:domain"
-      ]
-    },
-    ":feature:bootloader:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:bootloader:domain",
-        ":feature:bootloader:presentation"
-      ]
-    },
-    ":feature:customrom:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":core:native",
-        ":core:platform",
-        ":feature:customrom:domain"
-      ]
-    },
-    ":feature:customrom:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:customrom:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:customrom:domain"
-      ]
-    },
-    ":feature:customrom:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:customrom:domain",
-        ":feature:customrom:presentation"
-      ]
-    },
-    ":feature:dangerousapps:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":core:platform",
-        ":feature:dangerousapps:domain"
-      ]
-    },
-    ":feature:dangerousapps:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:dangerousapps:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:dangerousapps:domain"
-      ]
-    },
-    ":feature:dangerousapps:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:dangerousapps:domain",
-        ":feature:dangerousapps:presentation"
-      ]
-    },
-    ":feature:dashboard:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan"
-      ]
-    },
-    ":feature:dashboard:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:ui",
-        ":feature:dashboard:presentation"
-      ]
-    },
-    ":feature:deviceinfo:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":feature:deviceinfo:domain"
-      ]
-    },
-    ":feature:deviceinfo:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": []
-    },
-    ":feature:deviceinfo:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":feature:deviceinfo:domain"
-      ]
-    },
-    ":feature:deviceinfo:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:report",
-        ":core:ui",
-        ":feature:deviceinfo:domain",
-        ":feature:deviceinfo:presentation"
-      ]
-    },
-    ":feature:kernelcheck:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":feature:kernelcheck:domain"
-      ]
-    },
-    ":feature:kernelcheck:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:kernelcheck:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:kernelcheck:domain"
-      ]
-    },
-    ":feature:kernelcheck:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:kernelcheck:domain",
-        ":feature:kernelcheck:presentation"
-      ]
-    },
-    ":feature:lsposed:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":capability:selinuxpolicy:data",
-        ":core:native",
-        ":core:platform",
-        ":feature:lsposed:domain"
-      ]
-    },
-    ":feature:lsposed:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:lsposed:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:lsposed:domain"
-      ]
-    },
-    ":feature:lsposed:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:lsposed:domain",
-        ":feature:lsposed:presentation"
-      ]
-    },
-    ":feature:memory:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":feature:memory:domain"
-      ]
-    },
-    ":feature:memory:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:memory:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:memory:domain"
-      ]
-    },
-    ":feature:memory:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:memory:domain",
-        ":feature:memory:presentation"
-      ]
-    },
-    ":feature:mount:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:earlypreload:data",
-        ":capability:helperprocess:data",
-        ":core:native",
-        ":feature:mount:domain"
-      ]
-    },
-    ":feature:mount:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:mount:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:mount:domain"
-      ]
-    },
-    ":feature:mount:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:mount:domain",
-        ":feature:mount:presentation"
-      ]
-    },
-    ":feature:nativeroot:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:helperprocess:data",
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":core:native",
-        ":core:platform",
-        ":feature:nativeroot:domain"
-      ]
-    },
-    ":feature:nativeroot:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:nativeroot:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:nativeroot:domain"
-      ]
-    },
-    ":feature:nativeroot:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:nativeroot:domain",
-        ":feature:nativeroot:presentation"
-      ]
-    },
-    ":feature:playintegrityfix:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":core:platform",
-        ":feature:playintegrityfix:domain"
-      ]
-    },
-    ":feature:playintegrityfix:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:playintegrityfix:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:playintegrityfix:domain"
-      ]
-    },
-    ":feature:playintegrityfix:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:playintegrityfix:domain",
-        ":feature:playintegrityfix:presentation"
-      ]
-    },
-    ":feature:selinux:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:selinuxpolicy:data",
-        ":core:native",
-        ":feature:selinux:domain"
-      ]
-    },
-    ":feature:selinux:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:selinux:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:selinux:domain"
-      ]
-    },
-    ":feature:selinux:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:selinux:domain",
-        ":feature:selinux:presentation"
-      ]
-    },
-    ":feature:settings:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": []
-    },
-    ":feature:settings:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:ui",
-        ":feature:settings:presentation"
-      ]
-    },
-    ":feature:su:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":feature:su:domain"
-      ]
-    },
-    ":feature:su:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:su:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:su:domain"
-      ]
-    },
-    ":feature:su:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:su:domain",
-        ":feature:su:presentation"
-      ]
-    },
-    ":feature:systemproperties:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:systemproperties:data",
-        ":capability:systemproperties:domain",
-        ":feature:systemproperties:domain"
-      ]
-    },
-    ":feature:systemproperties:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:systemproperties:domain",
-        ":core:evidence"
-      ]
-    },
-    ":feature:systemproperties:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:systemproperties:domain",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:systemproperties:domain"
-      ]
-    },
-    ":feature:systemproperties:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:systemproperties:domain",
-        ":feature:systemproperties:presentation"
-      ]
-    },
-    ":feature:tee:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:attestation:data",
-        ":capability:attestation:domain",
-        ":core:native",
-        ":core:platform",
-        ":feature:tee:domain"
-      ]
-    },
-    ":feature:tee:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:evidence"
-      ]
-    },
-    ":feature:tee:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:tee:domain"
-      ]
-    },
-    ":feature:tee:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:attestation:domain",
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:tee:domain",
-        ":feature:tee:presentation"
-      ]
-    },
-    ":feature:update:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":feature:update:domain"
-      ]
-    },
-    ":feature:update:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": []
-    },
-    ":feature:update:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":feature:update:domain"
-      ]
-    },
-    ":feature:update:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:ui",
-        ":feature:update:domain",
-        ":feature:update:presentation"
-      ]
-    },
-    ":feature:virtualization:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":capability:earlypreload:data",
-        ":capability:helperprocess:data",
-        ":capability:packageinventory:data",
-        ":capability:packageinventory:domain",
-        ":core:platform",
-        ":feature:virtualization:domain"
-      ]
-    },
-    ":feature:virtualization:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:domain",
-        ":core:evidence"
-      ]
-    },
-    ":feature:virtualization:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":capability:packageinventory:domain",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:virtualization:domain"
-      ]
-    },
-    ":feature:virtualization:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:virtualization:domain",
-        ":feature:virtualization:presentation"
-      ]
-    },
-    ":feature:zygisk:data": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:native",
-        ":feature:zygisk:domain"
-      ]
-    },
-    ":feature:zygisk:domain": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence"
-      ]
-    },
-    ":feature:zygisk:presentation": {
-      "kind": "jvm",
-      "allowed_project_dependencies": [
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":feature:zygisk:domain"
-      ]
-    },
-    ":feature:zygisk:ui": {
-      "kind": "android-library",
-      "allowed_project_dependencies": [
-        ":core:detector",
-        ":core:evidence",
-        ":core:report",
-        ":core:scan",
-        ":core:ui",
-        ":feature:zygisk:domain",
-        ":feature:zygisk:presentation"
       ]
     }
   }

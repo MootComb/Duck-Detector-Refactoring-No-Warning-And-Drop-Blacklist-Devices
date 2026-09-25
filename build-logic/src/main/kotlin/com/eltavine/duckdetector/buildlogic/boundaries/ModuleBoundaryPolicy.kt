@@ -31,21 +31,35 @@ enum class ModuleKind(val id: String) {
     }
 }
 
+/**
+ * A module the policy names explicitly: the composition root and every module of a group without
+ * layers. [allowedProjectDependencies] are module paths or `*` globs over them.
+ */
 data class ModuleMember(
     val kind: ModuleKind,
+    val ui: Boolean,
     val allowedProjectDependencies: Set<String>,
 )
 
+/**
+ * The template every `group:unit:layer` module of a layered group follows, so adding a unit needs
+ * no policy change. [mayDependOn] names layers of the same unit; [mayUse] holds `*` globs over the
+ * modules outside the unit.
+ */
 data class LayerRule(
     val kind: ModuleKind,
+    val ui: Boolean,
     val mayDependOn: Set<String>,
+    val mayUse: Set<String>,
 )
 
 /**
  * Parsed form of `.github/policies/module-boundaries.json`.
  *
  * Paths follow `:group:unit[:layer]`. [dependencyDirection] orders groups from the composition
- * root down to the most neutral code; dependencies may only point along that order.
+ * root down to the most neutral code; dependencies may only point along that order. Only UI
+ * modules may apply Compose or depend on [uiOnlyDependencies], and nothing that is not UI may
+ * depend on a module that is.
  */
 data class ModuleBoundaryPolicy(
     val members: Map<String, ModuleMember>,
@@ -54,10 +68,24 @@ data class ModuleBoundaryPolicy(
     val isolatedGroups: Set<String>,
     val groupLayers: Map<String, Map<String, LayerRule>>,
     val jvmForbiddenDependencies: List<String>,
+    val uiOnlyDependencies: List<String>,
 ) {
+    /** The rule that governs [path], or null when the policy does not classify it. */
+    fun classify(path: String): ModuleRule? {
+        members[path]?.let { member -> return ModuleRule(path, member.kind, member.ui, layer = null) }
+        val modulePath = ModulePath(path)
+        val layers = groupLayers[modulePath.group] ?: return null
+        if (modulePath.depth != LAYERED_DEPTH) {
+            return null
+        }
+        val rule = layers[modulePath.layer] ?: return null
+        return ModuleRule(path, rule.kind, rule.ui, layer = rule)
+    }
+
     companion object {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
         const val RELATIVE_PATH = ".github/policies/module-boundaries.json"
+        const val LAYERED_DEPTH = 3
 
         private val TOP_LEVEL_KEYS = setOf("schema_version", "rules", "members")
         private val RULE_KEYS = setOf(
@@ -66,9 +94,10 @@ data class ModuleBoundaryPolicy(
             "isolated_groups",
             "group_layers",
             "jvm_forbidden_dependencies",
+            "ui_only_dependencies",
         )
-        private val MEMBER_KEYS = setOf("kind", "allowed_project_dependencies")
-        private val LAYER_KEYS = setOf("kind", "may_depend_on")
+        private val MEMBER_KEYS = setOf("kind", "ui", "allowed_project_dependencies")
+        private val LAYER_KEYS = setOf("kind", "ui", "may_depend_on", "may_use")
 
         fun parse(text: String): ModuleBoundaryPolicy {
             val document = try {
@@ -89,6 +118,7 @@ data class ModuleBoundaryPolicy(
                 member.requireExactKeys(MEMBER_KEYS, "member $path")
                 ModuleMember(
                     kind = member.requireKind("kind", "member $path"),
+                    ui = member.requireBoolean("ui", "member $path"),
                     allowedProjectDependencies = member.requireUniqueStrings(
                         "allowed_project_dependencies",
                         "member $path",
@@ -106,7 +136,9 @@ data class ModuleBoundaryPolicy(
                     rule.requireExactKeys(LAYER_KEYS, "layer $group:$layer")
                     LayerRule(
                         kind = rule.requireKind("kind", "layer $group:$layer"),
+                        ui = rule.requireBoolean("ui", "layer $group:$layer"),
                         mayDependOn = rule.requireUniqueStrings("may_depend_on", "layer $group:$layer").toSet(),
+                        mayUse = rule.requireUniqueStrings("may_use", "layer $group:$layer").toSet(),
                     )
                 }
             }
@@ -117,6 +149,7 @@ data class ModuleBoundaryPolicy(
                 isolatedGroups = rules.requireUniqueStrings("isolated_groups", "rules").toSet(),
                 groupLayers = groupLayers,
                 jvmForbiddenDependencies = rules.requireUniqueStrings("jvm_forbidden_dependencies", "rules"),
+                uiOnlyDependencies = rules.requireUniqueStrings("ui_only_dependencies", "rules"),
             )
         }
 
@@ -143,6 +176,10 @@ data class ModuleBoundaryPolicy(
             return value
         }
 
+        private fun JSONObject.requireBoolean(key: String, owner: String): Boolean =
+            opt(key) as? Boolean
+                ?: throw ModuleBoundaryPolicyException("$owner.$key must be true or false")
+
         private fun JSONObject.requireKind(key: String, owner: String): ModuleKind {
             val id = requireString(key, owner)
             return ModuleKind.fromId(id)
@@ -166,5 +203,13 @@ data class ModuleBoundaryPolicy(
         }
     }
 }
+
+/** How the policy governs one module: its kind, whether it is UI, and its layer rule if it has one. */
+data class ModuleRule(
+    val path: String,
+    val kind: ModuleKind,
+    val ui: Boolean,
+    val layer: LayerRule?,
+)
 
 class ModuleBoundaryPolicyException(message: String) : RuntimeException(message)

@@ -127,13 +127,26 @@ def load_policy(path: str) -> Policy:
     )
 
 
-def load_module_names(path: str) -> set[str]:
-    with open(path, encoding="utf-8") as handle:
-        document = json.load(handle)
-    members = document.get("members") if isinstance(document, dict) else None
-    if not isinstance(members, dict):
-        raise PolicyError(f"{path}: module policy has no members object")
-    return set(members)
+# Mirrors settings.gradle.kts: a module is a directory with a build file at its group's depth.
+MODULE_GROUP_DEPTHS = {"core": 1, "sdk": 1, "capability": 2, "feature": 2}
+
+
+def discover_modules(repo_root: str) -> set[str]:
+    modules = {":app"} if os.path.isfile(os.path.join(repo_root, "app", "build.gradle.kts")) else set()
+    for group, depth in MODULE_GROUP_DEPTHS.items():
+        directories = [os.path.join(repo_root, group)]
+        for _ in range(depth):
+            directories = [
+                os.path.join(directory, name)
+                for directory in directories if os.path.isdir(directory)
+                for name in sorted(os.listdir(directory))
+                if os.path.isdir(os.path.join(directory, name))
+            ]
+        for directory in directories:
+            if os.path.isfile(os.path.join(directory, "build.gradle.kts")):
+                relative = os.path.relpath(directory, repo_root).replace(os.sep, "/")
+                modules.add(":" + relative.replace("/", ":"))
+    return modules
 
 
 def owning_unit(policy: Policy, relative: str) -> Unit | None:
@@ -389,7 +402,7 @@ def check(repo_root: str, policy: Policy, module_names: set[str]) -> tuple[list[
     errors: list[str] = []
     for unit in policy.units.values():
         if unit.owner not in module_names:
-            errors.append(f"unit {unit.name}: owner {unit.owner} is not a module in the module boundary policy")
+            errors.append(f"unit {unit.name}: owner {unit.owner} is not a module of this build")
     source_root = os.path.join(repo_root, policy.source_root)
     for unit in policy.units.values():
         if not os.path.isdir(os.path.join(source_root, unit.path)):
@@ -414,13 +427,12 @@ def main(argv: list[str]) -> int:
     default_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     parser.add_argument("--repo-root", default=default_root)
     parser.add_argument("--policy", default=None, help="defaults to .github/policies/native-boundaries.json")
-    parser.add_argument("--module-policy", default=None, help="defaults to .github/policies/module-boundaries.json")
     arguments = parser.parse_args(argv)
     repo_root = os.path.abspath(arguments.repo_root)
     policies = os.path.join(repo_root, ".github", "policies")
     try:
         policy = load_policy(arguments.policy or os.path.join(policies, "native-boundaries.json"))
-        module_names = load_module_names(arguments.module_policy or os.path.join(policies, "module-boundaries.json"))
+        module_names = discover_modules(repo_root)
     except (OSError, PolicyError, json.JSONDecodeError) as error:
         print(f"native boundary policy error: {error}", file=sys.stderr)
         return 2
