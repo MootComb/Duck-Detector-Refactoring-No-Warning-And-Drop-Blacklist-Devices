@@ -1,0 +1,38 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.sdk
+
+import android.app.ZygotePreload
+import android.content.pm.ApplicationInfo
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityPreload
+import com.eltavine.duckdetector.features.nativeroot.detector.NativeRootZygotePreload
+
+/**
+ * The detection work that has to run in the app zygote, before any isolated process forks from it.
+ *
+ * Name this class in `android:zygotePreloadName`, or delegate to it from the host's own
+ * [ZygotePreload]. It installs Native Root's throne-hunt watch and then captures the SELinux
+ * context validity evidence that the SELinux and LSPosed detectors read from their app zygote
+ * carriers. Without it, both carriers report their app zygote evidence as unavailable.
+ */
+public class DuckDetectorZygotePreload : ZygotePreload {
+    private val selinuxContextValidity = SelinuxContextValidityPreload()
+
+    override fun doPreload(appInfo: ApplicationInfo) {
+        selinuxContextValidity.preload(appInfo) { NativeRootZygotePreload.installThroneHuntWatch(appInfo) }
+    }
+}

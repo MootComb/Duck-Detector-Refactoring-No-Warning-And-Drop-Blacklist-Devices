@@ -30,6 +30,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":capability:earlypreload:data"))
+    implementation(project(":capability:selinuxpolicy:data"))
     api(project(":core:detector"))
     // Every detector unit, discovered from its directory, so the catalog and the AAR can hold all of them.
     detectorModules(DETECTOR_LAYER).forEach { api(project(it)) }

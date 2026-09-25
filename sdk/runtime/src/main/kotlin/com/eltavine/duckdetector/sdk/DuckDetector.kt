@@ -17,6 +17,12 @@
 package com.eltavine.duckdetector.sdk
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.view.View
+import android.webkit.WebView
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.run
 import com.eltavine.duckdetector.core.report.DetectorResult
@@ -55,4 +61,41 @@ public object DuckDetector {
         val application = context.applicationContext
         detectors.forEach { detector -> launch { send(detector.run(application)) } }
     }
+
+    /**
+     * Keeps the early mount and virtualization evidence that the transparent `NativeActivity`
+     * captured before the first activity and passed on in [intent].
+     *
+     * Call it from the receiving activity's `onCreate` and `onNewIntent`. Without that launch, the
+     * Mount and Virtualization detectors report the early capture as unavailable.
+     */
+    public fun captureLaunchEvidence(intent: Intent?) {
+        EarlyMountPreloadStore.capture(intent)
+        EarlyVirtualizationPreloadStore.capture(intent)
+    }
+
+    /**
+     * Creates the invisible 1x1 WebView an activity attaches before its UI starts, or null when
+     * WebView is unavailable.
+     *
+     * The application attaches it before binding any helper process, matching the WebView-before-
+     * bind order of PrivIsolated, from which the isolated mount-view scanner is ported. Destroy it
+     * with the activity.
+     */
+    public fun createProcMountSampler(context: Context): WebView? = runCatching {
+        WebView(context).apply {
+            alpha = 0f
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            setBackgroundColor(Color.TRANSPARENT)
+            loadDataWithBaseURL(
+                null,
+                "<html><body></body></html>",
+                "text/html",
+                Charsets.UTF_8.name(),
+                null,
+            )
+        }
+    }.getOrNull()
 }
