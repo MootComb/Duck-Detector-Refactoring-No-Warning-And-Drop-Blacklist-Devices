@@ -201,7 +201,8 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":capability:systemproperties:domain",
-        ":core:native"
+        ":core:native",
+        ":core:platform"
       ]
     },
     ":capability:systemproperties:domain": {

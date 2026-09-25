@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourceP
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 import java.util.concurrent.TimeUnit
 
 public class SystemPropertyReadUtils(
@@ -71,11 +72,7 @@ public class SystemPropertyReadUtils(
     private fun readViaReflection(
         property: String,
     ): String {
-        return runCatching {
-            val clazz = Class.forName("android.os.SystemProperties")
-            val method = clazz.getMethod("get", String::class.java)
-            (method.invoke(null, property) as? String)?.trim().orEmpty()
-        }.getOrDefault("")
+        return HiddenSystemProperties.read(property).getOrNull()?.trim().orEmpty()
     }
 
     private fun readViaGetprop(

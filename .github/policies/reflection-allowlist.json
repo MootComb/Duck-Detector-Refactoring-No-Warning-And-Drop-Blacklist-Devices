@@ -44,13 +44,6 @@
       "reason": "Calls the hidden android.os.SELinux context methods, which are absent from the SDK."
     },
     {
-      "path": "capability/systemproperties/data/src/main/kotlin/com/eltavine/duckdetector/capability/systemproperties/data/SystemPropertyReadUtils.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "core/platform/src/main/kotlin/com/eltavine/duckdetector/core/platform/HiddenPlatformFailure.kt",
       "uses": [
         "operations",
