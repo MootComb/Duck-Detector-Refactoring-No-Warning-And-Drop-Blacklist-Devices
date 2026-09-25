@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.su.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.su.domain.SuMethodOutcome
 import com.eltavine.duckdetector.features.su.domain.SuMethodResult
 import com.eltavine.duckdetector.features.su.domain.SuReport

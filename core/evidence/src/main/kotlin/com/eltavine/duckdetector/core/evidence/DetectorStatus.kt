@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.ui.model
+package com.eltavine.duckdetector.core.evidence
 
-data class DetectorStatus(
-    val severity: DetectionSeverity,
-    val infoKind: InfoKind? = null,
+public data class DetectorStatus(
+    public val severity: DetectionSeverity,
+    public val infoKind: InfoKind? = null,
 ) {
     init {
         require(severity == DetectionSeverity.INFO || infoKind == null) {
@@ -26,10 +26,10 @@ data class DetectorStatus(
         }
     }
 
-    companion object {
-        fun info(kind: InfoKind) = DetectorStatus(DetectionSeverity.INFO, kind)
-        fun allClear() = DetectorStatus(DetectionSeverity.ALL_CLEAR)
-        fun warning() = DetectorStatus(DetectionSeverity.WARNING)
-        fun danger() = DetectorStatus(DetectionSeverity.DANGER)
+    public companion object {
+        public fun info(kind: InfoKind): DetectorStatus = DetectorStatus(DetectionSeverity.INFO, kind)
+        public fun allClear(): DetectorStatus = DetectorStatus(DetectionSeverity.ALL_CLEAR)
+        public fun warning(): DetectorStatus = DetectorStatus(DetectionSeverity.WARNING)
+        public fun danger(): DetectorStatus = DetectorStatus(DetectionSeverity.DANGER)
     }
 }

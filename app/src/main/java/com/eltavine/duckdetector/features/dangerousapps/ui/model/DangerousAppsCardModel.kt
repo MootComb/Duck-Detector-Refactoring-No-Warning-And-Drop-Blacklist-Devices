@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.dangerousapps.ui.model
 
 import com.eltavine.duckdetector.core.ui.model.ContextItemModel
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 
 data class DangerousAppsCardModel(
     val title: String,

@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
@@ -51,7 +51,7 @@ class DetectorResultNoticeDialogTest {
             shouldShowDetectorResultNotice(
                 isLoading = false,
                 overviewStatus = DetectorStatus.info(
-                    com.eltavine.duckdetector.core.ui.model.InfoKind.ERROR
+                    com.eltavine.duckdetector.core.evidence.InfoKind.ERROR
                 ),
             ),
         )

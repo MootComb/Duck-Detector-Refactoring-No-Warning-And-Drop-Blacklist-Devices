@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.bootloader.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderEvidenceMode
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFinding
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingGroup

@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.systemproperties.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodOutcome
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodResult
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport

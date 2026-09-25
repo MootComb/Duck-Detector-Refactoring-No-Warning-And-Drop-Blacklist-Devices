@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.kernelcheck.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome

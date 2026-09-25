@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.dangerousapps.presentation
 
 import com.eltavine.duckdetector.core.ui.model.ContextItemModel
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFinding
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage

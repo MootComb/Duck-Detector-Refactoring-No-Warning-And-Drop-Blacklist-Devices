@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.selinux.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoProbe
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentProbe

@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode

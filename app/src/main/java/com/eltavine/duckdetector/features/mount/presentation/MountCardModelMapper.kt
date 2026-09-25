@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.mount.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.mount.domain.MountFinding
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome

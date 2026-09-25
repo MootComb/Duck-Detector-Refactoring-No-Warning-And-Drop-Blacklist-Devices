@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.nativeroot.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup

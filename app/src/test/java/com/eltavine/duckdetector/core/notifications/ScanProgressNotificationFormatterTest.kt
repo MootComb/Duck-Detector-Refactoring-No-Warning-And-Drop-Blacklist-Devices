@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.core.notifications
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewMetricModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
 import org.junit.Assert.assertEquals

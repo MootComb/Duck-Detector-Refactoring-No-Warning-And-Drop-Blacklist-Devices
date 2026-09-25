@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.virtualization.presentation
 
 import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationImpact
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationMethodOutcome
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationMethodResult

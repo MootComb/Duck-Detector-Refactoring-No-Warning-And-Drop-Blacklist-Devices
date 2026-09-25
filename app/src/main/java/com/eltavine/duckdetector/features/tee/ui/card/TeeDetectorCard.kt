@@ -66,7 +66,7 @@ import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.tee.ui.TeeCertificatesDialog
 import com.eltavine.duckdetector.features.tee.ui.TeeDetailsDialog

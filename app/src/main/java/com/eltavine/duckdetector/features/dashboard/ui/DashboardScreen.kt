@@ -63,7 +63,7 @@ import com.eltavine.duckdetector.BuildConfig
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.openExternalUri
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.bootloader.ui.card.BootloaderDetectorCard
@@ -727,7 +727,7 @@ private fun DashboardFindingsHeader(
     findings: List<DashboardFindingModel>,
 ) {
     val headerStatus = findings.firstOrNull()?.status
-        ?: com.eltavine.duckdetector.core.ui.model.DetectorStatus.allClear()
+        ?: com.eltavine.duckdetector.core.evidence.DetectorStatus.allClear()
     val appearance = rememberStatusAppearance(headerStatus)
     Row(
         modifier = Modifier.fillMaxWidth(),

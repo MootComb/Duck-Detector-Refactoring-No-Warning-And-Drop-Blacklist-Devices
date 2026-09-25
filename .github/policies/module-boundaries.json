@@ -2,18 +2,53 @@
   "schema_version": 1,
   "rules": {
     "composition_root": ":app",
-    "dependency_direction": [":app", ":feature", ":capability", ":core"],
-    "isolated_groups": [":feature", ":capability"],
+    "dependency_direction": [
+      ":app",
+      ":feature",
+      ":capability",
+      ":core"
+    ],
+    "isolated_groups": [
+      ":feature",
+      ":capability"
+    ],
     "group_layers": {
       ":feature": {
-        "domain": { "kind": "jvm", "may_depend_on": [] },
-        "data": { "kind": "android-library", "may_depend_on": ["domain"] },
-        "presentation": { "kind": "jvm", "may_depend_on": ["domain"] },
-        "ui": { "kind": "android-library", "may_depend_on": ["domain", "presentation"] }
+        "domain": {
+          "kind": "jvm",
+          "may_depend_on": []
+        },
+        "data": {
+          "kind": "android-library",
+          "may_depend_on": [
+            "domain"
+          ]
+        },
+        "presentation": {
+          "kind": "jvm",
+          "may_depend_on": [
+            "domain"
+          ]
+        },
+        "ui": {
+          "kind": "android-library",
+          "may_depend_on": [
+            "domain",
+            "presentation"
+          ]
+        }
       },
       ":capability": {
-        "domain": { "kind": "jvm", "may_depend_on": [] },
-        "data": { "kind": "android-library", "may_depend_on": ["domain"] }
+        "domain": {
+          "kind": "jvm",
+          "may_depend_on": []
+        },
+        "data": {
+          "kind": "android-library",
+          "may_depend_on": [
+            "domain"
+          ]
+        }
       }
     },
     "jvm_forbidden_dependencies": [
@@ -27,6 +62,12 @@
   "members": {
     ":app": {
       "kind": "android-application",
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
+    },
+    ":core:evidence": {
+      "kind": "jvm",
       "allowed_project_dependencies": []
     }
   }

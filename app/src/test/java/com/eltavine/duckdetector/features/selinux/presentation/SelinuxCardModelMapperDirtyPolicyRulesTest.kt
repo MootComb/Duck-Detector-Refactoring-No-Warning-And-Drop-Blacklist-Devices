@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.selinux.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
@@ -79,7 +79,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
             model.methodRows.any {
                 it.label == "Dirty sepolicy rule: shell -> su transition" &&
                     it.value == "Unavailable" &&
-                    it.status == DetectorStatus.info(com.eltavine.duckdetector.core.ui.model.InfoKind.SUPPORT)
+                    it.status == DetectorStatus.info(com.eltavine.duckdetector.core.evidence.InfoKind.SUPPORT)
             },
         )
         assertTrue(

@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility

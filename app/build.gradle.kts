@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:evidence"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

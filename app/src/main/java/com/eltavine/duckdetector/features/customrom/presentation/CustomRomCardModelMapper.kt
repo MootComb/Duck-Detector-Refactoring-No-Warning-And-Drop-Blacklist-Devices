@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.customrom.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomModificationFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomMethodOutcome

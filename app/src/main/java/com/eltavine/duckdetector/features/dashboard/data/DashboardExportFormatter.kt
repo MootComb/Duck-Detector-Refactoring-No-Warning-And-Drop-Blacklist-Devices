@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.dashboard.data
 
 import com.eltavine.duckdetector.BuildConfig
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomCardModel

@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.playintegrityfix.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixGroup
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixMethodOutcome
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixMethodResult

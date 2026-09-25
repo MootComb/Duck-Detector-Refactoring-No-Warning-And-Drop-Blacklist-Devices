@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.customrom.ui.model
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 
 data class CustomRomCardModel(
     val title: String,

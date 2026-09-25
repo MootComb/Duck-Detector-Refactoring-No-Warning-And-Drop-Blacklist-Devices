@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.dashboard.ui.model
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

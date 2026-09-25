@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.lsposed.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility

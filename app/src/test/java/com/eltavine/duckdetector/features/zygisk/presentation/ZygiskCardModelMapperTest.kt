@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.zygisk.presentation
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.core.ui.model.InfoKind
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignal
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalGroup

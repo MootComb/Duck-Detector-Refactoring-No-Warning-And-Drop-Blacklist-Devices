@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.selinux.ui.model
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 
 data class SelinuxCardModel(
     val title: String,

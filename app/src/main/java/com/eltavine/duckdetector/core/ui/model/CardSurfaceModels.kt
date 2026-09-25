@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.core.ui.model
 
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+
 data class MetricChipModel(
     val label: String,
     val value: String,
