@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.tee.data.repository.TeeRepository
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.presentation.TeeCardModelMapper
-import com.eltavine.duckdetector.features.tee.presentation.TeeDetectorId
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeCardModel
 import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
 
@@ -39,7 +38,7 @@ import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
  * The card model is described collapsed; expansion only changes the card, never the export.
  */
 public object TeeDetector : Detector<TeeReport, TeeCardModel> {
-    override val id: DetectorId = TeeDetectorId
+    override val id: DetectorId = DetectorId("tee")
 
     override fun createScanner(context: Context): DetectorScanner<TeeReport> = TeeRepository(context)
 

@@ -30,6 +30,7 @@ dependencies {
     api(project(":core:report"))
     api(project(":core:scan"))
     api(project(":core:ui"))
+    implementation(project(":feature:tee:detector"))
     api(project(":feature:tee:domain"))
     api(project(":feature:tee:presentation"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)

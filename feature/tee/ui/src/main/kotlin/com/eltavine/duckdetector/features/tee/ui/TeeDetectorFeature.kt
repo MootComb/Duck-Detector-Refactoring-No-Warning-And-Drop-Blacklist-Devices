@@ -16,35 +16,35 @@
 
 package com.eltavine.duckdetector.features.tee.ui
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.tee.domain.TeeReport
-import com.eltavine.duckdetector.features.tee.presentation.TeeDetectorId
-import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.tee.detector.TeeDetector
 import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
-class TeeDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<TeeReport>,
-) : DetectorFeature {
-    override val id: DetectorId = TeeDetectorId
+/**
+ * The TEE card on the dashboard. Its card keeps expansion and dialog state of its own, so it has a
+ * session of its own rather than a CardDetectorFeature; it still scans through [TeeDetector].
+ */
+object TeeDetectorFeature : DetectorFeature {
+    override val id: DetectorId = TeeDetector.id
 
     @Composable
     override fun rememberSession(): DetectorSession {
         val context = LocalContext.current
         val viewModel: TeeViewModel = viewModel(
-            factory = remember(context) { TeeViewModel.factory { createScanner(context.applicationContext) } },
+            factory = remember(context) {
+                TeeViewModel.factory { TeeDetector.createScanner(context.applicationContext) }
+            },
         )
         return remember(viewModel) { TeeDetectorSession(viewModel) }
     }
@@ -53,11 +53,11 @@ class TeeDetectorFeature(
 private class TeeDetectorSession(
     private val viewModel: TeeViewModel,
 ) : DetectorSession {
-    override val id: DetectorId = TeeDetectorId
+    override val id: DetectorId = TeeDetector.id
 
     override val summary: StateFlow<DetectorSummary> = viewModel.summary
 
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
+    override fun report(): DetectorReport = TeeDetector.export(viewModel.uiState.value.cardModel)
 
     override fun rescan() {
         viewModel.rescan()

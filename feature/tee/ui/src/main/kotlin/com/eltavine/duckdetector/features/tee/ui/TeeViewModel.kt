@@ -22,13 +22,14 @@ import androidx.lifecycle.viewModelScope
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
+import com.eltavine.duckdetector.core.scan.summarize
+import com.eltavine.duckdetector.features.tee.detector.TeeDetector
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
 import com.eltavine.duckdetector.features.tee.presentation.TeeCardModelMapper
 import com.eltavine.duckdetector.features.tee.presentation.TeeUiStage
 import com.eltavine.duckdetector.features.tee.presentation.TeeUiState
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionId
-import com.eltavine.duckdetector.features.tee.presentation.toDetectorSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +55,9 @@ class TeeViewModel(
     val summary: StateFlow<DetectorSummary> = uiState
         .map { it.toDetectorSummary() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, uiState.value.toDetectorSummary())
+
+    private fun TeeUiState.toDetectorSummary(): DetectorSummary =
+        cardModel.summarize(TeeDetector.id, ready = stage != TeeUiStage.LOADING)
 
     private val scans = ScanSessionRunner(viewModelScope)
 
