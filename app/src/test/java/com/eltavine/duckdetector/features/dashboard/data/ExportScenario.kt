@@ -56,7 +56,7 @@ import com.eltavine.duckdetector.features.tee.ui.model.TeeCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.virtualization.ui.model.VirtualizationCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskCardModel
+import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 
 /** One fully populated dashboard export built from generated card models. */
 internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListSize: Int = 0) {

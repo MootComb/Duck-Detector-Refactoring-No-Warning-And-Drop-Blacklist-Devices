@@ -42,6 +42,8 @@ dependencies {
     implementation(project(":feature:kernelcheck:ui"))
     implementation(project(":feature:playintegrityfix:data"))
     implementation(project(":feature:playintegrityfix:ui"))
+    implementation(project(":feature:zygisk:data"))
+    implementation(project(":feature:zygisk:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

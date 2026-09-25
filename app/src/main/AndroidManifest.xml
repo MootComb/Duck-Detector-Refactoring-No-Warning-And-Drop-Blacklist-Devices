@@ -76,10 +76,6 @@ limitations under the License.
         </activity>
 
         <service
-            android:name=".features.zygisk.data.fdtrap.ZygiskFdTrapDetectorService"
-            android:exported="false"
-            android:process=":zygisk_fd_detector" />
-        <service
             android:name=".features.virtualization.data.service.VirtualizationProbeService"
             android:exported="false"
             android:process=":virtualization_probe" />
