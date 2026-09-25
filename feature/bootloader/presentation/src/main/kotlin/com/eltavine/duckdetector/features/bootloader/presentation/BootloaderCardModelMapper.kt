@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderEvidenceMode
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFinding
+import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingGroup
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingSeverity
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodOutcome
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodResult
@@ -306,7 +307,7 @@ class BootloaderCardModelMapper {
                     label = "Cross-checks",
                     value = report.consistencyFindingCount.toString(),
                     status = if (report.consistencyFindingCount > 0) {
-                        if (report.dangerFindings.any { it.group.name == "CONSISTENCY" }) {
+                        if (report.dangerFindings.any { it.group == BootloaderFindingGroup.CONSISTENCY }) {
                             DetectorStatus.danger()
                         } else {
                             DetectorStatus.warning()
