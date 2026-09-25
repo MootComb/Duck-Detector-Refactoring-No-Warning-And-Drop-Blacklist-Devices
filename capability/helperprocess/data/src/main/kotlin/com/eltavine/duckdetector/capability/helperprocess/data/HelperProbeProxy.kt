@@ -19,7 +19,7 @@ package com.eltavine.duckdetector.capability.helperprocess.data
 import android.os.IBinder
 import android.os.Parcel
 
-internal class VirtualizationProbeProxy(
+internal class HelperProbeProxy(
     private val remote: IBinder,
 ) {
 
@@ -27,9 +27,9 @@ internal class VirtualizationProbeProxy(
         val data = Parcel.obtain()
         val reply = Parcel.obtain()
         return try {
-            data.writeInterfaceToken(VirtualizationProbeProtocol.DESCRIPTOR)
+            data.writeInterfaceToken(HelperProbeProtocol.DESCRIPTOR)
             remote.transact(
-                VirtualizationProbeProtocol.TRANSACTION_COLLECT_SNAPSHOT,
+                HelperProbeProtocol.TRANSACTION_COLLECT_SNAPSHOT,
                 data,
                 reply,
                 0,
@@ -46,9 +46,9 @@ internal class VirtualizationProbeProxy(
         val data = Parcel.obtain()
         val reply = Parcel.obtain()
         return try {
-            data.writeInterfaceToken(VirtualizationProbeProtocol.DESCRIPTOR)
+            data.writeInterfaceToken(HelperProbeProtocol.DESCRIPTOR)
             remote.transact(
-                VirtualizationProbeProtocol.TRANSACTION_COLLECT_PROC_MOUNT_VIEW,
+                HelperProbeProtocol.TRANSACTION_COLLECT_PROC_MOUNT_VIEW,
                 data,
                 reply,
                 0,
@@ -65,9 +65,9 @@ internal class VirtualizationProbeProxy(
         val data = Parcel.obtain()
         val reply = Parcel.obtain()
         return try {
-            data.writeInterfaceToken(VirtualizationProbeProtocol.DESCRIPTOR)
+            data.writeInterfaceToken(HelperProbeProtocol.DESCRIPTOR)
             remote.transact(
-                VirtualizationProbeProtocol.TRANSACTION_IS_NATIVE_AVAILABLE,
+                HelperProbeProtocol.TRANSACTION_IS_NATIVE_AVAILABLE,
                 data,
                 reply,
                 0,
@@ -84,9 +84,9 @@ internal class VirtualizationProbeProxy(
         val data = Parcel.obtain()
         val reply = Parcel.obtain()
         return try {
-            data.writeInterfaceToken(VirtualizationProbeProtocol.DESCRIPTOR)
+            data.writeInterfaceToken(HelperProbeProtocol.DESCRIPTOR)
             remote.transact(
-                VirtualizationProbeProtocol.TRANSACTION_RUN_SACRIFICIAL_SYSCALL_PACK,
+                HelperProbeProtocol.TRANSACTION_RUN_SACRIFICIAL_SYSCALL_PACK,
                 data,
                 reply,
                 0,

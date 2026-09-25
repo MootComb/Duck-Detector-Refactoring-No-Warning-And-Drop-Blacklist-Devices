@@ -18,10 +18,10 @@ package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.content.Context
 
-public open class VirtualizationIsolatedProbeManager(
+public open class IsolatedHelperProbeManager(
     context: Context? = null,
-) : VirtualizationProbeManager(
+) : HelperProbeManager(
     context = context,
-    serviceClass = VirtualizationIsolatedProbeService::class.java,
-    expectedProfile = VirtualizationRemoteProfile.ISOLATED,
+    serviceClass = IsolatedHelperProbeService::class.java,
+    expectedProfile = HelperProcessProfile.ISOLATED,
 )

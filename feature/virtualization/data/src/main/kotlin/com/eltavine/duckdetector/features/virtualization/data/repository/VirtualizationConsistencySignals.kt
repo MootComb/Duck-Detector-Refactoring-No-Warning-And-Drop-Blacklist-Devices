@@ -17,10 +17,10 @@
 package com.eltavine.duckdetector.features.virtualization.data.repository
 
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeSnapshot
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
 import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbeResult
 import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbeResult
 import com.eltavine.duckdetector.features.virtualization.data.rules.VirtualizationHostAppsCatalog
@@ -31,8 +31,8 @@ import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSi
 internal fun buildConsistencySignals(
     nativeSnapshot: VirtualizationNativeSnapshot,
     preloadResult: EarlyVirtualizationPreloadResult,
-    remoteSnapshot: VirtualizationRemoteSnapshot,
-    isolatedSnapshot: VirtualizationRemoteSnapshot,
+    remoteSnapshot: HelperProcessSnapshot,
+    isolatedSnapshot: HelperProcessSnapshot,
     mainProcessInfo: VirtualizationProcessInfo,
     dexPathResult: DexPathProbeResult,
     uidIdentityResult: UidIdentityProbeResult,
@@ -41,7 +41,7 @@ internal fun buildConsistencySignals(
     val isolatedSignals = mutableListOf<VirtualizationSignal>()
     var mountAnchorDriftCount = 0
 
-    if (remoteSnapshot.available && remoteSnapshot.profile == VirtualizationRemoteProfile.REGULAR) {
+    if (remoteSnapshot.available && remoteSnapshot.profile == HelperProcessProfile.REGULAR) {
         val pathMismatches = buildList {
             if (
                 mainProcessInfo.filesDir.isNotBlank() &&

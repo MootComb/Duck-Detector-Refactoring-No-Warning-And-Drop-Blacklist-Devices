@@ -19,9 +19,9 @@ package com.eltavine.duckdetector.features.mount.data.repository
 import android.content.Context
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadResult
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
@@ -51,8 +51,8 @@ class MountRepository(
     private val nativeBridge: MountNativeBridge = MountNativeBridge(),
     private val preloadResultProvider: () -> EarlyMountPreloadResult = EarlyMountPreloadStore::currentResult,
     private val shellTmpConcealmentProbe: ShellTmpConcealmentProbe = ShellTmpConcealmentProbe(),
-    private val isolatedProbeManager: VirtualizationIsolatedProbeManager =
-        VirtualizationIsolatedProbeManager(context?.applicationContext),
+    private val isolatedProbeManager: IsolatedHelperProbeManager =
+        IsolatedHelperProbeManager(context?.applicationContext),
     private val zygoteNextProbeManager: ZygoteNextProbeManager =
         ZygoteNextProbeManager(context?.applicationContext),
 ) : DetectorScanner<MountReport> {
@@ -119,7 +119,7 @@ class MountRepository(
 
     private fun buildFailedReport(
         message: String,
-        procMountView: VirtualizationRemoteSnapshot,
+        procMountView: HelperProcessSnapshot,
         zygoteNext: MountZygoteNextReport,
     ): MountReport {
         return MountReport.failed(message).copy(
@@ -129,8 +129,8 @@ class MountRepository(
         ).withProcMountView(procMountView)
     }
 
-    private fun MountReport.withProcMountView(snapshot: VirtualizationRemoteSnapshot): MountReport {
-        val available = snapshot.profile == VirtualizationRemoteProfile.ISOLATED &&
+    private fun MountReport.withProcMountView(snapshot: HelperProcessSnapshot): MountReport {
+        val available = snapshot.profile == HelperProcessProfile.ISOLATED &&
                 snapshot.procMountViewAvailable
         return copy(
             procMountViewProbeAvailable = available,

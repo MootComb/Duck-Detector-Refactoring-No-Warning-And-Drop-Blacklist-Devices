@@ -19,9 +19,9 @@ package com.eltavine.duckdetector.features.nativeroot.data.probes
 import android.content.Context
 import android.system.ErrnoException
 import android.system.Os
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
@@ -115,8 +115,8 @@ internal data class ParsedMountAnchor(
 
 class MountNamespaceDriftProbe(
     context: Context? = null,
-    private val isolatedProbeManager: VirtualizationIsolatedProbeManager =
-        VirtualizationIsolatedProbeManager(context?.applicationContext),
+    private val isolatedProbeManager: IsolatedHelperProbeManager =
+        IsolatedHelperProbeManager(context?.applicationContext),
 ) {
 
     suspend fun run(): MountNamespaceDriftProbeResult {
@@ -127,7 +127,7 @@ class MountNamespaceDriftProbe(
 
     internal fun evaluate(
         localSnapshot: LocalMountNamespaceSnapshot,
-        isolatedSnapshot: VirtualizationRemoteSnapshot,
+        isolatedSnapshot: HelperProcessSnapshot,
     ): MountNamespaceDriftProbeResult {
         if (!localSnapshot.available) {
             return MountNamespaceDriftProbeResult(
@@ -143,7 +143,7 @@ class MountNamespaceDriftProbe(
 
         if (
             !isolatedSnapshot.available ||
-            isolatedSnapshot.profile != VirtualizationRemoteProfile.ISOLATED
+            isolatedSnapshot.profile != HelperProcessProfile.ISOLATED
         ) {
             return MountNamespaceDriftProbeResult(
                 available = true,

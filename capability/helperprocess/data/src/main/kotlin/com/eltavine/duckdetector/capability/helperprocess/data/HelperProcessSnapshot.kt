@@ -18,14 +18,14 @@ package com.eltavine.duckdetector.capability.helperprocess.data
 
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
 
-public enum class VirtualizationRemoteProfile {
+public enum class HelperProcessProfile {
     REGULAR,
     ISOLATED,
 }
 
-public data class VirtualizationRemoteSnapshot(
+public data class HelperProcessSnapshot(
     val available: Boolean = false,
-    val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR,
+    val profile: HelperProcessProfile = HelperProcessProfile.REGULAR,
     val nativeAvailable: Boolean = false,
     val uid: Int = -1,
     val packageName: String = "",
@@ -58,13 +58,13 @@ public data class VirtualizationRemoteSnapshot(
         get() = findings.mapTo(linkedSetOf()) { "${it.group}:${it.label}:${it.value}" }
 
     public companion object {
-        public fun parse(raw: String): VirtualizationRemoteSnapshot {
+        public fun parse(raw: String): HelperProcessSnapshot {
             if (raw.isBlank()) {
-                return VirtualizationRemoteSnapshot()
+                return HelperProcessSnapshot()
             }
 
             var available = false
-            var profile = VirtualizationRemoteProfile.REGULAR
+            var profile = HelperProcessProfile.REGULAR
             var nativeAvailable = false
             var uid = -1
             var packageName = ""
@@ -121,9 +121,9 @@ public data class VirtualizationRemoteSnapshot(
                                 "AVAILABLE" -> available = value.asBool()
                                 "PROFILE" -> {
                                     profile = value.takeIf { it.isNotBlank() }?.let {
-                                        runCatching { VirtualizationRemoteProfile.valueOf(it) }
-                                            .getOrDefault(VirtualizationRemoteProfile.REGULAR)
-                                    } ?: VirtualizationRemoteProfile.REGULAR
+                                        runCatching { HelperProcessProfile.valueOf(it) }
+                                            .getOrDefault(HelperProcessProfile.REGULAR)
+                                    } ?: HelperProcessProfile.REGULAR
                                 }
 
                                 "NATIVE_AVAILABLE" -> nativeAvailable = value.asBool()
@@ -159,7 +159,7 @@ public data class VirtualizationRemoteSnapshot(
                     }
                 }
 
-            return VirtualizationRemoteSnapshot(
+            return HelperProcessSnapshot(
                 available = available,
                 profile = profile,
                 nativeAvailable = nativeAvailable,

@@ -21,37 +21,37 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.IBinder
 import android.os.Build
-import java.util.concurrent.atomic.AtomicBoolean
+import android.os.IBinder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
-public open class VirtualizationProbeManager(
+public open class HelperProbeManager(
     private val context: Context? = null,
-    private val serviceClass: Class<out Service> = VirtualizationProbeService::class.java,
-    private val expectedProfile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR,
+    private val serviceClass: Class<out Service> = HelperProbeService::class.java,
+    private val expectedProfile: HelperProcessProfile = HelperProcessProfile.REGULAR,
     private val nativeBridge: VirtualizationNativeBridge = VirtualizationNativeBridge(),
 ) {
 
-    public open suspend fun collect(): VirtualizationRemoteSnapshot = collectRemote(
+    public open suspend fun collect(): HelperProcessSnapshot = collectRemote(
         timeoutMs = DETECTION_TIMEOUT_MS,
-        payloadCollector = VirtualizationProbeProxy::collectSnapshot,
+        payloadCollector = HelperProbeProxy::collectSnapshot,
     )
 
-    public open suspend fun collectProcMountView(): VirtualizationRemoteSnapshot = collectRemote(
+    public open suspend fun collectProcMountView(): HelperProcessSnapshot = collectRemote(
         timeoutMs = PROC_MOUNT_VIEW_TIMEOUT_MS,
-        payloadCollector = VirtualizationProbeProxy::collectProcMountView,
+        payloadCollector = HelperProbeProxy::collectProcMountView,
     )
 
     private suspend fun collectRemote(
         timeoutMs: Long,
-        payloadCollector: (VirtualizationProbeProxy) -> String,
-    ): VirtualizationRemoteSnapshot {
-        val appContext = context?.applicationContext ?: return VirtualizationRemoteSnapshot()
+        payloadCollector: (HelperProbeProxy) -> String,
+    ): HelperProcessSnapshot {
+        val appContext = context?.applicationContext ?: return HelperProcessSnapshot()
         // Match PrivIsolated's named isolated instance. The manifest flag supplies the isolated
         // UID, while bindIsolatedService gives ActivityManager a stable instance identity and
         // mirrors the reference app's lifecycle.
@@ -60,7 +60,7 @@ public open class VirtualizationProbeManager(
         // https://developer.android.com/reference/android/content/Context#bindIsolatedService(android.content.Intent,%20int,%20java.lang.String,java.util.concurrent.Executor,android.content.ServiceConnection)
         return withTimeoutOrNull(timeoutMs) {
             performRemoteCollection(appContext, payloadCollector)
-        } ?: VirtualizationRemoteSnapshot(
+        } ?: HelperProcessSnapshot(
             available = false,
             errorDetail = "Virtualization helper process timed out.",
         )
@@ -98,22 +98,22 @@ public open class VirtualizationProbeManager(
 
     private suspend fun performRemoteCollection(
         context: Context,
-        payloadCollector: (VirtualizationProbeProxy) -> String,
-    ): VirtualizationRemoteSnapshot {
+        payloadCollector: (HelperProbeProxy) -> String,
+    ): HelperProcessSnapshot {
         val snapshot = performRemoteCall(
             context = context,
             onConnected = { proxy ->
-                VirtualizationRemoteSnapshot.parse(payloadCollector(proxy))
+                HelperProcessSnapshot.parse(payloadCollector(proxy))
             },
             onNullBinder = {
-                VirtualizationRemoteSnapshot(
+                HelperProcessSnapshot(
                     available = false,
                     profile = expectedProfile,
                     errorDetail = "Detector service returned a null binder.",
                 )
             },
             onError = { error ->
-                VirtualizationRemoteSnapshot(
+                HelperProcessSnapshot(
                     available = false,
                     profile = expectedProfile,
                     errorDetail = error,
@@ -132,7 +132,7 @@ public open class VirtualizationProbeManager(
 
     private suspend fun <T> performRemoteCall(
         context: Context,
-        onConnected: (VirtualizationProbeProxy) -> T,
+        onConnected: (HelperProbeProxy) -> T,
         onNullBinder: () -> T,
         onError: (String) -> T,
     ): T = suspendCancellableCoroutine { continuation ->
@@ -166,7 +166,7 @@ public open class VirtualizationProbeManager(
                     return
                 }
                 try {
-                    val proxy = VirtualizationProbeProxy(service)
+                    val proxy = HelperProbeProxy(service)
                     finish(onConnected(proxy))
                 } catch (throwable: Throwable) {
                     finish(onError(throwable.message ?: "Binder call failed."))
@@ -194,7 +194,7 @@ public open class VirtualizationProbeManager(
         // main thread's executor - that previously froze the UI (and could trigger an ANR)
         // for as long as the remote process took to answer.
         val bound = runCatching {
-            if (expectedProfile == VirtualizationRemoteProfile.ISOLATED &&
+            if (expectedProfile == HelperProcessProfile.ISOLATED &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             ) {
                 context.bindIsolatedService(

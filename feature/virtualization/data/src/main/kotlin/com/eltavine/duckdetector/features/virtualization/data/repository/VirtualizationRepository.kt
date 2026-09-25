@@ -20,11 +20,11 @@ import android.content.Context
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadSignal
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeBridge
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmCounterTrapProbe
@@ -84,11 +84,11 @@ class VirtualizationRepository(
     private val hostAppProbe: VirtualizationHostAppProbe = VirtualizationHostAppProbe(
         context?.applicationContext,
     ),
-    private val probeManager: VirtualizationProbeManager = VirtualizationProbeManager(
+    private val probeManager: HelperProbeManager = HelperProbeManager(
         context?.applicationContext,
     ),
-    private val isolatedProbeManager: VirtualizationIsolatedProbeManager =
-        VirtualizationIsolatedProbeManager(context?.applicationContext),
+    private val isolatedProbeManager: IsolatedHelperProbeManager =
+        IsolatedHelperProbeManager(context?.applicationContext),
     private val nativeTimingTrapProbe: NativeTimingTrapProbe = NativeTimingTrapProbe(nativeBridge),
     private val nativeSyscallParityTrapProbe: NativeSyscallParityTrapProbe =
         NativeSyscallParityTrapProbe(nativeBridge),

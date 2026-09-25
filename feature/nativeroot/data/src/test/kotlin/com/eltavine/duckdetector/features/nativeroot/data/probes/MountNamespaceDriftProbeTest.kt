@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,9 +34,9 @@ class MountNamespaceDriftProbeTest {
                 namespaceInode = "mnt:[41]",
                 systemMountKey = "10|8:1|/|/system|ext4|/dev/block/dm-1",
             ),
-            isolatedSnapshot = VirtualizationRemoteSnapshot(
+            isolatedSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.ISOLATED,
+                profile = HelperProcessProfile.ISOLATED,
                 mountNamespaceInode = "mnt:[42]",
                 systemMountKey = "11|0:22|/|/system|overlay|overlay",
             ),
@@ -57,9 +57,9 @@ class MountNamespaceDriftProbeTest {
             localSnapshot = LocalMountNamespaceSnapshot(
                 namespaceInode = "mnt:[100]",
             ),
-            isolatedSnapshot = VirtualizationRemoteSnapshot(
+            isolatedSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.ISOLATED,
+                profile = HelperProcessProfile.ISOLATED,
                 mountNamespaceInode = "mnt:[101]",
             ),
         )

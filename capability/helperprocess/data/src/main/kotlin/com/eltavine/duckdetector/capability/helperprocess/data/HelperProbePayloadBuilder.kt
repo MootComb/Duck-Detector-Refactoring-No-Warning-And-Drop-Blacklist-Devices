@@ -18,11 +18,11 @@ package com.eltavine.duckdetector.capability.helperprocess.data
 
 import android.content.Context
 
-internal object VirtualizationProbePayloadBuilder {
+internal object HelperProbePayloadBuilder {
 
     fun buildSnapshotPayload(
         context: Context,
-        profile: VirtualizationRemoteProfile,
+        profile: HelperProcessProfile,
         classLoader: ClassLoader?,
         nativeBridge: VirtualizationNativeBridge,
     ): String = buildSnapshotPayload(
@@ -33,7 +33,7 @@ internal object VirtualizationProbePayloadBuilder {
 
     fun buildSnapshotPayload(
         environment: SnapshotEnvironment,
-        profile: VirtualizationRemoteProfile,
+        profile: HelperProcessProfile,
         nativeBridge: VirtualizationNativeBridge,
     ): String {
         return runCatching {
@@ -74,7 +74,7 @@ internal object VirtualizationProbePayloadBuilder {
                 // ENOENT and erase the payload. Keep storage-only probes out of this branch.
                 // isolated service 没有普通 app-private storage，不能让预期 ENOENT 抹掉 mount 证据。
                 // https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/res/res/values/attrs_manifest.xml
-                if (profile != VirtualizationRemoteProfile.ISOLATED) {
+                if (profile != HelperProcessProfile.ISOLATED) {
                     appendLine("FILES_DIR=${environment.filesDir.encodeValue()}")
                     appendLine("CACHE_DIR=${environment.cacheDir.encodeValue()}")
                 }
@@ -102,8 +102,8 @@ internal object VirtualizationProbePayloadBuilder {
         }
     }
 
-    fun buildProcMountViewPayload(profile: VirtualizationRemoteProfile): String {
-        if (profile != VirtualizationRemoteProfile.ISOLATED) {
+    fun buildProcMountViewPayload(profile: HelperProcessProfile): String {
+        if (profile != HelperProcessProfile.ISOLATED) {
             return "AVAILABLE=0\nPROFILE=${profile.name}\nERROR=Isolated profile required.\n"
         }
         val mountView = ProcMountViewScanner().scan()
@@ -162,7 +162,7 @@ internal object VirtualizationProbePayloadBuilder {
     private fun List<String>.encodeList(): String {
         return distinct()
             .filter { it.isNotBlank() }
-            .joinToString(separator = VirtualizationProbeProtocol.LIST_SEPARATOR) {
+            .joinToString(separator = HelperProbeProtocol.LIST_SEPARATOR) {
                 it.encodeValue()
             }
     }

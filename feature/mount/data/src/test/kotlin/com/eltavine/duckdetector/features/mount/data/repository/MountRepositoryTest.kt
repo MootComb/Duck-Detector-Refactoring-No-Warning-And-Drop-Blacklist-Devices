@@ -18,9 +18,9 @@ package com.eltavine.duckdetector.features.mount.data.repository
 
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadResult
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadSource
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
@@ -221,9 +221,9 @@ class MountRepositoryTest {
             nativeBridge = FakeMountNativeBridge(snapshot = cleanSnapshot()),
             preloadResultProvider = { EarlyMountPreloadResult.empty() },
             isolatedProbeManager = FakeIsolatedProbeManager(
-                VirtualizationRemoteSnapshot(
+                HelperProcessSnapshot(
                     available = true,
-                    profile = VirtualizationRemoteProfile.ISOLATED,
+                    profile = HelperProcessProfile.ISOLATED,
                     procMountViewAvailable = true,
                     procMountViewCount = 2,
                     procMountViewExpected = 1,
@@ -290,8 +290,8 @@ class MountRepositoryTest {
     }
 
     private class FakeIsolatedProbeManager(
-        private val snapshot: VirtualizationRemoteSnapshot,
-    ) : VirtualizationIsolatedProbeManager() {
-        override suspend fun collectProcMountView(): VirtualizationRemoteSnapshot = snapshot
+        private val snapshot: HelperProcessSnapshot,
+    ) : IsolatedHelperProbeManager() {
+        override suspend fun collectProcMountView(): HelperProcessSnapshot = snapshot
     }
 }

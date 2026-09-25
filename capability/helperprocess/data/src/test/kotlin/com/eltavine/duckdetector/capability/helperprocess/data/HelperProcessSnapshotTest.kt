@@ -21,12 +21,12 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class VirtualizationRemoteSnapshotTest {
+class HelperProcessSnapshotTest {
 
     @Test
     fun `parse handles extended payload with isolated profile`() {
         val separator = "\u001f"
-        val snapshot = VirtualizationRemoteSnapshot.parse(
+        val snapshot = HelperProcessSnapshot.parse(
             """
             AVAILABLE=1
             PROFILE=ISOLATED
@@ -51,7 +51,7 @@ class VirtualizationRemoteSnapshotTest {
         )
 
         assertTrue(snapshot.available)
-        assertEquals(VirtualizationRemoteProfile.ISOLATED, snapshot.profile)
+        assertEquals(HelperProcessProfile.ISOLATED, snapshot.profile)
         assertEquals(99000, snapshot.uid)
         assertEquals("com.eltavine.duckdetector:isolated", snapshot.processName)
         assertEquals(2, snapshot.packagesForUid.size)
@@ -64,7 +64,7 @@ class VirtualizationRemoteSnapshotTest {
 
     @Test
     fun `keeps the finding columns aligned when a renderer string carries a separator`() {
-        val snapshot = VirtualizationRemoteSnapshot.parse(
+        val snapshot = HelperProcessSnapshot.parse(
             "AVAILABLE=1\n" +
                 "FINDING=RUNTIME\tWARNING\tGraphics renderer\t" +
                 "gfxstream\\ttab\\nnewline\tGoogle",
@@ -80,7 +80,7 @@ class VirtualizationRemoteSnapshotTest {
 
     @Test
     fun `parse handles proc mount view divergence fields`() {
-        val snapshot = VirtualizationRemoteSnapshot.parse(
+        val snapshot = HelperProcessSnapshot.parse(
             """
             AVAILABLE=1
             PROFILE=ISOLATED
@@ -110,7 +110,7 @@ class VirtualizationRemoteSnapshotTest {
 
     @Test
     fun `parse defaults proc mount view fields when absent`() {
-        val snapshot = VirtualizationRemoteSnapshot.parse(
+        val snapshot = HelperProcessSnapshot.parse(
             """
             AVAILABLE=1
             PROFILE=ISOLATED

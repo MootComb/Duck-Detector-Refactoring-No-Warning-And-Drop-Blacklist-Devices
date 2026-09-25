@@ -23,9 +23,9 @@ import android.os.IBinder
 import android.os.Parcel
 import android.os.Process
 
-public abstract class BaseVirtualizationProbeService : Service() {
+public abstract class BaseHelperProbeService : Service() {
 
-    protected abstract val profile: VirtualizationRemoteProfile
+    protected abstract val profile: HelperProcessProfile
 
     private val nativeBridge = VirtualizationNativeBridge()
 
@@ -40,37 +40,37 @@ public abstract class BaseVirtualizationProbeService : Service() {
             // 只暴露必要操作，并在执行 probe 前校验 descriptor，保持与 AIDL 的边界语义一致。
             return when (code) {
                 INTERFACE_TRANSACTION -> {
-                    reply?.writeString(VirtualizationProbeProtocol.DESCRIPTOR)
+                    reply?.writeString(HelperProbeProtocol.DESCRIPTOR)
                     true
                 }
 
-                VirtualizationProbeProtocol.TRANSACTION_COLLECT_SNAPSHOT -> {
-                    data.enforceInterface(VirtualizationProbeProtocol.DESCRIPTOR)
+                HelperProbeProtocol.TRANSACTION_COLLECT_SNAPSHOT -> {
+                    data.enforceInterface(HelperProbeProtocol.DESCRIPTOR)
                     reply?.writeNoException()
                     val payload = buildSnapshotPayload()
                     reply?.writeString(payload)
                     true
                 }
 
-                VirtualizationProbeProtocol.TRANSACTION_IS_NATIVE_AVAILABLE -> {
-                    data.enforceInterface(VirtualizationProbeProtocol.DESCRIPTOR)
+                HelperProbeProtocol.TRANSACTION_IS_NATIVE_AVAILABLE -> {
+                    data.enforceInterface(HelperProbeProtocol.DESCRIPTOR)
                     reply?.writeNoException()
                     reply?.writeInt(if (nativeBridge.isNativeAvailable()) 1 else 0)
                     true
                 }
 
-                VirtualizationProbeProtocol.TRANSACTION_COLLECT_PROC_MOUNT_VIEW -> {
-                    data.enforceInterface(VirtualizationProbeProtocol.DESCRIPTOR)
+                HelperProbeProtocol.TRANSACTION_COLLECT_PROC_MOUNT_VIEW -> {
+                    data.enforceInterface(HelperProbeProtocol.DESCRIPTOR)
                     reply?.writeNoException()
-                    val payload = VirtualizationProbePayloadBuilder.buildProcMountViewPayload(profile)
+                    val payload = HelperProbePayloadBuilder.buildProcMountViewPayload(profile)
                     reply?.writeString(payload)
                     true
                 }
 
-                VirtualizationProbeProtocol.TRANSACTION_RUN_SACRIFICIAL_SYSCALL_PACK -> {
-                    data.enforceInterface(VirtualizationProbeProtocol.DESCRIPTOR)
+                HelperProbeProtocol.TRANSACTION_RUN_SACRIFICIAL_SYSCALL_PACK -> {
+                    data.enforceInterface(HelperProbeProtocol.DESCRIPTOR)
                     reply?.writeNoException()
-                    val payload = if (profile == VirtualizationRemoteProfile.REGULAR) {
+                    val payload = if (profile == HelperProcessProfile.REGULAR) {
                         nativeBridge.runSacrificialSyscallPack()
                     } else {
                         com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult(
@@ -126,7 +126,7 @@ public abstract class BaseVirtualizationProbeService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         // The reference service refuses a non-isolated bind. Keep the same fail-closed boundary
         // for the isolated profile even though the manifest already requests isolatedProcess.
-        val allowed = profile != VirtualizationRemoteProfile.ISOLATED || Process.isIsolated()
+        val allowed = profile != HelperProcessProfile.ISOLATED || Process.isIsolated()
         return if (!allowed) {
             null
         } else {
@@ -135,7 +135,7 @@ public abstract class BaseVirtualizationProbeService : Service() {
     }
 
     private fun buildSnapshotPayload(): String {
-        return VirtualizationProbePayloadBuilder.buildSnapshotPayload(
+        return HelperProbePayloadBuilder.buildSnapshotPayload(
             context = applicationContext,
             profile = profile,
             classLoader = javaClass.classLoader,
@@ -144,10 +144,10 @@ public abstract class BaseVirtualizationProbeService : Service() {
     }
 }
 
-public class VirtualizationProbeService : BaseVirtualizationProbeService() {
-    override val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.REGULAR
+public class HelperProbeService : BaseHelperProbeService() {
+    override val profile: HelperProcessProfile = HelperProcessProfile.REGULAR
 }
 
-public class VirtualizationIsolatedProbeService : BaseVirtualizationProbeService() {
-    override val profile: VirtualizationRemoteProfile = VirtualizationRemoteProfile.ISOLATED
+public class IsolatedHelperProbeService : BaseHelperProbeService() {
+    override val profile: HelperProcessProfile = HelperProcessProfile.ISOLATED
 }

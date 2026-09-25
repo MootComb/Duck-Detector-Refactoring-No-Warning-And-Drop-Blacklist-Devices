@@ -24,8 +24,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class VirtualizationProbePayloadBuilderTest(
-    private val profile: VirtualizationRemoteProfile,
+class HelperProbePayloadBuilderTest(
+    private val profile: HelperProcessProfile,
 ) {
     @Test
     fun `helper skips renderer and preserves diagnostic evidence`() {
@@ -48,12 +48,12 @@ class VirtualizationProbePayloadBuilderTest(
         )
         val bridge = RecordingNativeBridge(nativeSnapshot)
 
-        val payload = VirtualizationProbePayloadBuilder.buildSnapshotPayload(
+        val payload = HelperProbePayloadBuilder.buildSnapshotPayload(
             environment = environment,
             profile = profile,
             nativeBridge = bridge,
         )
-        val snapshot = VirtualizationRemoteSnapshot.parse(payload)
+        val snapshot = HelperProcessSnapshot.parse(payload)
 
         // Assert outside the builder's runCatching so a swallowed failure cannot pass this test.
         assertEquals(listOf(false), bridge.rendererRequests)
@@ -71,7 +71,7 @@ class VirtualizationProbePayloadBuilderTest(
         assertEquals(nativeSnapshot.vendorMountKey, snapshot.vendorMountKey)
         assertEquals(nativeSnapshot.findings, snapshot.findings)
         assertFalse(payload.lineSequence().any { it.startsWith("EGL_") })
-        if (profile == VirtualizationRemoteProfile.ISOLATED) {
+        if (profile == HelperProcessProfile.ISOLATED) {
             assertEquals(0, environment.storageReads)
             assertEquals("", snapshot.filesDir)
             assertEquals("", snapshot.cacheDir)
@@ -86,8 +86,8 @@ class VirtualizationProbePayloadBuilderTest(
     fun `native unavailable still preserves managed helper evidence without renderer retry`() {
         val bridge = RecordingNativeBridge(VirtualizationNativeSnapshot(available = false))
 
-        val snapshot = VirtualizationRemoteSnapshot.parse(
-            VirtualizationProbePayloadBuilder.buildSnapshotPayload(
+        val snapshot = HelperProcessSnapshot.parse(
+            HelperProbePayloadBuilder.buildSnapshotPayload(
                 environment = FakeEnvironment(profile),
                 profile = profile,
                 nativeBridge = bridge,
@@ -109,8 +109,8 @@ class VirtualizationProbePayloadBuilderTest(
             override val codePath: String get() = error("code path unavailable")
         }
 
-        val snapshot = VirtualizationRemoteSnapshot.parse(
-            VirtualizationProbePayloadBuilder.buildSnapshotPayload(
+        val snapshot = HelperProcessSnapshot.parse(
+            HelperProbePayloadBuilder.buildSnapshotPayload(
                 environment = environment,
                 profile = profile,
                 nativeBridge = bridge,
@@ -136,8 +136,8 @@ class VirtualizationProbePayloadBuilderTest(
     }
 
     private open class FakeEnvironment(
-        private val profile: VirtualizationRemoteProfile,
-    ) : VirtualizationProbePayloadBuilder.SnapshotEnvironment {
+        private val profile: HelperProcessProfile,
+    ) : HelperProbePayloadBuilder.SnapshotEnvironment {
         var storageReads = 0
             private set
 
@@ -152,9 +152,9 @@ class VirtualizationProbePayloadBuilderTest(
         )
 
         override fun observeUidIdentity() = UidIdentityObservation(
-            uid = if (profile == VirtualizationRemoteProfile.ISOLATED) 99001 else 10123,
+            uid = if (profile == HelperProcessProfile.ISOLATED) 99001 else 10123,
             packageName = packageName,
-            packagesForUid = if (profile == VirtualizationRemoteProfile.ISOLATED) {
+            packagesForUid = if (profile == HelperProcessProfile.ISOLATED) {
                 emptyList()
             } else {
                 listOf(packageName)
@@ -163,7 +163,7 @@ class VirtualizationProbePayloadBuilderTest(
 
         private fun readStorage(directory: String): String {
             storageReads += 1
-            check(profile != VirtualizationRemoteProfile.ISOLATED) {
+            check(profile != HelperProcessProfile.ISOLATED) {
                 "Isolated helper must not access app-private storage"
             }
             return "/data/user/0/duck/$directory"
@@ -173,7 +173,7 @@ class VirtualizationProbePayloadBuilderTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun profiles(): List<Array<VirtualizationRemoteProfile>> =
-            VirtualizationRemoteProfile.entries.map { arrayOf(it) }
+        fun profiles(): List<Array<HelperProcessProfile>> =
+            HelperProcessProfile.entries.map { arrayOf(it) }
     }
 }

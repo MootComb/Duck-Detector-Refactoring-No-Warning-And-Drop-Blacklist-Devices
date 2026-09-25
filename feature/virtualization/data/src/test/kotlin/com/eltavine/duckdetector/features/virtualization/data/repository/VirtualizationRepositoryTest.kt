@@ -17,14 +17,14 @@
 package com.eltavine.duckdetector.features.virtualization.data.repository
 
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeBridge
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeSnapshot
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeManager
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmCounterTrapProbe
@@ -201,7 +201,7 @@ class VirtualizationRepositoryTest {
                     ),
                 ),
             ),
-            remoteSnapshot = VirtualizationRemoteSnapshot(
+            remoteSnapshot = HelperProcessSnapshot(
                 available = true,
                 nativeAvailable = true,
                 filesDir = "/data/user/0/com.eltavine.duckdetector.virtual",
@@ -236,9 +236,9 @@ class VirtualizationRepositoryTest {
                         ),
                     ),
                 ),
-                remoteSnapshot = VirtualizationRemoteSnapshot(
+                remoteSnapshot = HelperProcessSnapshot(
                     available = true,
-                    profile = VirtualizationRemoteProfile.REGULAR,
+                    profile = HelperProcessProfile.REGULAR,
                     findings = emptyList(),
                 ),
             ).scanInternal()
@@ -302,14 +302,14 @@ class VirtualizationRepositoryTest {
     @Test
     fun `main helper contaminated while isolated stays clean maps to danger`() = runBlocking {
         val report = repository(
-            remoteSnapshot = VirtualizationRemoteSnapshot(
+            remoteSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.REGULAR,
+                profile = HelperProcessProfile.REGULAR,
                 classPathEntries = listOf("/data/app/com.vmos.pro/base.apk"),
             ),
-            isolatedSnapshot = VirtualizationRemoteSnapshot(
+            isolatedSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.ISOLATED,
+                profile = HelperProcessProfile.ISOLATED,
                 classPathEntries = emptyList(),
                 packagesForUid = emptyList(),
             ),
@@ -331,9 +331,9 @@ class VirtualizationRepositoryTest {
                 mountNamespaceInode = "mnt:[1]",
                 apexMountKey = "10|8:1|/|/apex|ext4|/dev/block/dm-1",
             ),
-            remoteSnapshot = VirtualizationRemoteSnapshot(
+            remoteSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.REGULAR,
+                profile = HelperProcessProfile.REGULAR,
                 mountNamespaceInode = "mnt:[2]",
                 apexMountKey = "11|8:1|/|/apex|authfs|microdroid",
             ),
@@ -357,9 +357,9 @@ class VirtualizationRepositoryTest {
                 apexMountKey = "10|0:22|/|/apex|tmpfs|tmpfs",
                 vendorMountKey = "20|254:29|/|/vendor|erofs|/dev/block/dm-29",
             ),
-            remoteSnapshot = VirtualizationRemoteSnapshot(
+            remoteSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.REGULAR,
+                profile = HelperProcessProfile.REGULAR,
                 mountNamespaceInode = "mnt:[2]",
                 apexMountKey = "99|0:22|/|/apex|tmpfs|tmpfs",
                 vendorMountKey = "88|254:29|/|/vendor|erofs|/dev/block/dm-29",
@@ -380,9 +380,9 @@ class VirtualizationRepositoryTest {
                 apexMountKey = "10|0:22|/|/apex|tmpfs|tmpfs",
                 vendorMountKey = "20|254:29|/|/vendor|erofs|/dev/block/dm-29",
             ),
-            isolatedSnapshot = VirtualizationRemoteSnapshot(
+            isolatedSnapshot = HelperProcessSnapshot(
                 available = false,
-                profile = VirtualizationRemoteProfile.ISOLATED,
+                profile = HelperProcessProfile.ISOLATED,
                 errorDetail = "Identity probe failed.",
             ),
         ).scanInternal()
@@ -400,9 +400,9 @@ class VirtualizationRepositoryTest {
                 available = true,
                 mountNamespaceInode = "mnt:[1]",
             ),
-            remoteSnapshot = VirtualizationRemoteSnapshot(
+            remoteSnapshot = HelperProcessSnapshot(
                 available = true,
-                profile = VirtualizationRemoteProfile.REGULAR,
+                profile = HelperProcessProfile.REGULAR,
                 mountNamespaceInode = "mnt:[2]",
             ),
         ).scanInternal()
@@ -480,9 +480,9 @@ class VirtualizationRepositoryTest {
         uidIdentityResult: UidIdentityProbeResult = UidIdentityProbeResult(),
         nativeSnapshot: VirtualizationNativeSnapshot = VirtualizationNativeSnapshot(available = true),
         preloadResult: EarlyVirtualizationPreloadResult = EarlyVirtualizationPreloadResult.empty(),
-        remoteSnapshot: VirtualizationRemoteSnapshot = VirtualizationRemoteSnapshot(),
-        isolatedSnapshot: VirtualizationRemoteSnapshot = VirtualizationRemoteSnapshot(
-            profile = VirtualizationRemoteProfile.ISOLATED,
+        remoteSnapshot: HelperProcessSnapshot = HelperProcessSnapshot(),
+        isolatedSnapshot: HelperProcessSnapshot = HelperProcessSnapshot(
+            profile = HelperProcessProfile.ISOLATED,
         ),
         hostAppResult: VirtualizationHostAppProbeResult = VirtualizationHostAppProbeResult(
             packageVisibility = InstalledPackageVisibility.FULL,
@@ -517,13 +517,13 @@ class VirtualizationRepositoryTest {
             hostAppProbe = object : VirtualizationHostAppProbe() {
                 override fun probe(): VirtualizationHostAppProbeResult = hostAppResult
             },
-            probeManager = object : VirtualizationProbeManager() {
-                override suspend fun collect(): VirtualizationRemoteSnapshot = remoteSnapshot
+            probeManager = object : HelperProbeManager() {
+                override suspend fun collect(): HelperProcessSnapshot = remoteSnapshot
                 override suspend fun runSacrificialSyscallPack(): SacrificialSyscallPackResult =
                     syscallPackResult
             },
-            isolatedProbeManager = object : VirtualizationIsolatedProbeManager() {
-                override suspend fun collect(): VirtualizationRemoteSnapshot = isolatedSnapshot
+            isolatedProbeManager = object : IsolatedHelperProbeManager() {
+                override suspend fun collect(): HelperProcessSnapshot = isolatedSnapshot
             },
             nativeTimingTrapProbe = object : NativeTimingTrapProbe() {
                 override fun probe(): VirtualizationTrapResult = VirtualizationTrapResult()

@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.virtualization.data.repository
 
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbeResult
@@ -41,8 +41,8 @@ internal fun buildMethods(
     preloadResult: EarlyVirtualizationPreloadResult,
     crossProcessSignals: List<VirtualizationSignal>,
     isolatedSignals: List<VirtualizationSignal>,
-    remoteSnapshot: VirtualizationRemoteSnapshot,
-    isolatedSnapshot: VirtualizationRemoteSnapshot,
+    remoteSnapshot: HelperProcessSnapshot,
+    isolatedSnapshot: HelperProcessSnapshot,
     hostAppResult: VirtualizationHostAppProbeResult,
     nativeTimingTrap: VirtualizationTrapResult,
     nativeSyscallParityTrap: VirtualizationTrapResult,

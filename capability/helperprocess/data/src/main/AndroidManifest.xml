@@ -19,11 +19,11 @@ limitations under the License.
 
     <application>
         <service
-            android:name="com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeService"
+            android:name="com.eltavine.duckdetector.capability.helperprocess.data.HelperProbeService"
             android:exported="false"
-            android:process=":virtualization_probe" />
+            android:process=":helper_probe" />
         <service
-            android:name="com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeService"
+            android:name="com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeService"
             android:exported="false"
             android:isolatedProcess="true" />
     </application>
