@@ -1,0 +1,35 @@
+package {{package}}.domain
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class {{Class}}ReportStatusTest {
+
+    @Test
+    fun `loading and failed scans are informational`() {
+        assertEquals(DetectorStatus.info(InfoKind.SUPPORT), {{Class}}Report.loading().toDetectorStatus())
+        assertEquals(DetectorStatus.info(InfoKind.ERROR), {{Class}}Report.failed("failure").toDetectorStatus())
+    }
+
+    @Test
+    fun `a scan that could not probe is not clean`() {
+        assertEquals(DetectorStatus.info(InfoKind.SUPPORT), ready(probed = false).toDetectorStatus())
+    }
+
+    @Test
+    fun `a probed scan without signals is clean`() {
+        assertEquals(DetectorStatus.allClear(), ready(probed = true).toDetectorStatus())
+    }
+
+    @Test
+    fun `an observed signal is a warning`() {
+        val report = ready(probed = true, signals = listOf({{Class}}Signal(label = "label", detail = "detail")))
+
+        assertEquals(DetectorStatus.warning(), report.toDetectorStatus())
+    }
+
+    private fun ready(probed: Boolean, signals: List<{{Class}}Signal> = emptyList()) =
+        {{Class}}Report(stage = {{Class}}Stage.READY, signals = signals, probed = probed)
+}

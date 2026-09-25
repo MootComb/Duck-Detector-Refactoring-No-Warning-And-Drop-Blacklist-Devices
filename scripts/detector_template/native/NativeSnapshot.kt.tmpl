@@ -1,0 +1,11 @@
+package {{package}}.data.native
+
+import com.eltavine.duckdetector.core.native.NativeCollectionStatus
+
+data class {{Class}}NativeSnapshot(
+    /** True only when the native probe observed the device; otherwise its silence says nothing. */
+    val available: Boolean = false,
+    val signals: List<String> = emptyList(),
+    /** Why the snapshot is or is not usable: a missing library and a rejected payload read differently. */
+    val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
+)

@@ -55,6 +55,7 @@ jobs:
           python3 .github/scripts/test-native-boundaries.py
           python3 .github/scripts/test-reflection-boundaries.py
           python3 .github/scripts/test-source-file-length.py
+          python3 scripts/test_new_detector.py
 
       - name: Verify every detector stays inside its own directory
         run: python3 .github/scripts/check-detector-touch-points.py
@@ -142,6 +143,36 @@ jobs:
           set -euo pipefail
 
           ./gradlew --stacktrace :app:lintDebug
+
+      # Adding a detector has to stay one command that changes nothing outside feature/<name>/ but
+      # its registrations, and what the scaffold generates has to keep building and passing every
+      # guard as the code around it changes. This step runs last because it adds a detector to the
+      # checkout.
+      - name: Scaffold a native detector and build it
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Spelled through a variable so this file never names the probe's directory itself.
+          probe=scaffoldprobe
+          git status --porcelain | sort > /tmp/status-before
+          python3 scripts/new_detector.py "$probe" --class-name ScaffoldProbe --native \
+            --description "exercises the detector scaffold in CI"
+          git status --porcelain | sort > /tmp/status-after
+          comm -13 /tmp/status-before /tmp/status-after > /tmp/scaffold-changes
+          diff -u - /tmp/scaffold-changes <<EXPECTED
+           M .github/policies/native-boundaries.json
+           M app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt
+           M sdk/runtime/src/main/cpp/CMakeLists.txt
+           M sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt
+          ?? feature/$probe/
+          EXPECTED
+
+          python3 .github/scripts/check-detector-touch-points.py
+          python3 .github/scripts/check-jni-contracts.py
+          python3 .github/scripts/check-native-boundaries.py
+          python3 .github/scripts/check-source-file-length.py
+          ./gradlew --stacktrace unitTest :app:assembleDebug buildHealth
 
       - name: Upload test and lint reports
         if: always()

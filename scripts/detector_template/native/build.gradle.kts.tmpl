@@ -1,0 +1,15 @@
+plugins {
+    id("duckdetector.android.library")
+}
+
+android {
+    namespace = "{{package}}.data"
+}
+
+dependencies {
+    api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:native"))
+    api(project(":feature:{{name}}:domain"))
+    implementation(libs.kotlinx.coroutines.android)
+}

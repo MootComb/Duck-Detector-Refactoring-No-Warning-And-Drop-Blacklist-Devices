@@ -1,0 +1,9 @@
+package {{package}}.ui
+
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
+import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
+import {{package}}.detector.{{Class}}Detector
+import {{package}}.ui.card.{{Class}}DetectorCard
+
+/** The {{title}} card on the dashboard. */
+val {{Class}}DetectorFeature: DetectorFeature = CardDetectorFeature({{Class}}Detector) { model -> {{Class}}DetectorCard(model = model) }

@@ -1,0 +1,30 @@
+package {{package}}.detector
+
+import android.content.Context
+import com.eltavine.duckdetector.core.detector.Detector
+import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.report.DetectorReport
+import {{package}}.data.repository.{{Class}}Repository
+import {{package}}.domain.{{Class}}Report
+import {{package}}.presentation.{{Class}}CardModelMapper
+import {{package}}.presentation.model.{{Class}}CardModel
+import {{package}}.presentation.toDetectorReport
+
+/**
+ * {{title}}: {{description}}
+ *
+ * Collected by [{{Class}}Repository], judged by `{{Class}}Report.toDetectorStatus()` in the domain
+ * layer, and described by [{{Class}}CardModelMapper].
+ */
+public object {{Class}}Detector : Detector<{{Class}}Report, {{Class}}CardModel> {
+    override val id: DetectorId = DetectorId("{{id}}")
+
+    override fun createScanner(context: Context): DetectorScanner<{{Class}}Report> = {{Class}}Repository()
+
+    override fun loadingReport(): {{Class}}Report = {{Class}}Report.loading()
+
+    override fun describe(report: {{Class}}Report): {{Class}}CardModel = {{Class}}CardModelMapper().map(report)
+
+    override fun export(model: {{Class}}CardModel): DetectorReport = model.toDetectorReport()
+}

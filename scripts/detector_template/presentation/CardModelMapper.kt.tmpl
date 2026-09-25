@@ -1,0 +1,74 @@
+package {{package}}.presentation
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+import {{package}}.domain.{{Class}}Report
+import {{package}}.domain.{{Class}}Stage
+import {{package}}.domain.toDetectorStatus
+import {{package}}.presentation.model.{{Class}}CardModel
+import {{package}}.presentation.model.{{Class}}DetailRowModel
+
+/** Words and rows of the {{title}} card; the verdict itself comes from the domain layer. */
+class {{Class}}CardModelMapper {
+
+    fun map(report: {{Class}}Report): {{Class}}CardModel = {{Class}}CardModel(
+        title = TITLE,
+        subtitle = SUBTITLE,
+        status = report.toDetectorStatus(),
+        verdict = verdict(report),
+        summary = summary(report),
+        signalRows = report.signals.map { signal ->
+            {{Class}}DetailRowModel(
+                label = signal.label,
+                value = "Observed",
+                status = DetectorStatus.warning(),
+                detail = signal.detail,
+            )
+        },
+        scanRows = scanRows(report),
+    )
+
+    private fun verdict(report: {{Class}}Report): String = when (report.stage) {
+        {{Class}}Stage.LOADING -> "Scanning"
+        {{Class}}Stage.FAILED -> "Scan failed"
+        {{Class}}Stage.READY -> when {
+            report.signals.isNotEmpty() -> "Signals observed"
+            !report.probed -> "Not evaluated"
+            else -> "No signals observed"
+        }
+    }
+
+    private fun summary(report: {{Class}}Report): String = when (report.stage) {
+        {{Class}}Stage.LOADING -> "Collecting evidence."
+        {{Class}}Stage.FAILED -> report.errorMessage ?: "The scan failed before it collected any evidence."
+        {{Class}}Stage.READY -> when {
+            report.signals.isNotEmpty() -> "The probes observed the signals listed below."
+            !report.probed -> "No probe could observe the device, so the absence of signals says nothing."
+            else -> "The probes observed the device and found no signals."
+        }
+    }
+
+    private fun scanRows(report: {{Class}}Report): List<{{Class}}DetailRowModel> {
+        if (report.stage != {{Class}}Stage.READY) {
+            return emptyList()
+        }
+        return listOf(
+            {{Class}}DetailRowModel(
+                label = "Probe",
+                value = if (report.probed) "Observed" else "Unavailable",
+                status = if (report.probed) DetectorStatus.allClear() else DetectorStatus.info(InfoKind.SUPPORT),
+                detail = report.unavailableReason,
+            ),
+            {{Class}}DetailRowModel(
+                label = "Signals",
+                value = report.signals.size.toString(),
+                status = report.toDetectorStatus(),
+            ),
+        )
+    }
+
+    private companion object {
+        const val TITLE = "{{title}}"
+        const val SUBTITLE = "{{subtitle}}"
+    }
+}

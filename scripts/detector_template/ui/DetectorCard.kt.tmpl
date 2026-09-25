@@ -1,0 +1,54 @@
+package {{package}}.ui.card
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Policy
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
+import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
+import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
+import {{package}}.presentation.model.{{Class}}CardModel
+import {{package}}.presentation.model.{{Class}}DetailRowModel
+
+@Composable
+internal fun {{Class}}DetectorCard(
+    model: {{Class}}CardModel,
+    modifier: Modifier = Modifier,
+) {
+    DetectorCardFrame(
+        title = model.title,
+        subtitle = model.subtitle,
+        status = model.status,
+        verdict = model.verdict,
+        summary = model.summary,
+        leadingIcon = Icons.Rounded.Search,
+        modifier = modifier,
+    ) {
+        {{Class}}RowSection(title = "Signals", icon = Icons.Rounded.Policy, rows = model.signalRows)
+        {{Class}}RowSection(title = "Scan", icon = Icons.Rounded.Info, rows = model.scanRows)
+    }
+}
+
+@Composable
+private fun {{Class}}RowSection(
+    title: String,
+    icon: ImageVector,
+    rows: List<{{Class}}DetailRowModel>,
+) {
+    if (rows.isEmpty()) {
+        return
+    }
+    DetectorSectionFrame(title = title, icon = icon) {
+        rows.forEach { row ->
+            DetectorDetailRowBlock(
+                label = row.label,
+                value = row.value,
+                status = row.status,
+                detail = row.detail,
+            )
+        }
+    }
+}
