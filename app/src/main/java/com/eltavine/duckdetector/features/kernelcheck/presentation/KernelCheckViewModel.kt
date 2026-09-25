@@ -19,13 +19,17 @@ package com.eltavine.duckdetector.features.kernelcheck.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class KernelCheckViewModel(
@@ -41,6 +45,10 @@ class KernelCheckViewModel(
         ),
     )
     val uiState: StateFlow<KernelCheckUiState> = _uiState.asStateFlow()
+
+    val summary: StateFlow<DetectorSummary> = uiState
+        .map { it.toDetectorSummary() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, uiState.value.toDetectorSummary())
 
     private val scans = ScanSessionRunner(viewModelScope)
 
