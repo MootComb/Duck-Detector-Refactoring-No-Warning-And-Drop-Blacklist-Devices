@@ -26,13 +26,13 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyAnalysis
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
-import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoProbe
-import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentProbe
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxDetailRowModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxHeaderFactModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxImpactItemModel
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
 
 class SelinuxCardModelMapper {
 
@@ -86,7 +86,7 @@ class SelinuxCardModelMapper {
             SelinuxStage.READY -> when (report.mode) {
                 SelinuxMode.ENFORCING -> when {
                     report.auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> "Enforcing with audit rewrite"
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT ->
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT ->
                         "Enforcing with KSU context materialized"
                     policyloadSeqno?.isSecure == false -> "Enforcing with app_zygote seqno split"
                     procAttrCurrent?.isSecure == false -> "Enforcing with app_zygote attr-write anomaly"
@@ -96,14 +96,14 @@ class SelinuxCardModelMapper {
                     appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED ->
                         "Enforcing with reduced app_zygote coverage"
 
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED ->
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED ->
                         if (repeatabilityFailed) {
                             "Enforcing with unstable context oracle"
                         } else {
                             "Enforcing with untrusted context oracle"
                         }
 
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS ->
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS ->
                         "Enforcing with context split"
 
                     report.auditIntegrity?.state == SelinuxAuditIntegrityState.EXPOSED -> "Enforcing with audit exposure"
@@ -186,23 +186,23 @@ class SelinuxCardModelMapper {
                         }
                     }
                     val contextNote = when (contextValidity?.status) {
-                        SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT ->
+                        SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT ->
                             "The context validity oracle accepted both KSU-specific contexts from the current carrier."
 
-                        SelinuxContextValidityProbe.BITPAIR_CLEAN ->
+                        SelinuxContextValidityLabels.BITPAIR_CLEAN ->
                             "The context validity oracle rejected both KSU-specific contexts in live policy."
 
-                        SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED ->
+                        SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED ->
                             if (repeatabilityFailed) {
                                 "The context validity oracle repeated inconsistently, so its KSU verdict was not trusted."
                             } else {
                                 "The context validity oracle failed its self-test, so its KSU verdict was not trusted."
                             }
 
-                        SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS ->
+                        SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS ->
                             "The context validity oracle split across the two KSU-specific contexts."
 
-                        SelinuxContextValidityProbe.BITPAIR_UNSUPPORTED ->
+                        SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED ->
                             when (appZygoteCarrierState) {
                                 AppZygoteCarrierSupportState.UNTRUSTED ->
                                     buildString {
@@ -446,17 +446,17 @@ class SelinuxCardModelMapper {
         }
 
         when (contextValidity?.status) {
-            SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT -> items += SelinuxImpactItemModel(
+            SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> items += SelinuxImpactItemModel(
                 "The app_zygote carrier validated both KSU-specific contexts in live policy.",
                 DetectorStatus.danger(),
             )
 
-            SelinuxContextValidityProbe.BITPAIR_CLEAN -> items += SelinuxImpactItemModel(
+            SelinuxContextValidityLabels.BITPAIR_CLEAN -> items += SelinuxImpactItemModel(
                 "The app_zygote carrier rejected both KSU-specific contexts.",
                 DetectorStatus.allClear(),
             )
 
-            SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED -> items += SelinuxImpactItemModel(
+            SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> items += SelinuxImpactItemModel(
                 if (repeatabilityFailed) {
                     "The context validity oracle repeated inconsistently, so its KSU verdict was not trusted."
                 } else {
@@ -465,12 +465,12 @@ class SelinuxCardModelMapper {
                 DetectorStatus.warning(),
             )
 
-            SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS -> items += SelinuxImpactItemModel(
+            SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> items += SelinuxImpactItemModel(
                 "The context validity oracle split across the two KSU-specific contexts.",
                 DetectorStatus.warning(),
             )
 
-            SelinuxContextValidityProbe.BITPAIR_UNSUPPORTED -> items += SelinuxImpactItemModel(
+            SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED -> items += SelinuxImpactItemModel(
                 contextValidity.details ?: "The context validity oracle stayed unavailable.",
                 when (appZygoteCarrierState) {
                     AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
@@ -935,12 +935,12 @@ class SelinuxCardModelMapper {
     }
 
     private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
-        if (result.method == SelinuxContextValidityProbe.METHOD_LABEL) {
+        if (result.method == SelinuxContextValidityLabels.METHOD_LABEL) {
             return when (result.status) {
-                SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
-                SelinuxContextValidityProbe.BITPAIR_CLEAN -> DetectorStatus.allClear()
-                SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
-                SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
+                SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
+                SelinuxContextValidityLabels.BITPAIR_CLEAN -> DetectorStatus.allClear()
+                SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
+                SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
                 else -> when (contextValiditySupportState(result)) {
                     AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
                     AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
@@ -948,14 +948,14 @@ class SelinuxCardModelMapper {
                 }
             }
         }
-        if (result.method == SelinuxProcAttrCurrentProbe.METHOD_LABEL) {
+        if (result.method == SelinuxProcAttrCurrentLabels.METHOD_LABEL) {
             return when {
                 result.isSecure == false -> DetectorStatus.danger()
                 result.isSecure == true -> DetectorStatus.allClear()
                 else -> DetectorStatus.info(InfoKind.SUPPORT)
             }
         }
-        if (result.method == SelinuxPolicyloadSeqnoProbe.METHOD_LABEL) {
+        if (result.method == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL) {
             return when {
                 result.isSecure == false -> DetectorStatus.danger()
                 result.isSecure == true -> DetectorStatus.allClear()
@@ -1018,15 +1018,15 @@ class SelinuxCardModelMapper {
     }
 
     private fun contextValidityResult(report: SelinuxReport): SelinuxCheckResult? {
-        return report.methods.firstOrNull { it.method == SelinuxContextValidityProbe.METHOD_LABEL }
+        return report.methods.firstOrNull { it.method == SelinuxContextValidityLabels.METHOD_LABEL }
     }
 
     private fun procAttrCurrentResult(report: SelinuxReport): SelinuxCheckResult? {
-        return report.methods.firstOrNull { it.method == SelinuxProcAttrCurrentProbe.METHOD_LABEL }
+        return report.methods.firstOrNull { it.method == SelinuxProcAttrCurrentLabels.METHOD_LABEL }
     }
 
     private fun policyloadSeqnoResult(report: SelinuxReport): SelinuxCheckResult? {
-        return report.methods.firstOrNull { it.method == SelinuxPolicyloadSeqnoProbe.METHOD_LABEL }
+        return report.methods.firstOrNull { it.method == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL }
     }
 
     private fun SelinuxReport.toDetectorStatus(): DetectorStatus {
@@ -1041,14 +1041,14 @@ class SelinuxCardModelMapper {
             SelinuxStage.READY -> when (mode) {
                 SelinuxMode.ENFORCING -> when {
                     auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> DetectorStatus.danger()
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
                     policyloadSeqno?.isSecure == false -> DetectorStatus.danger()
                     procAttrCurrent?.isSecure == false -> DetectorStatus.danger()
                     dirtyPolicyHit != null -> DetectorStatus.warning()
                     appZygoteCarrierState == AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
                     appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
-                    contextValidity?.status == SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
+                    contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
                     policyAnalysis?.weakness == SelinuxPolicyWeakness.SEVERE ||
                             policyAnalysis?.weakness == SelinuxPolicyWeakness.MODERATE ||
                             auditIntegrity?.state == SelinuxAuditIntegrityState.EXPOSED ||
@@ -1116,8 +1116,8 @@ class SelinuxCardModelMapper {
     }
 
     private fun contextValiditySupportState(result: SelinuxCheckResult?): AppZygoteCarrierSupportState {
-        if (result?.method != SelinuxContextValidityProbe.METHOD_LABEL ||
-            result.status != SelinuxContextValidityProbe.BITPAIR_UNSUPPORTED
+        if (result?.method != SelinuxContextValidityLabels.METHOD_LABEL ||
+            result.status != SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED
         ) {
             return AppZygoteCarrierSupportState.AVAILABLE
         }

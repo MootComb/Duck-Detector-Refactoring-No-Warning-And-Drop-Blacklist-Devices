@@ -129,9 +129,6 @@ public class SelinuxProcAttrCurrentProbe {
     )
 
     public companion object {
-        public const val METHOD_LABEL: String = "app_zygote attr/current write"
-        public const val STATUS_CLEAN: String = "Normal EINVAL"
-        public const val STATUS_UNSUPPORTED: String = "Unsupported"
         private const val PROC_ATTR_CURRENT_PATH = "/proc/self/attr/current"
 
         private val TARGETS = listOf(

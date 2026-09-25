@@ -17,14 +17,14 @@
 package com.eltavine.duckdetector.features.selinux.data.repository
 
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierState
-import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoProbe
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoState
-import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentProbe
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbeResult
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
 import java.io.File
 
 internal fun buildContextValidityMethod(
@@ -32,17 +32,17 @@ internal fun buildContextValidityMethod(
 ): SelinuxCheckResult {
     val status = when (result.state) {
         SelinuxContextValidityState.UNAVAILABLE ->
-            SelinuxContextValidityProbe.BITPAIR_UNSUPPORTED
+            SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED
 
         SelinuxContextValidityState.CLEAN -> ""
         SelinuxContextValidityState.KSU_PRESENT ->
-            SelinuxContextValidityProbe.BITPAIR_KSU_PRESENT
+            SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT
 
         SelinuxContextValidityState.AMBIGUOUS ->
-            SelinuxContextValidityProbe.BITPAIR_AMBIGUOUS
+            SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS
 
         SelinuxContextValidityState.INCONSISTENT ->
-            SelinuxContextValidityProbe.BITPAIR_SELF_TEST_FAILED
+            SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED
     }
 
     val detail = buildList {
@@ -111,7 +111,7 @@ internal fun buildContextValidityMethod(
     }.joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxContextValidityProbe.METHOD_LABEL,
+        method = SelinuxContextValidityLabels.METHOD_LABEL,
         status = status,
         isSecure = when (result.state) {
             SelinuxContextValidityState.UNAVAILABLE -> null
@@ -132,10 +132,10 @@ internal fun buildPolicyloadSeqnoMethod(
         SelinuxPolicyloadSeqnoState.valueOf(result.policyloadSeqnoState.orEmpty())
     }.getOrDefault(SelinuxPolicyloadSeqnoState.UNAVAILABLE)
     val status = when (state) {
-        SelinuxPolicyloadSeqnoState.CLEAN -> SelinuxPolicyloadSeqnoProbe.STATUS_CLEAN
-        SelinuxPolicyloadSeqnoState.SUSPICIOUS -> SelinuxPolicyloadSeqnoProbe.STATUS_SUSPICIOUS
-        SelinuxPolicyloadSeqnoState.INCONCLUSIVE -> SelinuxPolicyloadSeqnoProbe.STATUS_INCONCLUSIVE
-        SelinuxPolicyloadSeqnoState.UNAVAILABLE -> SelinuxPolicyloadSeqnoProbe.STATUS_UNAVAILABLE
+        SelinuxPolicyloadSeqnoState.CLEAN -> SelinuxPolicyloadSeqnoLabels.STATUS_CLEAN
+        SelinuxPolicyloadSeqnoState.SUSPICIOUS -> SelinuxPolicyloadSeqnoLabels.STATUS_SUSPICIOUS
+        SelinuxPolicyloadSeqnoState.INCONCLUSIVE -> SelinuxPolicyloadSeqnoLabels.STATUS_INCONCLUSIVE
+        SelinuxPolicyloadSeqnoState.UNAVAILABLE -> SelinuxPolicyloadSeqnoLabels.STATUS_UNAVAILABLE
     }
     val detail = buildList {
         add("Evidence source=${EvidenceSource.DEDICATED_CARRIER.label}")
@@ -152,7 +152,7 @@ internal fun buildPolicyloadSeqnoMethod(
     }.joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxPolicyloadSeqnoProbe.METHOD_LABEL,
+        method = SelinuxPolicyloadSeqnoLabels.METHOD_LABEL,
         status = status,
         isSecure = when (state) {
             SelinuxPolicyloadSeqnoState.CLEAN -> true
@@ -172,8 +172,8 @@ internal fun buildProcAttrCurrentMethod(
     val outcomes = result.procAttrCurrentResults
     if (!result.procAttrCurrentProbeAttempted) {
         return SelinuxCheckResult(
-            method = SelinuxProcAttrCurrentProbe.METHOD_LABEL,
-            status = SelinuxProcAttrCurrentProbe.STATUS_UNSUPPORTED,
+            method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+            status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
             isSecure = null,
             permissionDenied = false,
             details = listOfNotNull(
@@ -184,8 +184,8 @@ internal fun buildProcAttrCurrentMethod(
     }
     if (outcomes.isEmpty()) {
         return SelinuxCheckResult(
-            method = SelinuxProcAttrCurrentProbe.METHOD_LABEL,
-            status = SelinuxProcAttrCurrentProbe.STATUS_UNSUPPORTED,
+            method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+            status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
             isSecure = null,
             permissionDenied = false,
             details = listOfNotNull(
@@ -201,8 +201,8 @@ internal fun buildProcAttrCurrentMethod(
     }
     val status = when {
         detected.isNotEmpty() -> "Detected: ${detected.joinToString { it.label }}"
-        clean -> SelinuxProcAttrCurrentProbe.STATUS_CLEAN
-        else -> SelinuxProcAttrCurrentProbe.STATUS_UNSUPPORTED
+        clean -> SelinuxProcAttrCurrentLabels.STATUS_CLEAN
+        else -> SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED
     }
     val detail = listOf(
         "Evidence source=${source.label}",
@@ -212,7 +212,7 @@ internal fun buildProcAttrCurrentMethod(
     ).joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxProcAttrCurrentProbe.METHOD_LABEL,
+        method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
         status = status,
         isSecure = when {
             detected.isNotEmpty() -> false

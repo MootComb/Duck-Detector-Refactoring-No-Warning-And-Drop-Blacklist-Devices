@@ -166,12 +166,6 @@ public class SelinuxPolicyloadSeqnoProbe {
     )
 
     public companion object {
-        public const val METHOD_LABEL: String = "App-zygote seqno oracle"
-        public const val STATUS_CLEAN: String = "Clean"
-        public const val STATUS_SUSPICIOUS: String = "Seqno split"
-        public const val STATUS_INCONCLUSIVE: String = "Info"
-        public const val STATUS_UNAVAILABLE: String = "Unavailable"
-
         private const val SELINUX_STATUS = "/sys/fs/selinux/status"
         private const val SELINUX_ACCESS = "/sys/fs/selinux/access"
         private const val SELINUX_PROCESS_CLASS = "/sys/fs/selinux/class/process/index"

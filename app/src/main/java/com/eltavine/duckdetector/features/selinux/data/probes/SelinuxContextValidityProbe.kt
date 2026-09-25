@@ -208,13 +208,4 @@ class SelinuxContextValidityProbe(
             notes = notes,
         )
     }
-
-    companion object {
-        const val METHOD_LABEL = "Context validity oracle"
-        const val BITPAIR_CLEAN = "00"
-        const val BITPAIR_KSU_PRESENT = "11"
-        const val BITPAIR_AMBIGUOUS = "01/10"
-        const val BITPAIR_SELF_TEST_FAILED = "Self-test failed"
-        const val BITPAIR_UNSUPPORTED = "Unsupported"
-    }
 }
