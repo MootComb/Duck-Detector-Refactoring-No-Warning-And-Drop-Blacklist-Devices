@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadS
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.domain.MountFinding
 import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
+import com.eltavine.duckdetector.features.mount.domain.MountFindingOrigin
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 
 internal fun sanitizePreloadResult(
@@ -92,6 +93,7 @@ internal fun buildPreloadFindings(result: EarlyMountPreloadResult): List<MountFi
                         ),
                     ),
                     detailMonospace = true,
+                    origin = MountFindingOrigin.STARTUP_PRELOAD,
                 ),
             )
         }
@@ -112,6 +114,7 @@ internal fun buildPreloadFindings(result: EarlyMountPreloadResult): List<MountFi
                         ),
                     ),
                     detailMonospace = true,
+                    origin = MountFindingOrigin.STARTUP_PRELOAD,
                 ),
             )
         }
@@ -128,6 +131,7 @@ internal fun buildPreloadFindings(result: EarlyMountPreloadResult): List<MountFi
                         signal = EarlyMountPreloadSignal.MOUNT_ID_GAP,
                     ),
                     detailMonospace = true,
+                    origin = MountFindingOrigin.STARTUP_PRELOAD,
                 ),
             )
         }
@@ -144,6 +148,7 @@ internal fun buildPreloadFindings(result: EarlyMountPreloadResult): List<MountFi
                         signal = EarlyMountPreloadSignal.MINOR_DEV_GAP,
                     ),
                     detailMonospace = true,
+                    origin = MountFindingOrigin.STARTUP_PRELOAD,
                 ),
             )
         }
@@ -160,6 +165,7 @@ internal fun buildPreloadFindings(result: EarlyMountPreloadResult): List<MountFi
                         signal = EarlyMountPreloadSignal.PEER_GROUP_GAP,
                     ),
                     detailMonospace = true,
+                    origin = MountFindingOrigin.STARTUP_PRELOAD,
                 ),
             )
         }
@@ -244,6 +250,11 @@ private fun mergeMountIdFinding(
         severity = MountFindingSeverity.DANGER,
         detail = detailParts.joinToString(separator = ". ", postfix = "."),
         detailMonospace = runtimeFindings.any { it.detailMonospace } || preloadFinding?.detailMonospace == true,
+        origin = when {
+            preloadFinding == null -> MountFindingOrigin.RUNTIME
+            runtimeFindings.isEmpty() -> MountFindingOrigin.STARTUP_PRELOAD
+            else -> MountFindingOrigin.STARTUP_AND_RUNTIME
+        },
     )
 }
 

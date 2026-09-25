@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.mount.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.mount.domain.MountFindingOrigin
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
@@ -179,5 +180,5 @@ private fun hasOnlyPreloadEvidence(report: MountReport): Boolean {
     val findings = report.findings.filter {
         it.severity == MountFindingSeverity.DANGER || it.severity == MountFindingSeverity.WARNING
     }
-    return findings.isNotEmpty() && findings.all { it.id.startsWith("early_preload_") }
+    return findings.isNotEmpty() && findings.all { it.origin == MountFindingOrigin.STARTUP_PRELOAD }
 }

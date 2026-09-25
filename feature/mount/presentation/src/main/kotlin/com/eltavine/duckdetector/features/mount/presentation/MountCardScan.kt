@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.mount.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.mount.domain.MountFindingOrigin
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
@@ -175,14 +176,12 @@ private fun preloadContextStatus(report: MountReport): DetectorStatus {
 
 private fun hasDangerPreloadEvidence(report: MountReport): Boolean {
     return report.findings.any { finding ->
-        (finding.id.startsWith("early_preload_") || finding.detail.orEmpty()
-            .contains("Startup preload:")) &&
-                finding.severity == MountFindingSeverity.DANGER
+        finding.origin != MountFindingOrigin.RUNTIME && finding.severity == MountFindingSeverity.DANGER
     }
 }
 
 private fun hasWarningPreloadEvidence(report: MountReport): Boolean {
     return report.findings.any { finding ->
-        finding.id.startsWith("early_preload_") && finding.severity == MountFindingSeverity.WARNING
+        finding.origin == MountFindingOrigin.STARTUP_PRELOAD && finding.severity == MountFindingSeverity.WARNING
     }
 }

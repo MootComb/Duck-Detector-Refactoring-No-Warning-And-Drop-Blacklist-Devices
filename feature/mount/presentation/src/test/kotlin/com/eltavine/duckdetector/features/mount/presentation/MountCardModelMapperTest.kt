@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.mount.presentation
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.mount.domain.MountFinding
 import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
+import com.eltavine.duckdetector.features.mount.domain.MountFindingOrigin
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
 import com.eltavine.duckdetector.features.mount.domain.MountMethodResult
@@ -86,6 +87,7 @@ class MountCardModelMapperTest {
                         group = MountFindingGroup.ARTIFACTS,
                         severity = MountFindingSeverity.DANGER,
                         detail = "Source=startup preload",
+                        origin = MountFindingOrigin.STARTUP_PRELOAD,
                     ),
                     MountFinding(
                         id = "early_preload_futile_hide",
@@ -94,6 +96,7 @@ class MountCardModelMapperTest {
                         group = MountFindingGroup.CONSISTENCY,
                         severity = MountFindingSeverity.DANGER,
                         detail = "Source=startup preload",
+                        origin = MountFindingOrigin.STARTUP_PRELOAD,
                     ),
                 ),
                 methods = listOf(

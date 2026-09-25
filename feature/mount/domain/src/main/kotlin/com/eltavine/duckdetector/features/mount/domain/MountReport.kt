@@ -43,6 +43,13 @@ enum class MountMethodOutcome {
     SUPPORT,
 }
 
+/** Which capture saw a finding: the scan itself, the early launch capture, or both. */
+enum class MountFindingOrigin {
+    RUNTIME,
+    STARTUP_PRELOAD,
+    STARTUP_AND_RUNTIME,
+}
+
 data class MountFinding(
     val id: String,
     val label: String,
@@ -51,6 +58,7 @@ data class MountFinding(
     val severity: MountFindingSeverity,
     val detail: String? = null,
     val detailMonospace: Boolean = false,
+    val origin: MountFindingOrigin = MountFindingOrigin.RUNTIME,
 )
 
 data class MountImpact(
