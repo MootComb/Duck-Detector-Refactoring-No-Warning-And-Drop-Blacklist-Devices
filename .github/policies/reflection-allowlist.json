@@ -30,13 +30,6 @@
       "reason": "Build tooling on the host JVM that names a failure in a Gradle warning; it is never shipped or minified."
     },
     {
-      "path": "capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/BootConsistencyProbe.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "capability/helperprocess/data/src/main/kotlin/com/eltavine/duckdetector/capability/helperprocess/data/DexPathCollector.kt",
       "uses": [
         "operations"

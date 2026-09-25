@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.capability.attestation.data
 
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
+
 public class BootConsistencyProbe(
     private val propertyReader: SystemPropertyReader = ReflectionSystemPropertyReader(),
 ) {
@@ -169,13 +171,9 @@ public data class PropertyReadResult(
 private class ReflectionSystemPropertyReader : SystemPropertyReader {
 
     override fun read(name: String): PropertyReadResult {
-        return runCatching {
-            val clazz = Class.forName("android.os.SystemProperties")
-            val method = clazz.getMethod("get", String::class.java)
-            val value = method.invoke(null, name) as? String
-            PropertyReadResult(available = true, value = value)
-        }.getOrElse {
-            PropertyReadResult(available = false)
-        }
+        return HiddenSystemProperties.read(name).fold(
+            onSuccess = { value -> PropertyReadResult(available = true, value = value) },
+            onFailure = { PropertyReadResult(available = false) },
+        )
     }
 }

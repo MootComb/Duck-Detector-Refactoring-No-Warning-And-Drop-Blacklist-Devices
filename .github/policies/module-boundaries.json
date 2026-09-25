@@ -155,7 +155,8 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":capability:attestation:domain",
-        ":core:evidence"
+        ":core:evidence",
+        ":core:platform"
       ]
     },
     ":capability:attestation:domain": {
