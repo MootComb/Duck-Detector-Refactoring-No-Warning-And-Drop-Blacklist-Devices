@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.virtualization.data.probes
 
-import android.os.IBinder
+import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalGroup
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalSeverity
@@ -28,18 +28,12 @@ data class VirtualizationServiceProbeResult(
 
 open class VirtualizationServiceProbe {
 
-    @Suppress("PrivateApi")
     open fun probe(): VirtualizationServiceProbeResult {
         return runCatching {
-            val serviceManagerClass = Class.forName("android.os.ServiceManager")
-            val getServiceMethod = serviceManagerClass.getMethod("getService", String::class.java)
-            val listServicesMethod = serviceManagerClass.getMethod("listServices")
-            val listedServices = (listServicesMethod.invoke(null) as? Array<*>)
-                ?.filterIsInstance<String>()
-                .orEmpty()
+            val listedServices = HiddenServiceManager.listServices().getOrThrow()
 
             val signals = mutableListOf<VirtualizationSignal>()
-            val qemudBinder = getServiceMethod.invoke(null, "qemud") as? IBinder
+            val qemudBinder = HiddenServiceManager.getService("qemud").getOrThrow()
             if (qemudBinder != null || listedServices.any {
                     it.equals(
                         "qemud",
@@ -56,10 +50,8 @@ open class VirtualizationServiceProbe {
                 )
             }
 
-            val virtualizationService = getServiceMethod.invoke(
-                null,
-                "android.system.virtualizationservice",
-            ) as? IBinder
+            val virtualizationService =
+                HiddenServiceManager.getService("android.system.virtualizationservice").getOrThrow()
             if (
                 virtualizationService != null ||
                 listedServices.any { it.contains("virtualizationservice", ignoreCase = true) }
