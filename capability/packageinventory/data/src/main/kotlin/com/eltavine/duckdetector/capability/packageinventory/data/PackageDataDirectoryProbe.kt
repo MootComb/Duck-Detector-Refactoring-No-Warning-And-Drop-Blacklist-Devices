@@ -26,14 +26,15 @@ import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
  */
 public class PackageDataDirectoryProbe {
 
-    public fun statPackages(packageNames: List<String>): Set<String> {
+    /** The packages whose data directory exists, or null when the native check could not run. */
+    public fun statPackages(packageNames: List<String>): Set<String>? {
         if (packageNames.isEmpty()) {
             return emptySet()
         }
         // Asking the shared handle first is also what triggers the one-time load. Without this the
-        // JNI call below would raise UnsatisfiedLinkError and be swallowed as "no packages found".
+        // JNI call below would raise UnsatisfiedLinkError.
         if (!DuckDetectorNativeLibrary.isLoaded) {
-            return emptySet()
+            return null
         }
         return runCatching {
             nativeStatPackages(packageNames.toTypedArray())
@@ -41,7 +42,7 @@ public class PackageDataDirectoryProbe {
                 .map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .toSet()
-        }.getOrDefault(emptySet())
+        }.getOrNull()
     }
 
     private external fun nativeStatPackages(packageNames: Array<String>): String

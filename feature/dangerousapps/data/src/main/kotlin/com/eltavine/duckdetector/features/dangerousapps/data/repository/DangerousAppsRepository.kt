@@ -158,12 +158,16 @@ class DangerousAppsRepository(
             }
         }
 
-        nativeBridge.statPackages(targets.map { it.packageName }).forEach { packageName ->
+        val nativeDataDirectories = nativeBridge.statPackages(targets.map { it.packageName })
+        nativeDataDirectories?.forEach { packageName ->
             appendMethod(
                 detectedApps = detectedApps,
                 packageName = packageName,
                 method = DangerousDetectionMethod(DangerousDetectionMethodKind.NATIVE_DATA_STAT),
             )
+        }
+        if (nativeDataDirectories == null) {
+            issues += "The native /data/data stat could not run, so apps it alone would find may be missing."
         }
 
         DangerousAppsCatalog.specialPathDetection.forEach { (path, packageName) ->
@@ -260,7 +264,7 @@ class DangerousAppsRepository(
             targets = targets,
             findings = findings,
             hiddenFromPackageManager = hiddenFromPackageManager,
-            probesRan = buildProbeList(packageVisibility),
+            probesRan = buildProbeList(packageVisibility, nativeDataStatRan = nativeDataDirectories != null),
             issues = issues,
         )
     }
@@ -284,6 +288,7 @@ class DangerousAppsRepository(
 
     private fun buildProbeList(
         packageVisibility: DangerousPackageVisibility,
+        nativeDataStatRan: Boolean,
     ): List<DangerousDetectionMethodKind> {
         return buildList {
             if (packageVisibility == DangerousPackageVisibility.FULL) {
@@ -295,7 +300,7 @@ class DangerousAppsRepository(
             add(DangerousDetectionMethodKind.ZWC_BYPASS)
             add(DangerousDetectionMethodKind.IGNORABLE_CODEPOINT_BYPASS)
             add(DangerousDetectionMethodKind.FUSE_STAT)
-            add(DangerousDetectionMethodKind.NATIVE_DATA_STAT)
+            if (nativeDataStatRan) add(DangerousDetectionMethodKind.NATIVE_DATA_STAT)
             add(DangerousDetectionMethodKind.SPECIAL_PATH)
             add(DangerousDetectionMethodKind.SCENE_LOOPBACK)
             add(DangerousDetectionMethodKind.SCENE_DEBUGFS_CONTEXT)

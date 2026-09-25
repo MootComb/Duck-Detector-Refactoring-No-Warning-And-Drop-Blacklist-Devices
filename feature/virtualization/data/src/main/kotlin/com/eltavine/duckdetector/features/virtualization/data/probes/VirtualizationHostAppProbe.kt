@@ -89,12 +89,13 @@ open class VirtualizationHostAppProbe(
             }
         }
 
-        nativeBridge.statPackages(VirtualizationHostAppsCatalog.targets.map { it.packageName })
-            .forEach { packageName ->
-                detected
-                    .getOrPut(packageName) { linkedSetOf() }
-                    .add(VirtualizationHostDetectionMethod(VirtualizationHostDetectionMethodKind.NATIVE_DATA_STAT))
-            }
+        val nativeDataDirectories =
+            nativeBridge.statPackages(VirtualizationHostAppsCatalog.targets.map { it.packageName })
+        nativeDataDirectories?.forEach { packageName ->
+            detected
+                .getOrPut(packageName) { linkedSetOf() }
+                .add(VirtualizationHostDetectionMethod(VirtualizationHostDetectionMethodKind.NATIVE_DATA_STAT))
+        }
 
         VirtualizationHostAppsCatalog.specialPaths.forEach { (path, packageName) ->
             if (runCatching { File(path).exists() }.getOrDefault(false)) {
@@ -126,6 +127,9 @@ open class VirtualizationHostAppProbe(
                 add("PackageManager inventory unavailable: ${inventoryResult.failure.detail}")
             } else if (packageVisibility == InstalledPackageVisibility.UNKNOWN) {
                 add("PackageManager inventory did not include this app, so the result is not trustworthy.")
+            }
+            if (nativeDataDirectories == null) {
+                add("The native /data/data stat could not run, so host apps it alone would find may be missing.")
             }
         }
 
