@@ -34,6 +34,7 @@ SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(SCRIPTS)
 SCAFFOLD = os.path.join(SCRIPTS, "new_detector.py")
 JNI_CHECKER = os.path.join(REPO, ".github", "scripts", "check-jni-contracts.py")
+EVIDENCE_CHECKER = os.path.join(REPO, ".github", "scripts", "check-evidence-records.py")
 CATALOG = "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt"
 FEATURES = "app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt"
 NATIVE_CMAKE = "sdk/runtime/src/main/cpp/CMakeLists.txt"
@@ -153,6 +154,17 @@ class NewDetectorTest(unittest.TestCase):
             self.assertNotIn("{{", text, path)
             if path.endswith((".kt", ".kts", ".cpp")):
                 self.assertTrue(text.startswith("/*\n * Copyright "), path)
+
+    def test_writes_a_draft_evidence_record_that_ci_rejects_until_researched(self) -> None:
+        self.assertEqual(self.scaffold("demo").returncode, 0)
+
+        record = self.read("feature/demo/EVIDENCE.md")
+        self.assertTrue(record.startswith("# Demo evidence record\n"), record)
+        self.assertIn("Status: draft", record)
+        evidence = subprocess.run([sys.executable, EVIDENCE_CHECKER, "--repo-root", self.root],
+                                  capture_output=True, text=True, check=False)
+        self.assertEqual(evidence.returncode, 1)
+        self.assertIn("feature/demo/EVIDENCE.md is still a draft", evidence.stderr)
 
     def test_native_unit_is_registered_and_its_jni_symbol_binds(self) -> None:
         result = self.scaffold("demo", "--native")

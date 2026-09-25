@@ -51,6 +51,7 @@ jobs:
           set -euo pipefail
 
           python3 .github/scripts/test-detector-touch-points.py
+          python3 .github/scripts/test-evidence-records.py
           python3 .github/scripts/test-jni-contracts.py
           python3 .github/scripts/test-native-boundaries.py
           python3 .github/scripts/test-reflection-boundaries.py
@@ -59,6 +60,9 @@ jobs:
 
       - name: Verify every detector stays inside its own directory
         run: python3 .github/scripts/check-detector-touch-points.py
+
+      - name: Verify every detector and capability keeps its evidence record
+        run: python3 .github/scripts/check-evidence-records.py
 
       - name: Verify JNI bindings
         run: python3 .github/scripts/check-jni-contracts.py
@@ -173,6 +177,12 @@ jobs:
           python3 .github/scripts/check-jni-contracts.py
           python3 .github/scripts/check-native-boundaries.py
           python3 .github/scripts/check-source-file-length.py
+          # The scaffold's evidence record is a draft, which must fail until research is recorded.
+          if python3 .github/scripts/check-evidence-records.py 2> /tmp/evidence-errors; then
+            echo "the scaffolded draft evidence record was accepted" >&2
+            exit 1
+          fi
+          grep -q "feature/$probe/EVIDENCE.md is still a draft" /tmp/evidence-errors
           ./gradlew --stacktrace unitTest :app:assembleDebug buildHealth
 
       - name: Upload test and lint reports

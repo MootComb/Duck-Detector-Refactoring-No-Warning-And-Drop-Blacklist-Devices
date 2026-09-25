@@ -13,6 +13,8 @@ A detector lives entirely in `feature/<name>/`, as five small Gradle modules, on
 
 Condense the first two points into one sentence. It becomes `--description` and opens the detector's documentation.
 
+Record the research in `feature/<name>/EVIDENCE.md`, which the scaffold writes as a draft. Give each signal family one entry with the AGENTS.md §12 chain: observable signal, producing subsystem, mechanism, references, applicability, visibility limits, result states and interpretation. Cite the sources you actually read, Tier 1 where one exists. When a signal rests only on a tool's observed behaviour or on a source you have not reviewed, start its references with `Discovery only:` so that readers can see it. Set `Status: reviewed` when the record is complete; `check-evidence-records.py` rejects a draft, a missing field and references that name no source.
+
 ## 2. Generate the detector
 
 ```bash
@@ -65,7 +67,7 @@ State what was observed and what it implies, never that a device is secure or co
 python3 .github/scripts/check-detector-touch-points.py
 ```
 
-With a native unit, also run `check-jni-contracts.py` and `check-native-boundaries.py`. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
+Also run `check-evidence-records.py`. With a native unit, run `check-jni-contracts.py` and `check-native-boundaries.py` as well. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
 
 JVM tests prove the rules, not the probe. Validate the probe on clean, modified and unsupported devices, as AGENTS.md §23 requires.
 
@@ -84,7 +86,7 @@ To add a detector to the golden export, run `DD_UPDATE_GOLDEN=1 ./gradlew :app:t
 
 ## Changing a detector
 
-The change stays inside `feature/<name>/`. If the detector is recorded in the golden export and its card or export changes, regenerate the golden report as above. Each detector draws its fixtures from its own sequence, so the diff touches only that detector's section and the overview lines.
+The change stays inside `feature/<name>/`, and a changed signal changes its entry in `EVIDENCE.md` in the same commit. If the detector is recorded in the golden export and its card or export changes, regenerate the golden report as above. Each detector draws its fixtures from its own sequence, so the diff touches only that detector's section and the overview lines.
 
 ## Sharing evidence
 

@@ -52,6 +52,7 @@ CATALOG_FIXED_ENTRIES = 2
 
 # Template, and its target below feature/<name>/.
 FILES = [
+    ("EVIDENCE.md.tmpl", "EVIDENCE.md"),
     ("domain/build.gradle.kts.tmpl", "domain/build.gradle.kts"),
     ("domain/Report.kt.tmpl", "domain/src/main/kotlin/{package_path}/domain/{Class}Report.kt"),
     ("domain/ReportStatus.kt.tmpl", "domain/src/main/kotlin/{package_path}/domain/{Class}ReportStatus.kt"),
@@ -320,11 +321,13 @@ def main(argv: list[str]) -> int:
         print(f"  {relative}")
     print(f"""
 Next:
-  1. Write the probe in {spec.class_name}Repository{" and native_bridge.cpp" if spec.native else ""}, and the
+  1. Research the signal and record it in feature/{spec.name}/EVIDENCE.md (AGENTS.md sections 2 and 12);
+     CI rejects the record while it is a draft.
+  2. Write the probe in {spec.class_name}Repository{" and native_bridge.cpp" if spec.native else ""}, and the
      verdict rules in {spec.class_name}ReportStatus.kt. Until the probe observes the device, the card
      reads "Not evaluated".
-  2. ./gradlew :feature:{spec.name}:domain:test :feature:{spec.name}:presentation:test
-  3. ./gradlew unitTest :app:assembleDebug buildHealth
+  3. ./gradlew :feature:{spec.name}:domain:test :feature:{spec.name}:presentation:test
+  4. ./gradlew unitTest :app:assembleDebug buildHealth
 See docs/guides/adding-a-detector.md.""")
     return 0
 
