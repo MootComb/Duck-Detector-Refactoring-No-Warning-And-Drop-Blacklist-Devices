@@ -24,20 +24,20 @@ android {
 }
 
 dependencies {
-    api(project(":capability:attestation:domain"))
+    implementation(project(":capability:attestation:domain"))
     api(project(":core:detector"))
-    api(project(":core:evidence"))
-    api(project(":core:report"))
+    implementation(project(":core:evidence"))
+    implementation(project(":core:report"))
     api(project(":core:scan"))
     api(project(":core:ui"))
     implementation(project(":feature:tee:detector"))
     api(project(":feature:tee:domain"))
     api(project(":feature:tee:presentation"))
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    api(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.material3)
+    api(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.coroutines.android)
 }

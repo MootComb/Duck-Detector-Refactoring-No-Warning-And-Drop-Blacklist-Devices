@@ -23,10 +23,10 @@ android {
 }
 
 dependencies {
-    api(project(":capability:packageinventory:data"))
+    implementation(project(":capability:packageinventory:data"))
     api(project(":capability:packageinventory:domain"))
     api(project(":core:detector"))
-    implementation(project(":core:native"))
+    api(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:customrom:domain"))
     implementation(libs.kotlinx.coroutines.android)

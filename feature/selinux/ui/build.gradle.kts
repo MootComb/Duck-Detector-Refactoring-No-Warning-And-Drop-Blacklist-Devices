@@ -24,9 +24,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:detector"))
+    implementation(project(":core:evidence"))
     api(project(":core:ui"))
     implementation(project(":feature:selinux:detector"))
-    api(project(":feature:selinux:presentation"))
+    implementation(project(":feature:selinux:presentation"))
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)

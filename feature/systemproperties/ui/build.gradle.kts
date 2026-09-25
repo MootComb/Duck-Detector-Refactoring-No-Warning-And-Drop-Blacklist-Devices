@@ -24,9 +24,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:detector"))
+    implementation(project(":core:evidence"))
     api(project(":core:ui"))
     implementation(project(":feature:systemproperties:detector"))
-    api(project(":feature:systemproperties:presentation"))
+    implementation(project(":feature:systemproperties:presentation"))
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)

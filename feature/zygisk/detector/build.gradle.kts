@@ -28,6 +28,8 @@ kotlin {
 
 dependencies {
     api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
     implementation(project(":feature:zygisk:data"))
     api(project(":feature:zygisk:domain"))
     api(project(":feature:zygisk:presentation"))

@@ -64,7 +64,9 @@
             ":core:evidence",
             ":core:report",
             ":core:detector",
-            ":capability:*:domain"
+            ":core:native",
+            ":capability:*:domain",
+            ":capability:*:data"
           ]
         },
         "ui": {

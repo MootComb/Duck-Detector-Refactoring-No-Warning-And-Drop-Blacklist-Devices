@@ -28,6 +28,8 @@ kotlin {
 
 dependencies {
     api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
     implementation(project(":feature:lsposed:data"))
     api(project(":feature:lsposed:domain"))
     api(project(":feature:lsposed:presentation"))

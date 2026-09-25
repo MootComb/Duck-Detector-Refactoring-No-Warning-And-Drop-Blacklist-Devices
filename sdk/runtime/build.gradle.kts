@@ -33,7 +33,9 @@ dependencies {
     implementation(project(":capability:earlypreload:data"))
     implementation(project(":capability:selinuxpolicy:data"))
     api(project(":core:detector"))
+    api(project(":core:report"))
     // Every detector unit, discovered from its directory, so the catalog and the AAR can hold all of them.
-    detectorModules(DETECTOR_LAYER).forEach { api(project(it)) }
+    detectorModules(DETECTOR_LAYER).forEach { implementation(project(it)) }
     api(libs.kotlinx.coroutines.core)
+    testImplementation(project(":core:evidence"))
 }

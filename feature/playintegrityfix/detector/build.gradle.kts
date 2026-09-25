@@ -28,6 +28,8 @@ kotlin {
 
 dependencies {
     api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
     implementation(project(":feature:playintegrityfix:data"))
     api(project(":feature:playintegrityfix:domain"))
     api(project(":feature:playintegrityfix:presentation"))

@@ -27,7 +27,10 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":capability:systemproperties:data"))
     api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
     implementation(project(":feature:systemproperties:data"))
     api(project(":feature:systemproperties:domain"))
     api(project(":feature:systemproperties:presentation"))

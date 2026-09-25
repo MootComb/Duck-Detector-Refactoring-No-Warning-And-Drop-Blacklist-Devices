@@ -28,6 +28,6 @@ kotlin {
 
 dependencies {
     api(project(":capability:systemproperties:domain"))
-    implementation(project(":core:native"))
+    api(project(":core:native"))
     implementation(project(":core:platform"))
 }

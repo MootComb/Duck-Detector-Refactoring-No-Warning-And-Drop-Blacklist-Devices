@@ -19,9 +19,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":capability:systemproperties:domain"))
+    implementation(project(":capability:systemproperties:domain"))
     api(project(":core:evidence"))
     api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":feature:systemproperties:domain"))
 }

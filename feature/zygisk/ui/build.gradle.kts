@@ -24,9 +24,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:detector"))
+    implementation(project(":core:evidence"))
     api(project(":core:ui"))
     implementation(project(":feature:zygisk:detector"))
-    api(project(":feature:zygisk:presentation"))
+    implementation(project(":feature:zygisk:presentation"))
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)

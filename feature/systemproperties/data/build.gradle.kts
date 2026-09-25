@@ -28,4 +28,5 @@ dependencies {
     api(project(":core:detector"))
     api(project(":feature:systemproperties:domain"))
     implementation(libs.kotlinx.coroutines.android)
+    testImplementation(project(":core:native"))
 }

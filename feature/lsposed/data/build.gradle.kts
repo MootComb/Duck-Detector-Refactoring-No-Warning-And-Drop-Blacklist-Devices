@@ -23,11 +23,11 @@ android {
 }
 
 dependencies {
-    api(project(":capability:packageinventory:data"))
+    implementation(project(":capability:packageinventory:data"))
     api(project(":capability:packageinventory:domain"))
     api(project(":capability:selinuxpolicy:data"))
     api(project(":core:detector"))
-    implementation(project(":core:native"))
+    api(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:lsposed:domain"))
     implementation(libs.kotlinx.coroutines.android)

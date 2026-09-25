@@ -19,9 +19,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":capability:attestation:domain"))
+    implementation(project(":capability:attestation:domain"))
     api(project(":core:evidence"))
     api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":feature:bootloader:domain"))
 }

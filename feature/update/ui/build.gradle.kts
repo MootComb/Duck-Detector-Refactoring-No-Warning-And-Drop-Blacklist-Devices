@@ -27,10 +27,10 @@ dependencies {
     implementation(project(":core:ui"))
     api(project(":feature:update:domain"))
     api(project(":feature:update:presentation"))
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    api(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.material3)
+    api(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.coroutines.android)
 }

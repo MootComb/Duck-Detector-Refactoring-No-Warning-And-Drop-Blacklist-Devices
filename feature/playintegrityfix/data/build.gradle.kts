@@ -24,7 +24,7 @@ android {
 
 dependencies {
     api(project(":core:detector"))
-    implementation(project(":core:native"))
+    api(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:playintegrityfix:domain"))
     implementation(libs.kotlinx.coroutines.android)

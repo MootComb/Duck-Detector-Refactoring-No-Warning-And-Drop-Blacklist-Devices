@@ -19,9 +19,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":capability:packageinventory:domain"))
+    implementation(project(":capability:packageinventory:domain"))
     api(project(":core:evidence"))
     api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":feature:virtualization:domain"))
 }

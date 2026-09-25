@@ -24,12 +24,14 @@ android {
 }
 
 dependencies {
-    api(project(":core:evidence"))
+    implementation(project(":core:evidence"))
+    implementation(project(":core:report"))
     api(project(":core:ui"))
     api(project(":feature:dashboard:presentation"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.material3)
+    api(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.activity)
 }

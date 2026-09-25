@@ -28,6 +28,8 @@ kotlin {
 
 dependencies {
     api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
     implementation(project(":feature:su:data"))
     api(project(":feature:su:domain"))
     api(project(":feature:su:presentation"))

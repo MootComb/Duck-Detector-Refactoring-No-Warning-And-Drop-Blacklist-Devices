@@ -26,7 +26,7 @@ dependencies {
     api(project(":capability:earlypreload:data"))
     api(project(":capability:helperprocess:data"))
     api(project(":core:detector"))
-    implementation(project(":core:native"))
+    api(project(":core:native"))
     api(project(":feature:mount:domain"))
     implementation(libs.kotlinx.coroutines.android)
 }

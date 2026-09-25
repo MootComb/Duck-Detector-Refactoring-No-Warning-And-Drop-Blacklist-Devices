@@ -21,6 +21,5 @@ plugins {
 dependencies {
     api(project(":core:evidence"))
     api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":feature:su:domain"))
 }
