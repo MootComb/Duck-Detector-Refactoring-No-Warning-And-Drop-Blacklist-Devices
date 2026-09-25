@@ -78,7 +78,6 @@ limitations under the License.
     <string name="update_view_changes">Переглянути всі зміни на GitHub</string>
     <string name="update_download">Відкрити завантаження</string>
     <string name="update_open_failed">Немає браузера для відкриття GitHub</string>
-    <string name="tee_diagnostic_clipboard_label">Діагностичні дані TEE</string>
 
     <string name="author_summary_eltavine">Зробив внесок в UI, C++, ASM та Kotlin.</string>
     <string name="author_summary_baka">TEE та Zygisk</string>

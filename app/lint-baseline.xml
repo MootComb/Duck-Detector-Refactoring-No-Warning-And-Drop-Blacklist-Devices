@@ -228,7 +228,7 @@ limitations under the License.
 
     <issue id="PackagedPrivateKey"
         message="The `raw/eltavine_marker_key.pem` file seems to be a private key file. Please make sure not to embed this in your APK file.">
-        <location file="src/main/res/raw/eltavine_marker_key.pem" />
+        <location file="../feature/tee/data/src/main/res/raw/eltavine_marker_key.pem" />
     </issue>
 
     <issue id="ObsoleteSdkInt" message="Unnecessary; `SDK_INT` is always >= 29"
@@ -251,7 +251,7 @@ limitations under the License.
         errorLine1="            if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/OperationPruningProbe.kt"
+            file="../feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/OperationPruningProbe.kt"
             line="22" column="33" />
     </issue>
 
@@ -267,7 +267,7 @@ limitations under the License.
         errorLine1="            if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/UpdateSubcomponentProbe.kt"
+            file="../feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/UpdateSubcomponentProbe.kt"
             line="19" column="33" />
     </issue>
 

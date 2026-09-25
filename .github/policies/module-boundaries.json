@@ -125,6 +125,10 @@
         ":feature:systemproperties:domain",
         ":feature:systemproperties:presentation",
         ":feature:systemproperties:ui",
+        ":feature:tee:data",
+        ":feature:tee:domain",
+        ":feature:tee:presentation",
+        ":feature:tee:ui",
         ":feature:virtualization:data",
         ":feature:virtualization:domain",
         ":feature:virtualization:presentation",
@@ -626,6 +630,44 @@
         ":core:ui",
         ":feature:systemproperties:domain",
         ":feature:systemproperties:presentation"
+      ]
+    },
+    ":feature:tee:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:attestation:data",
+        ":capability:attestation:domain",
+        ":core:native",
+        ":feature:tee:domain"
+      ]
+    },
+    ":feature:tee:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain"
+      ]
+    },
+    ":feature:tee:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:tee:domain"
+      ]
+    },
+    ":feature:tee:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain",
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:tee:domain",
+        ":feature:tee:presentation"
       ]
     },
     ":feature:virtualization:data": {

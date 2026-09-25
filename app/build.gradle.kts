@@ -69,6 +69,8 @@ dependencies {
     implementation(project(":feature:nativeroot:ui"))
     implementation(project(":feature:bootloader:data"))
     implementation(project(":feature:bootloader:ui"))
+    implementation(project(":feature:tee:data"))
+    implementation(project(":feature:tee:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

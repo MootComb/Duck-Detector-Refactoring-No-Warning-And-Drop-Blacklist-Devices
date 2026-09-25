@@ -51,8 +51,8 @@ import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesCardModel
 import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.tee.presentation.model.TeeCardModel
 import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.tee.ui.model.TeeCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
