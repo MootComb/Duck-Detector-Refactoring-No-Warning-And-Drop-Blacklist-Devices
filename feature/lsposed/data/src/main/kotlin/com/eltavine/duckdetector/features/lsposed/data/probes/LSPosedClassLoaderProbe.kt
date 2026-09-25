@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -74,6 +75,7 @@ class LSPosedClassLoaderProbe {
         suspiciousLoaders.forEach { (loaderName, chain) ->
             signals += LSPosedSignal(
                 id = "classloader_${loaderName.toSignalIdSegment()}",
+                probe = LSPosedProbe.CLASS_LOADER,
                 label = "ClassLoader token",
                 value = "Injected",
                 group = LSPosedSignalGroup.RUNTIME,
@@ -92,6 +94,7 @@ class LSPosedClassLoaderProbe {
         if (signals.isEmpty() && longestChain.size > DEEP_CHAIN_THRESHOLD) {
             signals += LSPosedSignal(
                 id = "classloader_deep_chain",
+                probe = LSPosedProbe.CLASS_LOADER,
                 label = "ClassLoader chain",
                 value = "Deep",
                 group = LSPosedSignalGroup.RUNTIME,

@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPac
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -69,6 +70,7 @@ class LSPosedPackageProbe(
             }
             signals += LSPosedSignal(
                 id = "pkg_${packageName.replace('.', '_')}",
+                probe = LSPosedProbe.PACKAGE,
                 label = label,
                 value = "Installed",
                 group = LSPosedSignalGroup.PACKAGES,
@@ -85,6 +87,7 @@ class LSPosedPackageProbe(
             }
             LSPosedSignal(
                 id = "module_${appInfo.packageName.replace('.', '_')}",
+                probe = LSPosedProbe.PACKAGE,
                 label = appInfo.label,
                 value = "Module",
                 group = LSPosedSignalGroup.PACKAGES,

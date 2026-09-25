@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -162,6 +163,7 @@ class LSPosedLogcatProbe(
                     val strong = pattern.startsWith("!!")
                     signals += LSPosedSignal(
                         id = signalId,
+                        probe = LSPosedProbe.LOGCAT,
                         label = "Logcat pattern",
                         value = pattern,
                         group = LSPosedSignalGroup.RUNTIME,
@@ -323,6 +325,7 @@ class LSPosedLogcatProbe(
     ): LSPosedSignal {
         return LSPosedSignal(
             id = id,
+            probe = LSPosedProbe.LOGCAT,
             label = label,
             value = value,
             group = LSPosedSignalGroup.RUNTIME,

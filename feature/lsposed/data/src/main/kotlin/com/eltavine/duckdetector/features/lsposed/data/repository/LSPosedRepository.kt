@@ -42,6 +42,7 @@ import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextVal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
@@ -119,6 +120,8 @@ class LSPosedRepository(
             runtimeArtifactAvailable = runtimeArtifactResult.available,
             logcatAvailable = logcatResult.available,
             dirtyPolicyAvailable = dirtyPolicyResult.available,
+            lsposedPolicyRuleExposed = dirtyPolicyResult.lsposedFileReadAllowed == true &&
+                dirtyPolicyResult.lsposedFileReadTrusted,
             packageVisibility = packageResult.packageVisibility,
             signals = signals,
             methods = buildMethods(
@@ -394,6 +397,7 @@ class LSPosedRepository(
     ): LSPosedSignal {
         return LSPosedSignal(
             id = "native_${trace.group.lowercase()}_$index",
+            probe = LSPosedProbe.NATIVE_TRACE,
             label = trace.label,
             value = if (trace.group == "HEAP") "Residual" else "Mapped",
             group = LSPosedSignalGroup.NATIVE,

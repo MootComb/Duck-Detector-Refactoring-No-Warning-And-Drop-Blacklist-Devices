@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
@@ -83,6 +84,7 @@ class LSPosedCardModelMapperTest {
             signals = listOf(
                 LSPosedSignal(
                     id = "policy_lsposed_file_read",
+                    probe = LSPosedProbe.DIRTY_POLICY,
                     label = "LSPosed file read",
                     value = "Allowed",
                     group = LSPosedSignalGroup.POLICY,
@@ -99,12 +101,13 @@ class LSPosedCardModelMapperTest {
                 ),
             ),
             dirtyPolicyAvailable = true,
+            lsposedPolicyRuleExposed = true,
         )
 
         val model = mapper.map(report)
 
         assertEquals(DetectionSeverity.DANGER, model.status.severity)
-        assertTrue(model.verdict.contains("Dirty SELinux policy", ignoreCase = true))
+        assertTrue(model.verdict.contains("Dirty SELinux policy exposes LSPosed rule"))
         assertTrue(
             model.policyRows.any {
                 it.label == "LSPosed file read" && it.value == "Allowed"
@@ -145,6 +148,7 @@ class LSPosedCardModelMapperTest {
             signals = listOf(
                 LSPosedSignal(
                     id = "runtime_bridge_field",
+                    probe = LSPosedProbe.BRIDGE_FIELD,
                     label = "XposedBridge fields",
                     value = "Detected",
                     group = LSPosedSignalGroup.RUNTIME,
@@ -153,6 +157,7 @@ class LSPosedCardModelMapperTest {
                 ),
                 LSPosedSignal(
                     id = "policy_magisk_binder_call",
+                    probe = LSPosedProbe.DIRTY_POLICY,
                     label = "Magisk binder",
                     value = "Allowed",
                     group = LSPosedSignalGroup.POLICY,

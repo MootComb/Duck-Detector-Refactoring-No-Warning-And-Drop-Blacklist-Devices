@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.lsposed.presentation
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -109,7 +110,7 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 value = report.classLoaderHitCount.toString(),
                 status = when {
                     report.signals.any {
-                        it.id.startsWith("classloader_") &&
+                        it.probe == LSPosedProbe.CLASS_LOADER &&
                                 it.severity == LSPosedSignalSeverity.DANGER
                     } -> DetectorStatus.danger()
 
@@ -142,7 +143,7 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 value = report.runtimeArtifactHitCount.toString(),
                 status = when {
                     report.signals.any {
-                        it.id.startsWith("runtime_") &&
+                        it.probe == LSPosedProbe.RUNTIME_ARTIFACT &&
                                 it.severity == LSPosedSignalSeverity.DANGER
                     } -> DetectorStatus.danger()
 
@@ -163,7 +164,7 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 value = report.logcatHitCount.toString(),
                 status = when {
                     report.signals.any {
-                        it.id.startsWith("logcat_") &&
+                        it.probe == LSPosedProbe.LOGCAT &&
                                 it.severity == LSPosedSignalSeverity.DANGER
                     } -> DetectorStatus.danger()
 

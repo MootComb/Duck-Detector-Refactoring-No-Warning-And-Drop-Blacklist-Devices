@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -48,6 +49,7 @@ class LSPosedBridgeFieldProbe {
                 val value = runCatching { field.get(null) }.getOrNull()
                 LSPosedSignal(
                     id = "bridge_field_${fieldName.toSignalIdSegment()}",
+                    probe = LSPosedProbe.BRIDGE_FIELD,
                     label = "XposedBridge field",
                     value = fieldName,
                     group = LSPosedSignalGroup.RUNTIME,

@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -68,6 +69,7 @@ class LSPosedStackProbe {
         return listOf(
             LSPosedSignal(
                 id = "stack_$id",
+                probe = LSPosedProbe.STACK,
                 label = label,
                 value = "Matched",
                 group = LSPosedSignalGroup.RUNTIME,

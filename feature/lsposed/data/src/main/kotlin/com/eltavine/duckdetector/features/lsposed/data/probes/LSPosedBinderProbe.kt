@@ -21,6 +21,7 @@ import android.os.Parcel
 import android.os.Process
 import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -78,6 +79,7 @@ class LSPosedBinderProbe {
                 listOf(
                     LSPosedSignal(
                         id = "binder_activity_bridge",
+                        probe = LSPosedProbe.BINDER,
                         label = "Activity service bridge",
                         value = replyDetail,
                         group = LSPosedSignalGroup.BINDER,
@@ -96,6 +98,7 @@ class LSPosedBinderProbe {
                     listOf(
                         LSPosedSignal(
                             id = "binder_activity_exception",
+                            probe = LSPosedProbe.BINDER,
                             label = "Activity bridge exception",
                             value = "LSPosed ref",
                             group = LSPosedSignalGroup.BINDER,
@@ -113,6 +116,7 @@ class LSPosedBinderProbe {
                     listOf(
                         LSPosedSignal(
                             id = "binder_activity_throwable",
+                            probe = LSPosedProbe.BINDER,
                             label = "Activity bridge throwable",
                             value = "Review",
                             group = LSPosedSignalGroup.BINDER,
@@ -139,6 +143,7 @@ class LSPosedBinderProbe {
             ?.let { descriptor ->
                 signals += LSPosedSignal(
                     id = "binder_serial_descriptor",
+                    probe = LSPosedProbe.BINDER,
                     label = "Serial service descriptor",
                     value = "Hook token",
                     group = LSPosedSignalGroup.BINDER,
@@ -161,6 +166,7 @@ class LSPosedBinderProbe {
             if (transactResult) {
                 signals += LSPosedSignal(
                     id = "binder_serial_bridge",
+                    probe = LSPosedProbe.BINDER,
                     label = "Serial service bridge",
                     value = "Responded",
                     group = LSPosedSignalGroup.BINDER,
@@ -181,6 +187,7 @@ class LSPosedBinderProbe {
                 ?.let { message ->
                     signals += LSPosedSignal(
                         id = "binder_serial_exception",
+                        probe = LSPosedProbe.BINDER,
                         label = "Serial bridge exception",
                         value = "LSPosed ref",
                         group = LSPosedSignalGroup.BINDER,
@@ -195,6 +202,7 @@ class LSPosedBinderProbe {
                 ?.let { message ->
                     signals += LSPosedSignal(
                         id = "binder_serial_throwable",
+                        probe = LSPosedProbe.BINDER,
                         label = "Serial bridge throwable",
                         value = "Review",
                         group = LSPosedSignalGroup.BINDER,

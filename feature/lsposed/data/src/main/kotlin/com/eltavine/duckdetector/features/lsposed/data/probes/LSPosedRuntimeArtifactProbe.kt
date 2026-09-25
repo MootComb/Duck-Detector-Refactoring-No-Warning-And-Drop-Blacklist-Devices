@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -76,6 +77,7 @@ class LSPosedRuntimeArtifactProbe(
             ?.let { hits ->
                 signals += LSPosedSignal(
                     id = "runtime_unix_sockets",
+                    probe = LSPosedProbe.RUNTIME_ARTIFACT,
                     label = "Unix sockets",
                     value = "${hits.size} hit(s)",
                     group = LSPosedSignalGroup.RUNTIME,
@@ -95,6 +97,7 @@ class LSPosedRuntimeArtifactProbe(
             ?.let { hits ->
                 signals += LSPosedSignal(
                     id = "runtime_file_descriptors",
+                    probe = LSPosedProbe.RUNTIME_ARTIFACT,
                     label = "File descriptors",
                     value = "${hits.size} hit(s)",
                     group = LSPosedSignalGroup.RUNTIME,
@@ -114,6 +117,7 @@ class LSPosedRuntimeArtifactProbe(
             ?.let { hits ->
                 signals += LSPosedSignal(
                     id = "runtime_environment",
+                    probe = LSPosedProbe.RUNTIME_ARTIFACT,
                     label = "Environment variables",
                     value = "${hits.size} hit(s)",
                     group = LSPosedSignalGroup.RUNTIME,

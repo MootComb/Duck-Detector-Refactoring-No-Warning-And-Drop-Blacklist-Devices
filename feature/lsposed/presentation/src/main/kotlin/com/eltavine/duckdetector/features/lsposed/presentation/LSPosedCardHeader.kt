@@ -20,8 +20,6 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFact
@@ -49,7 +47,7 @@ internal fun buildVerdict(report: LSPosedReport): String {
         LSPosedStage.LOADING -> "Scanning LSPosed/Xposed runtime and residue"
         LSPosedStage.FAILED -> "LSPosed scan failed"
         LSPosedStage.READY -> when {
-            report.hasLsposedPolicySignal() -> "Dirty SELinux policy exposes LSPosed rule"
+            report.lsposedPolicyRuleExposed -> "Dirty SELinux policy exposes LSPosed rule"
             report.hasDangerSignals -> "${report.dangerSignalCount} high-risk LSPosed signal(s)"
             report.hasPolicySignals() -> "Dirty SELinux policy signal(s)"
             report.hasWarningSignals -> "${report.warningSignalCount} LSPosed residue signal(s)"
@@ -155,14 +153,6 @@ private fun countLabel(count: Int, reducedCoverage: Boolean = false): String {
 
 private fun LSPosedReport.hasPolicySignals(): Boolean {
     return policySignalCount > 0
-}
-
-private fun LSPosedReport.hasLsposedPolicySignal(): Boolean {
-    return signals.any {
-        it.group == LSPosedSignalGroup.POLICY &&
-            it.severity == LSPosedSignalSeverity.DANGER &&
-            it.label.contains("lsposed", ignoreCase = true)
-    }
 }
 
 internal fun visibilityLabel(

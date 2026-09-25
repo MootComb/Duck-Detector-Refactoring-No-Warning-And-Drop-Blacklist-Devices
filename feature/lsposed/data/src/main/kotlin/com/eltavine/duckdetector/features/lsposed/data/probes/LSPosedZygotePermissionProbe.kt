@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -99,6 +100,7 @@ class LSPosedZygotePermissionProbe {
         val signals = mismatches.map { mismatch ->
             LSPosedSignal(
                 id = "zygote_gid_${mismatch.rule.shortLabel.lowercase()}",
+                probe = LSPosedProbe.ZYGOTE_PERMISSION,
                 label = "${mismatch.rule.shortLabel} GID mismatch",
                 value = "Restricted",
                 group = LSPosedSignalGroup.RUNTIME,

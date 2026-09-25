@@ -50,8 +50,25 @@ enum class LSPosedPackageVisibility {
     UNKNOWN,
 }
 
+/** The probe that raised a signal. */
+enum class LSPosedProbe {
+    CLASS,
+    CLASS_LOADER,
+    BRIDGE_FIELD,
+    PACKAGE,
+    STACK,
+    HOOK_CALLBACK,
+    BINDER,
+    ZYGOTE_PERMISSION,
+    RUNTIME_ARTIFACT,
+    LOGCAT,
+    DIRTY_POLICY,
+    NATIVE_TRACE,
+}
+
 data class LSPosedSignal(
     val id: String,
+    val probe: LSPosedProbe,
     val label: String,
     val value: String,
     val group: LSPosedSignalGroup,
@@ -92,6 +109,8 @@ data class LSPosedReport(
     val nativeMapsHitCount: Int,
     val nativeHeapHitCount: Int,
     val nativeHeapScannedRegions: Int,
+    /** A SELinux oracle that passed its own controls allowed untrusted_app to read lsposed_file. */
+    val lsposedPolicyRuleExposed: Boolean = false,
     val errorMessage: String? = null,
 ) {
     val dangerSignalCount: Int

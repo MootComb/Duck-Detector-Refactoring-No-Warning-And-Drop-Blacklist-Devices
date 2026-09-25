@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -63,6 +64,7 @@ class LSPosedClassProbe {
                 hitCount += hits.size
                 signals += LSPosedSignal(
                     id = "class_${family.id}",
+                    probe = LSPosedProbe.CLASS,
                     label = family.label,
                     value = "Loaded",
                     group = LSPosedSignalGroup.RUNTIME,
@@ -76,6 +78,7 @@ class LSPosedClassProbe {
         if (hiddenErrors.isNotEmpty()) {
             signals += LSPosedSignal(
                 id = "class_hidden_errors",
+                probe = LSPosedProbe.CLASS,
                 label = "Class loading anomalies",
                 value = "Review",
                 group = LSPosedSignalGroup.RUNTIME,

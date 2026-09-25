@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -43,6 +44,7 @@ class LSPosedHookCallbackProbe {
 
         val signal = LSPosedSignal(
             id = "hook_callback_handler",
+            probe = LSPosedProbe.HOOK_CALLBACK,
             label = "Default exception handler",
             value = "Injected",
             group = LSPosedSignalGroup.RUNTIME,
