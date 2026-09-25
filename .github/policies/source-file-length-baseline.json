@@ -2,7 +2,6 @@
   "schema_version": 1,
   "files": {
     "app/src/main/cpp/customrom/property_integrity_probe.cpp": 662,
-    "app/src/main/cpp/mount/detector_core.cpp": 1256,
     "app/src/main/cpp/preload/preload_entry.cpp": 700,
     "app/src/main/cpp/selinux/context_validity_probe.cpp": 1114,
     "app/src/main/cpp/tee/trickystore/trickystore_probe.cpp": 1113,

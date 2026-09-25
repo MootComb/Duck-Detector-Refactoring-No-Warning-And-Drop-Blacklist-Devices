@@ -66,7 +66,11 @@ set(BOOTLOADER_SOURCES
 )
 
 set(MOUNT_SOURCES
+    mount/detect_filesystems.cpp
+    mount/detect_mount_tables.cpp
+    mount/detect_paths.cpp
     mount/detector_core.cpp
+    mount/detector_support.cpp
     mount/native_bridge.cpp
 )
 
