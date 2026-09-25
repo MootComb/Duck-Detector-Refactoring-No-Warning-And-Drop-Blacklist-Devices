@@ -28,6 +28,17 @@ The Mount detector asks whether this app's mount view shows systemless root moun
 - Result states: anomaly, mount root, review, clean, unsupported, unavailable.
 - Interpretation: contradictions between kernel views are danger; a mount-root attribute on a system subdirectory is a warning.
 
+### Maps, Zygote Next and isolated process mount views
+
+- Observable signal: Zygisk, Riru and Magisk-hidden library paths in /proc/self/maps, the Zygote Next mount view compared with the main process, and the mount views of other processes collected by the isolated helper.
+- Producing subsystem: this process's address space, zygote's mount namespace setup, and the helper process.
+- Mechanism: a root solution that isolates mounts per app leaves the app's view different from zygote's and from other processes'.
+- References: kernel/common Documentation/filesystems/proc.rst (maps, mountinfo and ns); frameworks/base core/jni/com_android_internal_os_Zygote.cpp; capability/helperprocess/EVIDENCE.md.
+- Applicability: every release; the isolated helper must start.
+- Visibility limits: other processes' mount views are visible only where procfs allows.
+- Result states: hits, drift, clean, unavailable.
+- Interpretation: injected library paths and namespace drift are danger or warning by finding.
+
 ### Paths, startup preload and shell tmp
 
 - Observable signal: busybox and hybrid mount paths, the mount view captured by the NativeActivity before MainActivity, and whether /data/local/tmp is hidden or remapped.

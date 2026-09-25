@@ -8,7 +8,7 @@ The System Properties detector asks whether security-relevant properties describ
 
 ### Security property catalog
 
-- Observable signal: build type and tags, debuggable and secure flags, encryption state, OEM unlock state and custom ROM version properties.
+- Observable signal: build type and tags, debuggable and secure flags, encryption state, OEM unlock state, custom ROM version properties, and Build.TYPE, Build.TAGS and Build.FINGERPRINT against the matching properties.
 - Producing subsystem: init's property service and the build's property files.
 - Mechanism: user builds set fixed values for these properties; debug builds, unlocked devices and custom ROMs differ.
 - References: system/core init/property_service.cpp; frameworks/base services/core/java/com/android/server/pdb/PersistentDataBlockService.java (sets sys.oem_unlock_allowed at android-15.0.0_r1, no longer at android-16.0.0_r1).

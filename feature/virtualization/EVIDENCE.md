@@ -41,10 +41,10 @@ The Virtualization detector asks whether this app runs inside an emulator, a tra
 
 ### Cross-process and host app consistency
 
-- Observable signal: differences between the main app, a helper and an isolated process in classpath, UID identity and mount view, and installed app virtualization hosts.
+- Observable signal: differences between the startup preload, the main app, a helper and an isolated process in classpath (Dex and classpath), UID identity and mount view, and installed app virtualization hosts.
 - Producing subsystem: zygote, PackageManager and the helper processes.
 - Mechanism: app virtualization hosts run guest apps inside their own process and UID, which the isolated process does not inherit.
-- References: frameworks/base core/jni/com_android_internal_os_Zygote.cpp (per-app UID and mount setup) and core/java/android/content/pm/PackageManager.java (package visibility); capability/helperprocess/EVIDENCE.md and capability/packageinventory/EVIDENCE.md.
+- References: frameworks/base core/jni/com_android_internal_os_Zygote.cpp (per-app UID and mount setup) and core/java/android/content/pm/PackageManager.java (package visibility); capability/earlypreload/EVIDENCE.md, capability/helperprocess/EVIDENCE.md and capability/packageinventory/EVIDENCE.md.
 - Applicability: every release; host apps are visible only with package visibility.
 - Visibility limits: host apps found only by the native data directory stat may be missing when that check cannot run.
 - Result states: drift, host apps, clean, unavailable.

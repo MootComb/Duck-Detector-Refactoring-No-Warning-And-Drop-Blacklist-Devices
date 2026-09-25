@@ -8,7 +8,7 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 
 ### Attestation chain and RootOfTrust
 
-- Observable signal: the attestation certificate chain of a freshly generated key, its trust root, revocation status, and the RootOfTrust fields in the attestation extension.
+- Observable signal: the attestation certificate chain of a freshly generated key and the fields of its attestation extension. The rows are Local chain, Trust root, Chain layout, Root fingerprint, RKP, RKP manufacturer, CRL, Tier, Challenge, Verified boot, Boot consistency, Versions (OS, vendor and boot patch levels), Device IDs, Key properties, User auth, Application and Module hash.
 - Producing subsystem: KeyMint in the TEE or StrongBox, reached through keystore2, which also appends the RKP or factory certificates.
 - Mechanism: the attestation extension carries a KeyDescription whose RootOfTrust holds deviceLocked, verifiedBootState and verifiedBootHash; the chain must verify up to a Google or known root and not appear in Google's revocation list.
 - References: hardware/interfaces security/keymint/aidl KeyCreationResult.aidl (KeyDescription and RootOfTrust schema).
@@ -19,10 +19,10 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 
 ### Keystore behaviour probes
 
-- Observable signal: key pair consistency, AES-GCM round trip and authorization, key lifecycle, pure certificate entries, update subcomponent, oversized challenges and the dual RSA/EC chains.
+- Observable signal: the rows Key pair, AES-GCM, Lifecycle, KeyMint crypto, Timing, Oversized challenge, Keybox, ImportKey narrative, Pure cert, Pure cert level, Pure cert metadata, Update path, Update persistence, Pruning, Dual algorithm, Biometric TEE, StrongBox and ID attestation.
 - Producing subsystem: the AndroidKeyStore provider in this process, keystore2, and the vendor KeyMint.
 - Mechanism: each probe performs a keystore operation whose result a genuine stack fixes, for example a fresh signature that verifies against the leaf certificate.
-- References: system/security keystore2/src/operation.rs (operation pruning, BACKEND_BUSY, MAX_RECEIVE_DATA, check_active); hardware/interfaces security/keymint IKeyMintOperation.aidl.
+- References: system/security keystore2/src/operation.rs (operation pruning, BACKEND_BUSY, MAX_RECEIVE_DATA, check_active); hardware/interfaces security/keymint IKeyMintOperation.aidl and KeyCreationResult.aidl (attestation IDs and patch level tags); frameworks/base core/java/android/content/pm/PackageManager.java (FEATURE_STRONGBOX_KEYSTORE).
 - Applicability: deep checks run only when attestation reports a TEE or StrongBox tier.
 - Visibility limits: the probes run in parallel with a probe that fills operation slots, so keystore2 may prune this app's own operations; a probe that throws therefore did not complete rather than failed.
 - Result states: passed, failed, did not complete, skipped.
@@ -52,7 +52,7 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 
 ### Timing side channel and skip signatures
 
-- Observable signal: getKeyEntry timing for attested and non-attested keys through keystore2's private binder, and the exception stacks captured when that measurement cannot start.
+- Observable signal: getKeyEntry timing for attested and non-attested keys through keystore2's private binder, the exception stacks captured when that measurement cannot start, and the generate-mode parcel fingerprint (the Timing side-channel and TEE Simulator generate-mode fingerprint rows).
 - Producing subsystem: keystore2 and any process intercepting its binder calls.
 - Mechanism: an interception module that post-processes attested keys adds latency, and some modules answer with characteristic error codes and stacks.
 - References: frameworks/base core/java/android/content/pm/PackageManager.java (FEATURE_KEYSTORE_APP_ATTEST_KEY). Discovery only: the TrickyStore and TEE Simulator stack signatures come from collected samples.
@@ -60,6 +60,17 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 - Visibility limits: timing varies with CPU frequency and load; the proxy numbering in the stack needles depends on this app's own proxy creation.
 - Result states: measured, suspicious, skipped with a matched signature, skipped.
 - Interpretation: the specific signatures are FAIL worded as matching a known keystore-interception module; the generic binder exception fallback applies only where app attestation keys are advertised.
+
+### Keystore2 binder, grant and metadata probes
+
+- Observable signal: the rows Grant isolated-domain, Grant caller binding, Grant access vector, Grant self-domain, Keystore2, Legacy keystore, Metadata key, Metadata shape, Binder hook, Patch mode, Binder chain and Cert post-processing.
+- Producing subsystem: keystore2's IKeystoreService and IKeystoreSecurityLevel binder interfaces, and any process that intercepts them in this app or in keystore2.
+- Mechanism: keystore2 fixes how grants bind to a grantee, which metadata getKeyEntry returns, and which binder objects answer; an interception layer that rebuilds these answers diverges from them.
+- References: system/security keystore2/src/operation.rs for the operation semantics these probes share. The grant, metadata and binder expectations follow keystore2's AIDL as the probes implement it, and keystore2's grant and service code was not reviewed in this pass.
+- Applicability: Android 12 and later with keystore2; grant probes need the isolated grantee service.
+- Visibility limits: hidden API access and the isolated service must be available, or the probes report unavailable.
+- Result states: consistent, diverged, crashed, unavailable, skipped.
+- Interpretation: divergence is a supplementary FAIL or WARN by row; the dashboard picks the most specific grant finding.
 
 ### SOTER environment
 

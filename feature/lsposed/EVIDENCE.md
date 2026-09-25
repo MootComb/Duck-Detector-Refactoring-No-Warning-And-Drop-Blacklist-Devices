@@ -19,7 +19,7 @@ The LSPosed detector asks whether an Xposed-style framework (LSPosed, EdXposed, 
 
 ### Stacks, callbacks, binder bridge and logcat
 
-- Observable signal: XposedBridge or LSPHooker frames in current and synthetic stacks, an uncaught exception handler that points to the framework, LSPosed bridge transactions on activity and serial services, and framework log tags visible to the app.
+- Observable signal: XposedBridge or LSPHooker frames in current and synthetic stacks, an uncaught exception handler that points to the framework, LSPosed bridge transactions on activity and serial services, framework log tags visible to the app, and framework Unix sockets, descriptors and environment variables in this process.
 - Producing subsystem: ART stacks, the framework's binder bridge, and logd.
 - Mechanism: hooked methods run through the framework's callbacks, and the framework serves its bridge over existing system service binders.
 - References: Discovery only: the frame tokens, transaction codes and log tags follow LSPosed's observed behaviour.

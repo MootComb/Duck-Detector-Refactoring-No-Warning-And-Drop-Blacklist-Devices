@@ -28,6 +28,17 @@ The SELinux detector asks whether SELinux is enforcing for this app, whether the
 - Result states: rule present, not observed, untrusted oracle, unavailable.
 - Interpretation: a trusted oracle's allowed edge is danger or a policy observation, as each rule's text says; untrusted answers never exceed warning.
 
+### Context validity
+
+- Observable signal: whether root-tool contexts are valid in the loaded policy, and the native and Java app_zygote tracks that carry the checks.
+- Producing subsystem: the loaded SELinux policy, queried by the selinuxpolicy capability's carriers.
+- Mechanism: a context is valid only if the loaded policy defines it, so a root-tool domain's validity shows the policy was extended.
+- References: kernel/common security/selinux/selinuxfs.c (sel_write_context); capability/selinuxpolicy/EVIDENCE.md.
+- Applicability: where a carrier can start.
+- Visibility limits: a carrier that cannot start leaves the check unavailable.
+- Result states: clean, valid root context, unavailable.
+- Interpretation: a valid root-tool context is supporting evidence of a modified policy.
+
 ### Audit integrity
 
 - Observable signal: whether a controlled AVC denial appears in app-readable auditd logs, whether allow or rewrite markers appear, and auditpatch module residue.

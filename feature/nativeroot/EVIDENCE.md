@@ -72,6 +72,17 @@ The Native Root detector asks whether kernel-level root solutions (KernelSU and 
 - Result states: detected, clean, limited, unavailable.
 - Interpretation: kernel and process tokens are indirect evidence and never outweigh a direct probe.
 
+### KernelSU manager scans and shell tmp metadata
+
+- Observable signal: the throne hunt, which is an inotify watch on this package's directory installed from app_zygote while packages.list is rewritten; the public manager manifest under the KernelSU package name; and the owner, mode and inode of /data/local/tmp.
+- Producing subsystem: KernelSU's throne tracker, PackageManager's mime group path, and the filesystem.
+- Mechanism: setMimeGroup makes system_server rewrite packages.list, KernelSU's manager tracker then walks package directories, and the inherited watch sees that walk; a changed shell tmp owner or mode shows the directory was recreated.
+- References: frameworks/base core/java/android/content/pm/PackageManager.java (setMimeGroup); system/core rootdir/init.rc (/data/local/tmp is created shell:shell). Discovery only for the throne tracker's traversal and the manager manifest traits.
+- Applicability: the throne hunt needs this package's directory to be watchable from app_zygote.
+- Visibility limits: a denied watch, an unapplied stimulus or restricted package visibility reduce coverage; a high inode alone is weak.
+- Result states: detected, clean, limited, unavailable.
+- Interpretation: a traversal hit is danger; manifest traits are auxiliary; shell tmp owner or mode drift is a warning.
+
 ## Known gaps
 
 - The KernelSU interface probes and the kernel token catalogs rest on tool behaviour, not on a reviewed tool source.

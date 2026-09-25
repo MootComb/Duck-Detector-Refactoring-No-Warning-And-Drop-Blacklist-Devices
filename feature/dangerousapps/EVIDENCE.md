@@ -19,7 +19,7 @@ The Dangerous Apps detector asks whether root managers, hooking frameworks and s
 
 ### Filesystem and provider methods
 
-- Observable signal: package contexts, APK file descriptors, directory listings with zero-width and ignorable codepoints, FUSE stats and the native /data/data stat.
+- Observable signal: package contexts, APK file descriptors, directory listings with zero-width and ignorable codepoints, FUSE stats, the native /data/data stat and tool-specific special paths.
 - Producing subsystem: the filesystem through DAC, SELinux and MediaProvider's FUSE layer.
 - Mechanism: each method reaches the package's files by a path PackageManager filtering does not control.
 - References: capability/packageinventory/EVIDENCE.md (data directory stat); kernel/common Documentation/filesystems/proc.rst for fd views. Discovery only for the Unicode path bypass methods.

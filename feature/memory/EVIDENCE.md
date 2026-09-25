@@ -19,10 +19,10 @@ The Memory detector asks whether this process's own code and mappings show signs
 
 ### Mappings, file-backed code and loader visibility
 
-- Observable signal: writable or anonymous executable mappings, dirty or swapped executable system pages, executable memfd, ashmem, deleted libraries or /dev/zero, and modules visible to maps but not to dl_iterate_phdr.
+- Observable signal: writable or anonymous executable mappings, dirty or swapped executable system pages, executable memfd, ashmem, deleted libraries or /dev/zero, modules visible to maps but not to dl_iterate_phdr, and a remapped or unusually based [vdso].
 - Producing subsystem: the kernel's view of this process's address space.
 - Mechanism: injected code usually needs anonymous or writable executable memory or hides its loader entry.
-- References: kernel/common Documentation/filesystems/proc.rst (maps and smaps fields such as Private_Dirty and Swap).
+- References: kernel/common Documentation/filesystems/proc.rst (maps and smaps fields such as Private_Dirty and Swap, and the [vdso] mapping).
 - Applicability: every ABI and release.
 - Visibility limits: ART's JIT legitimately creates anonymous executable code; the repository removes that known case.
 - Result states: anomaly, review, clean.
