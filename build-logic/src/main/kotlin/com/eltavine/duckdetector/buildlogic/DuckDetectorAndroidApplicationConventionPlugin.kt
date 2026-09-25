@@ -18,13 +18,10 @@ package com.eltavine.duckdetector.buildlogic
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 private const val VERSION_CODE_BASE = 300
 private const val VERSION_NAME_ZONE_ID = "Asia/Singapore"
@@ -77,20 +74,14 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
             ).all { !it.isNullOrBlank() }
         }
 
-        val lintBaseline = layout.projectDirectory.file("lint-baseline.xml").asFile
-
         extensions.configure<ApplicationExtension> {
-            compileSdk = requiredIntGradleProperty("duckdetector.android.compileSdk")
-            compileSdkMinor = requiredIntGradleProperty("duckdetector.android.compileSdkMinor")
+            configureAndroidCommon(this)
             ndkVersion = requiredGradleProperty("duckdetector.android.ndk")
-            buildToolsVersion = requiredGradleProperty("duckdetector.android.buildTools")
 
             defaultConfig {
-                minSdk = requiredIntGradleProperty("duckdetector.android.minSdk")
                 targetSdk = requiredIntGradleProperty("duckdetector.android.targetSdk")
                 this.versionCode = versionCode.get()
                 this.versionName = versionName.get()
-                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 buildConfigField("String", "BUILD_TIME_UTC", "\"${buildTimeUtc.get()}\"")
                 buildConfigField("String", "BUILD_HASH", "\"${buildHash.get()}\"")
                 buildConfigField("boolean", "isAlphaVersion", isAlphaVersion.toString())
@@ -132,11 +123,6 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 }
             }
 
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_17
-                targetCompatibility = JavaVersion.VERSION_17
-            }
-
             buildFeatures {
                 compose = true
                 buildConfig = true
@@ -146,28 +132,6 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 resources {
                     excludes += "/META-INF/{AL2.0,LGPL2.1}"
                 }
-            }
-
-            lint {
-                if (lintBaseline.exists()) {
-                    baseline = lintBaseline
-                }
-
-                // Translations are contributed after the strings they cover, so a locale that has
-                // not caught up yet is a known state of this project rather than a defect. Keeping
-                // these reported but non-blocking is what lets every other lint error stay fatal and
-                // gate CI, instead of the whole check being switched off because of untranslated UI.
-                warning += setOf(
-                    "ImpliedQuantity",
-                    "MissingQuantity",
-                    "MissingTranslation",
-                )
-            }
-        }
-
-        extensions.configure<KotlinAndroidProjectExtension> {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_17)
             }
         }
 
