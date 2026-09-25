@@ -76,6 +76,10 @@
         ":feature:customrom:domain",
         ":feature:customrom:presentation",
         ":feature:customrom:ui",
+        ":feature:dangerousapps:data",
+        ":feature:dangerousapps:domain",
+        ":feature:dangerousapps:presentation",
+        ":feature:dangerousapps:ui",
         ":feature:kernelcheck:data",
         ":feature:kernelcheck:domain",
         ":feature:kernelcheck:presentation",
@@ -181,6 +185,39 @@
         ":core:ui",
         ":feature:customrom:domain",
         ":feature:customrom:presentation"
+      ]
+    },
+    ":feature:dangerousapps:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
+        ":feature:dangerousapps:domain"
+      ]
+    },
+    ":feature:dangerousapps:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:dangerousapps:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:dangerousapps:domain"
+      ]
+    },
+    ":feature:dangerousapps:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:dangerousapps:domain",
+        ":feature:dangerousapps:presentation"
       ]
     },
     ":feature:kernelcheck:data": {

@@ -48,6 +48,8 @@ dependencies {
     implementation(project(":feature:zygisk:ui"))
     implementation(project(":feature:customrom:data"))
     implementation(project(":feature:customrom:ui"))
+    implementation(project(":feature:dangerousapps:data"))
+    implementation(project(":feature:dangerousapps:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

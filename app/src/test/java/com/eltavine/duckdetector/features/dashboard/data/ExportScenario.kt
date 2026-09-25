@@ -27,7 +27,7 @@ import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardMode
 import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
+import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
