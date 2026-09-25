@@ -28,5 +28,6 @@ kotlin {
 
 dependencies {
     api(project(":capability:attestation:domain"))
+    implementation(project(":core:evidence"))
     implementation(libs.bouncycastle.bcprov)
 }

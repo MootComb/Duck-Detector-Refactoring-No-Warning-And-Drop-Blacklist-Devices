@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.capability.attestation.data
 
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
+import com.eltavine.duckdetector.core.evidence.FailureName
 import java.security.cert.X509Certificate
 
 public class CertificateTrustAnalyzer(
@@ -40,7 +41,7 @@ public class CertificateTrustAnalyzer(
         }
         val expiredCertificates = chain.mapIndexedNotNull { index, cert ->
             runCatching { cert.checkValidity() }.exceptionOrNull()?.let { throwable ->
-                "Certificate ${index + 1} validity issue: ${throwable.javaClass.simpleName}."
+                "Certificate ${index + 1} validity issue: ${FailureName.of(throwable)}."
             }
         }
         val trustRoot = when {

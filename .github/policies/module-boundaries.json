@@ -154,7 +154,8 @@
     ":capability:attestation:data": {
       "kind": "android-library",
       "allowed_project_dependencies": [
-        ":capability:attestation:domain"
+        ":capability:attestation:domain",
+        ":core:evidence"
       ]
     },
     ":capability:attestation:domain": {
