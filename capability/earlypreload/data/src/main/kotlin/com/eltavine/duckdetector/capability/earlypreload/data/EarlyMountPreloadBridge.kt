@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.preload
+package com.eltavine.duckdetector.capability.earlypreload.data
 
 import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
 
-open class EarlyMountPreloadBridge {
+public open class EarlyMountPreloadBridge {
 
-    open fun isNativeAvailable(): Boolean = isLoaded
+    public open fun isNativeAvailable(): Boolean = isLoaded
 
-    open fun getStoredResult(): EarlyMountPreloadResult {
+    public open fun getStoredResult(): EarlyMountPreloadResult {
         if (!isLoaded) {
             return EarlyMountPreloadResult.empty()
         }
@@ -57,7 +57,7 @@ open class EarlyMountPreloadBridge {
     }
 
     @Suppress("unused")
-    open fun resetForTesting() {
+    public open fun resetForTesting() {
         if (isLoaded) {
             runCatching { nativeReset() }
         }
@@ -97,7 +97,7 @@ open class EarlyMountPreloadBridge {
 
     private external fun nativeReset()
 
-    companion object {
+    public companion object {
         private val isLoaded: Boolean
             get() = DuckDetectorNativeLibrary.isLoaded
     }

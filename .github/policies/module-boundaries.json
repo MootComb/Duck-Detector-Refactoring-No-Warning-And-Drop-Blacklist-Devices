@@ -63,6 +63,7 @@
     ":app": {
       "kind": "android-application",
       "allowed_project_dependencies": [
+        ":capability:earlypreload:data",
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
         ":core:detector",
@@ -91,6 +92,12 @@
         ":feature:zygisk:domain",
         ":feature:zygisk:presentation",
         ":feature:zygisk:ui"
+      ]
+    },
+    ":capability:earlypreload:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:native"
       ]
     },
     ":capability:packageinventory:data": {

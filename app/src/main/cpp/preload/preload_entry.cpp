@@ -370,7 +370,7 @@ void ANativeActivity_onCreate(ANativeActivity *activity, void *savedState, size_
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeHasEarlyDetectionRun(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeHasEarlyDetectionRun(
         JNIEnv *,
         jobject
 ) {
@@ -378,7 +378,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeIsPreloadContextValid(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeIsPreloadContextValid(
         JNIEnv *,
         jobject
 ) {
@@ -386,7 +386,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasDetected(
         JNIEnv *,
         jobject
 ) {
@@ -395,7 +395,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasFutileHideDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasFutileHideDetected(
         JNIEnv *,
         jobject
 ) {
@@ -404,7 +404,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasMinorDevGapDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasMinorDevGapDetected(
         JNIEnv *,
         jobject
 ) {
@@ -413,7 +413,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasMountIdGapDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasMountIdGapDetected(
         JNIEnv *,
         jobject
 ) {
@@ -422,7 +422,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasMntStringsDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasMntStringsDetected(
         JNIEnv *,
         jobject
 ) {
@@ -431,7 +431,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeWasPeerGroupGapDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeWasPeerGroupGapDetected(
         JNIEnv *,
         jobject
 ) {
@@ -440,7 +440,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetDetectionMethod(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetDetectionMethod(
         JNIEnv *env,
         jobject
 ) {
@@ -449,7 +449,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetDetails(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetDetails(
         JNIEnv *env,
         jobject
 ) {
@@ -458,7 +458,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetFindings(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetFindings(
         JNIEnv *env,
         jobject
 ) {
@@ -482,7 +482,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetNsMntCtimeDeltaNs(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetNsMntCtimeDeltaNs(
         JNIEnv *,
         jobject
 ) {
@@ -491,7 +491,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetMountInfoCtimeDeltaNs(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetMountInfoCtimeDeltaNs(
         JNIEnv *,
         jobject
 ) {
@@ -500,7 +500,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetMntStringsSource(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetMntStringsSource(
         JNIEnv *env,
         jobject
 ) {
@@ -509,7 +509,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetMntStringsTarget(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetMntStringsTarget(
         JNIEnv *env,
         jobject
 ) {
@@ -518,7 +518,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeGetMntStringsFs(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeGetMntStringsFs(
         JNIEnv *env,
         jobject
 ) {
@@ -527,7 +527,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nativeReset(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyMountPreloadBridge_nativeReset(
         JNIEnv *,
         jobject
 ) {
@@ -535,7 +535,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyMountPreloadBridge_nati
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeHasEarlyDetectionRun(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeHasEarlyDetectionRun(
         JNIEnv *,
         jobject
 ) {
@@ -543,7 +543,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeIsPreloadContextValid(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeIsPreloadContextValid(
         JNIEnv *,
         jobject
 ) {
@@ -551,7 +551,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasDetected(
         JNIEnv *,
         jobject
 ) {
@@ -560,7 +560,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasQemuPropertyDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasQemuPropertyDetected(
         JNIEnv *,
         jobject
 ) {
@@ -569,7 +569,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasEmulatorHardwareDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasEmulatorHardwareDetected(
         JNIEnv *,
         jobject
 ) {
@@ -578,7 +578,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasDeviceNodeDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasDeviceNodeDetected(
         JNIEnv *,
         jobject
 ) {
@@ -587,7 +587,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasAvfRuntimeDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasAvfRuntimeDetected(
         JNIEnv *,
         jobject
 ) {
@@ -596,7 +596,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasAuthfsRuntimeDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasAuthfsRuntimeDetected(
         JNIEnv *,
         jobject
 ) {
@@ -605,7 +605,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeWasNativeBridgeDetected(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeWasNativeBridgeDetected(
         JNIEnv *,
         jobject
 ) {
@@ -614,7 +614,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetDetectionMethod(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetDetectionMethod(
         JNIEnv *env,
         jobject
 ) {
@@ -623,7 +623,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetDetails(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetDetails(
         JNIEnv *env,
         jobject
 ) {
@@ -632,7 +632,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetMountNamespaceInode(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetMountNamespaceInode(
         JNIEnv *env,
         jobject
 ) {
@@ -641,7 +641,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetApexMountKey(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetApexMountKey(
         JNIEnv *env,
         jobject
 ) {
@@ -650,7 +650,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetSystemMountKey(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetSystemMountKey(
         JNIEnv *env,
         jobject
 ) {
@@ -659,7 +659,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetVendorMountKey(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetVendorMountKey(
         JNIEnv *env,
         jobject
 ) {
@@ -668,7 +668,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT jobjectArray JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeGetFindings(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeGetFindings(
         JNIEnv *env,
         jobject
 ) {
@@ -692,7 +692,7 @@ Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBr
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_eltavine_duckdetector_core_startup_preload_EarlyVirtualizationPreloadBridge_nativeReset(
+Java_com_eltavine_duckdetector_capability_earlypreload_data_EarlyVirtualizationPreloadBridge_nativeReset(
         JNIEnv *,
         jobject
 ) {

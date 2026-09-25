@@ -27,8 +27,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadStore
-import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadStore
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.core.ui.AppBuildInfo
 import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
 import com.eltavine.duckdetector.ui.DuckDetectorApp

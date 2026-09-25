@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.preload
+package com.eltavine.duckdetector.capability.earlypreload.data
 
 import android.content.Intent
 import android.os.Bundle
 
-enum class EarlyMountPreloadSource {
+public enum class EarlyMountPreloadSource {
     NONE,
     INTENT,
     NATIVE,
 }
 
-enum class EarlyMountPreloadSignal(
-    val key: String,
-    val label: String,
+public enum class EarlyMountPreloadSignal(
+    public val key: String,
+    public val label: String,
 ) {
     FUTILE_HIDE("FUTILE_HIDE", "FutileHide"),
     MNT_STRINGS("MNT_STRINGS", "MntStrings"),
@@ -36,7 +36,7 @@ enum class EarlyMountPreloadSignal(
     PEER_GROUP_GAP("PEER_GROUP_GAP", "PeerGroupGap"),
 }
 
-data class EarlyMountPreloadCapturedExtras(
+public data class EarlyMountPreloadCapturedExtras(
     val hasRun: Boolean = false,
     val detected: Boolean = false,
     val detectionMethod: String = "",
@@ -54,7 +54,7 @@ data class EarlyMountPreloadCapturedExtras(
     val mntStringsFs: String = "",
 )
 
-data class EarlyMountPreloadResult(
+public data class EarlyMountPreloadResult(
     val hasRun: Boolean = false,
     val detected: Boolean = false,
     val detectionMethod: String = "",
@@ -104,7 +104,7 @@ data class EarlyMountPreloadResult(
     val hasWarningSignal: Boolean
         get() = minorDevGapDetected || peerGroupGapDetected
 
-    fun messagesFor(signal: EarlyMountPreloadSignal): List<String> {
+    public fun messagesFor(signal: EarlyMountPreloadSignal): List<String> {
         return findings.mapNotNull { finding ->
             val type = finding.substringBefore('|')
             if (type == signal.key) {
@@ -115,7 +115,7 @@ data class EarlyMountPreloadResult(
         }
     }
 
-    fun normalize(): EarlyMountPreloadResult {
+    public fun normalize(): EarlyMountPreloadResult {
         val resolvedSignals = activeSignals
         val resolvedDetected = detected || resolvedSignals.isNotEmpty()
         val resolvedMethod = detectionMethod.ifBlank {
@@ -141,32 +141,32 @@ data class EarlyMountPreloadResult(
         )
     }
 
-    companion object {
-        const val KEY_HAS_RUN = "early_detection_has_run"
-        const val KEY_DETECTED = "early_detection_detected"
-        const val KEY_DETECTION_METHOD = "early_detection_method"
-        const val KEY_DETAILS = "early_detection_details"
-        const val KEY_CONTEXT_VALID = "early_preload_context_valid"
-        const val KEY_FUTILE_HIDE = "early_futile_hide"
-        const val KEY_MNT_STRINGS = "early_mnt_strings"
-        const val KEY_MOUNT_ID_GAP = "early_mount_id_gap"
-        const val KEY_MINOR_DEV_GAP = "early_minor_dev_gap"
-        const val KEY_PEER_GROUP_GAP = "early_peer_group_gap"
-        const val KEY_NS_MNT_CTIME_DELTA_NS = "early_ns_mnt_ctime_delta_ns"
-        const val KEY_MOUNTINFO_CTIME_DELTA_NS = "early_mountinfo_ctime_delta_ns"
-        const val KEY_MNT_STRINGS_SOURCE = "early_mnt_strings_source"
-        const val KEY_MNT_STRINGS_TARGET = "early_mnt_strings_target"
-        const val KEY_MNT_STRINGS_FS = "early_mnt_strings_fs"
+    public companion object {
+        public const val KEY_HAS_RUN: String = "early_detection_has_run"
+        public const val KEY_DETECTED: String = "early_detection_detected"
+        public const val KEY_DETECTION_METHOD: String = "early_detection_method"
+        public const val KEY_DETAILS: String = "early_detection_details"
+        public const val KEY_CONTEXT_VALID: String = "early_preload_context_valid"
+        public const val KEY_FUTILE_HIDE: String = "early_futile_hide"
+        public const val KEY_MNT_STRINGS: String = "early_mnt_strings"
+        public const val KEY_MOUNT_ID_GAP: String = "early_mount_id_gap"
+        public const val KEY_MINOR_DEV_GAP: String = "early_minor_dev_gap"
+        public const val KEY_PEER_GROUP_GAP: String = "early_peer_group_gap"
+        public const val KEY_NS_MNT_CTIME_DELTA_NS: String = "early_ns_mnt_ctime_delta_ns"
+        public const val KEY_MOUNTINFO_CTIME_DELTA_NS: String = "early_mountinfo_ctime_delta_ns"
+        public const val KEY_MNT_STRINGS_SOURCE: String = "early_mnt_strings_source"
+        public const val KEY_MNT_STRINGS_TARGET: String = "early_mnt_strings_target"
+        public const val KEY_MNT_STRINGS_FS: String = "early_mnt_strings_fs"
 
-        fun empty(source: EarlyMountPreloadSource = EarlyMountPreloadSource.NONE): EarlyMountPreloadResult {
+        public fun empty(source: EarlyMountPreloadSource = EarlyMountPreloadSource.NONE): EarlyMountPreloadResult {
             return EarlyMountPreloadResult(source = source)
         }
 
-        fun fromIntent(intent: Intent?): EarlyMountPreloadResult {
+        public fun fromIntent(intent: Intent?): EarlyMountPreloadResult {
             return fromBundle(intent?.extras)
         }
 
-        fun fromBundle(bundle: Bundle?): EarlyMountPreloadResult {
+        public fun fromBundle(bundle: Bundle?): EarlyMountPreloadResult {
             if (bundle == null) {
                 return empty()
             }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.preload
+package com.eltavine.duckdetector.capability.earlypreload.data
 
 import org.junit.After
 import org.junit.Assert.assertEquals

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.preload
+package com.eltavine.duckdetector.capability.earlypreload.data
 
 import android.content.Intent
 import android.os.Bundle
 
-enum class EarlyVirtualizationPreloadSource {
+public enum class EarlyVirtualizationPreloadSource {
     NONE,
     INTENT,
     NATIVE,
 }
 
-enum class EarlyVirtualizationPreloadSignal(
-    val key: String,
-    val label: String,
-    val isDanger: Boolean,
+public enum class EarlyVirtualizationPreloadSignal(
+    public val key: String,
+    public val label: String,
+    public val isDanger: Boolean,
 ) {
     QEMU_PROPERTY("QEMU_PROPERTY", "QEMU property", true),
     EMULATOR_HARDWARE("EMULATOR_HARDWARE", "Emulator hardware", true),
@@ -38,7 +38,7 @@ enum class EarlyVirtualizationPreloadSignal(
     NATIVE_BRIDGE("NATIVE_BRIDGE", "Native bridge", false),
 }
 
-data class EarlyVirtualizationPreloadCapturedExtras(
+public data class EarlyVirtualizationPreloadCapturedExtras(
     val hasRun: Boolean = false,
     val detected: Boolean = false,
     val detectionMethod: String = "",
@@ -56,7 +56,7 @@ data class EarlyVirtualizationPreloadCapturedExtras(
     val nativeBridgeDetected: Boolean = false,
 )
 
-data class EarlyVirtualizationPreloadResult(
+public data class EarlyVirtualizationPreloadResult(
     val hasRun: Boolean = false,
     val detected: Boolean = false,
     val detectionMethod: String = "",
@@ -97,7 +97,7 @@ data class EarlyVirtualizationPreloadResult(
     val hasWarningSignal: Boolean
         get() = activeSignals.any { !it.isDanger }
 
-    fun normalize(): EarlyVirtualizationPreloadResult {
+    public fun normalize(): EarlyVirtualizationPreloadResult {
         val resolvedSignals = activeSignals
         val resolvedDetected = detected || resolvedSignals.isNotEmpty()
         val resolvedMethod = detectionMethod.ifBlank {
@@ -125,33 +125,33 @@ data class EarlyVirtualizationPreloadResult(
         )
     }
 
-    companion object {
-        const val KEY_HAS_RUN = "early_virtualization_has_run"
-        const val KEY_DETECTED = "early_virtualization_detected"
-        const val KEY_DETECTION_METHOD = "early_virtualization_method"
-        const val KEY_DETAILS = "early_virtualization_details"
-        const val KEY_CONTEXT_VALID = "early_virtualization_context_valid"
-        const val KEY_MOUNT_NAMESPACE_INODE = "early_virtualization_mount_namespace_inode"
-        const val KEY_APEX_MOUNT_KEY = "early_virtualization_apex_mount_key"
-        const val KEY_SYSTEM_MOUNT_KEY = "early_virtualization_system_mount_key"
-        const val KEY_VENDOR_MOUNT_KEY = "early_virtualization_vendor_mount_key"
-        const val KEY_QEMU_PROPERTY = "early_virtualization_qemu_property"
-        const val KEY_EMULATOR_HARDWARE = "early_virtualization_emulator_hardware"
-        const val KEY_DEVICE_NODE = "early_virtualization_device_node"
-        const val KEY_AVF_RUNTIME = "early_virtualization_avf_runtime"
-        const val KEY_AUTHFS_RUNTIME = "early_virtualization_authfs_runtime"
-        const val KEY_NATIVE_BRIDGE = "early_virtualization_native_bridge"
+    public companion object {
+        public const val KEY_HAS_RUN: String = "early_virtualization_has_run"
+        public const val KEY_DETECTED: String = "early_virtualization_detected"
+        public const val KEY_DETECTION_METHOD: String = "early_virtualization_method"
+        public const val KEY_DETAILS: String = "early_virtualization_details"
+        public const val KEY_CONTEXT_VALID: String = "early_virtualization_context_valid"
+        public const val KEY_MOUNT_NAMESPACE_INODE: String = "early_virtualization_mount_namespace_inode"
+        public const val KEY_APEX_MOUNT_KEY: String = "early_virtualization_apex_mount_key"
+        public const val KEY_SYSTEM_MOUNT_KEY: String = "early_virtualization_system_mount_key"
+        public const val KEY_VENDOR_MOUNT_KEY: String = "early_virtualization_vendor_mount_key"
+        public const val KEY_QEMU_PROPERTY: String = "early_virtualization_qemu_property"
+        public const val KEY_EMULATOR_HARDWARE: String = "early_virtualization_emulator_hardware"
+        public const val KEY_DEVICE_NODE: String = "early_virtualization_device_node"
+        public const val KEY_AVF_RUNTIME: String = "early_virtualization_avf_runtime"
+        public const val KEY_AUTHFS_RUNTIME: String = "early_virtualization_authfs_runtime"
+        public const val KEY_NATIVE_BRIDGE: String = "early_virtualization_native_bridge"
 
-        fun empty(
+        public fun empty(
             source: EarlyVirtualizationPreloadSource = EarlyVirtualizationPreloadSource.NONE,
         ): EarlyVirtualizationPreloadResult {
             return EarlyVirtualizationPreloadResult(source = source)
         }
 
-        fun fromIntent(intent: Intent?): EarlyVirtualizationPreloadResult =
+        public fun fromIntent(intent: Intent?): EarlyVirtualizationPreloadResult =
             fromBundle(intent?.extras)
 
-        fun fromBundle(bundle: Bundle?): EarlyVirtualizationPreloadResult {
+        public fun fromBundle(bundle: Bundle?): EarlyVirtualizationPreloadResult {
             if (bundle == null) {
                 return empty()
             }

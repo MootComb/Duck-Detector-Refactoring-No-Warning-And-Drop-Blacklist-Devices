@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":capability:earlypreload:data"))
     implementation(project(":capability:packageinventory:data"))
     implementation(project(":core:detector"))
     implementation(project(":core:evidence"))

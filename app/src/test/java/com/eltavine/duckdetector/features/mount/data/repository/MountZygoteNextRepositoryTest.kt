@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.mount.data.repository
 
-import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadResult
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadResult
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextMountMarker

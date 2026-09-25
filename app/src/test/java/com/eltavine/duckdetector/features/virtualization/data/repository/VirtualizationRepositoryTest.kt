@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.virtualization.data.repository
 
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
-import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadResult
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
 import com.eltavine.duckdetector.features.virtualization.data.native.SacrificialSyscallPackResult
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeBridge
 import com.eltavine.duckdetector.features.virtualization.data.native.VirtualizationNativeFinding

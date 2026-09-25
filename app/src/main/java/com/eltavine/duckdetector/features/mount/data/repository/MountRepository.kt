@@ -17,9 +17,9 @@
 package com.eltavine.duckdetector.features.mount.data.repository
 
 import android.content.Context
-import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadResult
-import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadSignal
-import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadStore
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadResult
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadSignal
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot

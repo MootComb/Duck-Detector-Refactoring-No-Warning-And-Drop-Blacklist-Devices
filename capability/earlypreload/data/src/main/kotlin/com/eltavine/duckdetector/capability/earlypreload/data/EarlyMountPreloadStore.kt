@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.startup.preload
+package com.eltavine.duckdetector.capability.earlypreload.data
 
 import android.content.Intent
 
-object EarlyMountPreloadStore {
+public object EarlyMountPreloadStore {
 
     @Volatile
     private var intentResult: EarlyMountPreloadResult = EarlyMountPreloadResult.empty()
@@ -26,14 +26,14 @@ object EarlyMountPreloadStore {
     @Volatile
     private var bridge: EarlyMountPreloadBridge = EarlyMountPreloadBridge()
 
-    fun capture(intent: Intent?) {
+    public fun capture(intent: Intent?) {
         val captured = EarlyMountPreloadResult.fromIntent(intent)
         if (captured.hasRun) {
             intentResult = captured
         }
     }
 
-    fun currentResult(): EarlyMountPreloadResult {
+    public fun currentResult(): EarlyMountPreloadResult {
         return selectPreferred(
             nativeResult = bridge.getStoredResult(),
             intentOnlyResult = intentResult,
