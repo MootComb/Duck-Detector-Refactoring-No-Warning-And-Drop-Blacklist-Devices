@@ -91,12 +91,12 @@ internal fun buildMethods(
             label = "__NR_supercall probe",
             summary = when {
                 snapshot.kernelPatchSideChannel -> "Detected"
-                snapshot.available -> "No pre-fix delay"
+                snapshot.kernelPatchSideChannelAvailable -> "No pre-fix delay"
                 else -> "Unavailable"
             },
             outcome = when {
                 snapshot.kernelPatchSideChannel -> NativeRootMethodOutcome.DETECTED
-                snapshot.available -> NativeRootMethodOutcome.CLEAN
+                snapshot.kernelPatchSideChannelAvailable -> NativeRootMethodOutcome.CLEAN
                 else -> NativeRootMethodOutcome.SUPPORT
             },
             detail = buildString {

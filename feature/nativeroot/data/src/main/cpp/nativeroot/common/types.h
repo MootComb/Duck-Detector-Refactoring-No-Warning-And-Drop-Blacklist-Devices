@@ -62,6 +62,7 @@ namespace duckdetector::nativeroot {
         long kernel_su_version = 0;
         bool prctl_probe_hit = false;
         bool kernelpatch_side_channel_detected = false;
+        bool kernelpatch_side_channel_available = false;
         std::string kernelpatch_side_channel_detail;
         bool kernelpatch_superkey_detected = false;
         bool kernelpatch_superkey_available = false;

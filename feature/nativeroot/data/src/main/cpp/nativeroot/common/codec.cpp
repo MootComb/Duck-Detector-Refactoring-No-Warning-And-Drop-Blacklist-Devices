@@ -60,6 +60,7 @@ namespace duckdetector::nativeroot {
         output << "KSU_VERSION=" << snapshot.kernel_su_version << '\n';
         output << "PRCTL_HIT=" << (snapshot.prctl_probe_hit ? '1' : '0') << '\n';
         output << "KERNELPATCH_SIDE_CHANNEL_ATTACK=" << (snapshot.kernelpatch_side_channel_detected ? '1' : '0') << '\n';
+        output << "KERNELPATCH_SIDE_CHANNEL_AVAILABLE=" << (snapshot.kernelpatch_side_channel_available ? '1' : '0') << '\n';
         output << "KERNELPATCH_SIDE_CHANNEL_DETAIL=" << escape_value(snapshot.kernelpatch_side_channel_detail) << '\n';
         output << "KERNELPATCH_SUPERKEY=" << (snapshot.kernelpatch_superkey_detected ? '1' : '0') << '\n';
         output << "KERNELPATCH_SUPERKEY_AVAILABLE=" << (snapshot.kernelpatch_superkey_available ? '1' : '0') << '\n';

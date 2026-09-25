@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_LATENCY_PROBE_H
-#define DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_LATENCY_PROBE_H
-
-#include "nativeroot/common/types.h"
+#ifndef DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_ABI_H
+#define DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_ABI_H
 
 namespace duckdetector::nativeroot {
 
-    // Set in ProbeResult::aux_flags only when both latencies were measured, so
-    // a run that never produced a measurement is not read as "no delay".
-    constexpr long kLatencyAuxMeasured = 1L << 0;
-
-    ProbeResult run_kernelpatch_supercall_latency_check();
+    // KernelPatch patches arm64 kernels only and takes over syscall 45 of the
+    // arm64 table. Other ABIs, including 32-bit processes on an arm64 kernel,
+    // use their own syscall numbering, so a probe built for them never reaches it.
+    inline constexpr const char *kKernelPatchArm64Only =
+            "Not run: KernelPatch's supercall is syscall 45 of the arm64 table, which this ABI does not call.";
 
 }  // namespace duckdetector::nativeroot
 
-#endif  // #ifdef DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_LATENCY_PROBE_H
+#endif  // DUCKDETECTOR_NATIVEROOT_PROBES_KERNELPATCH_SUPERCALL_ABI_H

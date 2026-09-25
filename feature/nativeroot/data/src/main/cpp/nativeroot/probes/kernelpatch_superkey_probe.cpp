@@ -15,6 +15,7 @@
  */
 
 #include "nativeroot/probes/kernelpatch_superkey_probe.h"
+#include "nativeroot/probes/kernelpatch_supercall_abi.h"
 
 #include <csignal>
 #include <cstdio>
@@ -360,7 +361,7 @@ namespace duckdetector::nativeroot {
 
     ProbeResult run_kernelpatch_superkey_check() {
         ProbeResult result;
-        result.extra_text = "";
+        result.extra_text = kKernelPatchArm64Only;
         return result;
     }
 

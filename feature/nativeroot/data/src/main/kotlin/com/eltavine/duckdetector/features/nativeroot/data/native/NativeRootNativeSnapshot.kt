@@ -36,6 +36,7 @@ data class NativeRootNativeSnapshot(
     val kernelSuVersion: Long = 0L,
     val prctlProbeHit: Boolean = false,
     val kernelPatchSideChannel: Boolean = false,
+    val kernelPatchSideChannelAvailable: Boolean = false,
     val kernelPatchSideChannelDetail: String = "",
     val kernelPatchSuperkey: Boolean = false,
     val kernelPatchSuperkeyAvailable: Boolean = false,

@@ -75,6 +75,8 @@ namespace duckdetector::nativeroot {
                                      : ksu_supercall_probe.numeric_value;
         snapshot.prctl_probe_hit = prctl_probe.flags.kernel_su;
         snapshot.kernelpatch_side_channel_detected = kernelpatch_supercall_latency_probe.flags.apatch;
+        snapshot.kernelpatch_side_channel_available =
+                (kernelpatch_supercall_latency_probe.aux_flags & kLatencyAuxMeasured) != 0;
         snapshot.kernelpatch_side_channel_detail = kernelpatch_supercall_latency_probe.extra_text;
         snapshot.kernelpatch_superkey_detected = kernelpatch_superkey_probe.flags.apatch;
         snapshot.kernelpatch_superkey_available =

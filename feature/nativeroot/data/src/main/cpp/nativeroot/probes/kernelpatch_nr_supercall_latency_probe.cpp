@@ -15,6 +15,7 @@
  */
 
 #include "nativeroot/probes/kernelpatch_nr_supercall_latency_probe.h"
+#include "nativeroot/probes/kernelpatch_supercall_abi.h"
 
 #include <csignal>
 #include <cstdio>
@@ -229,6 +230,9 @@ namespace duckdetector::nativeroot {
         LatencyResult latencies{};
 
         if (!run_benchmark_in_child(latencies, blocked)) {
+            result.extra_text = blocked
+                    ? "Syscall 45 was blocked by seccomp in the measurement child."
+                    : "The measurement child could not start or did not return a result.";
             if (blocked) {
                 result.checked_count = 1;
                 result.denied_count = 1;
@@ -246,7 +250,11 @@ namespace duckdetector::nativeroot {
         }
 
         result.checked_count = 1;
-        if (!latencies.success) return result;
+        if (!latencies.success) {
+            result.extra_text = "The latency measurement did not complete.";
+            return result;
+        }
+        result.aux_flags |= kLatencyAuxMeasured;
 
         const double diff = latencies.full_latency - latencies.empty_latency;
 
@@ -285,7 +293,7 @@ namespace duckdetector::nativeroot {
 
     ProbeResult run_kernelpatch_supercall_latency_check() {
         ProbeResult result;
-        result.extra_text = "";
+        result.extra_text = kKernelPatchArm64Only;
         return result;
     }
 

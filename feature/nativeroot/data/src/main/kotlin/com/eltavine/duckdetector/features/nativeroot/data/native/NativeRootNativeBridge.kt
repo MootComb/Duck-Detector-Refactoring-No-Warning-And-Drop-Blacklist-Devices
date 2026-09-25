@@ -83,6 +83,7 @@ class NativeRootNativeBridge(
             "KSU_VERSION" -> copy(kernelSuVersion = value.toLongOrNull() ?: kernelSuVersion)
             "PRCTL_HIT" -> copy(prctlProbeHit = value.asBool())
             "KERNELPATCH_SIDE_CHANNEL_ATTACK" -> copy(kernelPatchSideChannel = value.asBool())
+            "KERNELPATCH_SIDE_CHANNEL_AVAILABLE" -> copy(kernelPatchSideChannelAvailable = value.asBool())
             "KERNELPATCH_SIDE_CHANNEL_DETAIL" -> copy(kernelPatchSideChannelDetail = value.decodeValue())
             "KERNELPATCH_SUPERKEY" -> copy(kernelPatchSuperkey = value.asBool())
             "KERNELPATCH_SUPERKEY_AVAILABLE" -> copy(kernelPatchSuperkeyAvailable = value.asBool())

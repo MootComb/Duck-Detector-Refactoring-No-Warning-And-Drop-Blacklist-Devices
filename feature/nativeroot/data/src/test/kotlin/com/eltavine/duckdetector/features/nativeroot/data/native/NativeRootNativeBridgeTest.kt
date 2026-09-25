@@ -38,6 +38,7 @@ class NativeRootNativeBridgeTest {
                 KSU_VERSION=12000
                 PRCTL_HIT=1
                 KERNELPATCH_SIDE_CHANNEL_ATTACK=1
+                KERNELPATCH_SIDE_CHANNEL_AVAILABLE=1
                 KERNELPATCH_SIDE_CHANNEL_DETAIL=Full: 8.1 us, Empty: 3.2 us, Diff: 4.9 us
                 KERNELPATCH_SUPERKEY=1
                 KERNELPATCH_SUPERKEY_AVAILABLE=1
@@ -87,6 +88,7 @@ class NativeRootNativeBridgeTest {
         assertTrue(snapshot.magiskDetected)
         assertEquals(12000L, snapshot.kernelSuVersion)
         assertTrue(snapshot.kernelPatchSideChannel)
+        assertTrue(snapshot.kernelPatchSideChannelAvailable)
         assertTrue(snapshot.kernelPatchSuperkey)
         assertTrue(snapshot.kernelPatchSuperkeyAvailable)
         assertEquals(4, snapshot.kernelPatchSuperkeyCheckedCount)
