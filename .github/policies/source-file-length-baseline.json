@@ -13,7 +13,6 @@
     "app/src/main/java/com/eltavine/duckdetector/features/lsposed/presentation/LSPosedCardModelMapper.kt": 668,
     "app/src/main/java/com/eltavine/duckdetector/features/nativeroot/data/repository/NativeRootRepository.kt": 645,
     "app/src/main/java/com/eltavine/duckdetector/features/nativeroot/presentation/NativeRootCardModelMapper.kt": 911,
-    "app/src/main/java/com/eltavine/duckdetector/features/selinux/presentation/SelinuxCardModelMapper.kt": 1138,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducer.kt": 3251,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/repository/TeeRepository.kt": 662,
     "app/src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeyMintCapabilityProbe.kt": 1629,
