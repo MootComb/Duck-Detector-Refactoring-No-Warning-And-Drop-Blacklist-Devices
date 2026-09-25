@@ -208,7 +208,7 @@ limitations under the License.
         errorLine1="        val targetPath = &quot;/sdcard/Android/data&quot;"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/kernelcheck/data/repository/KernelCheckRepository.kt"
+            file="../feature/kernelcheck/data/src/main/kotlin/com/eltavine/duckdetector/features/kernelcheck/data/probes/KernelCvePatchProbe.kt"
             line="606" column="27" />
     </issue>
 

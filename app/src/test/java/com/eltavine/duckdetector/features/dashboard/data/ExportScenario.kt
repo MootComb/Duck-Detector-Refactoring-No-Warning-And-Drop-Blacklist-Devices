@@ -34,7 +34,7 @@ import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckCardModel
+import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckCardModel
 import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedCardModel
 import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport

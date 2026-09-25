@@ -38,6 +38,8 @@ dependencies {
     implementation(project(":feature:su:ui"))
     implementation(project(":feature:memory:data"))
     implementation(project(":feature:memory:ui"))
+    implementation(project(":feature:kernelcheck:data"))
+    implementation(project(":feature:kernelcheck:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

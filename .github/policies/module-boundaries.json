@@ -69,6 +69,10 @@
         ":core:report",
         ":core:scan",
         ":core:ui",
+        ":feature:kernelcheck:data",
+        ":feature:kernelcheck:domain",
+        ":feature:kernelcheck:presentation",
+        ":feature:kernelcheck:ui",
         ":feature:memory:data",
         ":feature:memory:domain",
         ":feature:memory:presentation",
@@ -111,6 +115,38 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":core:evidence"
+      ]
+    },
+    ":feature:kernelcheck:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:native",
+        ":feature:kernelcheck:domain"
+      ]
+    },
+    ":feature:kernelcheck:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:kernelcheck:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:kernelcheck:domain"
+      ]
+    },
+    ":feature:kernelcheck:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:kernelcheck:domain",
+        ":feature:kernelcheck:presentation"
       ]
     },
     ":feature:memory:data": {
