@@ -41,17 +41,21 @@
 
 ### 3.1 按功能分层
 
-每个 feature 应优先维持以下边界：
+每个 feature 是 `feature/<name>/` 下的一组 Gradle 模块，层次由构建强制：
 
+- `domain`：结果与报告模型、状态定义、判定规则（纯 JVM）
 - `data`：采集、解析、桥接、底层探测
-- `domain`：报告模型、状态定义、判定抽象
-- `presentation`：卡片映射、UI 展示、文案呈现
+- `presentation`：卡片模型、报告投影与摘要映射（纯 JVM）
+- `ui`：Compose 卡片、ViewModel 与 `DetectorFeature` 实现
+
+依赖方向为 `:app` → `:feature` → `:capability` → `:core`，feature 之间、capability 之间互不依赖。模块职责、禁止知识与扩展规则见 [`docs/architecture/README.md`](./docs/architecture/README.md)；`.github/policies/` 中的边界策略在构建与 CI 中校验。
 
 不要出现这些情况：
 
 - `presentation` 直接调用 native / JNI
 - `domain` 持有 Android Framework 细节
 - `reducer` 直接做文件系统、Binder、KeyStore 访问
+- `:app`、dashboard、导出或通知代码按具体检测项分支
 
 ### 3.2 Probe 拆分规则
 
@@ -68,6 +72,7 @@
 ### 3.3 共享逻辑收敛
 
 - 只有在两个以上模块确实共享同一语义时，才抽公共 helper。
+- 多个 feature 共享的证据采集放入 `:capability`；capability 只采集，不判定。
 - 公共 helper 必须表达稳定语义，不要为了省几行代码强行抽象。
 - 涉及安全级别、判定等级、字段兼容映射的 helper，要优先测试覆盖。
 
@@ -156,6 +161,7 @@
 - 修改 verdict 影响规则
 - 修改证据层级定义
 - 修改 release / CI / Telegram 推送行为
+- 修改模块边界、capability 或 native unit：同步更新 `docs/architecture/README.md`，新的架构决策写成 `docs/adr/` 下的 ADR
 
 涉及 TEE、native root、virtualization 这类检测口径变化时，应同步更新对应根目录文档或 README。
 
