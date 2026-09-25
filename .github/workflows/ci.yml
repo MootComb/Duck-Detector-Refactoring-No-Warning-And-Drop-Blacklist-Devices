@@ -50,10 +50,14 @@ jobs:
         run: |
           set -euo pipefail
 
+          python3 .github/scripts/test-detector-touch-points.py
           python3 .github/scripts/test-jni-contracts.py
           python3 .github/scripts/test-native-boundaries.py
           python3 .github/scripts/test-reflection-boundaries.py
           python3 .github/scripts/test-source-file-length.py
+
+      - name: Verify every detector stays inside its own directory
+        run: python3 .github/scripts/check-detector-touch-points.py
 
       - name: Verify JNI bindings
         run: python3 .github/scripts/check-jni-contracts.py

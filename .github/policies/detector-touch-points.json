@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "registrations": [
+    {
+      "path": "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt",
+      "layer": "detector",
+      "reason": "The one list of detectors, in the order their scans start."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt",
+      "layer": "ui",
+      "reason": "Names the dashboard card of each detector."
+    }
+  ],
+  "indexes": [
+    {
+      "path": "sdk/runtime/src/main/cpp/CMakeLists.txt",
+      "reason": "The native unit registry names each unit's owning module in link order."
+    },
+    {
+      "path": ".github/policies/native-boundaries.json",
+      "reason": "States the owner of each native unit and what it may include."
+    },
+    {
+      "path": ".github/policies/reflection-allowlist.json",
+      "reason": "Lists every reviewed file that uses reflection."
+    },
+    {
+      "path": "app/lint-baseline.xml",
+      "reason": "Lint records its baselined findings by file path."
+    }
+  ],
+  "exceptions": [
+    {
+      "path": "app/build.gradle.kts",
+      "detectors": ["tee"],
+      "reason": "The startup policy reads and writes the TEE network consent before the first scan (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/AppReadyShell.kt",
+      "detectors": ["tee"],
+      "reason": "Changing the TEE network consent in settings rescans TEE (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/DuckDetectorApp.kt",
+      "detectors": ["tee"],
+      "reason": "Loads the TEE network consent for the startup policy (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/AppShellState.kt",
+      "detectors": ["tee"],
+      "reason": "The startup policy state carries the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyCards.kt",
+      "detectors": ["tee"],
+      "reason": "The startup policy card asks for the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyScreen.kt",
+      "detectors": ["tee"],
+      "reason": "The startup policy screen asks for the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
+    },
+    {
+      "path": "app/src/test/java/com/eltavine/duckdetector/ui/shell/AppShellStateTest.kt",
+      "detectors": ["tee"],
+      "reason": "Tests the startup policy state, which carries the TEE network consent."
+    },
+    {
+      "path": "app/src/test/java/com/eltavine/duckdetector/integration/dashboard/ExportScenario.kt",
+      "detectors": ["bootloader", "customrom", "dangerousapps", "kernelcheck", "lsposed", "memory", "mount", "nativeroot", "playintegrityfix", "selinux", "su", "systemproperties", "tee", "virtualization", "zygisk"],
+      "reason": "The golden export renders the report of every detector that existed when it was recorded; a new detector does not have to join it."
+    },
+    {
+      "path": "build-logic/src/test/kotlin/com/eltavine/duckdetector/buildlogic/boundaries/ModuleBoundaryPolicyTest.kt",
+      "detectors": ["su"],
+      "reason": "Boundary policy fixtures use real module paths as examples."
+    },
+    {
+      "path": "build-logic/src/test/kotlin/com/eltavine/duckdetector/buildlogic/boundaries/ModuleBoundaryValidatorTest.kt",
+      "detectors": ["su", "tee"],
+      "reason": "Boundary policy fixtures use real module paths as examples."
+    },
+    {
+      "path": "capability/helperprocess/data/src/main/kotlin/com/eltavine/duckdetector/capability/helperprocess/data/VirtualizationProbeProtocol.kt",
+      "detectors": ["virtualization"],
+      "reason": "The Binder descriptor keeps the name it had before the helper process capability was extracted (follow-ups: historical names in the helper process capability)."
+    },
+    {
+      "path": "capability/selinuxpolicy/data/src/main/kotlin/com/eltavine/duckdetector/capability/selinuxpolicy/data/SelinuxContextValidityCarrierProtocol.kt",
+      "detectors": ["selinux"],
+      "reason": "The Binder descriptor keeps the name it had before the SELinux policy capability was extracted."
+    },
+    {
+      "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
+      "detectors": ["su"],
+      "reason": "Shows a consumer using one detector's typed object through the SDK."
+    },
+    {
+      "path": "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DuckDetectorZygotePreload.kt",
+      "detectors": ["nativeroot"],
+      "reason": "The app zygote preload installs Native Root's throne-hunt watch before the SELinux context validity capture."
+    }
+  ]
+}
