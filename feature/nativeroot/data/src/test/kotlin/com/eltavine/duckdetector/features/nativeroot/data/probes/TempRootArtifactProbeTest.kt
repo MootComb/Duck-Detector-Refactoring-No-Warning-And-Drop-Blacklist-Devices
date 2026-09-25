@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
+import com.eltavine.duckdetector.core.platform.PathState
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,7 +30,7 @@ class TempRootArtifactProbeTest {
     @Test
     fun `known paths that could not be stat-ed leave the fallback unavailable`() {
         val result = TempRootArtifactProbe { path ->
-            if (path.endsWith("/ksud")) ArtifactPathState.NOT_OBSERVABLE else ArtifactPathState.ABSENT
+            if (path.endsWith("/ksud")) PathState.NOT_OBSERVABLE else PathState.ABSENT
         }.probeKnownFiles()
 
         assertFalse(result.available)
@@ -39,7 +40,7 @@ class TempRootArtifactProbeTest {
 
     @Test
     fun `known paths that are all absent keep the fallback clean`() {
-        val result = TempRootArtifactProbe { ArtifactPathState.ABSENT }.probeKnownFiles()
+        val result = TempRootArtifactProbe { PathState.ABSENT }.probeKnownFiles()
 
         assertTrue(result.available)
         assertFalse(result.tempRootDetected)
@@ -49,9 +50,9 @@ class TempRootArtifactProbeTest {
     fun `a staged CVE library is found even when other paths are not observable`() {
         val result = TempRootArtifactProbe { path ->
             when {
-                path.endsWith("/libcve43499root.so") -> ArtifactPathState.PRESENT
-                path.endsWith("/ksud") -> ArtifactPathState.NOT_OBSERVABLE
-                else -> ArtifactPathState.ABSENT
+                path.endsWith("/libcve43499root.so") -> PathState.PRESENT
+                path.endsWith("/ksud") -> PathState.NOT_OBSERVABLE
+                else -> PathState.ABSENT
             }
         }.probeKnownFiles()
 

@@ -16,9 +16,8 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
-import android.system.ErrnoException
-import android.system.Os
-import android.system.OsConstants
+import com.eltavine.duckdetector.core.platform.PathState
+import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
@@ -58,10 +57,10 @@ data class TempRootArtifactProbeResult(
  * tooling was placed on the device, not that an escalation succeeded or is still active.
  */
 class TempRootArtifactProbe internal constructor(
-    private val pathState: (String) -> ArtifactPathState,
+    private val pathState: (String) -> PathState,
 ) {
 
-    constructor() : this(::statArtifactPath)
+    constructor() : this(PathStat::of)
 
     fun run(): TempRootArtifactProbeResult {
         val tmpDir = File(TMP_PATH)
@@ -147,8 +146,8 @@ class TempRootArtifactProbe internal constructor(
     /** Stats known artifact filenames when the directory itself cannot be listed. */
     internal fun probeKnownFiles(): TempRootArtifactProbeResult {
         val states = KNOWN_PROBE_FILENAMES.associateWith { filename -> pathState("$TMP_PATH/$filename") }
-        val foundNames = states.filterValues { it == ArtifactPathState.PRESENT }.keys.toList()
-        val unobservable = states.count { it.value == ArtifactPathState.NOT_OBSERVABLE }
+        val foundNames = states.filterValues { it == PathState.PRESENT }.keys.toList()
+        val unobservable = states.count { it.value == PathState.NOT_OBSERVABLE }
 
         if (foundNames.isEmpty() && unobservable > 0) {
             return TempRootArtifactProbeResult(
@@ -254,14 +253,4 @@ class TempRootArtifactProbe internal constructor(
             "cve-2026-43499.sh",
         )
     }
-}
-
-internal enum class ArtifactPathState { PRESENT, ABSENT, NOT_OBSERVABLE }
-
-// Only ENOENT shows a name is absent; any other error means this process could not look.
-private fun statArtifactPath(path: String): ArtifactPathState = try {
-    Os.stat(path)
-    ArtifactPathState.PRESENT
-} catch (error: ErrnoException) {
-    if (error.errno == OsConstants.ENOENT) ArtifactPathState.ABSENT else ArtifactPathState.NOT_OBSERVABLE
 }

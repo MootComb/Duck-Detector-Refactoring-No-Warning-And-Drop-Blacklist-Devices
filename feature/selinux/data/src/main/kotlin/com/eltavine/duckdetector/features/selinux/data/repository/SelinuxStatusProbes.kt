@@ -16,9 +16,8 @@
 
 package com.eltavine.duckdetector.features.selinux.data.repository
 
-import android.system.ErrnoException
-import android.system.Os
-import android.system.OsConstants
+import com.eltavine.duckdetector.core.platform.PathState
+import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import java.io.File
@@ -26,8 +25,10 @@ import java.util.concurrent.TimeUnit
 
 internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
     return try {
-        when (nodeState(SELINUX_MOUNT_PATH)) {
-            NodeState.ABSENT -> SelinuxCheckResult(
+        // AOSP lets every domain search selinuxfs and getattr its files (system/sepolicy
+        // private/domain.te), so a stat that fails for another reason means this process may not look.
+        when (PathStat.of(SELINUX_MOUNT_PATH)) {
+            PathState.ABSENT -> SelinuxCheckResult(
                 method = METHOD_FILESYSTEM,
                 status = FILESYSTEM_NOT_MOUNTED,
                 isSecure = false,
@@ -35,7 +36,7 @@ internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
                 details = "/sys/fs/selinux does not exist",
             )
 
-            NodeState.NOT_OBSERVABLE -> SelinuxCheckResult(
+            PathState.NOT_OBSERVABLE -> SelinuxCheckResult(
                 method = METHOD_FILESYSTEM,
                 status = FILESYSTEM_NOT_OBSERVABLE,
                 isSecure = null,
@@ -43,7 +44,7 @@ internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
                 details = "/sys/fs/selinux could not be examined from this process",
             )
 
-            NodeState.PRESENT -> selinuxNodesResult()
+            PathState.PRESENT -> selinuxNodesResult()
         }
     } catch (throwable: Throwable) {
         SelinuxCheckResult(
@@ -76,17 +77,6 @@ private fun selinuxNodesResult(): SelinuxCheckResult {
             details = "SELinux filesystem present",
         )
     }
-}
-
-private enum class NodeState { PRESENT, ABSENT, NOT_OBSERVABLE }
-
-// Only ENOENT shows a node is missing. AOSP lets every domain search selinuxfs and getattr its
-// files (system/sepolicy private/domain.te), so any other error means this process may not look.
-private fun nodeState(path: String): NodeState = try {
-    Os.stat(path)
-    NodeState.PRESENT
-} catch (error: ErrnoException) {
-    if (error.errno == OsConstants.ENOENT) NodeState.ABSENT else NodeState.NOT_OBSERVABLE
 }
 
 internal fun checkViaSysfs(): SelinuxCheckResult {
