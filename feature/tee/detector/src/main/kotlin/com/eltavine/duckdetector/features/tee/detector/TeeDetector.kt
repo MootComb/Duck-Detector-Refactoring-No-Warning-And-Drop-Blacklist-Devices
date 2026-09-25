@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.detector
 
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
+import com.eltavine.duckdetector.core.detector.DetectorConsent
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
@@ -39,6 +40,8 @@ import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
  */
 public object TeeDetector : Detector<TeeReport, TeeCardModel> {
     override val id: DetectorId = DetectorId("tee")
+
+    override val consents: List<DetectorConsent> = listOf(TeeRevocationNetworkConsent)
 
     override fun createScanner(context: Context): DetectorScanner<TeeReport> = TeeRepository(context)
 

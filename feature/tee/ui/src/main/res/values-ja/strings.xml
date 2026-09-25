@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_revocation_network_title">CRL オンライン更新</string>
+    <string name="tee_revocation_network_prompt_headline">TEE の失効確認でオンライン更新を取得するか選択してください。</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector は常に内蔵の失効スナップショットを確認します。ネットワークを許可すると、TEE 検証中に Google の最新 attestation revocation feed を取得できます。</string>
+    <string name="tee_revocation_network_allow">更新を許可</string>
+    <string name="tee_revocation_network_decline">内蔵のみ</string>
+    <string name="tee_revocation_network_granted_headline">オンライン CRL 更新が許可されています。</string>
+    <string name="tee_revocation_network_granted_detail">TEE 検証は内蔵スナップショットを確認し、ネットワーク条件が許す限り Google の attestation revocation feed を更新できます。</string>
+    <string name="tee_revocation_network_declined_status">ローカル</string>
+    <string name="tee_revocation_network_declined_headline">TEE の失効確認は内蔵スナップショットを使用します。</string>
+    <string name="tee_revocation_network_declined_detail">設定で再度有効にするまで、Duck Detector はオンライン CRL 更新を実行しません。内蔵の失効確認は有効なままです。</string>
+    <string name="tee_revocation_network_setting_title">オンライン CRL 更新を許可</string>
+    <string name="tee_revocation_network_setting_summary">TEE の失効確認は常に内蔵スナップショットを使用します。この設定は Google の最新 attestation revocation feed の取得だけを許可します。</string>
+    <string name="tee_revocation_network_setting_footer">変更はオンライン更新の動作に即時反映されます。内蔵 TEE 失効確認は有効なままです。</string>
+</resources>

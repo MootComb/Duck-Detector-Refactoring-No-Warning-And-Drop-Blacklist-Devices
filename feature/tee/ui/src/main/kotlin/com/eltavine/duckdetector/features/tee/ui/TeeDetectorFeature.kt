@@ -16,6 +16,9 @@
 
 package com.eltavine.duckdetector.features.tee.ui
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CloudSync
+import androidx.compose.material.icons.rounded.NetworkCheck
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,9 +28,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.ConsentCard
+import com.eltavine.duckdetector.core.ui.detector.ConsentPrompt
+import com.eltavine.duckdetector.core.ui.detector.ConsentSetting
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
 import com.eltavine.duckdetector.features.tee.detector.TeeDetector
+import com.eltavine.duckdetector.features.tee.detector.TeeRevocationNetworkConsent
 import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
@@ -40,6 +47,31 @@ val detectorFeature: DetectorFeature = TeeDetectorFeature
  */
 internal object TeeDetectorFeature : DetectorFeature {
     override val id: DetectorId = TeeDetector.id
+
+    override val consentCards: List<ConsentCard> = listOf(
+        ConsentCard(
+            consent = TeeRevocationNetworkConsent,
+            prompt = ConsentPrompt(
+                icon = Icons.Rounded.CloudSync,
+                title = R.string.tee_revocation_network_title,
+                headline = R.string.tee_revocation_network_prompt_headline,
+                detail = R.string.tee_revocation_network_prompt_detail,
+                allowLabel = R.string.tee_revocation_network_allow,
+                declineLabel = R.string.tee_revocation_network_decline,
+                grantedHeadline = R.string.tee_revocation_network_granted_headline,
+                grantedDetail = R.string.tee_revocation_network_granted_detail,
+                declinedStatus = R.string.tee_revocation_network_declined_status,
+                declinedHeadline = R.string.tee_revocation_network_declined_headline,
+                declinedDetail = R.string.tee_revocation_network_declined_detail,
+            ),
+            setting = ConsentSetting(
+                icon = Icons.Rounded.NetworkCheck,
+                title = R.string.tee_revocation_network_setting_title,
+                summary = R.string.tee_revocation_network_setting_summary,
+                footer = R.string.tee_revocation_network_setting_footer,
+            ),
+        ),
+    )
 
     @Composable
     override fun rememberSession(): DetectorSession {

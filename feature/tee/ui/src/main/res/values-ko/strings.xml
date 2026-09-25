@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_revocation_network_title">CRL 온라인 새로고침</string>
+    <string name="tee_revocation_network_prompt_headline">TEE 폐기 확인이 온라인 업데이트를 가져올지 선택하세요.</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector는 항상 내장 폐기 스냅샷을 확인합니다. 네트워크를 허용하면 TEE 검증 중 Google 최신 attestation revocation feed를 가져올 수 있습니다.</string>
+    <string name="tee_revocation_network_allow">새로고침 허용</string>
+    <string name="tee_revocation_network_decline">내장만</string>
+    <string name="tee_revocation_network_granted_headline">온라인 CRL 새로고침이 허용되었습니다.</string>
+    <string name="tee_revocation_network_granted_detail">TEE 검증은 내장 스냅샷을 확인하고 네트워크 상태가 허용될 때마다 Google attestation revocation feed를 새로고침할 수 있습니다.</string>
+    <string name="tee_revocation_network_declined_status">로컬</string>
+    <string name="tee_revocation_network_declined_headline">TEE 폐기 확인은 내장 스냅샷을 사용합니다.</string>
+    <string name="tee_revocation_network_declined_detail">설정에서 다시 활성화할 때까지 Duck Detector는 온라인 CRL 새로고침을 수행하지 않습니다. 내장 폐기 확인은 계속 활성화됩니다.</string>
+    <string name="tee_revocation_network_setting_title">온라인 CRL 새로고침 허용</string>
+    <string name="tee_revocation_network_setting_summary">TEE 폐기 확인은 항상 내장 스냅샷을 사용합니다. 이 설정은 Google 최신 attestation revocation feed 가져오기만 허용합니다.</string>
+    <string name="tee_revocation_network_setting_footer">변경 사항은 온라인 새로고침 동작에 즉시 적용됩니다. 내장 TEE 폐기 확인은 계속 활성화됩니다.</string>
+</resources>

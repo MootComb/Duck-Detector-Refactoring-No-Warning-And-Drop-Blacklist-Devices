@@ -16,4 +16,17 @@ limitations under the License.
 
 <resources>
     <string name="tee_diagnostic_clipboard_label">Діагностичні дані TEE</string>
+    <string name="tee_revocation_network_title">Онлайн-оновлення CRL</string>
+    <string name="tee_revocation_network_prompt_headline">Виберіть, чи можуть перевірки відкликання TEE отримувати онлайн-оновлення.</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector завжди перевіряє вбудований знімок відкликання. Дозвіл на мережу дає змогу отримувати найновіший канал відкликання атестації Google під час валідації TEE.</string>
+    <string name="tee_revocation_network_allow">Дозволити оновлення</string>
+    <string name="tee_revocation_network_decline">Лише вбудований</string>
+    <string name="tee_revocation_network_granted_headline">Онлайн-оновлення CRL дозволено.</string>
+    <string name="tee_revocation_network_granted_detail">Валідація TEE перевіряє вбудований знімок і може оновлювати канал відкликання атестації Google, коли дозволяють умови мережі.</string>
+    <string name="tee_revocation_network_declined_status">Локальний</string>
+    <string name="tee_revocation_network_declined_headline">Перевірки відкликання TEE використовують вбудований знімок.</string>
+    <string name="tee_revocation_network_declined_detail">Duck Detector не виконуватиме онлайн-оновлення CRL, доки ви не ввімкнете його знову в Налаштуваннях. Вбудовані перевірки відкликання залишаються активними.</string>
+    <string name="tee_revocation_network_setting_title">Дозволити онлайн-оновлення CRL</string>
+    <string name="tee_revocation_network_setting_summary">Перевірки відкликання TEE завжди використовують вбудований знімок; цей перемикач лише дозволяє отримувати найновіший канал відкликання атестації Google.</string>
+    <string name="tee_revocation_network_setting_footer">Зміни негайно застосовуються до онлайн-оновлення. Вбудовані перевірки відкликання TEE залишаються ввімкненими.</string>
 </resources>
