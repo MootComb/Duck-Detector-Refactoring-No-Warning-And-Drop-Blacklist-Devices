@@ -64,10 +64,11 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `check-detector-touch-points.py` with `detector-touch-points.json` | Outside `feature/<name>/`, a detector is named only by `DetectorCatalog` and `DetectorFeatures`, which must name every detector, by tooling indexes, and by reviewed exceptions that state a reason | `test-detector-touch-points.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
+| `./gradlew buildHealth` (`DuckDetectorDependencyAnalysisPlugin`) | Every module declares exactly the modules and libraries its code uses: nothing unused, nothing reached only transitively, and `api` only for types in its public API. The plugin records its two reviewed exceptions | Upstream Dependency Analysis Gradle Plugin |
 | `:sdk:aar:verifySdkAar` | The SDK AAR fuses every project module it needs and reaches no UI library, directly or through an external dependency | Runs on the Fused Library report |
 | `DashboardExportGoldenTest` | Export output of every detector stays byte-identical | Golden fixtures in `app/src/test/.../integration/dashboard` |
 
-The CI `contracts` job runs the Python checkers and their self-tests; the `verify` job runs `:build-logic:test`, every module's `unitTest`, `:app:assembleDebug` for all four ABIs and `:app:lintDebug`, which analyses every dependency of `:app`.
+The CI `contracts` job runs the Python checkers and their self-tests. The `verify` job runs `:build-logic:test`, every module's `unitTest`, `:app:assembleDebug` for all four ABIs, `buildHealth`, `:sdk:aar:publish` with `:sdk:aar:verifySdkAar`, the sample application built from the published AAR alone, and `:app:lintDebug`, which analyses every dependency of `:app`.
 
 ## Composition invariants
 

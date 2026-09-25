@@ -139,6 +139,7 @@
 - TEE probe / reducer 改动：相关 unit tests
 - Native / JNI 改动：`python3 .github/scripts/check-jni-contracts.py` + `python3 .github/scripts/check-native-boundaries.py`
 - 模块边界或 build-logic 改动：`./gradlew :build-logic:test`
+- 依赖或模块改动（任何 `build.gradle.kts`、`libs.versions.toml`、新增模块）：`./gradlew buildHealth`，按报告增删依赖或调整 `api` / `implementation`
 - 检查脚本改动：运行对应的 `.github/scripts/test-*.py` 自测
 - 文案或卡片映射改动：对应 mapper / reducer tests
 

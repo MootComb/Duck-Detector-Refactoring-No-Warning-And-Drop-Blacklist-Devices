@@ -33,6 +33,7 @@ class DuckDetectorJvmLibraryConventionPlugin : Plugin<Project> {
             pluginManager.apply("org.jetbrains.kotlin.jvm")
             pluginManager.apply("com.android.lint")
             pluginManager.apply("duckdetector.module-boundaries")
+            pluginManager.apply("com.autonomousapps.dependency-analysis")
 
             extensions.configure<JavaPluginExtension> {
                 sourceCompatibility = JavaVersion.VERSION_17

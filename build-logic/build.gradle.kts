@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.json)
     implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.dependency.analysis.gradle.plugin)
     testImplementation(libs.junit)
 }
 
@@ -62,6 +63,10 @@ gradlePlugin {
         register("duckDetectorAndroidApkArtifacts") {
             id = "duckdetector.android.apk-artifacts"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorApkArtifactsConventionPlugin"
+        }
+        register("duckDetectorDependencyAnalysis") {
+            id = "duckdetector.dependency-analysis"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorDependencyAnalysisPlugin"
         }
         register("duckDetectorSdkDistribution") {
             id = "duckdetector.sdk.distribution"

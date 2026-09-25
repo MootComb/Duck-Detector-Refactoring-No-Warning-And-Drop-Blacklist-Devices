@@ -26,6 +26,7 @@ class DuckDetectorAndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("com.android.library")
             pluginManager.apply("duckdetector.module-boundaries")
+            pluginManager.apply("com.autonomousapps.dependency-analysis")
 
             extensions.configure<LibraryExtension> {
                 configureAndroidCommon(this)

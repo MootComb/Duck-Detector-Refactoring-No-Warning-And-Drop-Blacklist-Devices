@@ -32,6 +32,7 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
         pluginManager.apply("com.android.application")
         pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
         pluginManager.apply("duckdetector.module-boundaries")
+        pluginManager.apply("com.autonomousapps.dependency-analysis")
         registerUnitTestLifecycle("testDebugUnitTest")
 
         val buildHash = providers.environmentVariable("GITHUB_SHA")
@@ -176,6 +177,11 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 )
             }
             tasks.named("preBuild").configure {
+                dependsOn(generateGithubContributorsAsset)
+            }
+            // The asset is written into src/main/assets, so every task that reads the asset sources
+            // outside preBuild, such as dependency analysis, has to run after it too.
+            tasks.named { it.startsWith("explodeAssetSource") }.configureEach {
                 dependsOn(generateGithubContributorsAsset)
             }
             androidComponents.onVariants(androidComponents.selector().all()) { variant ->

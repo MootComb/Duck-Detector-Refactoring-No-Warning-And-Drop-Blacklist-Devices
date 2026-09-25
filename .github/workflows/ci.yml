@@ -74,7 +74,7 @@ jobs:
   verify:
     name: Unit tests, lint, and native build
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -102,6 +102,16 @@ jobs:
             :build-logic:test \
             unitTest \
             :app:assembleDebug
+
+      # buildHealth fails when a module declares a dependency its code does not use, uses one it
+      # only reaches transitively, or exposes one through the wrong configuration. The reviewed
+      # exceptions live in DuckDetectorDependencyAnalysisPlugin.
+      - name: Verify every module declares exactly the dependencies it uses
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace buildHealth
 
       # The UI-free SDK is the second artifact of the same build. Publishing it to the build
       # directory fuses every headless module, and verifySdkAar fails if a project module is left
@@ -142,6 +152,7 @@ jobs:
             **/build/reports/tests/
             app/build/reports/lint-results-debug.html
             app/build/reports/lint-results-debug.txt
+            build/reports/dependency-analysis/
             sdk/aar/build/reports/fused_library_report/
           if-no-files-found: ignore
           retention-days: 7
