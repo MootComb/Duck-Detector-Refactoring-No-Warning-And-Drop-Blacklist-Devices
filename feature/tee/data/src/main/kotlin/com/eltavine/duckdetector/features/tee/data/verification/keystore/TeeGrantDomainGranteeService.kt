@@ -22,6 +22,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.Parcel
 import android.os.Process
+import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
 
 class TeeGrantDomainGranteeService : Service() {
 
@@ -178,12 +179,8 @@ private fun Throwable.rootCauseMessage(): String? = rootCause().message
 private fun Throwable.serviceSpecificErrorCode(): Int? {
     var current: Throwable? = this
     while (current != null) {
-        if (current.javaClass.name == "android.os.ServiceSpecificException") {
-            return runCatching {
-                val field = current.javaClass.getField("errorCode")
-                field.isAccessible = true
-                field.get(current) as? Int
-            }.getOrNull()
+        if (HiddenPlatformFailure.isServiceSpecific(current)) {
+            return HiddenPlatformFailure.serviceSpecificErrorCode(current)
         }
         current = current.cause
     }

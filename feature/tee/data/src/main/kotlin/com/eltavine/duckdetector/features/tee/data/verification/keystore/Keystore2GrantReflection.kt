@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
 import java.lang.reflect.InvocationTargetException
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
@@ -87,11 +88,8 @@ internal object Keystore2GrantReflection {
     }
 
     fun extractServiceSpecificErrorCode(throwable: Throwable): Int? {
-        return findThrowable(throwable) { current ->
-            current.javaClass.name == "android.os.ServiceSpecificException"
-        }?.let { serviceSpecific ->
-            readFieldValue(serviceSpecific, "errorCode") as? Int
-        }
+        return findThrowable(throwable, HiddenPlatformFailure::isServiceSpecific)
+            ?.let(HiddenPlatformFailure::serviceSpecificErrorCode)
     }
 
     fun findThrowable(

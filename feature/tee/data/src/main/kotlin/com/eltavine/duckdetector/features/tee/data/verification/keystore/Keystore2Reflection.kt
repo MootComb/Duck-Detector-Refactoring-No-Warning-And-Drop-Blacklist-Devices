@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 internal fun ensureHiddenApiAccess() {
@@ -94,14 +95,12 @@ internal fun loadClass(className: String): Class<*> {
 }
 
 internal fun isKeystoreServiceSpecificException(throwable: Throwable): Boolean {
-    return findThrowable(throwable) { it.javaClass.name == "android.os.ServiceSpecificException" } != null
+    return findThrowable(throwable, HiddenPlatformFailure::isServiceSpecific) != null
 }
 
 internal fun keystoreServiceSpecificErrorCode(throwable: Throwable): Int? {
-    val serviceSpecific = findThrowable(throwable) {
-        it.javaClass.name == "android.os.ServiceSpecificException"
-    } ?: return null
-    return getFieldValue(serviceSpecific, "errorCode") as? Int
+    val serviceSpecific = findThrowable(throwable, HiddenPlatformFailure::isServiceSpecific) ?: return null
+    return HiddenPlatformFailure.serviceSpecificErrorCode(serviceSpecific)
 }
 
 internal fun describeKeystoreThrowable(throwable: Throwable): String {
