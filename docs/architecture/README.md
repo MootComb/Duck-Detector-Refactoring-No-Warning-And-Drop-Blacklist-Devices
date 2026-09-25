@@ -9,7 +9,8 @@ Duck Detector 使用 ports-and-adapters 边界。Android framework、Binder、Ke
 
 inside one feature unit:     data -> domain
                              presentation -> domain
-                             ui -> presentation + domain
+                             detector -> data + presentation + domain
+                             ui -> detector + presentation + domain
 inside one capability unit:  data -> domain
 
 :core:report, :core:scan -> :core:evidence
@@ -33,6 +34,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:feature:<unit>:domain` | The feature's result and report models and pure judgement rules | Android, JNI, UI, other features |
 | `:feature:<unit>:data` | Probes, repositories, JNI bridges, platform access and the feature's services | Presentation, UI, other features |
 | `:feature:<unit>:presentation` | Card models, report projection (`DetectorReport`) and summary mapping | Android, probes, JNI, other features |
+| `:feature:<unit>:detector` | The detector's one headless object, `<Name>Detector`: binds the data scanner, the domain loading report and the presentation mapping and export; used by the SDK and the ui layer | Compose, probes beyond creating the scanner, other features |
 | `:feature:<unit>:ui` | Compose card, view model, the `DetectorFeature` implementation and dialogs | Probes, JNI, other features' models |
 | `:feature:dashboard:*` | Card ordering, overview, findings and export rendering over `DetectorSession` lists | Any specific detector |
 | `:feature:settings:*`, `:feature:update:*`, `:feature:deviceinfo:*` | Supporting features with the same layering | Detector internals |
