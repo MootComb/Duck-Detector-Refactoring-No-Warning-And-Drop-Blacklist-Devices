@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.security.UnrecoverableKeyException
 
 internal class GrantDetectionDiagnosticLog(
@@ -47,7 +48,7 @@ internal class GrantDetectionDiagnosticLog(
 
 internal object GrantThrowableFormatter {
     fun describe(throwable: Throwable): String {
-        val type = throwable.javaClass.simpleName.ifBlank { throwable.javaClass.name }
+        val type = PlatformFailureName.of(throwable)
         val message = throwable.message?.takeIf { it.isNotBlank() }
         return if (message == null) type else "$type: $message"
     }

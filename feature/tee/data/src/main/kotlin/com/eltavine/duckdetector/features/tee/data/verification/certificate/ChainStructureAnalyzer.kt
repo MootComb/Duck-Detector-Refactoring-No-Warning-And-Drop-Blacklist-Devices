@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.certificate
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.security.cert.X509Certificate
 
 class ChainStructureAnalyzer {
@@ -33,7 +34,7 @@ class ChainStructureAnalyzer {
         }
         val expiredCertificates = chain.mapIndexedNotNull { index, cert ->
             runCatching { cert.checkValidity() }.exceptionOrNull()?.let { throwable ->
-                "Cert ${index + 1}: ${throwable.javaClass.simpleName}"
+                "Cert ${index + 1}: ${PlatformFailureName.of(throwable)}"
             }
         }
         val attestationIndices =

@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 import android.os.BadParcelableException
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.security.KeyStore
 
 class ListEntriesConsistencyProbe {
@@ -61,7 +62,7 @@ class ListEntriesConsistencyProbe {
                 badParcelableLikeCrash = badParcelableLikeCrash,
                 inconsistent = badParcelableLikeCrash,
                 detail = if (badParcelableLikeCrash) {
-                    "aliases() crashed with a BadParcelable-style failure: ${throwable.message ?: throwable.javaClass.simpleName}"
+                    "aliases() crashed with a BadParcelable-style failure: ${throwable.message ?: PlatformFailureName.of(throwable)}"
                 } else {
                     throwable.message ?: "listEntries consistency probe could not complete."
                 },

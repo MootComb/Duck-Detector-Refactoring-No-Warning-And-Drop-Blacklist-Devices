@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.util.Locale
 
 internal object GenerateKeyParcelDiagnosticFormatter {
@@ -51,7 +52,7 @@ internal object GenerateKeyParcelDiagnosticFormatter {
                 "  Offset: ${token.range()} | interface descriptor: ${token.value ?: "null"}"
             )
         }.getOrElse { throwable ->
-            appendLine("  [!] Request parse interrupted: ${throwable.message ?: throwable.javaClass.simpleName}")
+            appendLine("  [!] Request parse interrupted: ${throwable.message ?: PlatformFailureName.of(throwable)}")
         }
         appendLine("--- [Request Raw Hex] ---")
         appendLine(rawRequest.toHexDump())

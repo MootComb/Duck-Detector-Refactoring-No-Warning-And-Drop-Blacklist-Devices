@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.io.File
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
@@ -251,7 +252,7 @@ class VintfKeyMintVersionProbe(
     }
 
     private fun describe(throwable: Throwable): String {
-        return "${throwable.javaClass.simpleName}: ${throwable.message ?: "no message"}"
+        return "${PlatformFailureName.of(throwable)}: ${throwable.message ?: "no message"}"
     }
 
     private fun isPotentialKeyMintManifest(path: String, xml: String): Boolean {

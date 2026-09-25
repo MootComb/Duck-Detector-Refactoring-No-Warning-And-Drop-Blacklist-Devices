@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.lang.reflect.InvocationTargetException
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
@@ -77,7 +78,7 @@ internal object Keystore2GrantReflection {
     fun describeThrowable(throwable: Throwable): String {
         val root = findRootCause(throwable)
         val code = extractServiceSpecificErrorCode(throwable)
-        val type = root.javaClass.simpleName.ifBlank { root.javaClass.name }
+        val type = PlatformFailureName.of(root)
         val message = root.message?.takeIf { it.isNotBlank() }
         return when {
             code != null && message != null -> "$type(code $code): $message"

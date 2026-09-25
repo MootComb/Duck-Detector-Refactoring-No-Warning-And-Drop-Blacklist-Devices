@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.soter
 
 import android.content.Context
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.tee.domain.TeeSoterState
 import com.tencent.soter.core.SoterCore
 import com.tencent.soter.core.model.ConstantsSoter
@@ -73,7 +74,7 @@ class SoterCapabilityProbe internal constructor(
             trebleConnected = runCatching { client.isTrebleServiceConnected() }.getOrDefault(false)
             summary = "service nativeSupport=$nativeSupport, coreType=$coreType, trebleConnected=$trebleConnected"
         } catch (throwable: Throwable) {
-            summary = "init failed with ${throwable.javaClass.simpleName}"
+            summary = "init failed with ${PlatformFailureName.of(throwable)}"
         }
 
         try {
@@ -83,7 +84,7 @@ class SoterCapabilityProbe internal constructor(
             val faceEnrolled = client.isSystemHasBiometric(ConstantsSoter.FACEID_AUTH)
             summary += ", biometric fpHw=$fpHw, fpEnrolled=$fpEnrolled, faceHw=$faceHw, faceEnrolled=$faceEnrolled"
         } catch (throwable: Throwable) {
-            summary += ", biometric=${throwable.javaClass.simpleName}"
+            summary += ", biometric=${PlatformFailureName.of(throwable)}"
         }
 
         if (nativeSupport && trebleConnected) {
@@ -93,7 +94,7 @@ class SoterCapabilityProbe internal constructor(
                 keyPrepareOk = prepareState.keyPrepareOk
                 summary += ", keyPrep ask=${prepareState.askOk}, askModel=${prepareState.askModelPresent}, auth=${prepareState.authOk}, hasAuth=${prepareState.authPresent}, authModel=${prepareState.authModelPresent}, retries=${prepareState.retryCount}, finalErr=${prepareState.finalErrCode}"
             } catch (throwable: Throwable) {
-                summary += ", keyPrep=${throwable.javaClass.simpleName}"
+                summary += ", keyPrep=${PlatformFailureName.of(throwable)}"
             }
         } else {
             summary += ", keyPrep=skipped"
@@ -108,7 +109,7 @@ class SoterCapabilityProbe internal constructor(
                 val sessionId = sessionResult?.session ?: -1L
                 summary += ", signing resultCode=${sessionResult?.resultCode ?: -1}, session=$sessionId"
             } catch (throwable: Throwable) {
-                summary += ", signing=${throwable.javaClass.simpleName}"
+                summary += ", signing=${PlatformFailureName.of(throwable)}"
             }
         } else {
             summary += ", signing=skipped"

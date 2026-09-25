@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
+
 data class GenerateKeyReplyParcelParseResult(
     val parseSucceeded: Boolean,
     val authorizationCount: Int?,
@@ -105,7 +107,7 @@ class GenerateKeyReplyParcelParser {
             failure(
                 rawReply = rawReply,
                 rawPrefix = resolvedRawPrefix,
-                reason = throwable.message ?: throwable.javaClass.simpleName,
+                reason = throwable.message ?: PlatformFailureName.of(throwable),
             )
         }
     }

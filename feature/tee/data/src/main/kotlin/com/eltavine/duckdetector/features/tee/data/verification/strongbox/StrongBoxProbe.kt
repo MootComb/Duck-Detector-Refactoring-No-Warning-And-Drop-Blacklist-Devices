@@ -24,6 +24,7 @@ import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
 import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.isInsideSecureHardwareCompat
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.keyInfoSecurityLevelLabel
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
@@ -343,11 +344,7 @@ class StrongBoxBehaviorProbeSuite(
     /**
      * Names a throwable for the exported report without claiming what it implies about StrongBox.
      */
-    private fun describeFailure(failure: Throwable): String {
-        val type = failure::class.java.simpleName
-        val message = failure.message?.takeIf(String::isNotBlank)
-        return if (message == null) type else "$type: $message"
-    }
+    private fun describeFailure(failure: Throwable): String = PlatformFailureName.describe(failure)
 
     private data class KeyInfoResult(
         val keyInfoLevel: String? = null,

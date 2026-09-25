@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
+
 fun interface VendorApiLevelReader {
     fun read(): VendorApiLevelResult
 }
@@ -85,7 +87,7 @@ internal class ReflectionVendorApiLevelReader : VendorApiLevelReader {
         }.getOrElse { throwable ->
             VendorApiLevelResult(
                 level = null,
-                detail = "SystemProperties unavailable: ${throwable.javaClass.simpleName}: " +
+                detail = "SystemProperties unavailable: ${PlatformFailureName.of(throwable)}: " +
                     (throwable.message ?: "no message"),
             )
         }

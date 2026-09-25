@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.content.Context
 import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.lang.reflect.InvocationTargetException
 import java.security.MessageDigest
 import org.lsposed.hiddenapibypass.HiddenApiBypass
@@ -137,7 +138,7 @@ class SupplementaryAttestationInfoProbe(
 
     private fun describe(throwable: Throwable): String {
         val cause = (throwable as? InvocationTargetException)?.cause ?: throwable
-        return "${cause.javaClass.simpleName}: ${cause.message ?: "no message"}"
+        return "${PlatformFailureName.of(cause)}: ${cause.message ?: "no message"}"
     }
 
     private fun ByteArray.sha256Hex(): String {

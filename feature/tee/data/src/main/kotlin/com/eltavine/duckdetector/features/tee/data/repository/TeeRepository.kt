@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.tee.data.repository
 import android.content.Context
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.tee.data.native.TeeNativeBridge
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefsStore
@@ -174,7 +175,7 @@ class TeeRepository(
                 }.getOrElse {
                     Keystore2PostProcessingResult(
                         probeRan = false,
-                        detail = "Keystore2 post-processing probe failed to start: ${it.message ?: it::class.java.simpleName}",
+                        detail = "Keystore2 post-processing probe failed to start: ${it.message ?: PlatformFailureName.of(it)}",
                     )
                 }
             } else {

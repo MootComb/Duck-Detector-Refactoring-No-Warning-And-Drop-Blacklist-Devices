@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 internal fun ensureHiddenApiAccess() {
@@ -107,10 +108,11 @@ internal fun describeKeystoreThrowable(throwable: Throwable): String {
     val root = findRootCause(throwable)
     val serviceSpecificCode = keystoreServiceSpecificErrorCode(throwable)
     val detail = root.message?.takeIf { it.isNotBlank() }
+    val type = PlatformFailureName.of(root)
     return when {
-        serviceSpecificCode != null && detail != null -> "${root.javaClass.simpleName}(code $serviceSpecificCode): $detail"
-        serviceSpecificCode != null -> "${root.javaClass.simpleName}(code $serviceSpecificCode)"
-        detail != null -> "${root.javaClass.simpleName}: $detail"
-        else -> root.javaClass.simpleName
+        serviceSpecificCode != null && detail != null -> "$type(code $serviceSpecificCode): $detail"
+        serviceSpecificCode != null -> "$type(code $serviceSpecificCode)"
+        detail != null -> "$type: $detail"
+        else -> type
     }
 }
