@@ -23,7 +23,6 @@ target to pad or compress towards.
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
 
@@ -53,37 +52,12 @@ def iter_source_files(repo_root: str):
                 yield os.path.relpath(path, repo_root).replace(os.sep, "/"), path
 
 
-def load_baseline(path: str | None) -> dict[str, int]:
-    if path is None or not os.path.exists(path):
-        return {}
-    with open(path, encoding="utf-8") as handle:
-        document = json.load(handle)
-    if set(document) != {"schema_version", "files"} or document["schema_version"] != 1:
-        raise ValueError(f"unsupported source length baseline: {path}")
-    files = document["files"]
-    if not isinstance(files, dict) or not all(
-        isinstance(key, str) and isinstance(value, int) and value >= LINE_LIMIT for key, value in files.items()
-    ):
-        raise ValueError(f"malformed source length baseline: {path}")
-    return files
-
-
-def check(repo_root: str, baseline: dict[str, int]) -> list[str]:
+def check(repo_root: str) -> list[str]:
     errors = []
-    seen = set()
     for relative, path in iter_source_files(repo_root):
         lines = count_lines(path)
-        ceiling = baseline.get(relative)
-        if ceiling is not None:
-            seen.add(relative)
-            if lines < LINE_LIMIT:
-                errors.append(f"{relative} now has {lines} lines; remove it from the migration baseline")
-            elif lines > ceiling:
-                errors.append(f"{relative} grew from {ceiling} to {lines} lines while baselined")
-        elif lines >= LINE_LIMIT:
+        if lines >= LINE_LIMIT:
             errors.append(f"{relative} has {lines} lines; split it below {LINE_LIMIT} along semantic ownership")
-    for relative in sorted(set(baseline) - seen):
-        errors.append(f"{relative} is baselined but no longer exists; remove it from the migration baseline")
     return errors
 
 
@@ -91,30 +65,13 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     default_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     parser.add_argument("--repo-root", default=default_root)
-    parser.add_argument(
-        "--baseline",
-        default=None,
-        help="shrink-only list of files that predate the limit (defaults to the repository policy)",
-    )
     arguments = parser.parse_args(argv)
-    repo_root = os.path.abspath(arguments.repo_root)
-    baseline_path = arguments.baseline or os.path.join(
-        repo_root, ".github", "policies", "source-file-length-baseline.json"
-    )
-    try:
-        baseline = load_baseline(baseline_path)
-    except (ValueError, json.JSONDecodeError) as error:
-        print(f"source length check failed: {error}", file=sys.stderr)
-        return 2
-    errors = check(repo_root, baseline)
+    errors = check(os.path.abspath(arguments.repo_root))
     if errors:
         for error in errors:
             print(f"source length violation: {error}", file=sys.stderr)
         return 1
-    if baseline:
-        print(f"No new source file reaches {LINE_LIMIT} lines; {len(baseline)} legacy files remain baselined.")
-    else:
-        print(f"Every source file is below {LINE_LIMIT} lines.")
+    print(f"Every source file is below {LINE_LIMIT} lines.")
     return 0
 
 

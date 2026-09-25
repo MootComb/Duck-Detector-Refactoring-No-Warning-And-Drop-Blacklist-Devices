@@ -32,7 +32,6 @@ class SourceFileLengthCheckerTest(unittest.TestCase):
     def setUp(self) -> None:
         self._directory = tempfile.TemporaryDirectory()
         self.root = self._directory.name
-        self.baseline = os.path.join(self.root, "baseline.json")
 
     def tearDown(self) -> None:
         self._directory.cleanup()
@@ -44,13 +43,9 @@ class SourceFileLengthCheckerTest(unittest.TestCase):
         with open(path, "w", encoding="utf-8") as handle:
             handle.write(body + ("\n" if trailing_newline and count else ""))
 
-    def write_baseline(self, files: dict[str, int]) -> None:
-        with open(self.baseline, "w", encoding="utf-8") as handle:
-            json.dump({"schema_version": 1, "files": files}, handle)
-
     def run_checker(self) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, CHECKER, "--repo-root", self.root, "--baseline", self.baseline],
+            [sys.executable, CHECKER, "--repo-root", self.root],
             capture_output=True,
             text=True,
             check=False,
@@ -90,32 +85,21 @@ class SourceFileLengthCheckerTest(unittest.TestCase):
         result = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_baseline_tolerates_existing_file_that_does_not_grow(self) -> None:
+    def test_reports_every_violation(self) -> None:
+        self.write_lines("feature/a/src/main/kotlin/A.kt", LIMIT)
+        self.write_lines("feature/b/src/main/kotlin/B.kt", LIMIT + 50)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("A.kt has 600 lines", result.stderr)
+        self.assertIn("B.kt has 650 lines", result.stderr)
+
+    def test_a_leftover_baseline_file_grants_no_exemption(self) -> None:
         self.write_lines("app/src/main/java/Legacy.kt", 700)
-        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
-        result = self.run_checker()
-        self.assertEqual(result.returncode, 0, result.stderr)
-
-    def test_baseline_rejects_growth(self) -> None:
-        self.write_lines("app/src/main/java/Legacy.kt", 701)
-        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
-        self.assert_rejected("grew from 700 to 701 lines")
-
-    def test_baseline_must_shrink_once_file_complies(self) -> None:
-        self.write_lines("app/src/main/java/Legacy.kt", 200)
-        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
-        self.assert_rejected("remove it from the migration baseline")
-
-    def test_baseline_rejects_stale_entries(self) -> None:
-        self.write_baseline({"app/src/main/java/Deleted.kt": 700})
-        self.assert_rejected("no longer exists")
-
-    def test_rejects_malformed_baseline(self) -> None:
-        self.write_lines("app/src/main/java/Small.kt", 10)
-        self.write_baseline({"app/src/main/java/Small.kt": 10})
-        result = self.run_checker()
-        self.assertEqual(result.returncode, 2)
-        self.assertIn("malformed", result.stderr)
+        policy = os.path.join(self.root, ".github", "policies", "source-file-length-baseline.json")
+        os.makedirs(os.path.dirname(policy))
+        with open(policy, "w", encoding="utf-8") as handle:
+            json.dump({"schema_version": 1, "files": {"app/src/main/java/Legacy.kt": 700}}, handle)
+        self.assert_rejected("Legacy.kt has 700 lines")
 
 
 if __name__ == "__main__":
