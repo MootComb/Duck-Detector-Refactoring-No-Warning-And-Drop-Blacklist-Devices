@@ -41,7 +41,7 @@ internal fun buildVerdict(report: NativeRootReport): String {
         NativeRootStage.LOADING -> "Scanning kernel-root indicators"
         NativeRootStage.FAILED -> "Native Root scan failed"
         NativeRootStage.READY -> when {
-            report.tempRootCveExploitDetected -> "Temp root exploit (CVE-2026-43499) detected"
+            report.tempRootCveExploitDetected -> "CVE-2026-43499 temp root tooling found"
             report.tempRootDetected -> "Temp root artifacts detected in /data/local/tmp"
             report.kernelSuDetected && report.aPatchDetected -> "KernelSU and APatch indicators detected"
             report.selfSuDomain -> "Current app already runs in KernelSU su domain"

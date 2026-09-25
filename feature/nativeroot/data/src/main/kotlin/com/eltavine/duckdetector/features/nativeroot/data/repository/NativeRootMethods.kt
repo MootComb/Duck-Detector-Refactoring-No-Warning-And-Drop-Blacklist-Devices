@@ -424,7 +424,7 @@ internal fun buildMethods(
                 tempRootArtifactResult.available -> NativeRootMethodOutcome.CLEAN
                 else -> NativeRootMethodOutcome.SUPPORT
             },
-            detail = "Scans /data/local/tmp for temp root exploit artifacts (ksud, temp_su, ksu-helper, ksu-payload, libcve43499root.so). Files matching CVE-2026-43499 pattern indicate an active temporary root escalation.",
+            detail = "Scans /data/local/tmp for temp root exploit artifacts (ksud, temp_su, ksu-helper, ksu-payload, libcve43499root.so). Files matching the CVE-2026-43499 tooling show it was staged on this device; they do not show whether an escalation succeeded or is still active. Paths this process cannot stat leave the check unavailable.",
         ),
         NativeRootMethodResult(
             label = "nativeLibrary",

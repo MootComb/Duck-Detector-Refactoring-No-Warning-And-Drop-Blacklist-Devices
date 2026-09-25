@@ -27,6 +27,39 @@ class TempRootArtifactProbeTest {
     private val probe = TempRootArtifactProbe()
 
     @Test
+    fun `known paths that could not be stat-ed leave the fallback unavailable`() {
+        val result = TempRootArtifactProbe { path ->
+            if (path.endsWith("/ksud")) ArtifactPathState.NOT_OBSERVABLE else ArtifactPathState.ABSENT
+        }.probeKnownFiles()
+
+        assertFalse(result.available)
+        assertFalse(result.tempRootDetected)
+        assertTrue(result.detail, result.detail.startsWith("1 of "))
+    }
+
+    @Test
+    fun `known paths that are all absent keep the fallback clean`() {
+        val result = TempRootArtifactProbe { ArtifactPathState.ABSENT }.probeKnownFiles()
+
+        assertTrue(result.available)
+        assertFalse(result.tempRootDetected)
+    }
+
+    @Test
+    fun `a staged CVE library is found even when other paths are not observable`() {
+        val result = TempRootArtifactProbe { path ->
+            when {
+                path.endsWith("/libcve43499root.so") -> ArtifactPathState.PRESENT
+                path.endsWith("/ksud") -> ArtifactPathState.NOT_OBSERVABLE
+                else -> ArtifactPathState.ABSENT
+            }
+        }.probeKnownFiles()
+
+        assertTrue(result.cveExploitDetected)
+        assertTrue(result.findings.single().detail.contains("was staged"))
+    }
+
+    @Test
     fun `empty directory returns clean result`() {
         val result = probe.evaluate(emptyList())
 

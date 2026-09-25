@@ -16,6 +16,9 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
+import android.system.ErrnoException
+import android.system.Os
+import android.system.OsConstants
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
@@ -47,10 +50,18 @@ data class TempRootArtifactProbeResult(
  * 1. Try File.listFiles() (works on permissive SELinux or if app has shell GID).
  * 2. Try "ls /data/local/tmp" via ProcessBuilder (works if the app can exec ls with
  *    inherited permissions).
- * 3. Fall back to probing known artifact filenames via File.exists(), which succeeds
- *    because the directory has execute (traverse) permission for others.
+ * 3. Fall back to stat on known artifact filenames. AOSP grants untrusted apps getattr on
+ *    shell_data_file (system/sepolicy untrusted_app_all.te) and the directory lets others
+ *    traverse it, but a policy that denies the stat must not read as an absent file.
+ *
+ * The CVE-2026-43499 names are those public temp-root tools stage here. A staged file shows the
+ * tooling was placed on the device, not that an escalation succeeded or is still active.
  */
-class TempRootArtifactProbe {
+class TempRootArtifactProbe internal constructor(
+    private val pathState: (String) -> ArtifactPathState,
+) {
+
+    constructor() : this(::statArtifactPath)
 
     fun run(): TempRootArtifactProbeResult {
         val tmpDir = File(TMP_PATH)
@@ -99,7 +110,7 @@ class TempRootArtifactProbe {
                     id = "temp_root_cve_${findings.size}",
                     label = "Temp root CVE exploit artifact",
                     value = name,
-                    detail = "File \"$name\" in $TMP_PATH matches CVE-2026-43499 temp root exploit pattern. This indicates an active or recent temporary root escalation.",
+                    detail = "File \"$name\" in $TMP_PATH matches the CVE-2026-43499 temp root tooling, so that tooling was staged on this device.",
                     group = NativeRootGroup.PATH,
                     severity = NativeRootFindingSeverity.DANGER,
                     detailMonospace = true,
@@ -133,21 +144,21 @@ class TempRootArtifactProbe {
         )
     }
 
-    /**
-     * Probes known artifact filenames individually via File.exists().
-     * This works on directories with execute-only (traverse) permission for others,
-     * where listing is denied but stat on known paths succeeds.
-     */
-    private fun probeKnownFiles(): TempRootArtifactProbeResult {
-        val foundNames = mutableListOf<String>()
-        KNOWN_PROBE_FILENAMES.forEach { filename ->
-            try {
-                if (File(TMP_PATH, filename).exists()) {
-                    foundNames += filename
-                }
-            } catch (_: SecurityException) {
-                // SELinux or other MAC may block stat; skip this entry
-            }
+    /** Stats known artifact filenames when the directory itself cannot be listed. */
+    internal fun probeKnownFiles(): TempRootArtifactProbeResult {
+        val states = KNOWN_PROBE_FILENAMES.associateWith { filename -> pathState("$TMP_PATH/$filename") }
+        val foundNames = states.filterValues { it == ArtifactPathState.PRESENT }.keys.toList()
+        val unobservable = states.count { it.value == ArtifactPathState.NOT_OBSERVABLE }
+
+        if (foundNames.isEmpty() && unobservable > 0) {
+            return TempRootArtifactProbeResult(
+                available = false,
+                checkedCount = KNOWN_PROBE_FILENAMES.size - unobservable,
+                findings = emptyList(),
+                tempRootDetected = false,
+                cveExploitDetected = false,
+                detail = "$unobservable of ${KNOWN_PROBE_FILENAMES.size} known paths in $TMP_PATH could not be checked, so their absence is not established.",
+            )
         }
 
         if (foundNames.isEmpty()) {
@@ -243,4 +254,14 @@ class TempRootArtifactProbe {
             "cve-2026-43499.sh",
         )
     }
+}
+
+internal enum class ArtifactPathState { PRESENT, ABSENT, NOT_OBSERVABLE }
+
+// Only ENOENT shows a name is absent; any other error means this process could not look.
+private fun statArtifactPath(path: String): ArtifactPathState = try {
+    Os.stat(path)
+    ArtifactPathState.PRESENT
+} catch (error: ErrnoException) {
+    if (error.errno == OsConstants.ENOENT) ArtifactPathState.ABSENT else ArtifactPathState.NOT_OBSERVABLE
 }
