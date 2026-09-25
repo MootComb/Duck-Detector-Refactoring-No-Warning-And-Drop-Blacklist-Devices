@@ -39,6 +39,7 @@ import com.eltavine.duckdetector.features.su.ui.SuDetectorFeature
 import com.eltavine.duckdetector.features.systemproperties.data.repository.SystemPropertiesRepository
 import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDetectorFeature
 import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
+import com.eltavine.duckdetector.features.virtualization.data.repository.VirtualizationRepository
 import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
 import com.eltavine.duckdetector.features.zygisk.data.repository.ZygiskRepository
 import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
@@ -63,7 +64,7 @@ internal object DetectorFeatures {
     val selinux: DetectorFeature = SelinuxDetectorFeature
     val su: DetectorFeature = SuDetectorFeature { SuRepository() }
     val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature { SystemPropertiesRepository() }
-    val virtualization: DetectorFeature = VirtualizationDetectorFeature
+    val virtualization: DetectorFeature = VirtualizationDetectorFeature { context -> VirtualizationRepository(context) }
     val zygisk: DetectorFeature = ZygiskDetectorFeature { context -> ZygiskRepository(context) }
     val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature
 }

@@ -54,6 +54,8 @@ dependencies {
     implementation(project(":feature:dangerousapps:ui"))
     implementation(project(":feature:systemproperties:data"))
     implementation(project(":feature:systemproperties:ui"))
+    implementation(project(":feature:virtualization:data"))
+    implementation(project(":feature:virtualization:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

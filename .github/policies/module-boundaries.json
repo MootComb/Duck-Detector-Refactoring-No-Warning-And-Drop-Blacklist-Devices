@@ -102,6 +102,10 @@
         ":feature:systemproperties:domain",
         ":feature:systemproperties:presentation",
         ":feature:systemproperties:ui",
+        ":feature:virtualization:data",
+        ":feature:virtualization:domain",
+        ":feature:virtualization:presentation",
+        ":feature:virtualization:ui",
         ":feature:zygisk:data",
         ":feature:zygisk:domain",
         ":feature:zygisk:presentation",
@@ -407,6 +411,44 @@
         ":core:ui",
         ":feature:systemproperties:domain",
         ":feature:systemproperties:presentation"
+      ]
+    },
+    ":feature:virtualization:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:earlypreload:data",
+        ":capability:helperprocess:data",
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
+        ":feature:virtualization:domain"
+      ]
+    },
+    ":feature:virtualization:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:domain"
+      ]
+    },
+    ":feature:virtualization:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:domain",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:virtualization:domain"
+      ]
+    },
+    ":feature:virtualization:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:virtualization:domain",
+        ":feature:virtualization:presentation"
       ]
     },
     ":feature:zygisk:data": {
