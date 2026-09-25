@@ -13,7 +13,6 @@
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateGrantClient.kt": 817,
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/TimingSideChannelProbe.kt": 603,
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/VintfKeyMintVersionProbe.kt": 630,
-    "feature/tee/data/src/test/kotlin/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducerTest.kt": 2631,
     "feature/tee/presentation/src/test/kotlin/com/eltavine/duckdetector/features/tee/presentation/TeeCardModelMapperTest.kt": 874
   }
 }
