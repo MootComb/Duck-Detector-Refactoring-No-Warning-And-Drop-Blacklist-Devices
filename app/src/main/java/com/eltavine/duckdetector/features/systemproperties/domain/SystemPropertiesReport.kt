@@ -22,52 +22,12 @@ enum class SystemPropertiesStage {
     FAILED,
 }
 
-enum class SystemPropertySeverity {
-    SAFE,
-    WARNING,
-    DANGER,
-    NEUTRAL,
-}
-
-enum class SystemPropertyCategory {
-    SECURITY_CORE,
-    VERIFIED_BOOT,
-    PARTITION_VERITY,
-    BUILD_PROFILE,
-    ROOT_RUNTIME,
-    CUSTOM_ROM,
-    DEVICE_INFO,
-    BUILD_FINGERPRINT,
-    SOURCE_CONSISTENCY,
-    PROPERTY_CONSISTENCY,
-}
-
-enum class SystemPropertySource {
-    REFLECTION,
-    GETPROP,
-    JVM,
-    BUILD,
-    NATIVE_LIBC,
-    CMDLINE,
-    BOOTCONFIG,
-}
-
 enum class SystemPropertiesMethodOutcome {
     CLEAN,
     WARNING,
     DANGER,
     SUPPORT,
 }
-
-data class SystemPropertySignal(
-    val property: String,
-    val description: String,
-    val value: String,
-    val category: SystemPropertyCategory,
-    val severity: SystemPropertySeverity,
-    val source: SystemPropertySource,
-    val detail: String? = null,
-)
 
 data class SystemPropertiesMethodResult(
     val label: String,

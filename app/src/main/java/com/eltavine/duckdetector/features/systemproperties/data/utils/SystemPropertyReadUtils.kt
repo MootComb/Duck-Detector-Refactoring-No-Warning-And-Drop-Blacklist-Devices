@@ -22,14 +22,6 @@ import com.eltavine.duckdetector.features.systemproperties.domain.SystemProperty
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
 import java.util.concurrent.TimeUnit
 
-data class MultiSourcePropertyRead(
-    val property: String,
-    val category: SystemPropertyCategory,
-    val preferredValue: String,
-    val preferredSource: SystemPropertySource,
-    val sourceValues: Map<SystemPropertySource, String>,
-)
-
 class SystemPropertyReadUtils(
     private val nativeBridge: SystemPropertiesNativeBridge = SystemPropertiesNativeBridge(),
 ) {
