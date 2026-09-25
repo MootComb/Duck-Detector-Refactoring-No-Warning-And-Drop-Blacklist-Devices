@@ -20,4 +20,5 @@ plugins {
 
 dependencies {
     api(project(":capability:attestation:domain"))
+    api(project(":core:evidence"))
 }
