@@ -1,0 +1,68 @@
+public final class com.eltavine.duckdetector.core.evidence.DetectionSeverity extends java.lang.Enum<com.eltavine.duckdetector.core.evidence.DetectionSeverity> {
+  public static final com.eltavine.duckdetector.core.evidence.DetectionSeverity INFO;
+  public static final com.eltavine.duckdetector.core.evidence.DetectionSeverity ALL_CLEAR;
+  public static final com.eltavine.duckdetector.core.evidence.DetectionSeverity WARNING;
+  public static final com.eltavine.duckdetector.core.evidence.DetectionSeverity DANGER;
+  public static com.eltavine.duckdetector.core.evidence.DetectionSeverity[] values();
+  public static com.eltavine.duckdetector.core.evidence.DetectionSeverity valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<com.eltavine.duckdetector.core.evidence.DetectionSeverity> getEntries();
+}
+
+public final class com.eltavine.duckdetector.core.evidence.DetectorId {
+  public final java.lang.String getValue();
+  public static java.lang.String toString-impl(java.lang.String);
+  public java.lang.String toString();
+  public static int hashCode-impl(java.lang.String);
+  public int hashCode();
+  public static boolean equals-impl(java.lang.String, java.lang.Object);
+  public boolean equals(java.lang.Object);
+  public static java.lang.String constructor-impl(java.lang.String);
+  public static final com.eltavine.duckdetector.core.evidence.DetectorId box-impl(java.lang.String);
+  public final java.lang.String unbox-impl();
+  public static final boolean equals-impl0(java.lang.String, java.lang.String);
+  public static final kotlin.text.Regex access$getFORMAT$cp();
+}
+
+public final class com.eltavine.duckdetector.core.evidence.DetectorStatus {
+  public static final com.eltavine.duckdetector.core.evidence.DetectorStatus$Companion Companion;
+  public com.eltavine.duckdetector.core.evidence.DetectorStatus(com.eltavine.duckdetector.core.evidence.DetectionSeverity, com.eltavine.duckdetector.core.evidence.InfoKind);
+  public com.eltavine.duckdetector.core.evidence.DetectorStatus(com.eltavine.duckdetector.core.evidence.DetectionSeverity, com.eltavine.duckdetector.core.evidence.InfoKind, int, kotlin.jvm.internal.DefaultConstructorMarker);
+  public final com.eltavine.duckdetector.core.evidence.DetectionSeverity getSeverity();
+  public final com.eltavine.duckdetector.core.evidence.InfoKind getInfoKind();
+  public final com.eltavine.duckdetector.core.evidence.DetectionSeverity component1();
+  public final com.eltavine.duckdetector.core.evidence.InfoKind component2();
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus copy(com.eltavine.duckdetector.core.evidence.DetectionSeverity, com.eltavine.duckdetector.core.evidence.InfoKind);
+  public static com.eltavine.duckdetector.core.evidence.DetectorStatus copy$default(com.eltavine.duckdetector.core.evidence.DetectorStatus, com.eltavine.duckdetector.core.evidence.DetectionSeverity, com.eltavine.duckdetector.core.evidence.InfoKind, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.evidence.DetectorStatus$Companion {
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus info(com.eltavine.duckdetector.core.evidence.InfoKind);
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus allClear();
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus warning();
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus danger();
+  public com.eltavine.duckdetector.core.evidence.DetectorStatus$Companion(kotlin.jvm.internal.DefaultConstructorMarker);
+}
+
+public final class com.eltavine.duckdetector.core.evidence.FailureName {
+  public static final com.eltavine.duckdetector.core.evidence.FailureName INSTANCE;
+  public final java.lang.String of(java.lang.Throwable);
+  public final java.lang.String describe(java.lang.Throwable);
+  public final java.lang.String messageOrName(java.lang.Throwable);
+  public final java.lang.String describe(java.lang.Throwable, java.lang.String);
+  public final java.lang.String messageOrName(java.lang.Throwable, java.lang.String);
+}
+
+public final class com.eltavine.duckdetector.core.evidence.InfoKind extends java.lang.Enum<com.eltavine.duckdetector.core.evidence.InfoKind> {
+  public static final com.eltavine.duckdetector.core.evidence.InfoKind ERROR;
+  public static final com.eltavine.duckdetector.core.evidence.InfoKind SUPPORT;
+  public static com.eltavine.duckdetector.core.evidence.InfoKind[] values();
+  public static com.eltavine.duckdetector.core.evidence.InfoKind valueOf(java.lang.String);
+  public static kotlin.enums.EnumEntries<com.eltavine.duckdetector.core.evidence.InfoKind> getEntries();
+}
+
+public interface com.eltavine.duckdetector.core.evidence.NamedFailure {
+  public abstract java.lang.String getFailureName();
+}

@@ -1,0 +1,150 @@
+public interface com.eltavine.duckdetector.core.report.DetectorHeadline {
+  public abstract java.lang.String getTitle();
+  public abstract com.eltavine.duckdetector.core.evidence.DetectorStatus getStatus();
+  public abstract java.lang.String getVerdict();
+  public abstract java.lang.String getSummary();
+  public default java.lang.String getFindingDetail();
+  public static java.lang.String access$getFindingDetail$jd(com.eltavine.duckdetector.core.report.DetectorHeadline);
+}
+
+public final class com.eltavine.duckdetector.core.report.DetectorHeadline$DefaultImpls {
+  public static java.lang.String getFindingDetail(com.eltavine.duckdetector.core.report.DetectorHeadline);
+}
+
+public final class com.eltavine.duckdetector.core.report.DetectorReport {
+  public com.eltavine.duckdetector.core.report.DetectorReport(java.lang.String, java.lang.String, com.eltavine.duckdetector.core.evidence.DetectionSeverity, java.util.List<com.eltavine.duckdetector.core.report.ReportFact>, java.util.List<? extends com.eltavine.duckdetector.core.report.ReportBlock>);
+  public final java.lang.String getTitle();
+  public final java.lang.String getVerdict();
+  public final com.eltavine.duckdetector.core.evidence.DetectionSeverity getSeverity();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportFact> getQuickFacts();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportBlock> getBlocks();
+  public final java.lang.String component1();
+  public final java.lang.String component2();
+  public final com.eltavine.duckdetector.core.evidence.DetectionSeverity component3();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportFact> component4();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportBlock> component5();
+  public final com.eltavine.duckdetector.core.report.DetectorReport copy(java.lang.String, java.lang.String, com.eltavine.duckdetector.core.evidence.DetectionSeverity, java.util.List<com.eltavine.duckdetector.core.report.ReportFact>, java.util.List<? extends com.eltavine.duckdetector.core.report.ReportBlock>);
+  public static com.eltavine.duckdetector.core.report.DetectorReport copy$default(com.eltavine.duckdetector.core.report.DetectorReport, java.lang.String, java.lang.String, com.eltavine.duckdetector.core.evidence.DetectionSeverity, java.util.List, java.util.List, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.DetectorResult {
+  public final java.lang.String getId-YyyATdw();
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus getStatus();
+  public final com.eltavine.duckdetector.core.report.DetectorReport getReport();
+  public final java.lang.String component1-YyyATdw();
+  public final com.eltavine.duckdetector.core.evidence.DetectorStatus component2();
+  public final com.eltavine.duckdetector.core.report.DetectorReport component3();
+  public final com.eltavine.duckdetector.core.report.DetectorResult copy-__0-aTQ(java.lang.String, com.eltavine.duckdetector.core.evidence.DetectorStatus, com.eltavine.duckdetector.core.report.DetectorReport);
+  public static com.eltavine.duckdetector.core.report.DetectorResult copy-__0-aTQ$default(com.eltavine.duckdetector.core.report.DetectorResult, java.lang.String, com.eltavine.duckdetector.core.evidence.DetectorStatus, com.eltavine.duckdetector.core.report.DetectorReport, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+  public com.eltavine.duckdetector.core.report.DetectorResult(java.lang.String, com.eltavine.duckdetector.core.evidence.DetectorStatus, com.eltavine.duckdetector.core.report.DetectorReport, kotlin.jvm.internal.DefaultConstructorMarker);
+}
+
+public final class com.eltavine.duckdetector.core.report.DeviceReport {
+  public com.eltavine.duckdetector.core.report.DeviceReport(com.eltavine.duckdetector.core.report.ReportDeviceIdentity, java.util.List<com.eltavine.duckdetector.core.report.ReportFact>, java.util.List<com.eltavine.duckdetector.core.report.ReportBlock$Verbatim>);
+  public final com.eltavine.duckdetector.core.report.ReportDeviceIdentity getIdentity();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportFact> getQuickFacts();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportBlock$Verbatim> getSections();
+  public final com.eltavine.duckdetector.core.report.ReportDeviceIdentity component1();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportFact> component2();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportBlock$Verbatim> component3();
+  public final com.eltavine.duckdetector.core.report.DeviceReport copy(com.eltavine.duckdetector.core.report.ReportDeviceIdentity, java.util.List<com.eltavine.duckdetector.core.report.ReportFact>, java.util.List<com.eltavine.duckdetector.core.report.ReportBlock$Verbatim>);
+  public static com.eltavine.duckdetector.core.report.DeviceReport copy$default(com.eltavine.duckdetector.core.report.DeviceReport, com.eltavine.duckdetector.core.report.ReportDeviceIdentity, java.util.List, java.util.List, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public interface com.eltavine.duckdetector.core.report.ReportBlock {
+  public abstract java.lang.String getTitle();
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportBlock$Bullets implements com.eltavine.duckdetector.core.report.ReportBlock {
+  public com.eltavine.duckdetector.core.report.ReportBlock$Bullets(java.lang.String, java.util.List<java.lang.String>);
+  public java.lang.String getTitle();
+  public final java.util.List<java.lang.String> getItems();
+  public final java.lang.String component1();
+  public final java.util.List<java.lang.String> component2();
+  public final com.eltavine.duckdetector.core.report.ReportBlock$Bullets copy(java.lang.String, java.util.List<java.lang.String>);
+  public static com.eltavine.duckdetector.core.report.ReportBlock$Bullets copy$default(com.eltavine.duckdetector.core.report.ReportBlock$Bullets, java.lang.String, java.util.List, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportBlock$Rows implements com.eltavine.duckdetector.core.report.ReportBlock {
+  public com.eltavine.duckdetector.core.report.ReportBlock$Rows(java.lang.String, java.util.List<com.eltavine.duckdetector.core.report.ReportRow>);
+  public java.lang.String getTitle();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportRow> getRows();
+  public final java.lang.String component1();
+  public final java.util.List<com.eltavine.duckdetector.core.report.ReportRow> component2();
+  public final com.eltavine.duckdetector.core.report.ReportBlock$Rows copy(java.lang.String, java.util.List<com.eltavine.duckdetector.core.report.ReportRow>);
+  public static com.eltavine.duckdetector.core.report.ReportBlock$Rows copy$default(com.eltavine.duckdetector.core.report.ReportBlock$Rows, java.lang.String, java.util.List, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportBlock$Verbatim implements com.eltavine.duckdetector.core.report.ReportBlock {
+  public com.eltavine.duckdetector.core.report.ReportBlock$Verbatim(java.lang.String, java.util.List<java.lang.String>);
+  public java.lang.String getTitle();
+  public final java.util.List<java.lang.String> getLines();
+  public final java.lang.String component1();
+  public final java.util.List<java.lang.String> component2();
+  public final com.eltavine.duckdetector.core.report.ReportBlock$Verbatim copy(java.lang.String, java.util.List<java.lang.String>);
+  public static com.eltavine.duckdetector.core.report.ReportBlock$Verbatim copy$default(com.eltavine.duckdetector.core.report.ReportBlock$Verbatim, java.lang.String, java.util.List, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportDeviceIdentity {
+  public com.eltavine.duckdetector.core.report.ReportDeviceIdentity(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public final java.lang.String getBrand();
+  public final java.lang.String getModel();
+  public final java.lang.String getAndroidRelease();
+  public final java.lang.String getSdk();
+  public final java.lang.String component1();
+  public final java.lang.String component2();
+  public final java.lang.String component3();
+  public final java.lang.String component4();
+  public final com.eltavine.duckdetector.core.report.ReportDeviceIdentity copy(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public static com.eltavine.duckdetector.core.report.ReportDeviceIdentity copy$default(com.eltavine.duckdetector.core.report.ReportDeviceIdentity, java.lang.String, java.lang.String, java.lang.String, java.lang.String, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportFact {
+  public com.eltavine.duckdetector.core.report.ReportFact(java.lang.String, java.lang.String);
+  public final java.lang.String getLabel();
+  public final java.lang.String getValue();
+  public final java.lang.String component1();
+  public final java.lang.String component2();
+  public final com.eltavine.duckdetector.core.report.ReportFact copy(java.lang.String, java.lang.String);
+  public static com.eltavine.duckdetector.core.report.ReportFact copy$default(com.eltavine.duckdetector.core.report.ReportFact, java.lang.String, java.lang.String, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}
+
+public final class com.eltavine.duckdetector.core.report.ReportRow {
+  public com.eltavine.duckdetector.core.report.ReportRow(java.lang.String, java.lang.String, java.lang.String);
+  public com.eltavine.duckdetector.core.report.ReportRow(java.lang.String, java.lang.String, java.lang.String, int, kotlin.jvm.internal.DefaultConstructorMarker);
+  public final java.lang.String getLabel();
+  public final java.lang.String getValue();
+  public final java.lang.String getDetail();
+  public final java.lang.String component1();
+  public final java.lang.String component2();
+  public final java.lang.String component3();
+  public final com.eltavine.duckdetector.core.report.ReportRow copy(java.lang.String, java.lang.String, java.lang.String);
+  public static com.eltavine.duckdetector.core.report.ReportRow copy$default(com.eltavine.duckdetector.core.report.ReportRow, java.lang.String, java.lang.String, java.lang.String, int, java.lang.Object);
+  public java.lang.String toString();
+  public int hashCode();
+  public boolean equals(java.lang.Object);
+}

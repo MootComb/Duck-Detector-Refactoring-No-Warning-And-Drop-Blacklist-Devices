@@ -1,0 +1,15 @@
+public interface com.eltavine.duckdetector.core.detector.Detector<R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> {
+  public abstract java.lang.String getId-YyyATdw();
+  public abstract com.eltavine.duckdetector.core.detector.DetectorScanner<R> createScanner(android.content.Context);
+  public abstract R loadingReport();
+  public abstract M describe(R);
+  public abstract com.eltavine.duckdetector.core.report.DetectorReport export(M);
+}
+
+public final class com.eltavine.duckdetector.core.detector.DetectorRunKt {
+  public static final <R, M extends com.eltavine.duckdetector.core.report.DetectorHeadline> java.lang.Object run(com.eltavine.duckdetector.core.detector.Detector<R, M>, android.content.Context, kotlin.coroutines.Continuation<? super com.eltavine.duckdetector.core.report.DetectorResult>);
+}
+
+public interface com.eltavine.duckdetector.core.detector.DetectorScanner<R> {
+  public abstract java.lang.Object scan(kotlin.coroutines.Continuation<? super R>);
+}

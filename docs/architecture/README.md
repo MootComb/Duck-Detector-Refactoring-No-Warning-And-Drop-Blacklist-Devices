@@ -68,6 +68,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
 | `./gradlew buildHealth` (`DuckDetectorDependencyAnalysisPlugin`) | Every module declares exactly the modules and libraries its code uses: nothing unused, nothing reached only transitively, and `api` only for types in its public API. The plugin records its two reviewed exceptions ([ADR 0010](../adr/0010-exact-dependency-declarations.md)) | Upstream Dependency Analysis Gradle Plugin |
 | `:sdk:aar:verifySdkAar` | The SDK AAR fuses every project module it needs and reaches no UI library, directly or through an external dependency | Runs on the Fused Library report |
+| `checkPublicApi` (`DuckDetectorPublicApiPlugin`) | The public API of the SDK contract modules, `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence`, matches the dump committed in each module's `api/`; `updatePublicApi` records an intended change | `PublicApiListingTest` |
 | `scripts/new_detector.py` | A generated detector builds and passes every guard, and changes nothing outside `feature/<name>/` except its registrations | `scripts/test_new_detector.py`; CI also scaffolds a native detector and builds it |
 | `DashboardExportGoldenTest` | The export of every detector recorded in `golden-detectors.txt` stays byte-identical | Golden fixtures in `app/src/test/.../integration/dashboard` |
 

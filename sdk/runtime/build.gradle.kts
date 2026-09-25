@@ -19,6 +19,7 @@ import com.eltavine.duckdetector.buildlogic.detectorModules
 
 plugins {
     id("duckdetector.android.library")
+    id("duckdetector.public-api")
 }
 
 android {

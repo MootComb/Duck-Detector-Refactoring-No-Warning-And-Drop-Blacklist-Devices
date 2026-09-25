@@ -68,6 +68,10 @@ gradlePlugin {
             id = "duckdetector.dependency-analysis"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorDependencyAnalysisPlugin"
         }
+        register("duckDetectorPublicApi") {
+            id = "duckdetector.public-api"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.api.DuckDetectorPublicApiPlugin"
+        }
         register("duckDetectorSdkDistribution") {
             id = "duckdetector.sdk.distribution"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorSdkDistributionPlugin"

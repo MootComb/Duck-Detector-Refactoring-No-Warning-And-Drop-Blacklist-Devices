@@ -16,6 +16,7 @@
 
 plugins {
     id("duckdetector.android.library")
+    id("duckdetector.public-api")
 }
 
 android {

@@ -16,6 +16,7 @@
 
 plugins {
     id("duckdetector.jvm.library")
+    id("duckdetector.public-api")
 }
 
 kotlin {

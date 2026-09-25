@@ -143,6 +143,7 @@
 - 依赖或模块改动（任何 `build.gradle.kts`、`libs.versions.toml`、新增模块）：`./gradlew buildHealth`，按报告增删依赖或调整 `api` / `implementation`
 - 新增检测器：用 `python3 scripts/new_detector.py <name> --description "..."` 生成，按 [docs/guides/adding-a-detector.md](./docs/guides/adding-a-detector.md) 填写各层；新增或修改检测器后运行 `python3 .github/scripts/check-detector-touch-points.py`
 - SDK 或 headless 模块改动：`./gradlew :sdk:aar:publish :sdk:aar:verifySdkAar`，再运行 `./gradlew -p samples/sdk-consumer assembleDebug`
+- SDK 契约模块（`:sdk:runtime`、`:core:detector`、`:core:report`、`:core:evidence`）的公开 API 改动：`./gradlew checkPublicApi`；确属有意的改动运行 `./gradlew updatePublicApi`，并在提交中审阅 `api/*.api` 的 diff
 - 脚手架或模板改动：`python3 scripts/test_new_detector.py`
 - 检查脚本改动：运行对应的 `.github/scripts/test-*.py` 自测
 - 文案或卡片映射改动：对应 mapper / reducer tests

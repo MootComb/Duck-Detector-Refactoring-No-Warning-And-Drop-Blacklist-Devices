@@ -34,6 +34,10 @@ The startup policy screens and app shell in `:app` read and write `TeeNetworkCon
 
 `DuckDetectorZygotePreload` in `:sdk:runtime` calls `NativeRootZygotePreload.installThroneHuntWatch` directly, before the SELinux context validity capture. It is the one place where the SDK names a detector outside `DetectorCatalog`, recorded as a touch point exception. If a second detector needs app zygote work, give `Detector` an optional preload hook that the SDK runs in catalog order, keeping the order the carriers depend on.
 
+## Public API dumps come from javap
+
+`DuckDetectorPublicApiPlugin` records the SDK contract modules' public API with javap, because Kotlin's ABI validation fails on libraries built with AGP's built-in Kotlin: its dump task has no class files to read. javap cannot tell Kotlin `internal` declarations from public ones, which is safe only while the contract modules declare nothing internal. When Kotlin's ABI validation supports these libraries, switch to it and regenerate the dumps in one change.
+
 ## Early launch capture starts a fixed activity
 
 The transparent `NativeActivity` in the `preload` unit starts `<applicationId>.MainActivity` by name after its capture. An SDK host whose launch activity has another name cannot reuse the launcher, so its Mount and Virtualization detectors report the early capture as unavailable. Reading the target activity from a `<meta-data>` entry on the `NativeActivity` would lift this; the app's behaviour must stay identical.
