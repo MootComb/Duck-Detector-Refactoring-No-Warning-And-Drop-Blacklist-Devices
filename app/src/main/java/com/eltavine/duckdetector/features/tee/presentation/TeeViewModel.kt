@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.tee.data.repository.TeeRepository
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class TeeViewModel(
     private val repository: TeeRepository,
@@ -43,6 +43,8 @@ class TeeViewModel(
         ),
     )
     val uiState: StateFlow<TeeUiState> = _uiState.asStateFlow()
+
+    private val scans = ScanSessionRunner(viewModelScope)
 
     init {
         rescan()
@@ -71,29 +73,33 @@ class TeeViewModel(
     }
 
     fun rescan() {
-        viewModelScope.launch {
-            val expanded = _uiState.value.cardModel.isExpanded
-            val loading = TeeReport.loading()
-            _uiState.update { state ->
-                state.copy(
-                    stage = TeeUiStage.LOADING,
-                    report = loading,
-                    cardModel = mapper.map(loading, expanded),
-                )
-            }
-            val report = repository.scan()
-            val stage = when {
-                report.stage == TeeScanStage.FAILED -> TeeUiStage.FAILED
-                else -> TeeUiStage.READY
-            }
-            _uiState.update { state ->
-                state.copy(
-                    stage = stage,
-                    report = report,
-                    cardModel = mapper.map(report, state.cardModel.isExpanded),
-                )
-            }
-        }
+        scans.launch(
+            begin = {
+                val expanded = _uiState.value.cardModel.isExpanded
+                val loading = TeeReport.loading()
+                _uiState.update { state ->
+                    state.copy(
+                        stage = TeeUiStage.LOADING,
+                        report = loading,
+                        cardModel = mapper.map(loading, expanded),
+                    )
+                }
+            },
+            collect = { repository.scan() },
+            publish = { report ->
+                val stage = when {
+                    report.stage == TeeScanStage.FAILED -> TeeUiStage.FAILED
+                    else -> TeeUiStage.READY
+                }
+                _uiState.update { state ->
+                    state.copy(
+                        stage = stage,
+                        report = report,
+                        cardModel = mapper.map(report, state.cardModel.isExpanded),
+                    )
+                }
+            },
+        )
     }
 
     companion object {
