@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.features.su.domain.SuMethodOutcome
 import com.eltavine.duckdetector.features.su.domain.SuMethodResult
 import com.eltavine.duckdetector.features.su.domain.SuReport
 import com.eltavine.duckdetector.features.su.domain.SuStage
+import com.eltavine.duckdetector.features.su.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactModel
@@ -509,15 +510,4 @@ class SuCardModelMapper {
         }
     }
 
-    private fun SuReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            SuStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            SuStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            SuStage.READY -> when {
-                hasRootIndicators -> DetectorStatus.danger()
-                !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
-            }
-        }
-    }
 }

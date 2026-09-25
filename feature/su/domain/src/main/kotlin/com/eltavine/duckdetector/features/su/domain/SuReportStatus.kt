@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id("duckdetector.jvm.library")
-}
+package com.eltavine.duckdetector.features.su.domain
 
-dependencies {
-    api(project(":core:evidence"))
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+
+fun SuReport.toDetectorStatus(): DetectorStatus {
+    return when (stage) {
+        SuStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
+        SuStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
+        SuStage.READY -> when {
+            hasRootIndicators -> DetectorStatus.danger()
+            !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
+            else -> DetectorStatus.allClear()
+        }
+    }
 }
