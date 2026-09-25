@@ -18,19 +18,18 @@ package com.eltavine.duckdetector.features.kernelcheck.data.repository
 
 import com.eltavine.duckdetector.features.kernelcheck.data.native.KernelCheckNativeBridge
 import com.eltavine.duckdetector.features.kernelcheck.data.native.KernelCheckNativeSnapshot
+import com.eltavine.duckdetector.features.kernelcheck.data.probes.KernelCvePatchProbe
 import com.eltavine.duckdetector.features.kernelcheck.data.rules.Arm64CpuIdentityConsistencyEvaluator
+import com.eltavine.duckdetector.features.kernelcheck.data.rules.KernelIdentityRules
+import com.eltavine.duckdetector.features.kernelcheck.data.rules.KernelIdentityScripts
 import com.eltavine.duckdetector.features.kernelcheck.data.utils.KernelIdentityConsistencyUtils
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityField
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityRead
 import java.io.File
-import java.util.LinkedHashSet
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -76,7 +75,7 @@ class KernelCheckRepository(
         val infoFindings = mutableListOf<KernelCheckFinding>()
         val combinedIdentity = identitySources.joinToString(separator = "\n")
 
-        val emojis = findEmojis(combinedIdentity)
+        val emojis = KernelIdentityScripts.findEmojis(combinedIdentity)
         if (emojis.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
                 id = "emoji",
@@ -87,7 +86,7 @@ class KernelCheckRepository(
             )
         }
 
-        val chineseChars = findChineseCharacters(combinedIdentity)
+        val chineseChars = KernelIdentityScripts.findChineseCharacters(combinedIdentity)
         if (chineseChars.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
                 id = "chinese_chars",
@@ -98,7 +97,7 @@ class KernelCheckRepository(
             )
         }
 
-        val nonLatinScriptResult = findNonLatinScriptCharacters(combinedIdentity)
+        val nonLatinScriptResult = KernelIdentityScripts.findNonLatinScriptCharacters(combinedIdentity)
         if (nonLatinScriptResult.samples.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
                 id = "non_latin_scripts",
@@ -120,7 +119,7 @@ class KernelCheckRepository(
             )
         }
 
-        val telegramMatches = TELEGRAM_REGEX.findAll(combinedIdentity)
+        val telegramMatches = KernelIdentityRules.TELEGRAM_REGEX.findAll(combinedIdentity)
             .map { it.value }
             .distinct()
             .toList()
@@ -134,7 +133,7 @@ class KernelCheckRepository(
             )
         }
 
-        val mentionMatches = MENTION_REGEX.findAll(combinedIdentity)
+        val mentionMatches = KernelIdentityRules.MENTION_REGEX.findAll(combinedIdentity)
             .map { it.value }
             .distinct()
             .toList()
@@ -148,7 +147,7 @@ class KernelCheckRepository(
             )
         }
 
-        val customKeywords = detectCustomKernelKeywords(combinedIdentity)
+        val customKeywords = KernelIdentityRules.detectCustomKernelKeywords(combinedIdentity)
         if (customKeywords.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
                 id = "custom_kernel",
@@ -159,7 +158,7 @@ class KernelCheckRepository(
             )
         }
 
-        val nonReleaseMajorVersion = detectNonReleaseKernelMajorVersion(unameOutput)
+        val nonReleaseMajorVersion = KernelIdentityRules.detectNonReleaseKernelMajorVersion(unameOutput)
         if (nonReleaseMajorVersion != null) {
             dangerFindings += KernelCheckFinding(
                 id = "non_release_kernel_version",
@@ -184,7 +183,7 @@ class KernelCheckRepository(
         cpuIdentityAssessment.finding?.let(dangerFindings::add)
 
         val cmdlineMatches = nativeSnapshot.findings.details("CMDLINE|CRITICAL|")
-            .ifEmpty { detectCriticalCmdlineFallback(procCmdline) }
+            .ifEmpty { KernelIdentityRules.detectCriticalCmdlineFallback(procCmdline) }
         if (cmdlineMatches.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
                 id = "suspicious_cmdline",
@@ -206,7 +205,7 @@ class KernelCheckRepository(
             )
         }
 
-        val cveAssessment = detectCvePatchState()
+        val cveAssessment = KernelCvePatchProbe.detectCvePatchState()
         if (cveAssessment.state == KernelCheckCvePatchState.UNPATCHED ||
             cveAssessment.state == KernelCheckCvePatchState.PARTIALLY_PATCHED
         ) {
@@ -219,7 +218,7 @@ class KernelCheckRepository(
             )
         }
 
-        val methods = buildMethods(
+        val methods = KernelCheckMethods.buildMethods(
             dangerFindings = dangerFindings,
             infoFindings = infoFindings,
             cveAssessment = cveAssessment,
@@ -240,8 +239,8 @@ class KernelCheckRepository(
             cvePatchState = cveAssessment.state,
             cvePatchDetail = cveAssessment.detail,
             nativeAvailable = nativeSnapshot.available,
-            checkedKeywordCount = KEYWORD_SCAN_COUNT,
-            checkedCmdlineRuleCount = CMDLINE_CHECKS.size,
+            checkedKeywordCount = KernelIdentityRules.KEYWORD_SCAN_COUNT,
+            checkedCmdlineRuleCount = KernelIdentityRules.CMDLINE_CHECKS.size,
             methods = methods,
             identityReads = identityReads,
         )
@@ -262,226 +261,6 @@ class KernelCheckRepository(
                 .ifBlank { readFileText("/proc/sys/kernel/version") },
             procVersion = procVersion,
         )
-    }
-
-    private fun buildMethods(
-        dangerFindings: List<KernelCheckFinding>,
-        infoFindings: List<KernelCheckFinding>,
-        cveAssessment: CvePatchAssessment,
-        nativeAvailable: Boolean,
-        comparedIdentityFields: List<Pair<KernelIdentityField, List<KernelIdentityRead>>>,
-        cpuIdentityMethod: KernelCheckMethodResult,
-    ): List<KernelCheckMethodResult> {
-        val dangerById = dangerFindings.associateBy { it.id }
-        val infoById = infoFindings.associateBy { it.id }
-
-        return listOf(
-            buildNamingMethod("emojiScan", dangerById["emoji"]),
-            buildNamingMethod("chineseScan", dangerById["chinese_chars"]),
-            buildNamingMethod("scriptScan", dangerById["non_latin_scripts"]),
-            buildNamingMethod("telegramScan", dangerById["telegram_ref"]),
-            buildNamingMethod("mentionScan", dangerById["at_mention"]),
-            buildNamingMethod("customKernel", dangerById["custom_kernel"]),
-            buildNamingMethod("kernelVersionCheck", dangerById["non_release_kernel_version"]),
-            buildIdentityConsistencyMethod(
-                dangerById[KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID],
-                comparedIdentityFields,
-            ),
-            cpuIdentityMethod,
-            buildNativeMethod(
-                "cmdlineCheck",
-                dangerById["suspicious_cmdline"],
-                nativeAvailable,
-                "Normal"
-            ),
-            buildCveMethod("cvePatchCheck", cveAssessment),
-            buildInfoMethod(
-                "kptrRestrict",
-                infoById["kptr_exposed"],
-                unavailable = !nativeAvailable
-            ),
-            KernelCheckMethodResult(
-                label = "nativeLibrary",
-                summary = if (nativeAvailable) "Loaded" else "Unavailable",
-                outcome = if (nativeAvailable) KernelCheckMethodOutcome.CLEAN else KernelCheckMethodOutcome.SUPPORT,
-            ),
-        )
-    }
-
-    private fun buildNamingMethod(
-        label: String,
-        finding: KernelCheckFinding?,
-    ): KernelCheckMethodResult {
-        return KernelCheckMethodResult(
-            label = label,
-            summary = finding?.value ?: "Clean",
-            outcome = if (finding != null) {
-                KernelCheckMethodOutcome.DETECTED
-            } else {
-                KernelCheckMethodOutcome.CLEAN
-            },
-            detail = finding?.detail,
-        )
-    }
-
-    private fun buildIdentityConsistencyMethod(
-        finding: KernelCheckFinding?,
-        comparedFields: List<Pair<KernelIdentityField, List<KernelIdentityRead>>>,
-    ): KernelCheckMethodResult {
-        return when {
-            finding != null -> KernelCheckMethodResult(
-                label = "identityConsistency",
-                summary = finding.value,
-                outcome = KernelCheckMethodOutcome.DETECTED,
-                detail = finding.detail,
-            )
-
-            comparedFields.isNotEmpty() -> KernelCheckMethodResult(
-                label = "identityConsistency",
-                summary = "${comparedFields.sumOf { (_, reads) -> reads.size }} reads agree",
-                outcome = KernelCheckMethodOutcome.CLEAN,
-                detail = comparedFields.joinToString(separator = "\n") { (field, fieldReads) ->
-                    "${field.label}: ${fieldReads.joinToString { it.label }}"
-                },
-            )
-
-            else -> KernelCheckMethodResult(
-                label = "identityConsistency",
-                summary = "Unavailable",
-                outcome = KernelCheckMethodOutcome.SUPPORT,
-                detail = "No kernel identity field had two readable sources, so nothing could be cross-checked.",
-            )
-        }
-    }
-
-    private fun buildNativeMethod(
-        label: String,
-        finding: KernelCheckFinding?,
-        nativeAvailable: Boolean,
-        cleanSummary: String,
-    ): KernelCheckMethodResult {
-        return when {
-            finding != null -> KernelCheckMethodResult(
-                label = label,
-                summary = finding.value,
-                outcome = KernelCheckMethodOutcome.DETECTED,
-                detail = finding.detail,
-            )
-
-            nativeAvailable -> KernelCheckMethodResult(
-                label = label,
-                summary = cleanSummary,
-                outcome = KernelCheckMethodOutcome.CLEAN,
-            )
-
-            else -> KernelCheckMethodResult(
-                label = label,
-                summary = "Unavailable",
-                outcome = KernelCheckMethodOutcome.SUPPORT,
-            )
-        }
-    }
-
-    private fun buildCveMethod(
-        label: String,
-        assessment: CvePatchAssessment,
-    ): KernelCheckMethodResult {
-        return KernelCheckMethodResult(
-            label = label,
-            summary = assessment.state.label,
-            outcome = when (assessment.state) {
-                KernelCheckCvePatchState.UNPATCHED,
-                KernelCheckCvePatchState.PARTIALLY_PATCHED -> KernelCheckMethodOutcome.INFO
-
-                KernelCheckCvePatchState.PATCHED -> KernelCheckMethodOutcome.CLEAN
-                KernelCheckCvePatchState.INCONCLUSIVE -> KernelCheckMethodOutcome.SUPPORT
-            },
-            detail = assessment.detail,
-        )
-    }
-
-    private fun buildInfoMethod(
-        label: String,
-        finding: KernelCheckFinding?,
-        unavailable: Boolean = false,
-    ): KernelCheckMethodResult {
-        return when {
-            finding != null -> KernelCheckMethodResult(
-                label = label,
-                summary = finding.value,
-                outcome = KernelCheckMethodOutcome.INFO,
-                detail = finding.detail,
-            )
-
-            unavailable -> KernelCheckMethodResult(
-                label = label,
-                summary = "Unavailable",
-                outcome = KernelCheckMethodOutcome.SUPPORT,
-            )
-
-            else -> KernelCheckMethodResult(
-                label = label,
-                summary = "OK",
-                outcome = KernelCheckMethodOutcome.CLEAN,
-            )
-        }
-    }
-
-    private fun detectCustomKernelKeywords(
-        input: String,
-    ): List<String> {
-        if (input.isBlank()) {
-            return emptyList()
-        }
-        return buildList {
-            CUSTOM_KERNEL_KEYWORDS.forEach { keyword ->
-                if (input.contains(keyword, ignoreCase = true)) {
-                    add(keyword)
-                }
-            }
-            CASE_SENSITIVE_KEYWORDS.forEach { keyword ->
-                if (input.contains(keyword)) {
-                    add(keyword)
-                }
-            }
-        }
-    }
-
-    private fun detectNonReleaseKernelMajorVersion(
-        unameOutput: String,
-    ): String? {
-        val major = extractKernelReleaseMajor(unameOutput) ?: return null
-        return major.takeIf { it !in KNOWN_KERNEL_MAJOR_VERSIONS }
-    }
-
-    private fun extractKernelReleaseMajor(
-        source: String,
-    ): String? {
-        // Genuine `uname -a` output on Android is "Linux localhost <release> ...". Requiring
-        // that exact prefix anchors extraction to a real uname invocation and rejects the
-        // /proc/version fallback ("Linux version <release> ...") and any other reformatted or
-        // spoofed identity string, instead of guessing the release field from its position alone.
-        val tokens = source.trim().split(Regex("""\s+"""))
-        if (tokens.getOrNull(0) != "Linux" || tokens.getOrNull(1) != "localhost") {
-            return null
-        }
-        val releaseToken = tokens.getOrNull(2) ?: return null
-        return KERNEL_RELEASE_MAJOR_REGEX.find(releaseToken)?.groupValues?.get(1)
-    }
-
-    private fun detectCriticalCmdlineFallback(
-        procCmdline: String,
-    ): List<String> {
-        if (procCmdline.isBlank()) {
-            return emptyList()
-        }
-        return CMDLINE_CHECKS.filter {
-            it.isCritical && procCmdline.contains(
-                it.pattern,
-                ignoreCase = true
-            )
-        }
-            .map { it.description }
     }
 
     private fun getUnameOutput(): String {
@@ -526,326 +305,6 @@ class KernelCheckRepository(
         }
     }
 
-    private fun findEmojis(
-        text: String,
-    ): List<String> {
-        val matches = LinkedHashSet<String>()
-        var index = 0
-        while (index < text.length) {
-            val codePoint = text.codePointAt(index)
-            if (isEmoji(codePoint)) {
-                matches += String(Character.toChars(codePoint))
-            }
-            index += Character.charCount(codePoint)
-        }
-        return matches.toList()
-    }
-
-    private fun isEmoji(
-        codePoint: Int,
-    ): Boolean {
-        return when (codePoint) {
-            in 0x1F600..0x1F64F,
-            in 0x1F300..0x1F5FF,
-            in 0x1F680..0x1F6FF,
-            in 0x1F900..0x1F9FF,
-            in 0x1FA00..0x1FA6F,
-            in 0x1FA70..0x1FAFF,
-            in 0x2700..0x27BF,
-            in 0x2600..0x26FF,
-            in 0x1F1E0..0x1F1FF -> true
-
-            else -> false
-        }
-    }
-
-    private fun findChineseCharacters(
-        text: String,
-    ): List<String> {
-        val matches = LinkedHashSet<String>()
-        var index = 0
-        while (index < text.length) {
-            val codePoint = text.codePointAt(index)
-            if (isChineseCharacter(codePoint)) {
-                matches += String(Character.toChars(codePoint))
-            }
-            index += Character.charCount(codePoint)
-        }
-        return matches.toList()
-    }
-
-    private fun isChineseCharacter(
-        codePoint: Int,
-    ): Boolean {
-        return when (codePoint) {
-            in 0x4E00..0x9FFF,
-            in 0x3400..0x4DBF,
-            in 0x20000..0x2A6DF,
-            in 0x2A700..0x2B73F,
-            in 0x2B740..0x2B81F,
-            in 0x2B820..0x2CEAF,
-            in 0xF900..0xFAFF,
-            in 0x2F800..0x2FA1F -> true
-
-            else -> false
-        }
-    }
-
-    private fun findNonLatinScriptCharacters(
-        text: String,
-    ): NonLatinScriptScanResult {
-        val scripts = LinkedHashSet<String>()
-        val samples = LinkedHashSet<String>()
-        var index = 0
-        while (index < text.length) {
-            val codePoint = text.codePointAt(index)
-            if (isUnexpectedNonLatinScript(codePoint)) {
-                scripts += unicodeScriptLabel(Character.UnicodeScript.of(codePoint))
-                if (samples.size < MAX_SCRIPT_SAMPLE_COUNT) {
-                    samples += String(Character.toChars(codePoint))
-                }
-            }
-            index += Character.charCount(codePoint)
-        }
-        return NonLatinScriptScanResult(
-            scriptNames = scripts.toList(),
-            samples = samples.toList(),
-        )
-    }
-
-    private fun isUnexpectedNonLatinScript(
-        codePoint: Int,
-    ): Boolean {
-        if (!Character.isLetter(codePoint)) {
-            return false
-        }
-        return when (Character.UnicodeScript.of(codePoint)) {
-            Character.UnicodeScript.LATIN,
-            Character.UnicodeScript.COMMON,
-            Character.UnicodeScript.INHERITED,
-            Character.UnicodeScript.HAN -> false
-
-            else -> true
-        }
-    }
-
-    private fun unicodeScriptLabel(
-        script: Character.UnicodeScript,
-    ): String {
-        return when (script) {
-            Character.UnicodeScript.ARABIC -> "Arabic"
-            Character.UnicodeScript.ARMENIAN -> "Armenian"
-            Character.UnicodeScript.BENGALI -> "Bengali"
-            Character.UnicodeScript.CYRILLIC -> "Cyrillic"
-            Character.UnicodeScript.DEVANAGARI -> "Devanagari"
-            Character.UnicodeScript.ETHIOPIC -> "Ethiopic"
-            Character.UnicodeScript.GEORGIAN -> "Georgian"
-            Character.UnicodeScript.GREEK -> "Greek"
-            Character.UnicodeScript.GUJARATI -> "Gujarati"
-            Character.UnicodeScript.GURMUKHI -> "Gurmukhi"
-            Character.UnicodeScript.HANGUL -> "Hangul"
-            Character.UnicodeScript.HEBREW -> "Hebrew"
-            Character.UnicodeScript.HIRAGANA -> "Hiragana"
-            Character.UnicodeScript.KANNADA -> "Kannada"
-            Character.UnicodeScript.KATAKANA -> "Katakana"
-            Character.UnicodeScript.KHMER -> "Khmer"
-            Character.UnicodeScript.LAO -> "Lao"
-            Character.UnicodeScript.MALAYALAM -> "Malayalam"
-            Character.UnicodeScript.MYANMAR -> "Myanmar"
-            Character.UnicodeScript.ORIYA -> "Oriya"
-            Character.UnicodeScript.SINHALA -> "Sinhala"
-            Character.UnicodeScript.TAMIL -> "Tamil"
-            Character.UnicodeScript.TELUGU -> "Telugu"
-            Character.UnicodeScript.THAI -> "Thai"
-            else -> script.name.lowercase()
-                .split('_')
-                .joinToString(" ") { part ->
-                    part.replaceFirstChar { char -> char.uppercase() }
-                }
-        }
-    }
-
-    private fun detectCvePatchState(): CvePatchAssessment {
-        val targetPath = "/sdcard/Android/data"
-        val zwcProbe = testUnicodeBypass(
-            basePath = targetPath,
-            bypassChar = "\u200B",
-            bypassName = "Zero Width Space",
-        )
-        val otherIgnorableChars = listOf(
-            "\u00AD" to "Soft Hyphen",
-            "\u034F" to "Combining Grapheme Joiner",
-            "\u200C" to "Zero Width Non-Joiner",
-            "\u200D" to "Zero Width Joiner",
-            "\u2060" to "Word Joiner",
-            "\uFEFF" to "BOM/ZWNBSP",
-            "\u180E" to "Mongolian Vowel Separator",
-        )
-
-        val otherProbes = otherIgnorableChars.map { (char, name) ->
-            char to testUnicodeBypass(
-                basePath = targetPath,
-                bypassChar = char,
-                bypassName = name,
-            )
-        }
-        val workingProbe = otherProbes.firstOrNull { (_, probe) ->
-            probe.state == UnicodeBypassState.BYPASSED
-        }
-        val inconclusiveProbe = otherProbes.firstOrNull { (_, probe) ->
-            probe.state == UnicodeBypassState.INCONCLUSIVE
-        }?.second
-
-        return when {
-            zwcProbe.state == UnicodeBypassState.BYPASSED && workingProbe != null -> {
-                val (char, probe) = workingProbe
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.UNPATCHED,
-                    detail = buildString {
-                        append("ZWC and ")
-                        append(probe.bypassName)
-                        append(" (U+")
-                        append(char.codePointAt(0).toString(16).uppercase())
-                        append(") still bypass the path filter.")
-                    },
-                )
-            }
-
-            zwcProbe.state == UnicodeBypassState.BLOCKED && workingProbe != null -> {
-                val (char, probe) = workingProbe
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.PARTIALLY_PATCHED,
-                    detail = buildString {
-                        append("ZWC is blocked, but ")
-                        append(probe.bypassName)
-                        append(" (U+")
-                        append(char.codePointAt(0).toString(16).uppercase())
-                        append(") still bypasses the path filter.")
-                    },
-                )
-            }
-
-            zwcProbe.state == UnicodeBypassState.BLOCKED &&
-                    otherProbes.all { (_, probe) -> probe.state == UnicodeBypassState.BLOCKED } -> {
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.PATCHED,
-                    detail = "ZWC and ${otherProbes.size} tested ignorable codepoints were blocked.",
-                )
-            }
-
-            zwcProbe.state == UnicodeBypassState.BYPASSED &&
-                    otherProbes.all { (_, probe) -> probe.state == UnicodeBypassState.BLOCKED } -> {
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.INCONCLUSIVE,
-                    detail = "ZWC bypassed, but the other tested ignorable codepoints did not. The result does not fit a stable patched or unpatched pattern.",
-                )
-            }
-
-            zwcProbe.state == UnicodeBypassState.INCONCLUSIVE -> {
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.INCONCLUSIVE,
-                    detail = zwcProbe.detail
-                        ?: "The ZWC bypass probe could not produce a stable result.",
-                )
-            }
-
-            inconclusiveProbe != null -> {
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.INCONCLUSIVE,
-                    detail = inconclusiveProbe.detail
-                        ?: "One or more ignorable-codepoint probes could not produce a stable result.",
-                )
-            }
-
-            else -> {
-                CvePatchAssessment(
-                    state = KernelCheckCvePatchState.INCONCLUSIVE,
-                    detail = "The bypass probes did not produce enough stable evidence to determine patch state.",
-                )
-            }
-        }
-    }
-
-    private fun testUnicodeBypass(
-        basePath: String,
-        bypassChar: String,
-        bypassName: String,
-    ): UnicodeBypassProbe {
-        val baseProbe = runListProbe("$basePath/")
-        if (baseProbe.succeeded) {
-            return UnicodeBypassProbe(
-                state = UnicodeBypassState.INCONCLUSIVE,
-                bypassName = bypassName,
-                detail = "The base Android/data path is directly listable, so bypass status cannot be inferred from this probe.",
-            )
-        }
-
-        val bypassPaths = listOf(
-            "$basePath$bypassChar/",
-            "$basePath/$bypassChar",
-        )
-
-        var hadCompletedAttempt = false
-        bypassPaths.forEach { bypassPath ->
-            val probe = runListProbe(bypassPath)
-            if (probe.completed) {
-                hadCompletedAttempt = true
-            }
-            if (probe.succeeded) {
-                return UnicodeBypassProbe(
-                    state = UnicodeBypassState.BYPASSED,
-                    bypassName = bypassName,
-                    detail = "$bypassName successfully bypassed the path filter.",
-                )
-            }
-        }
-
-        return if (hadCompletedAttempt) {
-            UnicodeBypassProbe(
-                state = UnicodeBypassState.BLOCKED,
-                bypassName = bypassName,
-                detail = "$bypassName was blocked by the path filter.",
-            )
-        } else {
-            UnicodeBypassProbe(
-                state = UnicodeBypassState.INCONCLUSIVE,
-                bypassName = bypassName,
-                detail = "The $bypassName probe could not execute reliably.",
-            )
-        }
-    }
-
-    private fun runListProbe(
-        path: String,
-    ): DirectoryListProbe {
-        var process: Process? = null
-        return try {
-            process = ProcessBuilder("ls", path)
-                .redirectErrorStream(true)
-                .start()
-            process.inputStream.bufferedReader().use { it.readText() }
-            if (!process.waitFor(UNICODE_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                process.destroyForcibly()
-                DirectoryListProbe(
-                    completed = false,
-                    exitCode = null,
-                )
-            } else {
-                DirectoryListProbe(
-                    completed = true,
-                    exitCode = process.exitValue(),
-                )
-            }
-        } catch (_: Exception) {
-            DirectoryListProbe(
-                completed = false,
-                exitCode = null,
-            )
-        } finally {
-            process?.destroy()
-        }
-    }
-
     private fun List<String>.firstDetail(
         prefix: String,
     ): String? {
@@ -862,98 +321,5 @@ class KernelCheckRepository(
 
     companion object {
         private const val PROCESS_TIMEOUT_SECONDS = 2L
-        private const val UNICODE_TEST_TIMEOUT_SECONDS = 2L
-        private const val MAX_SCRIPT_SAMPLE_COUNT = 8
-
-        private val TELEGRAM_REGEX =
-            Regex("""\bTG\b|\btg\b|\bTelegram\b|\btelegram\b|t\.me/""", RegexOption.IGNORE_CASE)
-
-        private val MENTION_REGEX = Regex("@[A-Za-z0-9_]+")
-
-        private val CUSTOM_KERNEL_KEYWORDS = listOf(
-            "xiaoxiaow",
-            "qdykernel",
-            "numbers",
-            "cctv",
-            "shirkneko",
-            "mirinfork",
-            "brokestar",
-            "sukisu",
-            "Glow-v",
-            "aptkernel",
-            "coolzyd9107",
-            "aptusitu",
-            "Winkmoon",
-            "ShirokoNeko",
-        )
-
-        private val CASE_SENSITIVE_KEYWORDS = listOf("OKI")
-
-        private val KEYWORD_SCAN_COUNT =
-            CUSTOM_KERNEL_KEYWORDS.size + CASE_SENSITIVE_KEYWORDS.size + 6
-
-        // Only the kernel release major number is checked - minor line, patch level, and
-        // kernel.org's own longterm/LTS tagging are intentionally ignored. Linux major numbers
-        // change roughly once per decade, so this stays valid far longer than a minor-line list.
-        private val KNOWN_KERNEL_MAJOR_VERSIONS = setOf("4", "5", "6")
-
-        private val KERNEL_RELEASE_MAJOR_REGEX = Regex("""^(\d{1,2})\.\d{1,3}\.\d+""")
-
-        private val CMDLINE_CHECKS = listOf(
-            CmdlineCheck(
-                "androidboot.verifiedbootstate=orange",
-                "Bootloader unlocked (orange)",
-                true
-            ),
-            CmdlineCheck("androidboot.verifiedbootstate=yellow", "Self-signed boot (yellow)", true),
-            CmdlineCheck("androidboot.enable_dm_verity=0", "dm-verity disabled", true),
-            CmdlineCheck("androidboot.secboot=disabled", "Secure boot disabled", true),
-            CmdlineCheck("androidboot.vbmeta.device_state=unlocked", "vbmeta unlocked", true),
-            CmdlineCheck("skip_initramfs", "Skip initramfs (possible root)", false),
-            CmdlineCheck("init=/sbin", "Custom init path", true),
-            CmdlineCheck("init=/system", "Custom init path", false),
-            CmdlineCheck("androidboot.force_normal_boot=1", "Force normal boot", false),
-            CmdlineCheck("magisk", "Magisk reference in cmdline", true),
-            CmdlineCheck("ksu", "KernelSU reference in cmdline", true),
-            CmdlineCheck("apatch", "APatch reference in cmdline", true),
-            CmdlineCheck("rootfs=", "Custom rootfs", false),
-            CmdlineCheck("androidboot.slot_suffix=", "Slot suffix present", false),
-        )
     }
 }
-
-private data class CmdlineCheck(
-    val pattern: String,
-    val description: String,
-    val isCritical: Boolean,
-)
-
-private data class CvePatchAssessment(
-    val state: KernelCheckCvePatchState,
-    val detail: String,
-)
-
-private data class UnicodeBypassProbe(
-    val state: UnicodeBypassState,
-    val bypassName: String,
-    val detail: String? = null,
-)
-
-private data class DirectoryListProbe(
-    val completed: Boolean,
-    val exitCode: Int?,
-) {
-    val succeeded: Boolean
-        get() = completed && exitCode == 0
-}
-
-private enum class UnicodeBypassState {
-    BYPASSED,
-    BLOCKED,
-    INCONCLUSIVE,
-}
-
-private data class NonLatinScriptScanResult(
-    val scriptNames: List<String>,
-    val samples: List<String>,
-)

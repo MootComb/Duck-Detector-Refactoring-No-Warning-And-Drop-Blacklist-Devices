@@ -13,7 +13,6 @@
     "app/src/main/java/com/eltavine/duckdetector/features/customrom/presentation/CustomRomCardModelMapper.kt": 889,
     "app/src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt": 769,
     "app/src/main/java/com/eltavine/duckdetector/features/dashboard/ui/DashboardScreen.kt": 873,
-    "app/src/main/java/com/eltavine/duckdetector/features/kernelcheck/data/repository/KernelCheckRepository.kt": 959,
     "app/src/main/java/com/eltavine/duckdetector/features/kernelcheck/presentation/KernelCheckCardModelMapper.kt": 706,
     "app/src/main/java/com/eltavine/duckdetector/features/lsposed/presentation/LSPosedCardModelMapper.kt": 668,
     "app/src/main/java/com/eltavine/duckdetector/features/mount/data/repository/MountRepository.kt": 896,
