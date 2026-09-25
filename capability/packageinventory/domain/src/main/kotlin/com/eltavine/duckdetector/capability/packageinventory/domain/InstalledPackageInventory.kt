@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.capability.packageinventory.domain
 
+import com.eltavine.duckdetector.core.evidence.FailureName
+
 /** Platform-neutral projection of the ApplicationInfo fields used by package-based probes. */
 public data class InstalledApplicationRecord(
     val packageName: String,
@@ -124,15 +126,5 @@ public class DefaultInstalledPackageInventoryReader(
         }
     }
 
-    private fun Exception.toInventoryFailureDetail(): String {
-        return buildString {
-            append(this@toInventoryFailureDetail::class.java.simpleName.ifBlank {
-                "Package visibility environment error"
-            })
-            message?.takeIf { it.isNotBlank() }?.let { errorMessage ->
-                append(": ")
-                append(errorMessage)
-            }
-        }
-    }
+    private fun Exception.toInventoryFailureDetail(): String = FailureName.describe(this)
 }

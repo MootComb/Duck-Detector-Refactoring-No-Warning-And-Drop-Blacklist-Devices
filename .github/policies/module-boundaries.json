@@ -178,12 +178,15 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":capability:packageinventory:domain",
-        ":core:native"
+        ":core:native",
+        ":core:platform"
       ]
     },
     ":capability:packageinventory:domain": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":capability:selinuxpolicy:data": {
       "kind": "android-library",

@@ -28,6 +28,7 @@ import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPac
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailure
 import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailureKind
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironment
 import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironmentProvider
 
@@ -82,13 +83,7 @@ public class AndroidInstalledApplicationsSource(
             InstalledApplicationsQueryResult.Unavailable(
                 PackageInventoryFailure(
                     kind = PackageInventoryFailureKind.PLATFORM_QUERY_FAILED,
-                    detail = buildString {
-                        append(exception::class.java.simpleName.ifBlank { "PackageManager error" })
-                        exception.message?.takeIf { it.isNotBlank() }?.let { message ->
-                            append(": ")
-                            append(message)
-                        }
-                    },
+                    detail = PlatformFailureName.describe(exception),
                 ),
             )
         }

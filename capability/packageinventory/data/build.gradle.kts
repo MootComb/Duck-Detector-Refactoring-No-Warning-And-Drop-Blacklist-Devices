@@ -29,4 +29,5 @@ kotlin {
 dependencies {
     api(project(":capability:packageinventory:domain"))
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
 }
