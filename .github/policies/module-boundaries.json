@@ -187,7 +187,8 @@
     ":capability:selinuxpolicy:data": {
       "kind": "android-library",
       "allowed_project_dependencies": [
-        ":core:native"
+        ":core:native",
+        ":core:platform"
       ]
     },
     ":capability:systemproperties:data": {

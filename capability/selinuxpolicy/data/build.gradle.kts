@@ -28,5 +28,6 @@ kotlin {
 
 dependencies {
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
     implementation(libs.kotlinx.coroutines.android)
 }

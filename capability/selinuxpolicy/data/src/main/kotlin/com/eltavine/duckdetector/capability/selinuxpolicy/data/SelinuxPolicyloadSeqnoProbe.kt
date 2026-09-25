@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -51,7 +52,7 @@ public class SelinuxPolicyloadSeqnoProbe {
                 state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
                 available = false,
                 probeAttempted = true,
-                failureReason = throwable.message ?: throwable.javaClass.simpleName,
+                failureReason = throwable.message ?: PlatformFailureName.of(throwable),
                 notes = listOf(ZYGOTE_PRELOAD_NOTE),
             )
         }

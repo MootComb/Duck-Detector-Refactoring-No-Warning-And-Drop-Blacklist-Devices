@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.capability.selinuxpolicy.data
 import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -72,7 +73,7 @@ public class SelinuxProcAttrCurrentProbe {
                 label = label,
                 targetContext = targetContext,
                 outcomeClass = SelinuxProcAttrCurrentResult.OUTCOME_DETECTED_SECURITY_EXCEPTION,
-                rawMessage = "${error::class.java.simpleName}: ${error.message}",
+                rawMessage = "${PlatformFailureName.of(error)}: ${error.message}",
             )
         } catch (error: IOException) {
             classifyIOException(label, targetContext, error)
@@ -86,7 +87,7 @@ public class SelinuxProcAttrCurrentProbe {
         targetContext: String,
         error: IOException,
     ): SelinuxProcAttrCurrentResult {
-        val detail = "${error::class.java.simpleName}: ${error.message}"
+        val detail = "${PlatformFailureName.of(error)}: ${error.message}"
         val outcome = if (
             error.message
                 ?.lowercase(Locale.ROOT)
@@ -109,7 +110,7 @@ public class SelinuxProcAttrCurrentProbe {
         targetContext: String,
         error: ErrnoException,
     ): SelinuxProcAttrCurrentResult {
-        val detail = "${error::class.java.simpleName}: errno=${error.errno}, ${error.message}"
+        val detail = "${PlatformFailureName.of(error)}: errno=${error.errno}, ${error.message}"
         val outcome = if (error.errno == OsConstants.EINVAL) {
             SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL
         } else {
