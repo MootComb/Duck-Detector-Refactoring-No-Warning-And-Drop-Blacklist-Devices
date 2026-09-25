@@ -87,13 +87,6 @@
       "reason": "Queries android.os.ServiceManager, which is hidden from the SDK, through reflection."
     },
     {
-      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBinderProbe.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Obtains the activity service binder from the hidden android.os.ServiceManager to probe the LSPosed bridge transaction."
-    },
-    {
       "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBridgeFieldProbe.kt",
       "uses": [
         "operations",

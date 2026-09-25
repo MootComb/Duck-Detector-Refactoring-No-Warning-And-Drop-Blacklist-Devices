@@ -17,14 +17,13 @@
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
 import android.os.DeadObjectException
-import android.os.IBinder
 import android.os.Parcel
 import android.os.Process
+import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
-import java.lang.reflect.Method
 
 data class LSPosedBinderProbeResult(
     val signals: List<LSPosedSignal>,
@@ -33,18 +32,10 @@ data class LSPosedBinderProbeResult(
 
 class LSPosedBinderProbe {
 
-    @Suppress("PrivateApi")
     fun run(): LSPosedBinderProbeResult {
-        val serviceManagerClass = runCatching {
-            Class.forName("android.os.ServiceManager")
-        }.getOrNull() ?: return LSPosedBinderProbeResult(emptyList(), 0)
-        val getServiceMethod = runCatching {
-            serviceManagerClass.getMethod("getService", String::class.java)
-        }.getOrNull() ?: return LSPosedBinderProbeResult(emptyList(), 0)
-
         val signals = buildList {
-            addAll(probeActivityBridge(getServiceMethod))
-            addAll(probeSerialBridge(getServiceMethod))
+            addAll(probeActivityBridge())
+            addAll(probeSerialBridge())
         }
         return LSPosedBinderProbeResult(
             signals = signals,
@@ -52,12 +43,8 @@ class LSPosedBinderProbe {
         )
     }
 
-    private fun probeActivityBridge(
-        getServiceMethod: Method,
-    ): List<LSPosedSignal> {
-        val binder = runCatching {
-            getServiceMethod.invoke(null, "activity") as? IBinder
-        }.getOrNull() ?: return emptyList()
+    private fun probeActivityBridge(): List<LSPosedSignal> {
+        val binder = HiddenServiceManager.getService("activity").getOrNull() ?: return emptyList()
 
         var data: Parcel? = null
         var reply: Parcel? = null
@@ -142,12 +129,8 @@ class LSPosedBinderProbe {
         }
     }
 
-    private fun probeSerialBridge(
-        getServiceMethod: Method,
-    ): List<LSPosedSignal> {
-        val binder = runCatching {
-            getServiceMethod.invoke(null, "serial") as? IBinder
-        }.getOrNull() ?: return emptyList()
+    private fun probeSerialBridge(): List<LSPosedSignal> {
+        val binder = HiddenServiceManager.getService("serial").getOrNull() ?: return emptyList()
 
         val signals = mutableListOf<LSPosedSignal>()
         runCatching { binder.interfaceDescriptor }
