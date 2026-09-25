@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class KernelCheckViewModel(
     private val repository: KernelCheckRepository,
@@ -42,34 +42,39 @@ class KernelCheckViewModel(
     )
     val uiState: StateFlow<KernelCheckUiState> = _uiState.asStateFlow()
 
+    private val scans = ScanSessionRunner(viewModelScope)
+
     init {
         rescan()
     }
 
     fun rescan() {
-        viewModelScope.launch {
-            val loading = KernelCheckReport.loading()
-            _uiState.update {
-                it.copy(
-                    stage = KernelCheckUiStage.LOADING,
-                    report = loading,
-                    cardModel = mapper.map(loading),
-                )
-            }
-
-            val report = repository.scan()
-            _uiState.update {
-                it.copy(
-                    stage = if (report.stage == KernelCheckStage.FAILED) {
-                        KernelCheckUiStage.FAILED
-                    } else {
-                        KernelCheckUiStage.READY
-                    },
-                    report = report,
-                    cardModel = mapper.map(report),
-                )
-            }
-        }
+        scans.launch(
+            begin = {
+                val loading = KernelCheckReport.loading()
+                _uiState.update {
+                    it.copy(
+                        stage = KernelCheckUiStage.LOADING,
+                        report = loading,
+                        cardModel = mapper.map(loading),
+                    )
+                }
+            },
+            collect = { repository.scan() },
+            publish = { report ->
+                _uiState.update {
+                    it.copy(
+                        stage = if (report.stage == KernelCheckStage.FAILED) {
+                            KernelCheckUiStage.FAILED
+                        } else {
+                            KernelCheckUiStage.READY
+                        },
+                        report = report,
+                        cardModel = mapper.map(report),
+                    )
+                }
+            },
+        )
     }
 
     companion object {
