@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+# Copyright (C) 2026 Duck Apps Contributor
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Self-test for check-source-file-length.py using synthetic source trees."""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import unittest
+
+CHECKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-source-file-length.py")
+LIMIT = 600
+
+
+class SourceFileLengthCheckerTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._directory = tempfile.TemporaryDirectory()
+        self.root = self._directory.name
+        self.baseline = os.path.join(self.root, "baseline.json")
+
+    def tearDown(self) -> None:
+        self._directory.cleanup()
+
+    def write_lines(self, relative_path: str, count: int, trailing_newline: bool = True) -> None:
+        path = os.path.join(self.root, relative_path)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        body = "\n".join(f"line {index}" for index in range(count))
+        with open(path, "w", encoding="utf-8") as handle:
+            handle.write(body + ("\n" if trailing_newline and count else ""))
+
+    def write_baseline(self, files: dict[str, int]) -> None:
+        with open(self.baseline, "w", encoding="utf-8") as handle:
+            json.dump({"schema_version": 1, "files": files}, handle)
+
+    def run_checker(self) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, CHECKER, "--repo-root", self.root, "--baseline", self.baseline],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def assert_rejected(self, expected_message: str) -> None:
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn(expected_message, result.stderr)
+
+    def test_accepts_files_below_the_limit(self) -> None:
+        self.write_lines("app/src/main/java/Small.kt", LIMIT - 1)
+        self.write_lines("app/src/main/cpp/small.cpp", LIMIT - 1, trailing_newline=False)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_rejects_file_at_the_limit(self) -> None:
+        self.write_lines("app/src/main/java/Large.kt", LIMIT)
+        self.assert_rejected("app/src/main/java/Large.kt has 600 lines")
+
+    def test_counts_final_line_without_newline(self) -> None:
+        self.write_lines("app/src/main/cpp/large.cpp", LIMIT, trailing_newline=False)
+        self.assert_rejected("large.cpp has 600 lines")
+
+    def test_covers_build_scripts_and_tooling(self) -> None:
+        for path in ("build.gradle.kts", "tools/check.py", "tools/run.sh", "lib/probe.S", "lib/probe.h"):
+            self.write_lines(path, LIMIT)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        for path in ("build.gradle.kts", "tools/check.py", "tools/run.sh", "lib/probe.S", "lib/probe.h"):
+            self.assertIn(path, result.stderr)
+
+    def test_ignores_non_source_and_build_outputs(self) -> None:
+        self.write_lines("app/src/main/res/values/strings.xml", LIMIT * 2)
+        self.write_lines("docs/architecture.md", LIMIT * 2)
+        self.write_lines("app/build/generated/Huge.kt", LIMIT * 2)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_baseline_tolerates_existing_file_that_does_not_grow(self) -> None:
+        self.write_lines("app/src/main/java/Legacy.kt", 700)
+        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_baseline_rejects_growth(self) -> None:
+        self.write_lines("app/src/main/java/Legacy.kt", 701)
+        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
+        self.assert_rejected("grew from 700 to 701 lines")
+
+    def test_baseline_must_shrink_once_file_complies(self) -> None:
+        self.write_lines("app/src/main/java/Legacy.kt", 200)
+        self.write_baseline({"app/src/main/java/Legacy.kt": 700})
+        self.assert_rejected("remove it from the migration baseline")
+
+    def test_baseline_rejects_stale_entries(self) -> None:
+        self.write_baseline({"app/src/main/java/Deleted.kt": 700})
+        self.assert_rejected("no longer exists")
+
+    def test_rejects_malformed_baseline(self) -> None:
+        self.write_lines("app/src/main/java/Small.kt", 10)
+        self.write_baseline({"app/src/main/java/Small.kt": 10})
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("malformed", result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
