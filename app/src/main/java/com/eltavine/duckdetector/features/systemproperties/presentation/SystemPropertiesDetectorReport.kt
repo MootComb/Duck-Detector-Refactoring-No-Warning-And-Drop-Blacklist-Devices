@@ -1,0 +1,45 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.systemproperties.presentation
+
+import com.eltavine.duckdetector.core.report.DetectorReport
+import com.eltavine.duckdetector.core.report.ReportBlock
+import com.eltavine.duckdetector.core.report.ReportFact
+import com.eltavine.duckdetector.core.report.ReportRow
+import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesCardModel
+import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesDetailRowModel
+
+fun SystemPropertiesCardModel.toDetectorReport(): DetectorReport = DetectorReport(
+    title = title,
+    verdict = verdict,
+    severity = status.severity,
+    quickFacts = headerFacts.map { ReportFact(it.label, it.value) },
+    blocks = listOf(
+        ReportBlock.Rows("Core", coreRows.toReportRows()),
+        ReportBlock.Rows("Boot", bootRows.toReportRows()),
+        ReportBlock.Rows("Build", buildRows.toReportRows()),
+        ReportBlock.Rows("Source", sourceRows.toReportRows()),
+        ReportBlock.Rows("Consistency", consistencyRows.toReportRows()),
+        ReportBlock.Rows("Info", infoRows.toReportRows()),
+        ReportBlock.Rows("Methods", methodRows.toReportRows()),
+        ReportBlock.Rows("Scan", scanRows.toReportRows()),
+        ReportBlock.Bullets("Impact & Guidance", impactItems.map { it.text }),
+    ),
+)
+
+private fun List<SystemPropertiesDetailRowModel>.toReportRows(): List<ReportRow> =
+    map { ReportRow(it.label, it.value, it.detail) }
