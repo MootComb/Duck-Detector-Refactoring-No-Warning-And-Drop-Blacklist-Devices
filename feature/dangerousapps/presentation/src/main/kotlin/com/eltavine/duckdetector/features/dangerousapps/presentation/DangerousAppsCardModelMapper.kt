@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFindi
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousPackageVisibility
+import com.eltavine.duckdetector.features.dangerousapps.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsContextItemModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFactModel
@@ -268,25 +269,4 @@ class DangerousAppsCardModelMapper {
         }
     }
 
-    private fun DangerousAppsReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            DangerousAppsStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            DangerousAppsStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            DangerousAppsStage.READY -> when {
-                hiddenCount > 0 -> DetectorStatus.danger()
-                detectedCount > 0 -> DetectorStatus.warning()
-                suspiciousSharedStorageDenied -> DetectorStatus.warning()
-                suspiciousLowPmInventory -> DetectorStatus.warning()
-                packageVisibility == DangerousPackageVisibility.RESTRICTED -> DetectorStatus.info(
-                    InfoKind.ERROR
-                )
-
-                packageVisibility == DangerousPackageVisibility.UNKNOWN -> DetectorStatus.info(
-                    InfoKind.SUPPORT
-                )
-
-                else -> DetectorStatus.allClear()
-            }
-        }
-    }
 }
