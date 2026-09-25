@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
+import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedDetailRowModel
 
 internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {

@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.lsposed.presentation
 
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
+import com.eltavine.duckdetector.features.lsposed.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedCardModel
 
 class LSPosedCardModelMapper {

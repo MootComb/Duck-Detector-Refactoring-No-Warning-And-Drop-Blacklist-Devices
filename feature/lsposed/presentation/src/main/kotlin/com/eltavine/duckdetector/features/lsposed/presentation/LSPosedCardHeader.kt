@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibilit
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
+import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFactModel
 
 internal fun buildSubtitle(report: LSPosedReport): String {
@@ -148,29 +149,6 @@ private fun countLabel(count: Int, reducedCoverage: Boolean = false): String {
         reducedCoverage -> "N/A"
         else -> "None"
     }
-}
-
-internal fun LSPosedReport.toDetectorStatus(): DetectorStatus {
-    return when (stage) {
-        LSPosedStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        LSPosedStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        LSPosedStage.READY -> when {
-            hasDangerSignals -> DetectorStatus.danger()
-            hasWarningSignals -> DetectorStatus.warning()
-            hasReducedCoverage() -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.allClear()
-        }
-    }
-}
-
-internal fun LSPosedReport.hasReducedCoverage(): Boolean {
-    return !nativeAvailable ||
-            !nativeHeapAvailable ||
-            !zygotePermissionAvailable ||
-            !runtimeArtifactAvailable ||
-            !logcatAvailable ||
-            !dirtyPolicyAvailable ||
-            packageVisibility != LSPosedPackageVisibility.FULL
 }
 
 private fun LSPosedReport.hasPolicySignals(): Boolean {

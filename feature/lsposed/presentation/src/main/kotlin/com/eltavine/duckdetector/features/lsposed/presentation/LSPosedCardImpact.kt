@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
+import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedImpactItemModel
 
 internal fun buildImpactItems(report: LSPosedReport): List<LSPosedImpactItemModel> {
