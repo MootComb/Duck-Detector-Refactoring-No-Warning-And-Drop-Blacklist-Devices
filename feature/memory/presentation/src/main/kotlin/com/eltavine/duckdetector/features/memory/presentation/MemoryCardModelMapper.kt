@@ -25,6 +25,7 @@ import com.eltavine.duckdetector.features.memory.domain.MemoryMethodOutcome
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodResult
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
 import com.eltavine.duckdetector.features.memory.domain.MemoryStage
+import com.eltavine.duckdetector.features.memory.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryDetailRowModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFactModel
@@ -447,16 +448,4 @@ class MemoryCardModelMapper {
         }
     }
 
-    private fun MemoryReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            MemoryStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            MemoryStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            MemoryStage.READY -> when {
-                dangerFindingCount > 0 -> DetectorStatus.danger()
-                reviewFindingCount > 0 -> DetectorStatus.warning()
-                !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
-            }
-        }
-    }
 }

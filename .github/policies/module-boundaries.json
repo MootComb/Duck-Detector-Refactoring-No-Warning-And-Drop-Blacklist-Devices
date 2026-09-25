@@ -486,7 +486,9 @@
     },
     ":feature:memory:domain": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":feature:memory:presentation": {
       "kind": "jvm",
