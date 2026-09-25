@@ -99,6 +99,10 @@
         ":feature:playintegrityfix:domain",
         ":feature:playintegrityfix:presentation",
         ":feature:playintegrityfix:ui",
+        ":feature:selinux:data",
+        ":feature:selinux:domain",
+        ":feature:selinux:presentation",
+        ":feature:selinux:ui",
         ":feature:su:data",
         ":feature:su:domain",
         ":feature:su:presentation",
@@ -388,6 +392,39 @@
         ":core:ui",
         ":feature:playintegrityfix:domain",
         ":feature:playintegrityfix:presentation"
+      ]
+    },
+    ":feature:selinux:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:selinuxpolicy:data",
+        ":core:native",
+        ":feature:selinux:domain"
+      ]
+    },
+    ":feature:selinux:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:selinux:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:selinux:domain"
+      ]
+    },
+    ":feature:selinux:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:selinux:domain",
+        ":feature:selinux:presentation"
       ]
     },
     ":feature:su:data": {

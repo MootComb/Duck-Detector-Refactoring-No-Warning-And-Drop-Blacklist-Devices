@@ -59,6 +59,8 @@ dependencies {
     implementation(project(":feature:virtualization:ui"))
     implementation(project(":feature:mount:data"))
     implementation(project(":feature:mount:ui"))
+    implementation(project(":feature:selinux:data"))
+    implementation(project(":feature:selinux:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

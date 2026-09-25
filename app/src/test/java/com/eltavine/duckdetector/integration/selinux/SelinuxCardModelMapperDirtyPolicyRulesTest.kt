@@ -1,0 +1,288 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.integration.selinux
+
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.selinux.data.repository.buildDirtyPolicyMethods
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
+import com.eltavine.duckdetector.features.selinux.presentation.SelinuxCardModelMapper
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class SelinuxCardModelMapperDirtyPolicyRulesTest {
+
+    private val mapper = SelinuxCardModelMapper()
+
+    @Test
+    fun `dirty sepolicy rule rows stay visible with per-rule statuses`() {
+        val model = mapper.map(
+            baseReport(
+                SelinuxCheckResult(
+                    method = "Dirty sepolicy rule: system_server execmem",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+                SelinuxCheckResult(
+                    method = "Dirty sepolicy rule: untrusted_app -> ksu_file read",
+                    status = "Denied",
+                    isSecure = true,
+                    permissionDenied = false,
+                    details = "Observed edge: untrusted_app -> ksu_file:file read. This should stay denied on stock policy because ordinary apps should not read KernelSU-labeled files. The access oracle reported this edge as denied.",
+                ),
+                SelinuxCheckResult(
+                    method = "Dirty sepolicy rule: shell -> su transition",
+                    status = "Unavailable",
+                    isSecure = null,
+                    permissionDenied = false,
+                    details = "Observed edge: shell -> su:process transition. This is only evaluated for confirmed user builds because stock user builds should not expose an AOSP su transition path. The access oracle could not produce a verdict for this edge. | Reason: Dirty policy oracle self-test failed.",
+                ),
+            ),
+        )
+
+        assertTrue(
+            model.methodRows.any {
+                it.label == "Dirty sepolicy rule: system_server execmem" &&
+                    it.value == "Allowed" &&
+                    it.status == DetectorStatus.danger()
+            },
+        )
+        assertTrue(
+            model.methodRows.any {
+                it.label == "Dirty sepolicy rule: untrusted_app -> ksu_file read" &&
+                    it.value == "Denied" &&
+                    it.status == DetectorStatus.allClear()
+            },
+        )
+        assertTrue(
+            model.methodRows.any {
+                it.label == "Dirty sepolicy rule: shell -> su transition" &&
+                    it.value == "Unavailable" &&
+                    it.status == DetectorStatus.info(com.eltavine.duckdetector.core.evidence.InfoKind.SUPPORT)
+            },
+        )
+        assertTrue(
+            model.methodRows.any {
+                val detail = it.detail
+                it.label == "Dirty sepolicy rule: system_server execmem" &&
+                    detail != null &&
+                    detail.contains("Observed edge:") &&
+                    detail.contains("reported this edge as allowed")
+            },
+        )
+    }
+
+    @Test
+    fun `trusted dirty sepolicy hit raises overall selinux warning`() {
+        val model = mapper.map(
+            baseReport(
+                SelinuxCheckResult(
+                    method = "Dirty sepolicy rule: system_server execmem",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+            ),
+        )
+
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("Enforcing with dirty sepolicy rule", model.verdict)
+        assertTrue(model.summary.contains("DirtySepolicy-style access query reported system_server execmem as allowed"))
+        assertTrue(model.impactItems.any { it.text.contains("trusted DirtySepolicy-style access rule was allowed") })
+    }
+
+    @Test
+    fun `reportable but untrusted dirty sepolicy hit does not use trusted copy`() {
+        val model = mapper.map(
+            baseReport(
+                SelinuxCheckResult(
+                    method = "Dirty sepolicy rule: system_server execmem",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed. | Reason: Dirty policy oracle self-test failed.",
+                    dirtyPolicyTrusted = false,
+                ),
+            ),
+        )
+
+        assertEquals(DetectorStatus.allClear(), model.status)
+        assertEquals("Enforcing", model.verdict)
+        assertTrue(model.summary.contains("visible policy surface looks internally consistent"))
+        assertTrue(model.impactItems.none { it.text.contains("trusted DirtySepolicy-style access rule was allowed") })
+    }
+
+    @Test
+    fun `trusted msd checker hit raises overall selinux warning`() {
+        val model = mapper.map(
+            baseReport(
+                SelinuxCheckResult(
+                    method = "MSD checker: msd_app -> msd_daemon connectto",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: msd_app -> msd_daemon:unix_stream_socket connectto. MSD relies on this dedicated app/domain socket path to talk to its daemon. The dedicated access oracles reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+                SelinuxCheckResult(
+                    method = "MSD checker: msd_daemon -> msd_daemon connectto",
+                    status = "Denied",
+                    isSecure = true,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: msd_daemon -> msd_daemon:unix_stream_socket connectto. MSD explicitly denies self-connect as a sanity check for its loaded policy shape. The dedicated access oracles reported this edge as denied.",
+                ),
+            ),
+        )
+
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("Enforcing with dirty sepolicy rule", model.verdict)
+        assertTrue(model.summary.contains("trusted DirtySepolicy-style access query reported MSD: msd_app -> msd_daemon connectto as allowed"))
+        assertTrue(model.impactItems.any { it.text.contains("trusted DirtySepolicy-style access rule was allowed: MSD: msd_app -> msd_daemon connectto") })
+        assertTrue(
+            model.methodRows.any {
+                it.label == "Dirty sepolicy rule: MSD" &&
+                    it.value == "1 allowed, 1 denied" &&
+                    it.status == DetectorStatus.danger() &&
+                    it.detail.orEmpty().contains("Allowed: msd_app -> msd_daemon connectto") &&
+                    it.detail.orEmpty().contains("Denied: msd_daemon -> msd_daemon connectto")
+            },
+        )
+        assertTrue(model.methodRows.none { it.label.startsWith("MSD checker: ") })
+    }
+
+    @Test
+    fun `trusted droidspaces checker hit is aggregated and raises warning`() {
+        val model = mapper.map(
+            baseReport(
+                SelinuxCheckResult(
+                    method = "Droidspaces checker: magisk -> droidspacesd dyntransition",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: magisk -> droidspacesd:process dyntransition. Droidspaces seeds this transition from its module policy so Magisk-rooted execution can move into the dedicated droidspacesd domain. The dedicated access oracles reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+                SelinuxCheckResult(
+                    method = "Droidspaces checker: su -> droidspacesd dyntransition",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: su -> droidspacesd:process dyntransition. Droidspaces exposes this transition so an su-rooted process can enter the dedicated droidspacesd domain. The dedicated access oracles reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+                SelinuxCheckResult(
+                    method = "Droidspaces checker: system_server -> droidspacesd binder",
+                    status = "Allowed",
+                    isSecure = false,
+                    permissionDenied = false,
+                    details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> droidspacesd:binder call. Droidspaces allows system_server to talk to the dedicated droidspacesd service over binder. The dedicated access oracles reported this edge as allowed.",
+                    dirtyPolicyTrusted = true,
+                ),
+            ),
+        )
+
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("Enforcing with dirty sepolicy rule", model.verdict)
+        assertTrue(model.summary.contains("Droidspaces: magisk -> droidspacesd dyntransition as allowed"))
+        assertTrue(model.impactItems.any { it.text.contains("Droidspaces: magisk -> droidspacesd dyntransition") })
+        assertTrue(
+            model.methodRows.any {
+                it.label == "Dirty sepolicy rule: Droidspaces" &&
+                    it.value == "3 allowed" &&
+                    it.status == DetectorStatus.danger() &&
+                    it.detail.orEmpty().contains("magisk -> droidspacesd dyntransition") &&
+                    it.detail.orEmpty().contains("system_server -> droidspacesd binder")
+            },
+        )
+        assertTrue(model.methodRows.none { it.label.startsWith("Droidspaces checker: ") })
+    }
+
+    @Test
+    fun `fsck observation stays informational and does not raise an overall warning`() {
+        listOf(true to "Allowed", false to "Denied", null to "Unavailable").forEach { (allowed, status) ->
+            val model = mapper.map(baseReport(*fsckPolicyMethods(allowed).toTypedArray()))
+            val row = model.methodRows.single { it.label == "SELinux policy observation: fsck_untrusted sys_admin" }
+
+            assertEquals(status, row.value)
+            assertEquals(DetectorStatus.info(InfoKind.SUPPORT), row.status)
+            assertTrue(row.detail.orEmpty().contains("Informational only"))
+            assertEquals(DetectorStatus.allClear(), model.status)
+            assertEquals("Enforcing", model.verdict)
+            assertTrue(!model.summary.contains("dirty sepolicy", ignoreCase = true))
+            assertTrue(model.impactItems.none { it.text.contains("trusted DirtySepolicy-style access rule was allowed") })
+        }
+    }
+
+    @Test
+    fun `fsck observation does not suppress or replace another dirty policy warning`() {
+        val model = mapper.map(baseReport(*fsckPolicyMethods(true, magiskAllowed = true).toTypedArray()))
+
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("Enforcing with dirty sepolicy rule", model.verdict)
+        assertTrue(model.summary.contains("untrusted_app -> magisk binder as allowed"))
+        assertTrue(model.impactItems.any { it.text.contains("untrusted_app -> magisk binder") })
+        assertTrue(model.impactItems.none { it.text.contains("fsck_untrusted") })
+        assertEquals(
+            DetectorStatus.info(InfoKind.SUPPORT),
+            model.methodRows.single { it.label == "SELinux policy observation: fsck_untrusted sys_admin" }.status,
+        )
+    }
+
+    private fun fsckPolicyMethods(allowed: Boolean?, magiskAllowed: Boolean = false): List<SelinuxCheckResult> {
+        return buildDirtyPolicyMethods(
+            SelinuxContextValiditySnapshot(
+                dirtyPolicyAvailable = true,
+                dirtyPolicyProbeAttempted = true,
+                dirtyPolicyCarrierContext = "u:r:app_zygote:s0:c1,c2",
+                dirtyPolicyCarrierMatchesExpected = true,
+                dirtyPolicyControlsPassed = true,
+                dirtyPolicyStable = true,
+                dirtyPolicyAccessControlAllowed = true,
+                dirtyPolicyNegativeControlRejected = true,
+                dirtyPolicyFsckSysAdminAllowed = allowed,
+                dirtyPolicyMagiskBinderCallAllowed = magiskAllowed,
+            ),
+        )
+    }
+
+    private fun baseReport(vararg methods: SelinuxCheckResult): SelinuxReport {
+        return SelinuxReport(
+            stage = SelinuxStage.READY,
+            mode = SelinuxMode.ENFORCING,
+            resolvedStatusLabel = "Enforcing",
+            filesystemMounted = true,
+            paradoxDetected = false,
+            methods = methods.toList(),
+            processContext = "u:r:untrusted_app:s0:c1,c2",
+            contextType = "untrusted_app",
+            policyAnalysis = null,
+            auditIntegrity = null,
+            androidVersion = "16",
+            apiLevel = 36,
+        )
+    }
+}
