@@ -54,11 +54,12 @@ internal fun buildPatchState(artifacts: TeeScanArtifacts): TeePatchState {
 internal fun headlineFor(
     verdict: TeeVerdict,
     supplementaryIndicators: List<TeeEvidenceItem>,
+    nativeProbesAvailable: Boolean,
 ): String = when (verdict) {
-    TeeVerdict.CONSISTENT -> if (supplementaryIndicators.isNotEmpty()) {
-        "Attestation aligned; local probes need review"
-    } else {
-        "Local TEE attestation checks aligned"
+    TeeVerdict.CONSISTENT -> when {
+        supplementaryIndicators.isNotEmpty() -> "Attestation aligned; local probes need review"
+        !nativeProbesAvailable -> "Attestation aligned; native probes did not run"
+        else -> "Local TEE attestation checks aligned"
     }
 
     TeeVerdict.TAMPERED -> "Policy-backed attestation anomalies were detected"
@@ -74,10 +75,15 @@ internal fun summaryFor(
     policyHardIndicators: List<TeeEvidenceItem>,
     policySoftIndicators: List<TeeEvidenceItem>,
     supplementaryIndicators: List<TeeEvidenceItem>,
+    nativeProbesAvailable: Boolean,
 ): String = when (verdict) {
     TeeVerdict.CONSISTENT -> supplementaryIndicators.highestPriority()?.let { item ->
         "${item.body} Attestation and trust-path checks still aligned."
-    } ?: "Attestation, trust path, and revocation checks line up."
+    } ?: if (nativeProbesAvailable) {
+        "Attestation, trust path, and revocation checks line up."
+    } else {
+        "Attestation, trust path, and revocation checks line up, but the native process-side probes did not run."
+    }
 
     TeeVerdict.TAMPERED -> policyHardIndicators.firstOrNull()?.body
         ?: "Multiple hard anomaly indicators were raised."
@@ -97,11 +103,12 @@ internal fun collapsedSummaryFor(
     policyHardIndicators: List<TeeEvidenceItem>,
     policySoftIndicators: List<TeeEvidenceItem>,
     supplementaryIndicators: List<TeeEvidenceItem>,
+    nativeProbesAvailable: Boolean,
 ): String = when (verdict) {
-    TeeVerdict.CONSISTENT -> if (supplementaryIndicators.isNotEmpty()) {
-        "Aligned • local review"
-    } else {
-        "Checks aligned"
+    TeeVerdict.CONSISTENT -> when {
+        supplementaryIndicators.isNotEmpty() -> "Aligned • local review"
+        !nativeProbesAvailable -> "Aligned • native unavailable"
+        else -> "Checks aligned"
     }
 
     TeeVerdict.TAMPERED -> "${policyHardIndicators.size} policy anomaly"

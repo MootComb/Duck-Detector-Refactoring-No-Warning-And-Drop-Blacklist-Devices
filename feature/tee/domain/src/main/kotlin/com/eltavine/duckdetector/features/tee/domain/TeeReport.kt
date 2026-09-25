@@ -34,6 +34,8 @@ data class TeeReport(
     val evidenceCount: Int,
     val supplementaryIndicatorCount: Int = 0,
     val supplementaryReviewLevel: TeeSignalLevel = TeeSignalLevel.INFO,
+    /** False when the native process-side probes did not run, so their silence says nothing. */
+    val nativeProbesAvailable: Boolean = true,
     val signals: List<TeeSignal>,
     val sections: List<TeeEvidenceSection>,
     val certificates: List<TeeCertificateItem>,

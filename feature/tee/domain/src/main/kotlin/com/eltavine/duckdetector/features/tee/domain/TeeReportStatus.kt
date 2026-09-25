@@ -29,6 +29,7 @@ fun TeeReport.toDetectorStatus(): DetectorStatus = when (verdict) {
         supplementaryReviewLevel == TeeSignalLevel.WARN -> DetectorStatus.warning()
         verdict == TeeVerdict.SUSPICIOUS -> DetectorStatus.warning()
         supplementaryIndicatorCount > 0 -> DetectorStatus.warning()
+        !nativeProbesAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
         else -> DetectorStatus.allClear()
     }
     TeeVerdict.TAMPERED, TeeVerdict.BROKEN -> DetectorStatus.danger()

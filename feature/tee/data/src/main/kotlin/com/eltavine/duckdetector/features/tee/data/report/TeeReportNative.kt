@@ -21,6 +21,8 @@ import java.util.Locale
 
 internal fun nativeValue(artifacts: TeeScanArtifacts): String {
     return when {
+        !artifacts.native.collection.isTrustworthy ->
+            artifacts.native.collection.explain("Native process-side probes did not run")
         artifacts.native.trickyStoreDetected -> buildString {
             append(nativeMethodSummary(artifacts))
             append(" • ")

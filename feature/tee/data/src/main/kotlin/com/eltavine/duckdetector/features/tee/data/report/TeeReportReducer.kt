@@ -49,23 +49,26 @@ class TeeReportReducer(
             supplementaryIndicators = supplementaryIndicators,
         )
         val normalizedTrustRoot = normalizeTrustRoot(artifacts.trust.trustRoot)
+        val nativeProbesAvailable = artifacts.native.collection.isTrustworthy
         val report = TeeReport(
             stage = TeeScanStage.READY,
             verdict = verdict,
             tier = effectiveTier,
-            headline = headlineFor(verdict, supplementaryIndicators),
+            headline = headlineFor(verdict, supplementaryIndicators, nativeProbesAvailable),
             summary = summaryFor(
                 verdict = verdict,
                 artifacts = artifacts,
                 policyHardIndicators = policyHardIndicators,
                 policySoftIndicators = policySoftIndicators,
                 supplementaryIndicators = supplementaryIndicators,
+                nativeProbesAvailable = nativeProbesAvailable,
             ),
             collapsedSummary = collapsedSummaryFor(
                 verdict = verdict,
                 policyHardIndicators = policyHardIndicators,
                 policySoftIndicators = policySoftIndicators,
                 supplementaryIndicators = supplementaryIndicators,
+                nativeProbesAvailable = nativeProbesAvailable,
             ),
             trustRoot = normalizedTrustRoot,
             localTrustChainLevel = localTrustChainLevel(artifacts),
@@ -74,6 +77,7 @@ class TeeReportReducer(
             evidenceCount = sections.sumOf { it.items.size },
             supplementaryIndicatorCount = supplementaryIndicators.size,
             supplementaryReviewLevel = supplementaryReviewLevel(supplementaryIndicators),
+            nativeProbesAvailable = nativeProbesAvailable,
             signals = buildSignals(
                 artifacts = artifacts,
                 patchState = patchState,
