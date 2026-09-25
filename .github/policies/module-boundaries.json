@@ -332,6 +332,7 @@
       "allowed_project_dependencies": [
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
+        ":core:platform",
         ":feature:dangerousapps:domain"
       ]
     },

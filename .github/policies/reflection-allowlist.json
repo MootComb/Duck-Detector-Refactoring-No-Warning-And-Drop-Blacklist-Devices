@@ -80,13 +80,6 @@
       "reason": "Queries the hidden android.os.ServiceManager and reads the hidden framework fields named by custom ROM signatures; the presence of those fields is the evidence."
     },
     {
-      "path": "feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Queries android.os.ServiceManager, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBridgeFieldProbe.kt",
       "uses": [
         "operations",

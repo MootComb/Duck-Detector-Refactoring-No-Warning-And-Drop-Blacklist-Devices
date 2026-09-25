@@ -19,13 +19,13 @@ package com.eltavine.duckdetector.features.dangerousapps.data.repository
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.IBinder
 import android.os.Parcel
 import android.provider.Settings
 import android.text.TextUtils
 import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.CreatePackageContextZipProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.OpenApkFdPackageProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneDebugfsContextProbe
@@ -325,14 +325,11 @@ class DangerousAppsRepository(
         appendMethod(detectedApps, target, method)
     }
 
-    @Suppress("PrivateApi")
     private fun detectThanoxIpc(): Boolean {
         var data: Parcel? = null
         var reply: Parcel? = null
         return try {
-            val serviceManagerClass = Class.forName("android.os.ServiceManager")
-            val getServiceMethod = serviceManagerClass.getMethod("getService", String::class.java)
-            val dropboxBinder = getServiceMethod.invoke(null, THANOX_PROXIED_SERVICE) as? IBinder
+            val dropboxBinder = HiddenServiceManager.getService(THANOX_PROXIED_SERVICE).getOrThrow()
                 ?: return false
 
             data = Parcel.obtain()
