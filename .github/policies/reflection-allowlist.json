@@ -145,13 +145,6 @@
       "reason": "Exercises the reflective method gateway against fake service methods."
     },
     {
-      "path": "feature/playintegrityfix/data/src/main/kotlin/com/eltavine/duckdetector/features/playintegrityfix/data/utils/PlayIntegrityPropertyReadUtils.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeyMintCapabilityProbe.kt",
       "uses": [
         "operations"
