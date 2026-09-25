@@ -21,6 +21,8 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
+import com.eltavine.duckdetector.features.nativeroot.domain.hasReducedCoverage
+import com.eltavine.duckdetector.features.nativeroot.domain.hasRuntimeReducedCoverage
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFactModel
 
 internal fun buildSubtitle(report: NativeRootReport): String {
@@ -200,33 +202,4 @@ private fun familyValue(report: NativeRootReport): String {
         else -> report.detectedFamilies.take(2)
             .joinToString("/") + " +${report.detectedFamilies.size - 2}"
     }
-}
-
-internal fun NativeRootReport.toDetectorStatus(): DetectorStatus {
-    return when (stage) {
-        NativeRootStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        NativeRootStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        NativeRootStage.READY -> when {
-            hasDangerFindings -> DetectorStatus.danger()
-            hasWarningFindings -> DetectorStatus.warning()
-            !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
-            hasReducedCoverage() -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.allClear()
-        }
-    }
-}
-
-internal fun NativeRootReport.hasReducedCoverage(): Boolean {
-    return ksuSupercallBlocked ||
-            !ksuSupercallAttempted ||
-            hasRuntimeReducedCoverage()
-}
-
-private fun NativeRootReport.hasRuntimeReducedCoverage(): Boolean {
-    return !cgroupAvailable ||
-            !isolatedMountProbeAvailable ||
-            !ksuThroneHuntAvailable ||
-            !ksuThroneHuntStimulusApplied ||
-            ksuManagerVisibilityRestricted ||
-            ksuManagerVisibilityUnknown
 }

@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.nativeroot.presentation
 
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
+import com.eltavine.duckdetector.features.nativeroot.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
 
 class NativeRootCardModelMapper {
