@@ -179,7 +179,7 @@ class ZygiskRepository(
                     !snapshot.available -> ZygiskMethodOutcome.SUPPORT
                     else -> ZygiskMethodOutcome.CLEAN
                 },
-                detail = "Checks whether linker entry points still belong to the expected loader and whether restricted-path libraries appear in the current process.",
+                detail = "Checks whether linker entry points still belong to the expected loader and whether restricted-path libraries appear in the current process. The check that an entry point immediately branches out of the loader decodes arm64 instructions, so on other ABIs only the owning-image check runs.",
             ),
             ZygiskMethodResult(
                 label = "Maps and smaps",
