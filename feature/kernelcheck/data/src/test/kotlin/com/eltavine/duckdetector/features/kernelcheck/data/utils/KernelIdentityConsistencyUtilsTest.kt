@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.kernelcheck.data.utils
 
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityField
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -82,7 +82,7 @@ class KernelIdentityConsistencyUtilsTest {
         val finding = utils.detectMismatch(reads)
 
         assertNotNull(finding)
-        assertEquals(KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID, finding!!.id)
+        assertEquals(KernelCheckFindingKind.KERNEL_IDENTITY_MISMATCH, finding!!.kind)
         assertEquals(KernelCheckFindingSeverity.HARD, finding.severity)
         assertEquals("${KernelIdentityField.RELEASE.label} diverged", finding.value)
         val detail = finding.detail.orEmpty()

@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
@@ -311,7 +312,7 @@ internal fun kptrRow(
 ): KernelCheckDetailRowModel {
     return when {
         report.kptrExposed -> {
-            val finding = report.infoFindings.firstOrNull { it.id == "kptr_exposed" }
+            val finding = report.infoFindings.firstOrNull { it.kind == KernelCheckFindingKind.KPTR_EXPOSED }
             KernelCheckDetailRowModel(
                 label = "kptr_restrict",
                 value = "Exposed",

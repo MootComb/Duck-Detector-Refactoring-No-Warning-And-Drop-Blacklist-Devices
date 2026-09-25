@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.kernelcheck.data.repository
 import com.eltavine.duckdetector.features.kernelcheck.data.probes.CvePatchAssessment
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityField
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityRead
 
@@ -36,32 +36,32 @@ internal object KernelCheckMethods {
         comparedIdentityFields: List<Pair<KernelIdentityField, List<KernelIdentityRead>>>,
         cpuIdentityMethod: KernelCheckMethodResult,
     ): List<KernelCheckMethodResult> {
-        val dangerById = dangerFindings.associateBy { it.id }
-        val infoById = infoFindings.associateBy { it.id }
+        val dangerById = dangerFindings.associateBy { it.kind }
+        val infoById = infoFindings.associateBy { it.kind }
 
         return listOf(
-            buildNamingMethod(KernelCheckMethod.EMOJI_SCAN, dangerById["emoji"]),
-            buildNamingMethod(KernelCheckMethod.CHINESE_SCAN, dangerById["chinese_chars"]),
-            buildNamingMethod(KernelCheckMethod.SCRIPT_SCAN, dangerById["non_latin_scripts"]),
-            buildNamingMethod(KernelCheckMethod.TELEGRAM_SCAN, dangerById["telegram_ref"]),
-            buildNamingMethod(KernelCheckMethod.MENTION_SCAN, dangerById["at_mention"]),
-            buildNamingMethod(KernelCheckMethod.CUSTOM_KERNEL, dangerById["custom_kernel"]),
-            buildNamingMethod(KernelCheckMethod.KERNEL_VERSION_CHECK, dangerById["non_release_kernel_version"]),
+            buildNamingMethod(KernelCheckMethod.EMOJI_SCAN, dangerById[KernelCheckFindingKind.EMOJI]),
+            buildNamingMethod(KernelCheckMethod.CHINESE_SCAN, dangerById[KernelCheckFindingKind.CHINESE_CHARS]),
+            buildNamingMethod(KernelCheckMethod.SCRIPT_SCAN, dangerById[KernelCheckFindingKind.NON_LATIN_SCRIPTS]),
+            buildNamingMethod(KernelCheckMethod.TELEGRAM_SCAN, dangerById[KernelCheckFindingKind.TELEGRAM_REF]),
+            buildNamingMethod(KernelCheckMethod.MENTION_SCAN, dangerById[KernelCheckFindingKind.AT_MENTION]),
+            buildNamingMethod(KernelCheckMethod.CUSTOM_KERNEL, dangerById[KernelCheckFindingKind.CUSTOM_KERNEL]),
+            buildNamingMethod(KernelCheckMethod.KERNEL_VERSION_CHECK, dangerById[KernelCheckFindingKind.NON_RELEASE_KERNEL_VERSION]),
             buildIdentityConsistencyMethod(
-                dangerById[KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID],
+                dangerById[KernelCheckFindingKind.KERNEL_IDENTITY_MISMATCH],
                 comparedIdentityFields,
             ),
             cpuIdentityMethod,
             buildNativeMethod(
                 KernelCheckMethod.CMDLINE_CHECK,
-                dangerById["suspicious_cmdline"],
+                dangerById[KernelCheckFindingKind.SUSPICIOUS_CMDLINE],
                 nativeAvailable,
                 "Normal"
             ),
             buildCveMethod(KernelCheckMethod.CVE_PATCH_CHECK, cveAssessment),
             buildInfoMethod(
                 KernelCheckMethod.KPTR_RESTRICT,
-                infoById["kptr_exposed"],
+                infoById[KernelCheckFindingKind.KPTR_EXPOSED],
                 unavailable = !nativeAvailable
             ),
             KernelCheckMethodResult(

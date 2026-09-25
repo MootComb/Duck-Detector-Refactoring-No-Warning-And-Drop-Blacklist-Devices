@@ -20,11 +20,11 @@ import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdenti
 import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdentityProbeStatus
 import com.eltavine.duckdetector.features.kernelcheck.data.native.CachedCpuIdentitySource
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 
 data class Arm64CpuIdentityAssessment(
     val finding: KernelCheckFinding?,
@@ -53,7 +53,7 @@ class Arm64CpuIdentityConsistencyEvaluator {
 
         val finding = mismatches.takeIf { it.isNotEmpty() }?.let {
             KernelCheckFinding(
-                id = KernelCheckReport.CPU_IDENTITY_MISMATCH_FINDING_ID,
+                kind = KernelCheckFindingKind.ARM64_CPU_IDENTITY_MISMATCH,
                 label = "ARM64 CPU identity",
                 value = "${it.size} core mismatch(es)",
                 detail = detail,

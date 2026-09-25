@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.kernelcheck.data.utils
 
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityField
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityRead
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentitySurface
@@ -114,7 +114,7 @@ class KernelIdentityConsistencyUtils {
         }
 
         return KernelCheckFinding(
-            id = KernelCheckReport.IDENTITY_MISMATCH_FINDING_ID,
+            kind = KernelCheckFindingKind.KERNEL_IDENTITY_MISMATCH,
             label = "Kernel identity sources",
             value = divergedFields.joinToString(separator = " + ") { (field, _) ->
                 field.label

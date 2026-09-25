@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.kernelcheck.data.rules.KernelIdentityR
 import com.eltavine.duckdetector.features.kernelcheck.data.rules.KernelIdentityScripts
 import com.eltavine.duckdetector.features.kernelcheck.data.utils.KernelIdentityConsistencyUtils
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
@@ -79,7 +80,7 @@ class KernelCheckRepository(
         val emojis = KernelIdentityScripts.findEmojis(combinedIdentity)
         if (emojis.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "emoji",
+                kind = KernelCheckFindingKind.EMOJI,
                 label = "Emoji markers",
                 value = emojis.joinToString(" "),
                 detail = "Kernel identity contains emoji codepoints.",
@@ -90,7 +91,7 @@ class KernelCheckRepository(
         val chineseChars = KernelIdentityScripts.findChineseCharacters(combinedIdentity)
         if (chineseChars.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "chinese_chars",
+                kind = KernelCheckFindingKind.CHINESE_CHARS,
                 label = "Chinese glyphs",
                 value = chineseChars.joinToString(""),
                 detail = "Kernel identity contains CJK characters.",
@@ -101,7 +102,7 @@ class KernelCheckRepository(
         val nonLatinScriptResult = KernelIdentityScripts.findNonLatinScriptCharacters(combinedIdentity)
         if (nonLatinScriptResult.samples.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "non_latin_scripts",
+                kind = KernelCheckFindingKind.NON_LATIN_SCRIPTS,
                 label = "Other language scripts",
                 value = nonLatinScriptResult.scriptNames.joinToString(", "),
                 detail = buildString {
@@ -126,7 +127,7 @@ class KernelCheckRepository(
             .toList()
         if (telegramMatches.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "telegram_ref",
+                kind = KernelCheckFindingKind.TELEGRAM_REF,
                 label = "Telegram reference",
                 value = telegramMatches.joinToString(", "),
                 detail = "Kernel identity references TG/Telegram style handles or channels.",
@@ -140,7 +141,7 @@ class KernelCheckRepository(
             .toList()
         if (mentionMatches.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "at_mention",
+                kind = KernelCheckFindingKind.AT_MENTION,
                 label = "@ mentions",
                 value = mentionMatches.joinToString(", "),
                 detail = "Kernel identity contains maintainer-style @ mentions.",
@@ -151,7 +152,7 @@ class KernelCheckRepository(
         val customKeywords = KernelIdentityRules.detectCustomKernelKeywords(combinedIdentity)
         if (customKeywords.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "custom_kernel",
+                kind = KernelCheckFindingKind.CUSTOM_KERNEL,
                 label = "Custom identifiers",
                 value = customKeywords.joinToString(", "),
                 detail = "Known community kernel identifiers matched the kernel identity.",
@@ -162,7 +163,7 @@ class KernelCheckRepository(
         val nonReleaseMajorVersion = KernelIdentityRules.detectNonReleaseKernelMajorVersion(unameOutput)
         if (nonReleaseMajorVersion != null) {
             dangerFindings += KernelCheckFinding(
-                id = "non_release_kernel_version",
+                kind = KernelCheckFindingKind.NON_RELEASE_KERNEL_VERSION,
                 label = "Kernel major version",
                 value = nonReleaseMajorVersion,
                 detail = "Kernel release major version $nonReleaseMajorVersion does not match any " +
@@ -187,7 +188,7 @@ class KernelCheckRepository(
             .ifEmpty { KernelIdentityRules.detectCriticalCmdlineFallback(procCmdline) }
         if (cmdlineMatches.isNotEmpty()) {
             dangerFindings += KernelCheckFinding(
-                id = "suspicious_cmdline",
+                kind = KernelCheckFindingKind.SUSPICIOUS_CMDLINE,
                 label = "Boot cmdline",
                 value = "${cmdlineMatches.size} hit(s)",
                 detail = cmdlineMatches.joinToString(separator = "\n"),
@@ -198,7 +199,7 @@ class KernelCheckRepository(
         val kptrDetail = nativeSnapshot.findings.firstDetail("KPTR_RESTRICT|DISABLED|")
         if (kptrDetail != null || nativeSnapshot.kptrExposed) {
             infoFindings += KernelCheckFinding(
-                id = "kptr_exposed",
+                kind = KernelCheckFindingKind.KPTR_EXPOSED,
                 label = "Kernel pointers",
                 value = "Exposed",
                 detail = kptrDetail ?: "kptr_restrict appears disabled.",
@@ -211,7 +212,7 @@ class KernelCheckRepository(
             cveAssessment.state == KernelCheckCvePatchState.PARTIALLY_PATCHED
         ) {
             infoFindings += KernelCheckFinding(
-                id = "cve_patch_state",
+                kind = KernelCheckFindingKind.CVE_PATCH_STATE,
                 label = "CVE-2024-43093",
                 value = cveAssessment.state.label,
                 detail = cveAssessment.detail,

@@ -43,8 +43,24 @@ enum class KernelCheckCvePatchState(
     INCONCLUSIVE("Inconclusive"),
 }
 
+/** What a kernel check finding is about; the report counts and the methods look findings up by it. */
+enum class KernelCheckFindingKind {
+    EMOJI,
+    CHINESE_CHARS,
+    NON_LATIN_SCRIPTS,
+    TELEGRAM_REF,
+    AT_MENTION,
+    CUSTOM_KERNEL,
+    NON_RELEASE_KERNEL_VERSION,
+    SUSPICIOUS_CMDLINE,
+    KPTR_EXPOSED,
+    CVE_PATCH_STATE,
+    KERNEL_IDENTITY_MISMATCH,
+    ARM64_CPU_IDENTITY_MISMATCH,
+}
+
 data class KernelCheckFinding(
-    val id: String,
+    val kind: KernelCheckFindingKind,
     val label: String,
     val value: String,
     val detail: String? = null,
@@ -129,22 +145,22 @@ data class KernelCheckReport(
         get() = infoFindings.size
 
     val reviewInfoFindingCount: Int
-        get() = infoFindings.count { it.id != "cve_patch_state" }
+        get() = infoFindings.count { it.kind != KernelCheckFindingKind.CVE_PATCH_STATE }
 
     val identityFindingCount: Int
-        get() = dangerFindings.count { it.id in IDENTITY_FINDING_IDS }
+        get() = dangerFindings.count { it.kind in IDENTITY_FINDING_KINDS }
 
     val bootFindingCount: Int
-        get() = dangerFindings.count { it.id in BOOT_FINDING_IDS }
+        get() = dangerFindings.count { it.kind in BOOT_FINDING_KINDS }
 
     val hasHardIndicators: Boolean
         get() = dangerFindings.isNotEmpty()
 
     val hasIdentityMismatch: Boolean
-        get() = dangerFindings.any { it.id == IDENTITY_MISMATCH_FINDING_ID }
+        get() = dangerFindings.any { it.kind == KernelCheckFindingKind.KERNEL_IDENTITY_MISMATCH }
 
     val hasCpuIdentityMismatch: Boolean
-        get() = dangerFindings.any { it.id == CPU_IDENTITY_MISMATCH_FINDING_ID }
+        get() = dangerFindings.any { it.kind == KernelCheckFindingKind.ARM64_CPU_IDENTITY_MISMATCH }
 
     val hasInfoIndicators: Boolean
         get() = infoFindings.isNotEmpty()
@@ -157,23 +173,20 @@ data class KernelCheckReport(
                 cvePatchState == KernelCheckCvePatchState.PARTIALLY_PATCHED
 
     companion object {
-        const val IDENTITY_MISMATCH_FINDING_ID = "kernel_identity_mismatch"
-        const val CPU_IDENTITY_MISMATCH_FINDING_ID = "arm64_cpu_identity_mismatch"
-
-        private val IDENTITY_FINDING_IDS = setOf(
-            "emoji",
-            "chinese_chars",
-            "non_latin_scripts",
-            "telegram_ref",
-            "at_mention",
-            "custom_kernel",
-            "non_release_kernel_version",
-            IDENTITY_MISMATCH_FINDING_ID,
-            CPU_IDENTITY_MISMATCH_FINDING_ID,
+        private val IDENTITY_FINDING_KINDS = setOf(
+            KernelCheckFindingKind.EMOJI,
+            KernelCheckFindingKind.CHINESE_CHARS,
+            KernelCheckFindingKind.NON_LATIN_SCRIPTS,
+            KernelCheckFindingKind.TELEGRAM_REF,
+            KernelCheckFindingKind.AT_MENTION,
+            KernelCheckFindingKind.CUSTOM_KERNEL,
+            KernelCheckFindingKind.NON_RELEASE_KERNEL_VERSION,
+            KernelCheckFindingKind.KERNEL_IDENTITY_MISMATCH,
+            KernelCheckFindingKind.ARM64_CPU_IDENTITY_MISMATCH,
         )
 
-        private val BOOT_FINDING_IDS = setOf(
-            "suspicious_cmdline",
+        private val BOOT_FINDING_KINDS = setOf(
+            KernelCheckFindingKind.SUSPICIOUS_CMDLINE,
         )
 
         fun loading(): KernelCheckReport {
