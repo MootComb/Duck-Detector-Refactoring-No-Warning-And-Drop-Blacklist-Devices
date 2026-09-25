@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 
 class OperationErrorPathProbe(
     private val binderClient: Keystore2PrivateBinderClient = Keystore2PrivateBinderClient(),
@@ -214,11 +215,7 @@ class OperationErrorPathProbe(
         }
 
         private fun readSystemProperty(key: String): String? {
-            return runCatching {
-                Class.forName("android.os.SystemProperties")
-                    .getMethod("get", String::class.java, String::class.java)
-                    .invoke(null, key, "") as String
-            }.getOrNull()?.takeIf { it.isNotBlank() }
+            return HiddenSystemProperties.read(key, "").getOrNull()?.takeIf { it.isNotBlank() }
         }
     }
 }

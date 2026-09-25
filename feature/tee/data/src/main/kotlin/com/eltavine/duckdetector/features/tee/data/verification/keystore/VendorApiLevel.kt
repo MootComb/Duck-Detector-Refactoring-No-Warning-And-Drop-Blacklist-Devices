@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
 
 fun interface VendorApiLevelReader {
@@ -81,9 +82,7 @@ internal fun resolveVendorApiLevel(readProperty: (String) -> String?): VendorApi
 internal class ReflectionVendorApiLevelReader : VendorApiLevelReader {
     override fun read(): VendorApiLevelResult {
         return runCatching {
-            val clazz = Class.forName("android.os.SystemProperties")
-            val method = clazz.getMethod("get", String::class.java)
-            resolveVendorApiLevel { name -> method.invoke(null, name) as? String }
+            resolveVendorApiLevel { name -> HiddenSystemProperties.read(name).getOrThrow() }
         }.getOrElse { throwable ->
             VendorApiLevelResult(
                 level = null,
