@@ -70,34 +70,18 @@ import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirecti
 import com.eltavine.duckdetector.core.ui.components.LocalDetectorAutoExpansionDirective
 import com.eltavine.duckdetector.core.ui.components.ScreenshotWatermarkOverlay
 import com.eltavine.duckdetector.core.ui.openExternalUri
-import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
-import com.eltavine.duckdetector.features.customrom.ui.CustomRomDetectorFeature
-import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetectorFeature
 import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.dashboard.ui.model.dashboardCardOrder
-import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
-import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeature
-import com.eltavine.duckdetector.features.lsposed.ui.LSPosedDetectorFeature
-import com.eltavine.duckdetector.features.memory.ui.MemoryDetectorFeature
-import com.eltavine.duckdetector.features.mount.ui.MountDetectorFeature
-import com.eltavine.duckdetector.features.nativeroot.ui.NativeRootDetectorFeature
-import com.eltavine.duckdetector.features.playintegrityfix.ui.PlayIntegrityFixDetectorFeature
-import com.eltavine.duckdetector.features.selinux.ui.SelinuxDetectorFeature
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
 import com.eltavine.duckdetector.features.settings.ui.model.SettingsUiState
-import com.eltavine.duckdetector.features.su.ui.SuDetectorFeature
-import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDetectorFeature
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
-import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
 import com.eltavine.duckdetector.features.update.presentation.UpdateViewModel
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
-import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
-import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
@@ -409,22 +393,22 @@ private fun AppReadyShell(
     val updateViewModel: UpdateViewModel = viewModel(factory = updateFactory)
     // Every detector view model starts scanning when it is created, so this order is the order in
     // which detector scans begin; it is kept exactly as it was when the shell created them itself.
-    val bootloader = BootloaderDetectorFeature.rememberSession()
-    val tee = TeeDetectorFeature.rememberSession()
-    val customRom = CustomRomDetectorFeature.rememberSession()
-    val dangerousApps = DangerousAppsDetectorFeature.rememberSession()
-    val deviceProfile = DeviceInfoProfileFeature.rememberSession()
-    val kernelCheck = KernelCheckDetectorFeature.rememberSession()
-    val lsposed = LSPosedDetectorFeature.rememberSession()
-    val memory = MemoryDetectorFeature.rememberSession()
-    val mount = MountDetectorFeature.rememberSession()
-    val nativeRoot = NativeRootDetectorFeature.rememberSession()
-    val playIntegrityFix = PlayIntegrityFixDetectorFeature.rememberSession()
-    val selinux = SelinuxDetectorFeature.rememberSession()
-    val su = SuDetectorFeature.rememberSession()
-    val systemProperties = SystemPropertiesDetectorFeature.rememberSession()
-    val virtualization = VirtualizationDetectorFeature.rememberSession()
-    val zygisk = ZygiskDetectorFeature.rememberSession()
+    val bootloader = DetectorFeatures.bootloader.rememberSession()
+    val tee = DetectorFeatures.tee.rememberSession()
+    val customRom = DetectorFeatures.customRom.rememberSession()
+    val dangerousApps = DetectorFeatures.dangerousApps.rememberSession()
+    val deviceProfile = DetectorFeatures.deviceProfile.rememberSession()
+    val kernelCheck = DetectorFeatures.kernelCheck.rememberSession()
+    val lsposed = DetectorFeatures.lsposed.rememberSession()
+    val memory = DetectorFeatures.memory.rememberSession()
+    val mount = DetectorFeatures.mount.rememberSession()
+    val nativeRoot = DetectorFeatures.nativeRoot.rememberSession()
+    val playIntegrityFix = DetectorFeatures.playIntegrityFix.rememberSession()
+    val selinux = DetectorFeatures.selinux.rememberSession()
+    val su = DetectorFeatures.su.rememberSession()
+    val systemProperties = DetectorFeatures.systemProperties.rememberSession()
+    val virtualization = DetectorFeatures.virtualization.rememberSession()
+    val zygisk = DetectorFeatures.zygisk.rememberSession()
     val detectors = remember(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk) {
         listOf(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk)
     }
