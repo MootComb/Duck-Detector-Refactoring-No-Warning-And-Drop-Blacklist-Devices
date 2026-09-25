@@ -20,6 +20,7 @@ import android.os.DeadObjectException
 import android.os.IBinder
 import android.os.Parcel
 import android.os.Process
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -85,7 +86,7 @@ class LSPosedBinderProbe {
                         "Reply accepted"
                     }
                 }.getOrElse {
-                    "Reply anomaly: ${it.javaClass.simpleName}"
+                    "Reply anomaly: ${PlatformFailureName.of(it)}"
                 }
                 listOf(
                     LSPosedSignal(

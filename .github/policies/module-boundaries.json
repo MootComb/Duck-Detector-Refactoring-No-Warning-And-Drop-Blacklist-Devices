@@ -441,6 +441,7 @@
         ":capability:packageinventory:domain",
         ":capability:selinuxpolicy:data",
         ":core:native",
+        ":core:platform",
         ":feature:lsposed:domain"
       ]
     },

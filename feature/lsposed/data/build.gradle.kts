@@ -27,6 +27,7 @@ dependencies {
     api(project(":capability:packageinventory:domain"))
     api(project(":capability:selinuxpolicy:data"))
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
     api(project(":feature:lsposed:domain"))
     implementation(libs.kotlinx.coroutines.android)
 }

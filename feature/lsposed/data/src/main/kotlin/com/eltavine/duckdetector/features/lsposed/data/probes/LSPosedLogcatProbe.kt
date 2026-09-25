@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -426,7 +427,7 @@ class LSPosedLogcatProbe(
             } catch (throwable: Throwable) {
                 LSPosedLogcatCommandOutput(
                     output = output.toString().trim(),
-                    errorMessage = throwable.message ?: throwable.javaClass.simpleName,
+                    errorMessage = throwable.message ?: PlatformFailureName.of(throwable),
                 )
             } finally {
                 process?.destroy()
