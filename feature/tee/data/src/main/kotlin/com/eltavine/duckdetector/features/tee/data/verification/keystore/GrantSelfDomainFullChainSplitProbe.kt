@@ -306,7 +306,7 @@ class GrantSelfDomainFullChainSplitProbe(
             }
             diagnostics.addThrowable("grant-attest-app-read", appReadFailure)
             val errorKind = classifyKeystore2PrivateGrantFailure(
-                throwableClassName = appReadFailure.javaClass.name,
+                family = grantFailureFamilyOf(appReadFailure),
                 message = appReadFailure.message,
                 serviceSpecificErrorCode = binderClient.extractServiceSpecificErrorCode(appReadFailure),
             )

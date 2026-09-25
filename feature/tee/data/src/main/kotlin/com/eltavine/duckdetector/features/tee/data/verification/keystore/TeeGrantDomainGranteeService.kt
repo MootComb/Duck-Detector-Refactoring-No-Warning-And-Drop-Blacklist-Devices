@@ -109,7 +109,7 @@ class TeeGrantDomainGranteeService : Service() {
             TeeGrantDomainGranteeChainResult(
                 available = false,
                 errorKind = classifyKeystore2PrivateGrantFailure(
-                    throwableClassName = throwable.rootCauseClassName(),
+                    family = grantFailureFamilyOf(throwable.rootCause()),
                     message = throwable.rootCauseMessage(),
                     serviceSpecificErrorCode = throwable.serviceSpecificErrorCode(),
                 ),
@@ -154,7 +154,7 @@ class TeeGrantDomainGranteeService : Service() {
             TeeGrantDomainGranteeChainResult(
                 available = false,
                 errorKind = classifyKeystore2PrivateGrantFailure(
-                    throwableClassName = throwable.rootCauseClassName(),
+                    family = grantFailureFamilyOf(throwable.rootCause()),
                     message = throwable.rootCauseMessage(),
                     serviceSpecificErrorCode = throwable.serviceSpecificErrorCode(),
                 ),
@@ -172,8 +172,6 @@ private fun Throwable.rootCause(): Throwable {
     }
     return current
 }
-
-private fun Throwable.rootCauseClassName(): String = rootCause().javaClass.name
 
 private fun Throwable.rootCauseMessage(): String? = rootCause().message
 

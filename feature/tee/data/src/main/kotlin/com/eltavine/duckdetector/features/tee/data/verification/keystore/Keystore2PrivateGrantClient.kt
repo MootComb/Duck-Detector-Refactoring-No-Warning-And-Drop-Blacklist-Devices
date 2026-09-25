@@ -483,7 +483,7 @@ class Keystore2PrivateGrantClient(
     private fun classifyFailure(throwable: Throwable): Keystore2PrivateGrantErrorKind {
         val errorCode = extractServiceSpecificErrorCode(throwable)
         return classifyKeystore2PrivateGrantFailure(
-            throwableClassName = findRootCause(throwable).javaClass.name,
+            family = grantFailureFamilyOf(findRootCause(throwable)),
             message = findRootCause(throwable).message,
             serviceSpecificErrorCode = errorCode,
         )

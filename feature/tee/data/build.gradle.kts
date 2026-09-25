@@ -26,6 +26,7 @@ dependencies {
     api(project(":capability:attestation:data"))
     api(project(":capability:attestation:domain"))
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
     api(project(":feature:tee:domain"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)

@@ -16,6 +16,10 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
+import android.os.BadParcelableException
+import android.os.ParcelFileDescriptor
+import android.os.ParcelFormatException
+import com.eltavine.duckdetector.core.platform.HiddenPlatformFailure
 import java.io.ByteArrayInputStream
 import java.lang.reflect.InvocationTargetException
 import java.security.cert.CertificateFactory
@@ -131,6 +135,35 @@ enum class Keystore2PrivateGrantErrorKind {
     UNGRANT_FAILED,
 }
 
+/** The exception families [classifyKeystore2PrivateGrantFailure] tells apart. */
+internal enum class GrantFailureFamily {
+    HIDDEN_API,
+    PARCEL_OR_REFLECTION,
+    OTHER,
+}
+
+/**
+ * Sorts a failure into the family the grant classifier distinguishes.
+ *
+ * The reflective wrappers extend ReflectiveOperationException, so they are checked before it.
+ */
+internal fun grantFailureFamilyOf(failure: Throwable): GrantFailureFamily = when {
+    failure is NoSuchMethodException ||
+        failure is NoSuchMethodError ||
+        failure is NoSuchFieldException ||
+        failure is NoSuchFieldError ||
+        failure is ClassNotFoundException -> GrantFailureFamily.HIDDEN_API
+    failure is InvocationTargetException ||
+        failure is IllegalAccessException ||
+        failure is IllegalAccessError ||
+        failure is BadParcelableException ||
+        failure is ParcelFormatException ||
+        failure is ParcelFileDescriptor.FileDescriptorDetachedException ||
+        HiddenPlatformFailure.isParcelable(failure) -> GrantFailureFamily.PARCEL_OR_REFLECTION
+    failure is ReflectiveOperationException && failure !is InstantiationException -> GrantFailureFamily.HIDDEN_API
+    else -> GrantFailureFamily.OTHER
+}
+
 internal fun buildDefaultKeystore2PrivateGrantConstants(): Keystore2PrivateGrantConstants {
     return Keystore2PrivateGrantConstants(
         domainApp = Keystore2PrivateGrantClient.DOMAIN_APP_FALLBACK,
@@ -145,7 +178,7 @@ internal fun buildDefaultKeystore2PrivateGrantConstants(): Keystore2PrivateGrant
 }
 
 internal fun classifyKeystore2PrivateGrantFailure(
-    throwableClassName: String,
+    family: GrantFailureFamily,
     message: String?,
     serviceSpecificErrorCode: Int?,
 ): Keystore2PrivateGrantErrorKind {
@@ -161,13 +194,8 @@ internal fun classifyKeystore2PrivateGrantFailure(
             text.contains("KEY_NOT_FOUND", ignoreCase = true) -> Keystore2PrivateGrantErrorKind.KEY_NOT_FOUND
         text.contains("permission denied", ignoreCase = true) ||
             text.contains("PERMISSION_DENIED", ignoreCase = true) -> Keystore2PrivateGrantErrorKind.PERMISSION_DENIED
-        throwableClassName.contains("ReflectiveOperationException") ||
-            throwableClassName.contains("NoSuchMethod") ||
-            throwableClassName.contains("NoSuchField") ||
-            throwableClassName.contains("ClassNotFound") -> Keystore2PrivateGrantErrorKind.HIDDEN_API_FAILURE
-        throwableClassName.contains("Parcel") ||
-            throwableClassName.contains("InvocationTargetException") ||
-            throwableClassName.contains("IllegalAccess") -> Keystore2PrivateGrantErrorKind.PARCEL_OR_REFLECTION_FAILURE
+        family == GrantFailureFamily.HIDDEN_API -> Keystore2PrivateGrantErrorKind.HIDDEN_API_FAILURE
+        family == GrantFailureFamily.PARCEL_OR_REFLECTION -> Keystore2PrivateGrantErrorKind.PARCEL_OR_REFLECTION_FAILURE
         else -> Keystore2PrivateGrantErrorKind.SERVICE_UNAVAILABLE
     }
 }

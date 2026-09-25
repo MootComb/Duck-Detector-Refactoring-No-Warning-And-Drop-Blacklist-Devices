@@ -67,7 +67,7 @@ class Keystore2PrivateGrantClientTest {
         assertEquals(
             Keystore2PrivateGrantErrorKind.KEY_NOT_FOUND,
             classifyKeystore2PrivateGrantFailure(
-                throwableClassName = "android.os.ServiceSpecificException",
+                family = GrantFailureFamily.OTHER,
                 message = "not found",
                 serviceSpecificErrorCode = Keystore2PrivateGrantClient.RESPONSE_CODE_KEY_NOT_FOUND,
             ),
@@ -76,7 +76,7 @@ class Keystore2PrivateGrantClientTest {
         assertEquals(
             Keystore2PrivateGrantErrorKind.KEY_NOT_FOUND,
             classifyKeystore2PrivateGrantFailure(
-                throwableClassName = "java.lang.IllegalStateException",
+                family = grantFailureFamilyOf(IllegalStateException()),
                 message = "No key found by the given alias",
                 serviceSpecificErrorCode = null,
             ),
@@ -88,7 +88,7 @@ class Keystore2PrivateGrantClientTest {
         assertEquals(
             Keystore2PrivateGrantErrorKind.PERMISSION_DENIED,
             classifyKeystore2PrivateGrantFailure(
-                throwableClassName = "android.os.ServiceSpecificException",
+                family = GrantFailureFamily.OTHER,
                 message = null,
                 serviceSpecificErrorCode = Keystore2PrivateGrantClient.RESPONSE_CODE_PERMISSION_DENIED,
             ),
@@ -97,11 +97,27 @@ class Keystore2PrivateGrantClientTest {
         assertEquals(
             Keystore2PrivateGrantErrorKind.HIDDEN_API_FAILURE,
             classifyKeystore2PrivateGrantFailure(
-                throwableClassName = "java.lang.ClassNotFoundException",
+                family = grantFailureFamilyOf(ClassNotFoundException()),
                 message = "android.system.keystore2.IKeystoreService",
                 serviceSpecificErrorCode = null,
             ),
         )
+    }
+
+    @Test
+    fun `grant failure families follow the exception type`() {
+        assertEquals(GrantFailureFamily.HIDDEN_API, grantFailureFamilyOf(NoSuchMethodException()))
+        assertEquals(GrantFailureFamily.HIDDEN_API, grantFailureFamilyOf(NoSuchFieldError()))
+        assertEquals(GrantFailureFamily.HIDDEN_API, grantFailureFamilyOf(ClassNotFoundException()))
+        assertEquals(GrantFailureFamily.HIDDEN_API, grantFailureFamilyOf(ReflectiveOperationException()))
+        assertEquals(
+            GrantFailureFamily.PARCEL_OR_REFLECTION,
+            grantFailureFamilyOf(java.lang.reflect.InvocationTargetException(Throwable())),
+        )
+        assertEquals(GrantFailureFamily.PARCEL_OR_REFLECTION, grantFailureFamilyOf(IllegalAccessError()))
+        assertEquals(GrantFailureFamily.OTHER, grantFailureFamilyOf(InstantiationException()))
+        assertEquals(GrantFailureFamily.OTHER, grantFailureFamilyOf(NoClassDefFoundError()))
+        assertEquals(GrantFailureFamily.OTHER, grantFailureFamilyOf(IllegalStateException()))
     }
 
     @Test

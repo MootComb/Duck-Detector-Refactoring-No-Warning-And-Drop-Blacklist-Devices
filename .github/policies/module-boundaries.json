@@ -722,6 +722,7 @@
         ":capability:attestation:data",
         ":capability:attestation:domain",
         ":core:native",
+        ":core:platform",
         ":feature:tee:domain"
       ]
     },
