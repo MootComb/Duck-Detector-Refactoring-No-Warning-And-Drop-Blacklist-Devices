@@ -23,9 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DeviceProfileFeature
-import com.eltavine.duckdetector.core.detector.DeviceProfileSession
 import com.eltavine.duckdetector.core.report.DeviceReport
+import com.eltavine.duckdetector.core.ui.detector.DeviceProfileFeature
+import com.eltavine.duckdetector.core.ui.detector.DeviceProfileSession
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoScanner
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
 import com.eltavine.duckdetector.features.deviceinfo.ui.card.DeviceInfoCard

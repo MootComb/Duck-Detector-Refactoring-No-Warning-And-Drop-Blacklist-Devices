@@ -25,11 +25,10 @@ android {
 
 dependencies {
     api(project(":capability:attestation:domain"))
-    api(project(":core:detector"))
     api(project(":core:evidence"))
     api(project(":core:report"))
     api(project(":core:scan"))
-    implementation(project(":core:ui"))
+    api(project(":core:ui"))
     api(project(":feature:tee:domain"))
     api(project(":feature:tee:presentation"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)

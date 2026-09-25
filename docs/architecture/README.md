@@ -12,8 +12,8 @@ inside one feature unit:     data -> domain
                              ui -> presentation + domain
 inside one capability unit:  data -> domain
 
-:core:report, :core:scan, :core:ui -> :core:evidence
-:core:detector -> :core:evidence + :core:report + :core:scan
+:core:report, :core:scan -> :core:evidence
+:core:ui -> :core:evidence + :core:report + :core:scan
 ```
 
 Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, pure JVM modules depend neither on Android modules nor on Android artifacts, and only UI modules may use Compose. [`module-boundaries.json`](../../.github/policies/module-boundaries.json) states each layer's rule once as a template and lists only the core modules and `:app` individually. Settings include every module by discovering its directory, so a new unit needs no central entry ([ADR 0001](../adr/0001-gradle-module-boundaries.md), [ADR 0007](../adr/0007-derived-module-classification.md)).
@@ -25,8 +25,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity, and the hidden `SystemProperties` and `ServiceManager` access | Detector semantics, verdicts, UI |
 | `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
-| `:core:detector` | `DetectorFeature` / `DetectorSession` and the device profile contract the composition root works with | Specific detectors, probes, rendering of other detectors |
-| `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings | Detector rules, probes, specific detectors |
+| `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings, and the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with | Detector rules, probes, specific detectors |
 | `:capability:<unit>:domain` | Evidence types a capability shares with several features | Android, feature interpretation, UI |
 | `:capability:<unit>:data` | Collection of shared evidence: package inventory, early preload capture, system property reads, helper processes, SELinux policy carriers, attestation | Feature verdicts, presentation, other capabilities |
 | `:feature:<unit>:domain` | The feature's result and report models and pure judgement rules | Android, JNI, UI, other features |

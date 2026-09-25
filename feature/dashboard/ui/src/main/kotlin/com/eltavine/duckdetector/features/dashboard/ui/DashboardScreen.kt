@@ -49,8 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.eltavine.duckdetector.core.detector.DetectorSession
-import com.eltavine.duckdetector.core.detector.DeviceProfileSession
+import com.eltavine.duckdetector.core.ui.detector.DetectorSession
+import com.eltavine.duckdetector.core.ui.detector.DeviceProfileSession
 import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
 import com.eltavine.duckdetector.core.ui.components.LocalDetectorIdentity
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText

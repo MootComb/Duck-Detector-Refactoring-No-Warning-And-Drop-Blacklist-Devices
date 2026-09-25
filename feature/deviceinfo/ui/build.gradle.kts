@@ -24,9 +24,8 @@ android {
 }
 
 dependencies {
-    api(project(":core:detector"))
     api(project(":core:report"))
-    implementation(project(":core:ui"))
+    api(project(":core:ui"))
     api(project(":feature:deviceinfo:domain"))
     api(project(":feature:deviceinfo:presentation"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)

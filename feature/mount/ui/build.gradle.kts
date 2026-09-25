@@ -24,11 +24,10 @@ android {
 }
 
 dependencies {
-    api(project(":core:detector"))
     api(project(":core:evidence"))
     api(project(":core:report"))
     api(project(":core:scan"))
-    implementation(project(":core:ui"))
+    api(project(":core:ui"))
     api(project(":feature:mount:domain"))
     api(project(":feature:mount:presentation"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)

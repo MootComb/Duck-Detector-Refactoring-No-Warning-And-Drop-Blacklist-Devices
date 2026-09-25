@@ -24,9 +24,8 @@ android {
 }
 
 dependencies {
-    api(project(":core:detector"))
     api(project(":core:evidence"))
-    implementation(project(":core:ui"))
+    api(project(":core:ui"))
     api(project(":feature:dashboard:presentation"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material.icons.extended)

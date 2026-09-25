@@ -29,6 +29,8 @@ kotlin {
 
 dependencies {
     api(project(":core:evidence"))
+    api(project(":core:report"))
+    api(project(":core:scan"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.ui)

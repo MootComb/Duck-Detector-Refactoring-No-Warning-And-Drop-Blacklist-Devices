@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.ui
 
-import com.eltavine.duckdetector.core.detector.DetectorFeature
-import com.eltavine.duckdetector.core.detector.DeviceProfileFeature
+import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
+import com.eltavine.duckdetector.core.ui.detector.DeviceProfileFeature
 import com.eltavine.duckdetector.features.bootloader.data.repository.BootloaderRepository
 import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
 import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRepository

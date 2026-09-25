@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.detector
+package com.eltavine.duckdetector.core.ui.detector
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
