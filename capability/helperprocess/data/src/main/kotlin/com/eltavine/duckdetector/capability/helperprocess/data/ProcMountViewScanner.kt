@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.capability.helperprocess.data
 
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import java.io.File
 
 /**
@@ -138,7 +139,7 @@ internal class ProcMountViewScanner(
                 .sortedBy { it.toIntOrNull() ?: Int.MAX_VALUE }
             evaluate(pids, mountInfoLineReader)
         }.getOrElse { throwable ->
-            unavailable(throwable.message ?: throwable.javaClass.simpleName)
+            unavailable(throwable.message ?: PlatformFailureName.of(throwable))
         }
     }
 
