@@ -28,10 +28,10 @@ import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRom
 import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.dashboard.data.DashboardExport
-import com.eltavine.duckdetector.features.dashboard.data.ExportHeader
-import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
-import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
+import com.eltavine.duckdetector.features.dashboard.presentation.export.DashboardExport
+import com.eltavine.duckdetector.features.dashboard.presentation.export.ExportHeader
+import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardFindings
+import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport

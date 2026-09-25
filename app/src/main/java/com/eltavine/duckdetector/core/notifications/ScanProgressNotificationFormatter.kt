@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.core.notifications
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewVerdict
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewVerdict
 import kotlin.math.roundToInt
 
 data class ScanProgressNotificationSnapshot(

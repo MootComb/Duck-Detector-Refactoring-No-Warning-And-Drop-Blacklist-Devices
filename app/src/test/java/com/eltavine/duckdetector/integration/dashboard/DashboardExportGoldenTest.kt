@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.integration.dashboard
 
-import com.eltavine.duckdetector.features.dashboard.data.DashboardReportRenderer
-import com.eltavine.duckdetector.features.dashboard.data.ExportHeader
+import com.eltavine.duckdetector.features.dashboard.presentation.export.DashboardReportRenderer
+import com.eltavine.duckdetector.features.dashboard.presentation.export.ExportHeader
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.dashboard.data
+package com.eltavine.duckdetector.features.dashboard.presentation.export
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.report.DetectorReport
@@ -22,8 +22,8 @@ import com.eltavine.duckdetector.core.report.DeviceReport
 import com.eltavine.duckdetector.core.report.ReportBlock
 import com.eltavine.duckdetector.core.report.ReportFact
 import com.eltavine.duckdetector.core.report.ReportRow
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardFindingModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardFindingModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 
 /** Values the report banner shows, already formatted for display by the caller. */
 data class ExportHeader(

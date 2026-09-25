@@ -19,9 +19,9 @@ package com.eltavine.duckdetector.ui.shell
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewCounts
-import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewVerdict
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewCounts
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewVerdict
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

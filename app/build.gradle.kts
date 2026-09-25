@@ -76,6 +76,7 @@ dependencies {
     implementation(project(":feature:update:data"))
     implementation(project(":feature:update:ui"))
     implementation(project(":feature:settings:ui"))
+    implementation(project(":feature:dashboard:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

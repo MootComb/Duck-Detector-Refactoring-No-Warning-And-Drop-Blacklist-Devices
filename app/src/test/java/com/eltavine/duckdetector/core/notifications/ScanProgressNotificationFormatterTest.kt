@@ -17,10 +17,10 @@
 package com.eltavine.duckdetector.core.notifications
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewMetricModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewCounts
-import com.eltavine.duckdetector.features.dashboard.ui.model.OverviewVerdict
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetricModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewCounts
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewVerdict
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -71,10 +71,10 @@ import com.eltavine.duckdetector.core.ui.components.LocalDetectorAutoExpansionDi
 import com.eltavine.duckdetector.core.ui.components.ScreenshotWatermarkOverlay
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
-import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
-import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
-import com.eltavine.duckdetector.features.dashboard.ui.model.dashboardCardOrder
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardUiState
+import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardFindings
+import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardOverview
+import com.eltavine.duckdetector.features.dashboard.presentation.model.dashboardCardOrder
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
 import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore

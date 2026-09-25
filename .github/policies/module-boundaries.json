@@ -89,6 +89,8 @@
         ":feature:dangerousapps:domain",
         ":feature:dangerousapps:presentation",
         ":feature:dangerousapps:ui",
+        ":feature:dashboard:presentation",
+        ":feature:dashboard:ui",
         ":feature:deviceinfo:data",
         ":feature:deviceinfo:domain",
         ":feature:deviceinfo:presentation",
@@ -339,6 +341,23 @@
         ":core:ui",
         ":feature:dangerousapps:domain",
         ":feature:dangerousapps:presentation"
+      ]
+    },
+    ":feature:dashboard:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan"
+      ]
+    },
+    ":feature:dashboard:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:ui",
+        ":feature:dashboard:presentation"
       ]
     },
     ":feature:deviceinfo:data": {

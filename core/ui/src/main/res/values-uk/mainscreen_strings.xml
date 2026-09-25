@@ -23,4 +23,5 @@ limitations under the License.
     <string name="status_info_error">Помилка</string>
     <string name="status_info_support">Підтримка</string>
     <string name="status_warning">Попередження</string>
+    <string name="app_name">Duck Detector</string>
 </resources>

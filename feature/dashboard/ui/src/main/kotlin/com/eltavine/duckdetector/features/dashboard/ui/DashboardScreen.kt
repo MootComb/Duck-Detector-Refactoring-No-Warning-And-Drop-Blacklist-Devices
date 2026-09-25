@@ -61,7 +61,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.features.dashboard.ui.R
 import com.eltavine.duckdetector.core.detector.DetectorSession
 import com.eltavine.duckdetector.core.detector.DeviceProfileSession
 import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
@@ -71,13 +71,13 @@ import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.features.dashboard.data.DashboardExport
-import com.eltavine.duckdetector.features.dashboard.data.DashboardReportRenderer
-import com.eltavine.duckdetector.features.dashboard.data.ExportHeader
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardFindingModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewMetricModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
+import com.eltavine.duckdetector.features.dashboard.presentation.export.DashboardExport
+import com.eltavine.duckdetector.features.dashboard.presentation.export.DashboardReportRenderer
+import com.eltavine.duckdetector.features.dashboard.presentation.export.ExportHeader
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardFindingModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetricModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardUiState
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -277,7 +277,7 @@ private fun BrandHeader() {
                 }
 
                 WrapSafeText(
-                    text = stringResource(R.string.app_name),
+                    text = stringResource(com.eltavine.duckdetector.core.ui.R.string.app_name),
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface,

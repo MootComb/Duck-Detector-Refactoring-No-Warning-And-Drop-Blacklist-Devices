@@ -40,7 +40,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.scan.DetectorSummary
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 import kotlinx.coroutines.delay
 
 internal const val RESULT_NOTICE_LOCK_SECONDS = 5

@@ -15,7 +15,6 @@ limitations under the License.
 -->
 
 <resources>
-    <string name="app_name">Duck Detector</string>
     <string name="dashboard_info_card">Інформаційна картка</string>
     <string name="dashboard_system_time">Системний час</string>
     <string name="dashboard_additional">Додатково</string>
