@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
+import com.eltavine.duckdetector.features.systemproperties.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesImpactItemModel
 
 internal fun buildImpactItems(report: SystemPropertiesReport): List<SystemPropertiesImpactItemModel> {

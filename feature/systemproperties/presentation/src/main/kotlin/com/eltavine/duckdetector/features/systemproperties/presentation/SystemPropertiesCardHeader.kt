@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
+import com.eltavine.duckdetector.features.systemproperties.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFactModel
 
 internal fun buildSubtitle(report: SystemPropertiesReport): String {
@@ -147,21 +148,4 @@ private fun categoryStatus(
 
 private fun countLabel(count: Int): String {
     return if (count > 0) count.toString() else "None"
-}
-
-internal fun SystemPropertiesReport.toDetectorStatus(): DetectorStatus {
-    return when (stage) {
-        SystemPropertiesStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        SystemPropertiesStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        SystemPropertiesStage.READY -> when {
-            hasDangerSignals -> DetectorStatus.danger()
-            hasWarningSignals -> DetectorStatus.warning()
-            hasReducedCoverage() -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.allClear()
-        }
-    }
-}
-
-internal fun SystemPropertiesReport.hasReducedCoverage(): Boolean {
-    return !propAreaAvailable
 }

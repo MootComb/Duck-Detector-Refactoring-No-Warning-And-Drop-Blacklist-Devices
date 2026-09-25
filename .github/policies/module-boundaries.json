@@ -715,7 +715,8 @@
     ":feature:systemproperties:domain": {
       "kind": "jvm",
       "allowed_project_dependencies": [
-        ":capability:systemproperties:domain"
+        ":capability:systemproperties:domain",
+        ":core:evidence"
       ]
     },
     ":feature:systemproperties:presentation": {

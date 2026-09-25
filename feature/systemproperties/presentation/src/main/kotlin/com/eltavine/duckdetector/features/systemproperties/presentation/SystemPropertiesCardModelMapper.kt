@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.systemproperties.presentation
 
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
+import com.eltavine.duckdetector.features.systemproperties.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesCardModel
 
 class SystemPropertiesCardModelMapper {
