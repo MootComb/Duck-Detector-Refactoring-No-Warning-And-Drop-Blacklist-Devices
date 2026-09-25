@@ -60,7 +60,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | Guard | Enforces | Self-test |
 |---|---|---|
 | `DuckDetectorModuleBoundariesPlugin` with `module-boundaries.json` | Classification by layer template or member entry, plugin kind, allowed project dependencies, direction, isolation, JVM purity, UI isolation (Compose only in UI modules) and acyclicity; evaluated while configuring every build | `./gradlew :build-logic:test` |
-| `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit, include direction, per-unit CMake targets, JNI exports owned by the unit's module | `test-native-boundaries.py` |
+| `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit and lives in the module that owns it, include direction, per-unit CMake targets and their registration, JNI exports owned by the unit's module | `test-native-boundaries.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
 | `:sdk:aar:verifySdkAar` | The SDK AAR fuses every project module it needs and reaches no UI library, directly or through an external dependency | Runs on the Fused Library report |
@@ -83,7 +83,7 @@ rescan request -> publish loading state -> wait for the previous scan of the sam
 
 ## Native units
 
-Native code under `sdk/runtime/src/main/cpp` is split into units, one directory each ([ADR 0005](../adr/0005-native-unit-boundaries.md)). Every unit is a `duckdetector_<unit>` object library linked into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
+Native code is split into units ([ADR 0005](../adr/0005-native-unit-boundaries.md)). Each unit lives in the module that owns it, as `<module>/src/main/cpp/<unit>/`, with a `CMakeLists.txt` listing its sources, so a detector's C++ sits next to its Kotlin JNI bridge ([ADR 0009](../adr/0009-native-units-in-their-modules.md)). The `DUCKDETECTOR_NATIVE_UNITS` registry in `sdk/runtime/src/main/cpp/CMakeLists.txt` names every unit with its owner, in link order, and links each `duckdetector_<unit>` object library into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
 
 | Unit | Owner | May include |
 |---|---|---|
@@ -103,7 +103,7 @@ Native code under `sdk/runtime/src/main/cpp` is split into units, one directory 
 3. Share evidence acquisition only through a capability used by at least two features. The capability must not interpret the evidence for any of them.
 4. Never add a dependency between two feature units or two capability units. If they need the same evidence, extract a capability; if they need the same contract, it belongs in `:core`.
 5. Export and dashboard output change only through a feature's own `DetectorReport` projection. Update the golden fixtures deliberately, never to silence a diff.
-6. Add native code as a unit directory with its own `duckdetector_native_unit` target and a `native-boundaries.json` entry. Cross-unit includes need a header-level exception with a reason.
+6. Add native code as `src/main/cpp/<unit>/` in the module that owns it, with a `CMakeLists.txt` that declares its `duckdetector_native_unit` target, one line in the `DUCKDETECTOR_NATIVE_UNITS` registry and a `native-boundaries.json` entry. Cross-unit includes need a header-level exception with a reason.
 7. Keep JNI bridges inside the module that owns the native unit. Kotlin `external` functions must be public or private members of a class or object other than a companion object, and must not be overloaded.
 8. Keep `:app` a composition root. It may wire adapters and platform entry points but must not acquire detection rules or per-detector branching.
 9. Split any file that approaches 600 lines along semantic ownership ([ADR 0006](../adr/0006-source-file-length-limit.md)); there is no baseline to hide in.

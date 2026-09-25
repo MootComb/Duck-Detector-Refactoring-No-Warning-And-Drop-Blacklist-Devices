@@ -1,0 +1,12 @@
+duckdetector_native_unit(duckdetector_memory
+    common/codec.cpp
+    common/maps_reader.cpp
+    detectors/function_hook_detector.cpp
+    detectors/maps_anomaly_detector.cpp
+    detectors/fd_detector.cpp
+    detectors/signal_detector.cpp
+    detectors/vdso_detector.cpp
+    detectors/linker_detector.cpp
+    snapshot_builder.cpp
+    native_bridge.cpp
+)

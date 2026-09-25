@@ -15,15 +15,19 @@
 
 """Enforce native unit ownership, include direction, CMake targets and JNI owners.
 
-Every file under the native source root belongs to exactly one unit, the one with the longest
-matching path. A unit may include its own headers, headers of the units in its may_include
-list, and the exact headers named by an include exception that states a reason. Quoted and
-angle-bracket includes are both checked because the source root is also an include directory.
+Each native unit lives in the module that owns it, under <module>/src/main/cpp/<unit path>. The
+src/main/cpp directories of all modules form one native tree: a file's native path is its path
+below its module's src/main/cpp, no two modules may provide the same native path, and every file
+belongs to exactly one unit, the one with the longest matching path, which the module holding the
+file must own. A unit may include its own headers, headers of the units in its may_include list,
+and the exact headers named by an include exception that states a reason. Quoted and
+angle-bracket includes are both checked because each of those directories is an include directory.
 
-Each unit compiles through its own CMake target. Object units are created by the unit function
-and linked into the aggregate library, which declares no sources of its own. A unit may instead
-be a standalone shared library, which may also compile the sources of units it may include.
-JNI exports defined in a unit must bind JVM declarations from the unit's owning module.
+The aggregate CMakeLists.txt registers every object unit, in link order, with the module that
+owns it, and adds the CMakeLists.txt in the unit's directory. Object units are created by the unit
+function and linked into the aggregate library, which declares no sources of its own. A unit may
+instead be a standalone shared library, which may also compile the sources of units it may
+include. JNI exports defined in a unit must bind JVM declarations from the unit's owning module.
 """
 
 from __future__ import annotations
@@ -39,14 +43,17 @@ import sys
 NATIVE_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".inc", ".S", ".s")
 COMPILED_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".S", ".s")
 LIBRARY_KINDS = {"STATIC", "SHARED", "MODULE", "OBJECT"}
-TARGET_KEYWORDS = {"PRIVATE", "PUBLIC", "INTERFACE", "EXCLUDE_FROM_ALL"}
+TARGET_KEYWORDS = {"PRIVATE", "PUBLIC", "INTERFACE", "EXCLUDE_FROM_ALL", "PARENT_SCOPE"}
 INCLUDE_PATTERN = re.compile(r'^[ \t]*#[ \t]*include[ \t]*([<"])([^>"\n]+)[>"]', re.M)
 COMMAND_PATTERN = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(")
 UNIT_KEYS = {"path", "owner", "target", "may_include"}
 POLICY_KEYS = {
-    "schema_version", "source_root", "cmake_lists", "unit_function", "aggregate_library",
+    "schema_version", "cmake_lists", "unit_registry", "unit_function", "aggregate_library",
     "units", "include_exceptions",
 }
+NATIVE_SOURCE_DIRECTORY = os.path.join("src", "main", "cpp")
+# Mirrors settings.gradle.kts: a module is a directory with a build file at its group's depth.
+MODULE_GROUP_DEPTHS = {"core": 1, "sdk": 1, "capability": 2, "feature": 2}
 
 
 class PolicyError(ValueError):
@@ -64,29 +71,34 @@ class Unit:
 
 @dataclasses.dataclass(frozen=True)
 class Policy:
-    source_root: str
     cmake_lists: str
+    unit_registry: str
     unit_function: str
     aggregate_library: str
     units: dict[str, Unit]
     exceptions: dict[tuple[str, str], str]
 
 
+@dataclasses.dataclass(frozen=True)
+class NativeFile:
+    module: str
+    path: str
+
+
 @dataclasses.dataclass
 class CMakeTarget:
     name: str
     kind: str
-    line: int
+    location: str
     sources: list[str] = dataclasses.field(default_factory=list)
-    links: list[str] = dataclasses.field(default_factory=list)
 
 
 def load_policy(path: str) -> Policy:
     with open(path, encoding="utf-8") as handle:
         document = json.load(handle)
-    if not isinstance(document, dict) or set(document) != POLICY_KEYS or document["schema_version"] != 1:
-        raise PolicyError(f"{path}: expected schema_version 1 with keys {sorted(POLICY_KEYS)}")
-    for key in ("source_root", "cmake_lists", "unit_function", "aggregate_library"):
+    if not isinstance(document, dict) or set(document) != POLICY_KEYS or document["schema_version"] != 2:
+        raise PolicyError(f"{path}: expected schema_version 2 with keys {sorted(POLICY_KEYS)}")
+    for key in ("cmake_lists", "unit_registry", "unit_function", "aggregate_library"):
         if not isinstance(document[key], str) or not document[key]:
             raise PolicyError(f"{key} must be a non-empty string")
     if not isinstance(document["units"], dict) or not document["units"]:
@@ -122,13 +134,9 @@ def load_policy(path: str) -> Policy:
             raise PolicyError(f"include exception {entry['unit']} -> {entry['header']} must state a reason")
         exceptions[(entry["unit"], entry["header"])] = entry["reason"]
     return Policy(
-        document["source_root"].strip("/"), document["cmake_lists"], document["unit_function"],
+        document["cmake_lists"], document["unit_registry"], document["unit_function"],
         document["aggregate_library"], units, exceptions,
     )
-
-
-# Mirrors settings.gradle.kts: a module is a directory with a build file at its group's depth.
-MODULE_GROUP_DEPTHS = {"core": 1, "sdk": 1, "capability": 2, "feature": 2}
 
 
 def discover_modules(repo_root: str) -> set[str]:
@@ -149,22 +157,36 @@ def discover_modules(repo_root: str) -> set[str]:
     return modules
 
 
-def owning_unit(policy: Policy, relative: str) -> Unit | None:
+def module_directory(module: str) -> str:
+    return module.strip(":").replace(":", "/")
+
+
+def owning_unit(policy: Policy, native_path: str) -> Unit | None:
     best = None
     for unit in policy.units.values():
-        if relative == unit.path or relative.startswith(unit.path + "/"):
+        if native_path == unit.path or native_path.startswith(unit.path + "/"):
             if best is None or len(unit.path) > len(best.path):
                 best = unit
     return best
 
 
-def iter_native_files(source_root: str):
-    for directory, subdirectories, files in os.walk(source_root):
-        subdirectories.sort()
-        for name in sorted(files):
-            if name.endswith(NATIVE_SUFFIXES):
-                path = os.path.join(directory, name)
-                yield os.path.relpath(path, source_root).replace(os.sep, "/"), path
+def collect_native_tree(repo_root: str, modules: set[str], errors: list[str]) -> dict[str, NativeFile]:
+    """Every native file of every module, by its native path below the module's src/main/cpp."""
+    tree: dict[str, NativeFile] = {}
+    for module in sorted(modules):
+        root = os.path.join(repo_root, module_directory(module), NATIVE_SOURCE_DIRECTORY)
+        for directory, subdirectories, files in os.walk(root):
+            subdirectories.sort()
+            for name in sorted(files):
+                if not name.endswith(NATIVE_SUFFIXES):
+                    continue
+                path = os.path.relpath(os.path.join(directory, name), repo_root).replace(os.sep, "/")
+                native_path = os.path.relpath(os.path.join(directory, name), root).replace(os.sep, "/")
+                if native_path in tree:
+                    errors.append(f"{path} and {tree[native_path].path} both provide native path {native_path}")
+                else:
+                    tree[native_path] = NativeFile(module, path)
+    return tree
 
 
 def strip_comments(source: str) -> str:
@@ -194,32 +216,33 @@ def strip_comments(source: str) -> str:
     return "".join(result)
 
 
-def resolve_include(source_root: str, including: str, delimiter: str, spelled: str) -> str | None:
+def resolve_include(tree: dict[str, NativeFile], including: str, delimiter: str, spelled: str) -> str | None:
     candidates = [os.path.join(os.path.dirname(including), spelled)] if delimiter == '"' else []
     candidates.append(spelled)
     for candidate in candidates:
         normalized = os.path.normpath(candidate).replace(os.sep, "/")
         if normalized.startswith("../") or normalized == ".." or os.path.isabs(normalized):
             continue
-        if os.path.isfile(os.path.join(source_root, normalized)):
+        if normalized in tree:
             return normalized
     return None
 
 
-def check_includes(policy: Policy, source_root: str, files: dict[str, Unit], errors: list[str]) -> int:
+def check_includes(policy: Policy, repo_root: str, tree: dict[str, NativeFile], files: dict[str, Unit],
+                   errors: list[str]) -> int:
     used_exceptions = set()
     count = 0
-    for relative, unit in sorted(files.items()):
-        with open(os.path.join(source_root, relative), encoding="utf-8") as handle:
+    for native_path, unit in sorted(files.items()):
+        with open(os.path.join(repo_root, tree[native_path].path), encoding="utf-8") as handle:
             code = strip_comments(handle.read())
         for match in INCLUDE_PATTERN.finditer(code):
             delimiter, spelled = match.group(1), match.group(2).strip()
             line = code.count("\n", 0, match.start()) + 1
-            location = f"{policy.source_root}/{relative}:{line}"
-            resolved = resolve_include(source_root, relative, delimiter, spelled)
+            location = f"{tree[native_path].path}:{line}"
+            resolved = resolve_include(tree, native_path, delimiter, spelled)
             if resolved is None:
                 if delimiter == '"':
-                    errors.append(f"{location}: \"{spelled}\" does not resolve inside {policy.source_root}; "
+                    errors.append(f"{location}: \"{spelled}\" does not resolve inside any native unit; "
                                   "include system headers with angle brackets")
                 continue
             count += 1
@@ -268,91 +291,132 @@ def cmake_commands(text: str):
             yield command, arguments, line
 
 
-def parse_cmake(path: str, unit_function: str, errors: list[str]) -> dict[str, CMakeTarget]:
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-    variables: dict[str, list[str]] = {}
-    targets: dict[str, CMakeTarget] = {}
+class CMakeProject:
+    """The aggregate CMakeLists.txt and every unit CMakeLists.txt it adds, read in build order."""
 
-    def expand(arguments: list[str]) -> list[str]:
+    def __init__(self, policy: Policy, repo_root: str, tree: dict[str, NativeFile], errors: list[str]):
+        self.policy = policy
+        self.repo_root = repo_root
+        self.errors = errors
+        self.by_real_path = {
+            os.path.normpath(os.path.join(repo_root, native.path)): native_path for native_path, native in tree.items()
+        }
+        self.variables: dict[str, list[str]] = {}
+        self.targets: dict[str, CMakeTarget] = {}
+        self.registry: list[tuple[str, str]] = []
+        self.aggregate_path = os.path.join(repo_root, policy.cmake_lists)
+        self.read(self.aggregate_path)
+        values = self.variables.get(policy.unit_registry, [])
+        if not values or len(values) % 2:
+            errors.append(f"{policy.cmake_lists}: {policy.unit_registry} must list unit and owner pairs")
+        self.registry = list(zip(values[0::2], values[1::2]))
+        for unit_name, owner_directory in self.registry:
+            self.read(os.path.join(repo_root, owner_directory, NATIVE_SOURCE_DIRECTORY, unit_name, "CMakeLists.txt"))
+
+    def display(self, path: str) -> str:
+        return os.path.relpath(path, self.repo_root).replace(os.sep, "/")
+
+    def read(self, path: str) -> None:
+        if not os.path.isfile(path):
+            self.errors.append(f"{self.display(path)} does not exist")
+            return
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+        directory = os.path.dirname(path)
+        for command, arguments, line in cmake_commands(text):
+            if not arguments:
+                continue
+            location = f"{self.display(path)}:{line}"
+            name, rest = arguments[0], self.expand(arguments[1:], directory)
+            if command == "set":
+                self.variables[name] = [value for value in rest if value not in TARGET_KEYWORDS]
+            elif command == self.policy.unit_function.lower():
+                self.declare(name, "UNIT", location, self.native_paths(rest, directory))
+            elif command == "add_library":
+                kind = rest[0] if rest and rest[0] in LIBRARY_KINDS else "STATIC"
+                sources = rest[1:] if rest and rest[0] in LIBRARY_KINDS else rest
+                self.declare(name, kind, location, self.native_paths(sources, directory))
+            elif command == "target_sources":
+                if name not in self.targets:
+                    self.errors.append(f"{location}: target_sources names undeclared target {name}")
+                    continue
+                self.targets[name].sources += self.native_paths(rest, directory)
+            elif command == "add_subdirectory" and path != self.aggregate_path:
+                self.read(os.path.join(directory, name, "CMakeLists.txt"))
+
+    def expand(self, arguments: list[str], directory: str) -> list[str]:
         values = []
         for argument in arguments:
             reference = re.fullmatch(r"\$\{(\w+)\}", argument)
-            if reference and reference.group(1) in variables:
-                values.extend(variables[reference.group(1)])
+            if reference and reference.group(1) in self.variables:
+                values.extend(self.variables[reference.group(1)])
             else:
-                values.append(argument.replace("${CMAKE_CURRENT_SOURCE_DIR}/", ""))
+                values.append(argument.replace("${CMAKE_CURRENT_SOURCE_DIR}", directory))
         return values
 
-    def declare(name: str, kind: str, line: int, sources: list[str]) -> None:
-        if name in targets:
-            errors.append(f"{path}:{line}: target {name} is declared twice")
-            return
-        targets[name] = CMakeTarget(name, kind, line, [source for source in sources if source not in TARGET_KEYWORDS])
-
-    for command, arguments, line in cmake_commands(text):
-        if not arguments:
-            continue
-        name, rest = arguments[0], expand(arguments[1:])
-        if command == "set":
-            variables[name] = rest
-        elif command == unit_function.lower():
-            declare(name, "UNIT", line, rest)
-        elif command == "add_library":
-            kind = rest[0] if rest and rest[0] in LIBRARY_KINDS else "STATIC"
-            declare(name, kind, line, rest[1:] if rest and rest[0] in LIBRARY_KINDS else rest)
-        elif command in ("target_sources", "target_link_libraries"):
-            if name not in targets:
-                errors.append(f"{path}:{line}: {command} names undeclared target {name}")
+    def native_paths(self, values: list[str], directory: str) -> list[str]:
+        """Native paths of the compiled sources in [values]; CMake resolves relative ones against [directory]."""
+        sources = []
+        for value in values:
+            if value in TARGET_KEYWORDS or not value.endswith(COMPILED_SUFFIXES):
                 continue
-            values = [value for value in rest if value not in TARGET_KEYWORDS]
-            (targets[name].sources if command == "target_sources" else targets[name].links).extend(values)
-    return targets
+            real = os.path.normpath(value if os.path.isabs(value) else os.path.join(directory, value))
+            sources.append(self.by_real_path.get(real, "<outside the native tree>/" + self.display(real)))
+        return sources
+
+    def declare(self, name: str, kind: str, location: str, sources: list[str]) -> None:
+        if name in self.targets:
+            self.errors.append(f"{location}: target {name} is declared twice")
+            return
+        self.targets[name] = CMakeTarget(name, kind, location, sources)
 
 
-def check_cmake(policy: Policy, repo_root: str, files: dict[str, Unit], errors: list[str]) -> None:
-    cmake_path = os.path.join(repo_root, policy.cmake_lists)
-    targets = parse_cmake(cmake_path, policy.unit_function, errors)
-    source_root = os.path.join(repo_root, policy.source_root)
-    for target in targets.values():
-        target.sources = [
-            os.path.relpath(os.path.join(os.path.dirname(cmake_path), source), source_root).replace(os.sep, "/")
-            for source in target.sources
-        ]
+def check_cmake(policy: Policy, repo_root: str, tree: dict[str, NativeFile], files: dict[str, Unit],
+                errors: list[str]) -> None:
+    project = CMakeProject(policy, repo_root, tree, errors)
     unit_by_target = {unit.target: unit for unit in policy.units.values()}
-    for name, target in sorted(targets.items()):
+    registered = {}
+    for unit_name, owner_directory in project.registry:
+        unit = policy.units.get(unit_name)
+        if unit is None:
+            errors.append(f"{policy.cmake_lists}: {policy.unit_registry} registers {unit_name}, which is not a unit")
+        elif module_directory(unit.owner) != owner_directory:
+            errors.append(f"{policy.cmake_lists}: {policy.unit_registry} registers {unit_name} under "
+                          f"{owner_directory}, but {unit.owner} owns it")
+        elif unit_name in registered:
+            errors.append(f"{policy.cmake_lists}: {policy.unit_registry} registers {unit_name} twice")
+        registered[unit_name] = owner_directory
+    for name, target in sorted(project.targets.items()):
         if name != policy.aggregate_library and name not in unit_by_target:
-            errors.append(f"{policy.cmake_lists}:{target.line}: target {name} belongs to no native unit")
+            errors.append(f"{target.location}: target {name} belongs to no native unit")
     for unit in policy.units.values():
-        target = targets.get(unit.target)
+        target = project.targets.get(unit.target)
         if target is None:
             errors.append(f"unit {unit.name}: CMake target {unit.target} is not declared")
             continue
         if target.kind not in ("UNIT", "SHARED", "MODULE"):
-            errors.append(f"{policy.cmake_lists}:{target.line}: unit target {unit.target} must be created by "
+            errors.append(f"{target.location}: unit target {unit.target} must be created by "
                           f"{policy.unit_function} or be a standalone shared library")
+        if target.kind == "UNIT" and unit.name not in registered:
+            errors.append(f"unit {unit.name}: object unit {unit.target} is not registered in {policy.unit_registry}")
         for source in target.sources:
             owner = files.get(source)
             if owner is None:
-                errors.append(f"{policy.cmake_lists}: {unit.target} compiles {source}, which is not a native "
+                errors.append(f"{target.location}: {unit.target} compiles {source}, which is not a native "
                               f"file of any unit")
             elif owner.name != unit.name and not (target.kind != "UNIT" and owner.name in unit.may_include):
-                errors.append(f"{policy.cmake_lists}: {unit.target} of unit {unit.name} compiles {source} "
+                errors.append(f"{target.location}: {unit.target} of unit {unit.name} compiles {source} "
                               f"owned by unit {owner.name}")
         compiled = set(target.sources)
-        for relative, owner in sorted(files.items()):
-            if owner.name == unit.name and relative.endswith(COMPILED_SUFFIXES) and relative not in compiled:
-                errors.append(f"{policy.source_root}/{relative} is not compiled by {unit.target} of unit {unit.name}")
-    aggregate = targets.get(policy.aggregate_library)
+        for native_path, owner in sorted(files.items()):
+            if owner.name == unit.name and native_path.endswith(COMPILED_SUFFIXES) and native_path not in compiled:
+                errors.append(f"{tree[native_path].path} is not compiled by {unit.target} of unit {unit.name}")
+    aggregate = project.targets.get(policy.aggregate_library)
     if aggregate is None or aggregate.kind != "SHARED":
         errors.append(f"aggregate library {policy.aggregate_library} must be declared as a SHARED library")
-        return
-    if aggregate.sources:
+    elif aggregate.sources:
         errors.append(f"aggregate library {policy.aggregate_library} must not compile sources itself: "
                       f"{aggregate.sources}")
-    for name, target in sorted(targets.items()):
-        if target.kind == "UNIT" and name not in aggregate.links:
-            errors.append(f"aggregate library {policy.aggregate_library} does not link unit target {name}")
 
 
 def module_of(path: str) -> str:
@@ -369,7 +433,7 @@ def load_jni_checker():
     return module
 
 
-def check_jni_owners(policy: Policy, repo_root: str, files: dict[str, Unit], errors: list[str]) -> int:
+def check_jni_owners(repo_root: str, tree: dict[str, NativeFile], files: dict[str, Unit], errors: list[str]) -> int:
     jni = load_jni_checker()
     ignored: list[str] = []
     declarations = {}
@@ -382,8 +446,8 @@ def check_jni_owners(policy: Policy, repo_root: str, files: dict[str, Unit], err
         for declaration in parse(relative, source, ignored):
             declarations[declaration.expected_symbol] = declaration
     count = 0
-    for relative, unit in sorted(files.items()):
-        path = f"{policy.source_root}/{relative}"
+    for native_path, unit in sorted(files.items()):
+        path = tree[native_path].path
         with open(os.path.join(repo_root, path), encoding="utf-8") as handle:
             source = handle.read()
         for definition in jni.parse_native(path, source, ignored):
@@ -403,22 +467,27 @@ def check(repo_root: str, policy: Policy, module_names: set[str]) -> tuple[list[
     for unit in policy.units.values():
         if unit.owner not in module_names:
             errors.append(f"unit {unit.name}: owner {unit.owner} is not a module of this build")
-    source_root = os.path.join(repo_root, policy.source_root)
-    for unit in policy.units.values():
-        if not os.path.isdir(os.path.join(source_root, unit.path)):
-            errors.append(f"unit {unit.name}: {policy.source_root}/{unit.path} does not exist")
+            continue
+        directory = f"{module_directory(unit.owner)}/src/main/cpp/{unit.path}"
+        if not os.path.isdir(os.path.join(repo_root, directory)):
+            errors.append(f"unit {unit.name}: {directory} does not exist")
+    tree = collect_native_tree(repo_root, module_names, errors)
     files = {}
-    for relative, _ in iter_native_files(source_root):
-        unit = owning_unit(policy, relative)
+    for native_path, native in tree.items():
+        unit = owning_unit(policy, native_path)
         if unit is None:
-            errors.append(f"{policy.source_root}/{relative} belongs to no native unit")
+            errors.append(f"{native.path} belongs to no native unit")
+        elif unit.owner != native.module:
+            errors.append(f"{native.path} belongs to unit {unit.name}, which {unit.owner} owns, "
+                          f"but lives in {native.module}")
         else:
-            files[relative] = unit
-    includes = check_includes(policy, source_root, files, errors)
-    check_cmake(policy, repo_root, files, errors)
-    exports = check_jni_owners(policy, repo_root, files, errors)
-    summary = (f"Native boundaries verified: {len(policy.units)} units, {len(files)} files, "
-               f"{includes} project includes, {exports} JNI exports.")
+            files[native_path] = unit
+    includes = check_includes(policy, repo_root, tree, files, errors)
+    check_cmake(policy, repo_root, tree, files, errors)
+    exports = check_jni_owners(repo_root, tree, files, errors)
+    owners = {unit.owner for unit in policy.units.values()}
+    summary = (f"Native boundaries verified: {len(policy.units)} units in {len(owners)} modules, {len(files)} "
+               f"files, {includes} project includes, {exports} JNI exports.")
     return errors, summary
 
 

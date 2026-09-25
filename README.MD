@@ -84,8 +84,7 @@ Supporting modules provide the dashboard, device information, settings, update c
 ```text
 Duck-Detector-Refactoring/
 ├─ app/                   # UI composition root: activities, dashboard cards, notifications
-├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, native libraries
-│  └─ src/main/cpp/       # Native units, one directory per owning module, with per-ABI assembly
+├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, native library registry
 ├─ core/                  # Contracts: evidence, native payloads, reports, scan lifecycle, detector, UI
 ├─ capability/            # Evidence collection shared by several detectors
 ├─ feature/               # One detector or supporting feature per directory, split into layers
@@ -107,7 +106,7 @@ Each detector is a set of Gradle modules under `feature/<name>/`:
 
 Dependencies point from `:app` to features, from features to capabilities, and from capabilities to core; features never depend on each other. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
 
-Native sources are organized into units, each compiled as its own object library and linked into `libduckdetector.so`. Kotlin code reaches native results through JNI bridges in the module that owns each unit.
+Native sources are organized into units. Each unit lives in `src/main/cpp/<unit>/` of the module that owns it, is compiled as its own object library and is linked into `libduckdetector.so`; Kotlin code reaches native results through the JNI bridges of that same module.
 
 # Build
 

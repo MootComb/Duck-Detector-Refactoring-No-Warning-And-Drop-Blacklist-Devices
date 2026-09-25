@@ -1,0 +1,22 @@
+duckdetector_native_unit(duckdetector_nativeroot
+    common/codec.cpp
+    common/io_utils.cpp
+    cgroup_bridge.cpp
+    throne_hunt_native_bridge.cpp
+    probes/prctl_probe.cpp
+    probes/kernelpatch_nr_supercall_latency_probe.cpp
+    probes/kernelpatch_superkey_probe.cpp
+    probes/devpts_abnormal_permission_probe.cpp
+    probes/permission_boundary_probe.cpp
+    probes/ksu_supercall_probe.cpp
+    probes/susfs_probe.cpp
+    probes/self_process_ioc_probe.cpp
+    probes/throne_hunt_watch_probe.cpp
+    probes/cgroup_process_probe.cpp
+    probes/path_probe.cpp
+    probes/process_probe.cpp
+    probes/kernel_probe.cpp
+    probes/property_probe.cpp
+    snapshot_builder.cpp
+    native_bridge.cpp
+)
