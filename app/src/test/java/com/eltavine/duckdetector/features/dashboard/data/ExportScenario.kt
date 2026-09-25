@@ -38,7 +38,7 @@ import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckCardMo
 import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedCardModel
 import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.memory.ui.model.MemoryCardModel
+import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
 import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.mount.ui.model.MountCardModel
 import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorReport

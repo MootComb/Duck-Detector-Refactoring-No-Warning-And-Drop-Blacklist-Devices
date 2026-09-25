@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetector
 import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
 import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeature
 import com.eltavine.duckdetector.features.lsposed.ui.LSPosedDetectorFeature
+import com.eltavine.duckdetector.features.memory.data.repository.MemoryRepository
 import com.eltavine.duckdetector.features.memory.ui.MemoryDetectorFeature
 import com.eltavine.duckdetector.features.mount.ui.MountDetectorFeature
 import com.eltavine.duckdetector.features.nativeroot.ui.NativeRootDetectorFeature
@@ -49,7 +50,7 @@ internal object DetectorFeatures {
     val dangerousApps: DetectorFeature = DangerousAppsDetectorFeature
     val kernelCheck: DetectorFeature = KernelCheckDetectorFeature
     val lsposed: DetectorFeature = LSPosedDetectorFeature
-    val memory: DetectorFeature = MemoryDetectorFeature
+    val memory: DetectorFeature = MemoryDetectorFeature { MemoryRepository() }
     val mount: DetectorFeature = MountDetectorFeature
     val nativeRoot: DetectorFeature = NativeRootDetectorFeature
     val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature
