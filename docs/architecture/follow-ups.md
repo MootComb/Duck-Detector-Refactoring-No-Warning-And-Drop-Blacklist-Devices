@@ -26,6 +26,10 @@ Lint's `MissingTranslation` check compares a string only against the locales pre
 
 Each detector still collects its own platform evidence during its scan, even when several detectors read the same source, such as the package inventory or system properties. A scan session that captures such evidence once and hands the same snapshot to every consumer would make cross-detector correlation exact, but it changes probe timing and ordering, so it needs its own design and on-device validation.
 
+## Startup policy wires the TEE network consent
+
+The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. It is composition-root wiring rather than a detection rule, but it is the only place outside `DetectorFeatures` where the shell names a detector. If another feature needs startup consent, replace it with a typed consent contract in `:core`.
+
 ## Composable detector sessions
 
 `DetectorSession.Card()` is `@Composable`, which makes `:core:detector` an Android library. The scan and report contracts it builds on are pure JVM, so a JVM-only session contract with a separate UI binding would allow composition-level tests without Robolectric or instrumentation. This only matters if such tests become necessary.
