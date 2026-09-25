@@ -418,7 +418,9 @@
     },
     ":feature:kernelcheck:domain": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":feature:kernelcheck:presentation": {
       "kind": "jvm",

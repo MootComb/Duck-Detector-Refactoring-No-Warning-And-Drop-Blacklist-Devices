@@ -22,9 +22,6 @@ import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatch
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethod
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodResult
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
-
 internal fun cvePatchStatus(
     state: KernelCheckCvePatchState,
 ): DetectorStatus {
@@ -50,23 +47,5 @@ internal fun methodStatus(result: KernelCheckMethodResult): DetectorStatus {
         }
 
         KernelCheckMethodOutcome.SUPPORT -> DetectorStatus.info(InfoKind.SUPPORT)
-    }
-}
-
-internal fun KernelCheckReport.toDetectorStatus(): DetectorStatus {
-    return when (stage) {
-        KernelCheckStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        KernelCheckStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        KernelCheckStage.READY -> when {
-            hasHardIndicators -> DetectorStatus.danger()
-            hasReviewInfoIndicators -> DetectorStatus.warning()
-            hasInformationalCveState -> DetectorStatus.info(InfoKind.SUPPORT)
-            cvePatchState == KernelCheckCvePatchState.INCONCLUSIVE -> DetectorStatus.info(
-                InfoKind.SUPPORT
-            )
-
-            !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.allClear()
-        }
     }
 }
