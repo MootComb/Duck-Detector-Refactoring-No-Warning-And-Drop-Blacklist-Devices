@@ -20,6 +20,8 @@ set(TEE_KEYSTORE_SOURCES
 )
 
 set(TEE_TRICKYSTORE_SOURCES
+    tee/trickystore/trickystore_honeypot.cpp
+    tee/trickystore/trickystore_hooks.cpp
     tee/trickystore/trickystore_probe.cpp
 )
 
