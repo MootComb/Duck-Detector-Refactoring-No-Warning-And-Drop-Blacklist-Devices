@@ -63,8 +63,6 @@ namespace duckdetector::mount {
         bool mountPropagationAnomaly = false;
         bool inconsistentMountDetected = false;
         bool mountIdLoopholeDetected = false;
-        bool peerGroupLoopholeDetected = false;
-        bool minorDevLoopholeDetected = false;
         bool futileHideDetected = false;
         bool statxMntIdMismatch = false;
         bool bindMountDetected = false;

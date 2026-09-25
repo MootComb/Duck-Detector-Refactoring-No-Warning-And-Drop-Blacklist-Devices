@@ -110,8 +110,6 @@ open class MountNativeBridge(
             "MOUNT_PROPAGATION" -> copy(mountPropagationAnomaly = value.asBool())
             "INCONSISTENT_MOUNT" -> copy(inconsistentMountDetected = value.asBool())
             "MOUNT_ID_LOOPHOLE" -> copy(mountIdLoopholeDetected = value.asBool())
-            "PEER_GROUP_LOOPHOLE" -> copy(peerGroupLoopholeDetected = value.asBool())
-            "MINOR_DEV_LOOPHOLE" -> copy(minorDevLoopholeDetected = value.asBool())
             "FUTILE_HIDE" -> copy(futileHideDetected = value.asBool())
             "STATX_MNT_ID_MISMATCH" -> copy(statxMntIdMismatch = value.asBool())
             "BIND_MOUNT_DETECTED" -> copy(bindMountDetected = value.asBool())

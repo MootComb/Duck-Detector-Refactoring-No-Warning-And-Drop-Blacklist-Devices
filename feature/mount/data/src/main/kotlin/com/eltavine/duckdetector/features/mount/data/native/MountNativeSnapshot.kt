@@ -57,8 +57,6 @@ data class MountNativeSnapshot(
     val mountPropagationAnomaly: Boolean = false,
     val inconsistentMountDetected: Boolean = false,
     val mountIdLoopholeDetected: Boolean = false,
-    val peerGroupLoopholeDetected: Boolean = false,
-    val minorDevLoopholeDetected: Boolean = false,
     val futileHideDetected: Boolean = false,
     val statxMntIdMismatch: Boolean = false,
     val bindMountDetected: Boolean = false,

@@ -119,8 +119,6 @@ namespace duckdetector::mount {
         out << "MOUNT_PROPAGATION=" << flag(snapshot.mountPropagationAnomaly) << '\n';
         out << "INCONSISTENT_MOUNT=" << flag(snapshot.inconsistentMountDetected) << '\n';
         out << "MOUNT_ID_LOOPHOLE=" << flag(snapshot.mountIdLoopholeDetected) << '\n';
-        out << "PEER_GROUP_LOOPHOLE=" << flag(snapshot.peerGroupLoopholeDetected) << '\n';
-        out << "MINOR_DEV_LOOPHOLE=" << flag(snapshot.minorDevLoopholeDetected) << '\n';
         out << "FUTILE_HIDE=" << flag(snapshot.futileHideDetected) << '\n';
         out << "STATX_MNT_ID_MISMATCH=" << flag(snapshot.statxMntIdMismatch) << '\n';
         out << "BIND_MOUNT_DETECTED=" << flag(snapshot.bindMountDetected) << '\n';
