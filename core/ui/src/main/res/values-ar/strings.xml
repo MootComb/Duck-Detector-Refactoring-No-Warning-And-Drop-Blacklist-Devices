@@ -28,4 +28,5 @@ limitations under the License.
     <string name="alpha_warning_runtime">قد تستمر حالات فشل التشغيل غير المتوقعة أو الأعطال أثناء التشغيل في هذا الفرع.</string>
     <string name="social_github">GitHub</string>
     <string name="social_telegram">تليجرام</string>
+    <string name="tee_diagnostic_copied_toast">تم نسخ تفاصيل التشخيص</string>
 </resources>

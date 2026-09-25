@@ -58,6 +58,7 @@ import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootDetailRo
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootHeaderFactModel
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.R as CoreUiR
 
 @Composable
 fun NativeRootDetectorCard(
@@ -248,7 +249,7 @@ private fun NativeRootDetailRow(
 ) {
     val context = LocalContext.current
     val clipboardLabel = stringResource(R.string.native_root_diagnostic_clipboard_label)
-    val copiedToast = stringResource(R.string.tee_diagnostic_copied_toast)
+    val copiedToast = stringResource(CoreUiR.string.tee_diagnostic_copied_toast)
     val rowModifier = if (row.hiddenCopyText != null) {
         Modifier.combinedClickable(
             interactionSource = remember { MutableInteractionSource() },

@@ -79,6 +79,7 @@ import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHighlightSignalModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.R as CoreUiR
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -391,7 +392,7 @@ private fun TeeFactRow(
 ) {
     val context = LocalContext.current
     val clipboardLabel = stringResource(R.string.tee_diagnostic_clipboard_label)
-    val copiedToast = stringResource(R.string.tee_diagnostic_copied_toast)
+    val copiedToast = stringResource(CoreUiR.string.tee_diagnostic_copied_toast)
     val valueModifier = if (row.hiddenCopyText != null) {
         // 诊断复制是故意做成“无显式 affordance”的双击隐藏入口，避免把正常读卡 UI 变成调试工具面板。
         // Diagnostic copy is intentionally a no-affordance double-tap entry so the normal card UI does not turn into a visible debugging panel.

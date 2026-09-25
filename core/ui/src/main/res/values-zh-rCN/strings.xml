@@ -28,4 +28,5 @@ limitations under the License.
     <string name="alpha_warning_runtime">此分支仍可能出现意外启动失败或运行时崩溃。</string>
     <string name="social_github">GitHub</string>
     <string name="social_telegram">Telegram</string>
+    <string name="tee_diagnostic_copied_toast">已复制诊断详情</string>
 </resources>

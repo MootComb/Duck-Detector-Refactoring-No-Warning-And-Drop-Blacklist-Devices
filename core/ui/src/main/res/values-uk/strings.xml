@@ -28,4 +28,5 @@ limitations under the License.
     <string name="alpha_warning_runtime">У цій гілці все ще можуть траплятися неочікувані помилки під час запуску або збої під час роботи.</string>
     <string name="social_github">GitHub</string>
     <string name="social_telegram">Telegram</string>
+    <string name="tee_diagnostic_copied_toast">Діагностичні дані скопійовано</string>
 </resources>

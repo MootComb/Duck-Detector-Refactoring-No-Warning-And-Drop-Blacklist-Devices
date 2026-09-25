@@ -58,6 +58,7 @@ import com.eltavine.duckdetector.features.mount.ui.model.MountDetailRowModel
 import com.eltavine.duckdetector.features.mount.ui.model.MountHeaderFactModel
 import com.eltavine.duckdetector.features.mount.ui.model.MountImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.R as CoreUiR
 
 @Composable
 fun MountDetectorCard(
@@ -256,7 +257,7 @@ private fun MountDetailRow(
 ) {
     val context = LocalContext.current
     val clipboardLabel = stringResource(R.string.mount_diagnostic_clipboard_label)
-    val copiedToast = stringResource(R.string.tee_diagnostic_copied_toast)
+    val copiedToast = stringResource(CoreUiR.string.tee_diagnostic_copied_toast)
     val rowModifier = if (row.hiddenCopyText != null) {
         Modifier.combinedClickable(
             interactionSource = remember { MutableInteractionSource() },

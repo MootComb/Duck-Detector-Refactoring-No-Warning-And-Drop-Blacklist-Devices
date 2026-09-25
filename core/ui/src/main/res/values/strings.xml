@@ -28,4 +28,5 @@ limitations under the License.
     <string name="alpha_warning_runtime">Unexpected startup failures or runtime crashes can still happen in this branch.</string>
     <string name="social_github">GitHub</string>
     <string name="social_telegram">Telegram</string>
+    <string name="tee_diagnostic_copied_toast">Diagnostic detail copied</string>
 </resources>

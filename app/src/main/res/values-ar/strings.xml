@@ -79,7 +79,6 @@ limitations under the License.
     <string name="update_download">فتح التنزيل</string>
     <string name="update_open_failed">لا يتوفر متصفح لفتح GitHub</string>
     <string name="tee_diagnostic_clipboard_label">تفاصيل تشخيص TEE</string>
-    <string name="tee_diagnostic_copied_toast">تم نسخ تفاصيل التشخيص</string>
     <string name="author_summary_eltavine">ساهم في واجهة المستخدم و C++ و ASM و Kotlin.</string>
     <string name="author_summary_baka">TEE و Zygisk</string>
     <string name="author_summary_xiaotong">TEE ‏(C++، Kotlin)</string>

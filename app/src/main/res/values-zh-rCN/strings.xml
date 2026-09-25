@@ -79,7 +79,6 @@ limitations under the License.
     <string name="update_download">前往下载</string>
     <string name="update_open_failed">没有可用于打开 GitHub 的浏览器</string>
     <string name="tee_diagnostic_clipboard_label">TEE 诊断详情</string>
-    <string name="tee_diagnostic_copied_toast">已复制诊断详情</string>
     <string name="author_summary_eltavine">负责 UI、C++、ASM 与 Kotlin。</string>
     <string name="author_summary_baka">TEE 与 Zygisk</string>
     <string name="author_summary_xiaotong">TEE（C++、Kotlin）</string>
