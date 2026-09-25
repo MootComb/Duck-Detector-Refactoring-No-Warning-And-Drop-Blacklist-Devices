@@ -62,3 +62,15 @@ internal fun Project.configureAndroidCommon(extension: CommonExtension) {
         }
     }
 }
+
+/**
+ * One task name that runs the unit tests every module is expected to keep green: debug unit tests
+ * for Android modules and plain tests for JVM modules. CI and local verification call only this.
+ */
+internal fun Project.registerUnitTestLifecycle(testTask: String) {
+    tasks.register("unitTest") {
+        group = "verification"
+        description = "Runs this module's unit tests."
+        dependsOn(testTask)
+    }
+}

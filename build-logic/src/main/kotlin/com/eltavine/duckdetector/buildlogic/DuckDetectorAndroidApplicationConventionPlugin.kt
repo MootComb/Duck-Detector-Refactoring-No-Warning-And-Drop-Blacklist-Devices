@@ -32,6 +32,7 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
         pluginManager.apply("com.android.application")
         pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
         pluginManager.apply("duckdetector.module-boundaries")
+        registerUnitTestLifecycle("testDebugUnitTest")
 
         val buildHash = providers.environmentVariable("GITHUB_SHA")
             .map { it.take(12) }

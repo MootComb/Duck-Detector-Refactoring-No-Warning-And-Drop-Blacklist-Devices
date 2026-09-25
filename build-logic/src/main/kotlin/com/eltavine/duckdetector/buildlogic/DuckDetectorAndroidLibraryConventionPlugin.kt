@@ -37,6 +37,7 @@ class DuckDetectorAndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             dependencies.add("testImplementation", libs.findBundle("test-unit").get())
+            registerUnitTestLifecycle("testDebugUnitTest")
         }
     }
 }
