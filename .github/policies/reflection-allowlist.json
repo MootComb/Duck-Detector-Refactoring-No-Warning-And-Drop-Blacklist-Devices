@@ -51,13 +51,6 @@
       "reason": "Calls the hidden android.os.SELinux context methods, which are absent from the SDK."
     },
     {
-      "path": "capability/selinuxpolicy/data/src/test/kotlin/com/eltavine/duckdetector/capability/selinuxpolicy/data/SelinuxContextValidityPreloadTest.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Calls a private preload helper under test."
-    },
-    {
       "path": "capability/systemproperties/data/src/main/kotlin/com/eltavine/duckdetector/capability/systemproperties/data/SystemPropertyReadUtils.kt",
       "uses": [
         "operations"

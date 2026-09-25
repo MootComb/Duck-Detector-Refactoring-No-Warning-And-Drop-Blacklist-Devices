@@ -25,14 +25,7 @@ class SelinuxContextValidityPreloadTest {
 
     @Test
     fun `fallback payload stays parseable`() {
-        val preload = SelinuxContextValidityPreload()
-        val method = SelinuxContextValidityPreload::class.java.getDeclaredMethod(
-            "fallbackPayload",
-            String::class.java,
-        )
-        method.isAccessible = true
-
-        val payload = method.invoke(preload, "boom\n\"quoted\"") as String
+        val payload = SelinuxContextValidityPreload().fallbackPayload("boom\n\"quoted\"")
         val snapshot = SelinuxContextValidityBridge().parse(payload)
 
         assertFalse(snapshot.available)

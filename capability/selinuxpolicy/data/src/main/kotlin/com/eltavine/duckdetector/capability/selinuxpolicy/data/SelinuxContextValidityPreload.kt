@@ -179,7 +179,7 @@ public class SelinuxContextValidityPreload {
         )
     }
 
-    private fun fallbackPayload(reason: String): String {
+    internal fun fallbackPayload(reason: String): String {
         return SelinuxContextValidityPayloadCodec.encode(fallbackSnapshot(reason))
     }
 
