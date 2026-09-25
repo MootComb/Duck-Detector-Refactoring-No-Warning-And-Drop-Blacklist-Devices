@@ -23,35 +23,8 @@ limitations under the License.
         errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/BootConsistencyProbe.kt"
-            line="122" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
             file="../feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt"
             line="433" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../feature/playintegrityfix/data/src/main/kotlin/com/eltavine/duckdetector/features/playintegrityfix/data/utils/PlayIntegrityPropertyReadUtils.kt"
-            line="57" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="../capability/systemproperties/data/src/main/kotlin/com/eltavine/duckdetector/capability/systemproperties/data/SystemPropertyReadUtils.kt"
-            line="67" column="25" />
     </issue>
 
     <issue id="SdCardPath"
