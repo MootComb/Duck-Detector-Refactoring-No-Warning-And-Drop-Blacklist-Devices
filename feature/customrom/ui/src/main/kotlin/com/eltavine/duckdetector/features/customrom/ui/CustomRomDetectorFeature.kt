@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.customrom.detector.CustomRomDetector
 import com.eltavine.duckdetector.features.customrom.ui.card.CustomRomDetectorCard
 
 /** The Custom ROM card on the dashboard. */
-val CustomRomDetectorFeature: DetectorFeature = CardDetectorFeature(CustomRomDetector) { model -> CustomRomDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(CustomRomDetector) { model -> CustomRomDetectorCard(model = model) }

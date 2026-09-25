@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.nativeroot.detector.NativeRootDetector
 import com.eltavine.duckdetector.features.nativeroot.ui.card.NativeRootDetectorCard
 
 /** The Native Root card on the dashboard. */
-val NativeRootDetectorFeature: DetectorFeature = CardDetectorFeature(NativeRootDetector) { model -> NativeRootDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(NativeRootDetector) { model -> NativeRootDetectorCard(model = model) }

@@ -37,12 +37,12 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:feature:<unit>:data` | Probes, repositories, JNI bridges, platform access and the feature's services | Presentation, UI, other features |
 | `:feature:<unit>:presentation` | The card model, which states its `DetectorHeadline`; the mapper from the domain report; and the `DetectorReport` projection | Android, probes, JNI, other features |
 | `:feature:<unit>:detector` | The detector's one headless object, `<Name>Detector`: binds the data scanner, the domain loading report and the presentation mapping and export; used by the SDK and the ui layer | Compose, probes beyond creating the scanner, other features |
-| `:feature:<unit>:ui` | The internal Compose card and dialogs, and one public `DetectorFeature` value built with `CardDetectorFeature`; only TEE keeps its own view model for its expansion and dialog state | Probes, JNI, other features' models |
+| `:feature:<unit>:ui` | The internal Compose card and dialogs, and one public `DetectorFeature`, `detectorFeature`, built with `CardDetectorFeature`; only TEE keeps its own view model for its expansion and dialog state | Probes, JNI, other features' models |
 | `:feature:dashboard:*` | Card ordering, overview, findings and export rendering over `DetectorSession` lists | Any specific detector |
 | `:feature:settings:*`, `:feature:update:*`, `:feature:deviceinfo:*` | Supporting features with the same layering | Detector internals |
 | `:sdk:runtime` | The headless composition root: `DetectorCatalog`, the one list of detectors in scan-start order; `DuckDetector`, which runs them without any UI; the native libraries; and the process-level hooks a host wires in: `DuckDetectorZygotePreload`, launch evidence capture and the mount-view sampler | Compose, UI modules, per-detector branching |
 | `:sdk:aar` | The distributable: fuses `:sdk:runtime` and every headless module it is made of into one AAR with its native libraries and services; `verifySdkAar` fails when a project module is left unfused or a UI library reaches it | Code of its own |
-| `:app` | The UI composition root: activities, the dashboard cards of `DetectorFeatures`, notifications, startup policy and package visibility; it names the SDK's zygote preload and calls its launch hooks | Detection rules, probes, report semantics, per-detector branching |
+| `:app` | The UI composition root: activities, the dashboard cards, generated from every detector's ui layer, notifications, startup policy and package visibility; it names the SDK's zygote preload and calls its launch hooks | Detection rules, probes, report semantics, per-detector branching |
 
 ### Capabilities and their consumers
 
@@ -63,7 +63,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 |---|---|---|
 | `DuckDetectorModuleBoundariesPlugin` with `module-boundaries.json` | Classification by layer template or member entry, plugin kind, allowed project dependencies, direction, isolation, JVM purity, UI isolation (Compose only in UI modules) and acyclicity; evaluated while configuring every build | `./gradlew :build-logic:test` |
 | `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit and lives in the module that owns it, include direction, per-unit CMake targets and their registration, JNI exports owned by the unit's module | `test-native-boundaries.py` |
-| `check-detector-touch-points.py` with `detector-touch-points.json` | Outside `feature/<name>/`, a detector is named only by `DetectorCatalog` and `DetectorFeatures`, which must name every detector, by tooling indexes, and by reviewed exceptions that state a reason | `test-detector-touch-points.py` |
+| `check-detector-touch-points.py` with `detector-touch-points.json` | Outside `feature/<name>/`, a detector is named only by `DetectorCatalog`, which must name every detector, by tooling indexes, and by reviewed exceptions that state a reason | `test-detector-touch-points.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
 | `./gradlew buildHealth` (`DuckDetectorDependencyAnalysisPlugin`) | Every module declares exactly the modules and libraries its code uses: nothing unused, nothing reached only transitively, and `api` only for types in its public API. The plugin records its two reviewed exceptions ([ADR 0010](../adr/0010-exact-dependency-declarations.md)) | Upstream Dependency Analysis Gradle Plugin |
@@ -76,7 +76,7 @@ The CI `contracts` job runs the Python checkers and their self-tests. The `verif
 
 ## Composition invariants
 
-`DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` names each detector's dashboard card and orders the cards by the catalog; a unit test fails when a detector has no card or a card has no detector. The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md), [ADR 0008](../adr/0008-headless-detectors-and-sdk.md)).
+`DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` orders the dashboard cards by the catalog. The cards come from `detectorCards`, which `GenerateDetectorCardsTask` writes from the `detectorFeature` every `feature/<name>/ui` module exports, so listing the cards names no detector. A unit test fails when a detector has no card or a card has no detector ([ADR 0011](../adr/0011-generated-dashboard-cards.md)). The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md), [ADR 0008](../adr/0008-headless-detectors-and-sdk.md)).
 
 Scan lifecycle is owned explicitly ([ADR 0003](../adr/0003-scan-lifecycle-ownership.md)):
 
@@ -104,7 +104,7 @@ Native code is split into units ([ADR 0005](../adr/0005-native-unit-boundaries.m
 
 ## Extension rules
 
-1. Create a detector with `scripts/new_detector.py`, as `:feature:<name>:{domain,data,presentation,detector,ui}` with one entry in `DetectorCatalog` and one in `DetectorFeatures` ([guide](../guides/adding-a-detector.md)). Settings, the boundary policy, both composition roots and the SDK AAR pick up the new modules from their directories. Central code must not change.
+1. Create a detector with `scripts/new_detector.py`, as `:feature:<name>:{domain,data,presentation,detector,ui}` with one entry in `DetectorCatalog` ([guide](../guides/adding-a-detector.md)). Settings, the boundary policy, both composition roots, the app's list of dashboard cards and the SDK AAR pick up the new modules from their directories. Central code must not change.
 2. Put judgement rules in the feature's domain layer and keep them pure JVM; the data layer collects and the presentation layer projects.
 3. Share evidence acquisition only through a capability used by at least two features. The capability must not interpret the evidence for any of them.
 4. Never add a dependency between two feature units or two capability units. If they need the same evidence, extract a capability; if they need the same contract, it belongs in `:core`.

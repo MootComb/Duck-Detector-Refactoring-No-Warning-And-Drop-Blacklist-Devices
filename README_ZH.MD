@@ -111,7 +111,7 @@ Duck-Detector-Refactoring/
 
 原生源码按单元组织：每个单元位于其所属模块的 `src/main/cpp/<unit>/`，编译为独立的 object library 并链接进 `libduckdetector.so`；Kotlin 代码通过同一模块中的 JNI 桥接读取原生结果。
 
-新增检测器只改动它自己的目录，以及 `DetectorCatalog`、`DetectorFeatures` 各一行。一条命令即可生成全部代码；生成结果可以直接构建，在探针写好之前显示“Not evaluated”：
+新增检测器只改动它自己的目录，以及 `DetectorCatalog` 中的一行；应用会根据各 ui 模块自动生成仪表盘卡片列表。一条命令即可生成全部代码；生成结果可以直接构建，在探针写好之前显示“Not evaluated”：
 
 ```bash
 python3 scripts/new_detector.py <name> --description "检测什么，以及为什么它构成证据"

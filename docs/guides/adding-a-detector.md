@@ -1,6 +1,6 @@
 # Adding a detector
 
-A detector lives entirely in `feature/<name>/`, as five small Gradle modules, one per layer. Outside that directory it is named in exactly two places: `DetectorCatalog` in the SDK and `DetectorFeatures` in the app. Everything else finds the new modules from their directory, including the Gradle settings, the boundary policy, both composition roots, the SDK AAR, the dashboard and the export.
+A detector lives entirely in `feature/<name>/`, as five small Gradle modules, one per layer. Outside that directory it is named in exactly one place, its entry in `DetectorCatalog`, which fixes the order scans start. Everything else finds the new modules from their directory, including the Gradle settings, the boundary policy, both composition roots, the app's list of dashboard cards, the SDK AAR, the dashboard and the export.
 
 ## 1. Research before you generate anything
 
@@ -40,7 +40,7 @@ feature/debugger/
 └─ ui/            DebuggerDetectorCard and DebuggerDetectorFeature
 ```
 
-It adds `DebuggerDetector` to `DetectorCatalog`, after bootloader and TEE and ordered by id, and `DebuggerDetectorFeature` to `DetectorFeatures`. With `--native` it also registers the unit in `DUCKDETECTOR_NATIVE_UNITS` and `native-boundaries.json`. Before writing anything, it rejects an existing directory, class, id or native unit.
+It adds `DebuggerDetector` to `DetectorCatalog`, after bootloader and TEE and ordered by id. The ui layer exports the card as `detectorFeature`, the name from which the app generates its list of cards. With `--native` it also registers the unit in `DUCKDETECTOR_NATIVE_UNITS` and `native-boundaries.json`. Before writing anything, it rejects an existing directory, class, id or native unit.
 
 The generated detector builds and passes every guard. Until its probe observes the device, it reports **Not evaluated** with an informational status, so an unfinished detector never reads as a clean result.
 
@@ -76,6 +76,7 @@ JVM tests prove the rules, not the probe. Validate the probe on clean, modified 
 | `settings.gradle.kts` | Modules are included from their directories |
 | `module-boundaries.json` | Every layer is classified by its path |
 | `app/build.gradle.kts`, `sdk/runtime/build.gradle.kts`, `sdk/aar` | The ui and detector layers are discovered, and the AAR fuses every headless module |
+| `DetectorFeatures` in the app | Its cards come from `detectorCards`, which the build generates from every ui module's `detectorFeature` |
 | Dashboard, export and notification code | They work on sessions and `DetectorReport` values, never on a specific detector |
 | The golden export | It covers the detectors recorded in `golden-detectors.txt`, so a new detector does not have to join it |
 
@@ -91,4 +92,4 @@ When a second detector needs the same evidence, move its collection into a capab
 
 ## Removing a detector
 
-Delete `feature/<name>/` and its two registration lines. For a native unit, also delete its `DUCKDETECTOR_NATIVE_UNITS` line and its `native-boundaries.json` entry. If the detector was recorded in the golden export, regenerate it.
+Delete `feature/<name>/` and its line in `DetectorCatalog`. For a native unit, also delete its `DUCKDETECTOR_NATIVE_UNITS` line and its `native-boundaries.json` entry. If the detector was recorded in the golden export, regenerate it.

@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.playintegrityfix.detector.PlayIntegrit
 import com.eltavine.duckdetector.features.playintegrityfix.ui.card.PlayIntegrityFixDetectorCard
 
 /** The Play Integrity Fix card on the dashboard. */
-val PlayIntegrityFixDetectorFeature: DetectorFeature = CardDetectorFeature(PlayIntegrityFixDetector) { model -> PlayIntegrityFixDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(PlayIntegrityFixDetector) { model -> PlayIntegrityFixDetectorCard(model = model) }

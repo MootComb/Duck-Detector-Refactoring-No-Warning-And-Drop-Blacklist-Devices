@@ -109,7 +109,7 @@ Each detector is a set of Gradle modules under `feature/<name>/`:
 
 Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
 
-A new detector touches only its own directory and one line in each of `DetectorCatalog` and `DetectorFeatures`. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
+A new detector touches only its own directory and its one line in `DetectorCatalog`; the app generates its dashboard cards from the ui modules. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
 
 ```bash
 python3 scripts/new_detector.py <name> --description "what it looks for and why that is evidence"

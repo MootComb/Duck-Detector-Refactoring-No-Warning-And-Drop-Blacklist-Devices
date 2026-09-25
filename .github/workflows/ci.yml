@@ -164,7 +164,6 @@ jobs:
           comm -13 /tmp/status-before /tmp/status-after > /tmp/scaffold-changes
           diff -u - /tmp/scaffold-changes <<EXPECTED
            M .github/policies/native-boundaries.json
-           M app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt
            M sdk/runtime/src/main/cpp/CMakeLists.txt
            M sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt
           ?? feature/$probe/

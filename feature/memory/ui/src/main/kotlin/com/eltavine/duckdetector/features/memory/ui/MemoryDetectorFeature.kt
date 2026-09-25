@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.memory.detector.MemoryDetector
 import com.eltavine.duckdetector.features.memory.ui.card.MemoryDetectorCard
 
 /** The Memory card on the dashboard. */
-val MemoryDetectorFeature: DetectorFeature = CardDetectorFeature(MemoryDetector) { model -> MemoryDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(MemoryDetector) { model -> MemoryDetectorCard(model = model) }

@@ -47,9 +47,9 @@
 - `data`：采集、解析、桥接、底层探测
 - `presentation`：卡片模型、报告投影与卡片映射（纯 JVM）
 - `detector`（仅检测器）：唯一的 headless `<Name>Detector` 对象，把 data、domain 与 presentation 绑定给 SDK 与 UI
-- `ui`：Compose 卡片与对话框（`internal`），以及用 `CardDetectorFeature` 构造的 `DetectorFeature`
+- `ui`：Compose 卡片与对话框（`internal`），以及用 `CardDetectorFeature` 构造、以 `detectorFeature` 导出的 `DetectorFeature`
 
-依赖方向为 `:app` → `:sdk` → `:feature` → `:capability` → `:core`，feature 之间、capability 之间互不依赖。新增检测器只改动 `feature/<name>/` 与 `DetectorCatalog`、`DetectorFeatures` 各一行。模块职责、禁止知识与扩展规则见 [`docs/architecture/README.md`](./docs/architecture/README.md)；`.github/policies/` 中的边界策略在构建与 CI 中校验。
+依赖方向为 `:app` → `:sdk` → `:feature` → `:capability` → `:core`，feature 之间、capability 之间互不依赖。新增检测器只改动 `feature/<name>/` 与 `DetectorCatalog` 中的一行；仪表盘卡片列表由构建根据各 ui 模块生成。模块职责、禁止知识与扩展规则见 [`docs/architecture/README.md`](./docs/architecture/README.md)；`.github/policies/` 中的边界策略在构建与 CI 中校验。
 
 不要出现这些情况：
 

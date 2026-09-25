@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.kernelcheck.detector.KernelCheckDetect
 import com.eltavine.duckdetector.features.kernelcheck.ui.card.KernelCheckDetectorCard
 
 /** The Kernel Check card on the dashboard. */
-val KernelCheckDetectorFeature: DetectorFeature = CardDetectorFeature(KernelCheckDetector) { model -> KernelCheckDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(KernelCheckDetector) { model -> KernelCheckDetectorCard(model = model) }

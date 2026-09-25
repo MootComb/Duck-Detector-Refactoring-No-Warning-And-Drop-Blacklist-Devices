@@ -15,6 +15,7 @@
  */
 
 import com.eltavine.duckdetector.buildlogic.detectorModules
+import com.eltavine.duckdetector.buildlogic.generateDetectorCards
 
 plugins {
     id("duckdetector.android.application")
@@ -28,6 +29,9 @@ android {
         applicationId = "com.eltavine.duckdetector"
     }
 }
+
+// Every detector's dashboard card, discovered like the ui modules the application depends on.
+generateDetectorCards(packageName = "com.eltavine.duckdetector.ui")
 
 dependencies {
     implementation(project(":capability:packageinventory:data"))

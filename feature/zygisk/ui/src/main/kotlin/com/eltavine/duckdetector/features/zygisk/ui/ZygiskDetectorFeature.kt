@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.zygisk.detector.ZygiskDetector
 import com.eltavine.duckdetector.features.zygisk.ui.card.ZygiskDetectorCard
 
 /** The Zygisk card on the dashboard. */
-val ZygiskDetectorFeature: DetectorFeature = CardDetectorFeature(ZygiskDetector) { model -> ZygiskDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(ZygiskDetector) { model -> ZygiskDetectorCard(model = model) }

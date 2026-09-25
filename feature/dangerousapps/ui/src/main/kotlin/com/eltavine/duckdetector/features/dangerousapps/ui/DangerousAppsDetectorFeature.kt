@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.dangerousapps.detector.DangerousAppsDe
 import com.eltavine.duckdetector.features.dangerousapps.ui.card.DangerousAppsDetectorCard
 
 /** The Dangerous Apps card on the dashboard. */
-val DangerousAppsDetectorFeature: DetectorFeature = CardDetectorFeature(DangerousAppsDetector) { model -> DangerousAppsDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(DangerousAppsDetector) { model -> DangerousAppsDetectorCard(model = model) }

@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.systemproperties.detector.SystemProper
 import com.eltavine.duckdetector.features.systemproperties.ui.card.SystemPropertiesDetectorCard
 
 /** The System Properties card on the dashboard. */
-val SystemPropertiesDetectorFeature: DetectorFeature = CardDetectorFeature(SystemPropertiesDetector) { model -> SystemPropertiesDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(SystemPropertiesDetector) { model -> SystemPropertiesDetectorCard(model = model) }

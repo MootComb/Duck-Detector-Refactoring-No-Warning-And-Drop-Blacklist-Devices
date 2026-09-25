@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.selinux.detector.SelinuxDetector
 import com.eltavine.duckdetector.features.selinux.ui.card.SelinuxDetectorCard
 
 /** The SELinux card on the dashboard. */
-val SelinuxDetectorFeature: DetectorFeature = CardDetectorFeature(SelinuxDetector) { model -> SelinuxDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(SelinuxDetector) { model -> SelinuxDetectorCard(model = model) }

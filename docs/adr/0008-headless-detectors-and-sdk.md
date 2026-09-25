@@ -1,6 +1,6 @@
 # ADR 0008: Headless detectors, one SDK library and one registration per detector
 
-- Status: Accepted
+- Status: Accepted; decision 8 amended by [ADR 0011](./0011-generated-dashboard-cards.md)
 - Date: 2026-09-25
 
 ## Context

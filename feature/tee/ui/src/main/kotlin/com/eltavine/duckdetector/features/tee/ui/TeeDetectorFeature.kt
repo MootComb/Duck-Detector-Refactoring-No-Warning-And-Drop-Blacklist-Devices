@@ -31,11 +31,14 @@ import com.eltavine.duckdetector.features.tee.detector.TeeDetector
 import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
+/** The TEE card on the dashboard. */
+val detectorFeature: DetectorFeature = TeeDetectorFeature
+
 /**
- * The TEE card on the dashboard. Its card keeps expansion and dialog state of its own, so it has a
- * session of its own rather than a CardDetectorFeature; it still scans through [TeeDetector].
+ * The TEE card keeps expansion and dialog state of its own, so it has a session of its own rather
+ * than a CardDetectorFeature; it still scans through [TeeDetector].
  */
-object TeeDetectorFeature : DetectorFeature {
+internal object TeeDetectorFeature : DetectorFeature {
     override val id: DetectorId = TeeDetector.id
 
     @Composable

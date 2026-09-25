@@ -104,7 +104,7 @@ class NewDetectorTest(unittest.TestCase):
         modified = {path for path in self.before if after.get(path) != self.before[path]}
         return created, modified
 
-    def test_creates_five_modules_and_touches_only_the_two_registrations(self) -> None:
+    def test_creates_five_modules_and_touches_only_the_catalog(self) -> None:
         result = self.scaffold("demo")
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -112,7 +112,7 @@ class NewDetectorTest(unittest.TestCase):
         self.assertTrue(all(path.startswith("feature/demo/") for path in created), created)
         self.assertEqual({path.split("/")[2] for path in created if path.endswith("build.gradle.kts")},
                          {"domain", "data", "presentation", "detector", "ui"})
-        self.assertEqual(modified, {CATALOG, FEATURES})
+        self.assertEqual(modified, {CATALOG})
 
     def test_catalog_keeps_its_first_two_detectors_and_orders_the_rest_by_id(self) -> None:
         first_two = self.catalog_ids()[:2]
@@ -124,15 +124,14 @@ class NewDetectorTest(unittest.TestCase):
         self.assertEqual(ids[2:], sorted(ids[2:]))
         self.assertTrue({"aaaa", "mmmm", "zzzz"} <= set(ids))
 
-    def test_cards_stay_sorted_and_imports_stay_sorted(self) -> None:
+    def test_the_card_is_exported_under_the_name_the_app_generates_and_imports_stay_sorted(self) -> None:
         self.assertEqual(self.scaffold("demo").returncode, 0)
 
-        cards = self.list_entries(FEATURES, "    private val cards: Map<DetectorId, DetectorFeature> = listOf(")
-        self.assertIn("DemoDetectorFeature", cards)
-        self.assertEqual(cards, sorted(cards))
-        for relative in (CATALOG, FEATURES):
-            imports = [line for line in self.read(relative).split("\n") if line.startswith("import ")]
-            self.assertEqual(imports, sorted(imports), relative)
+        feature = self.read("feature/demo/ui/src/main/kotlin/com/eltavine/duckdetector/features/demo/ui/"
+                            "DemoDetectorFeature.kt")
+        self.assertIn("\nval detectorFeature: DetectorFeature = CardDetectorFeature(DemoDetector)", feature)
+        imports = [line for line in self.read(CATALOG).split("\n") if line.startswith("import ")]
+        self.assertEqual(imports, sorted(imports))
 
     def test_names_derive_from_the_class_name(self) -> None:
         self.assertEqual(self.scaffold("playdemo", "--class-name", "PlayDemo").returncode, 0)
@@ -160,7 +159,7 @@ class NewDetectorTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         _, modified = self.changes()
-        self.assertEqual(modified, {CATALOG, FEATURES, NATIVE_CMAKE, NATIVE_POLICY})
+        self.assertEqual(modified, {CATALOG, NATIVE_CMAKE, NATIVE_POLICY})
         registry = self.read(NATIVE_CMAKE)
         self.assertRegex(registry, r"\n    demo +feature/demo/data\n\)")
         unit = json.loads(self.read(NATIVE_POLICY))["units"]["demo"]

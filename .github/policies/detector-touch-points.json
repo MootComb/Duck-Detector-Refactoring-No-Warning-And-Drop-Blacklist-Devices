@@ -4,12 +4,7 @@
     {
       "path": "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt",
       "layer": "detector",
-      "reason": "The one list of detectors, in the order their scans start."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt",
-      "layer": "ui",
-      "reason": "Names the dashboard card of each detector."
+      "reason": "The one list of detectors, in the order their scans start. Dashboard cards are generated from the ui modules."
     }
   ],
   "indexes": [

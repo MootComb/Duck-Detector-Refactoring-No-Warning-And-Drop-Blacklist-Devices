@@ -28,7 +28,7 @@ Each detector still collects its own platform evidence during its scan, even whe
 
 ## Startup policy wires the TEE network consent
 
-The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. When the consent changes, the shell finds the TEE session by `TeeDetector.id` and rescans it. This is composition-root wiring rather than a detection rule, but these files are where the shell names a detector outside `DetectorFeatures`, each recorded as a touch point exception. If another feature needs startup consent, replace this with a typed consent contract in `:core`.
+The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. When the consent changes, the shell finds the TEE session by `TeeDetector.id` and rescans it. This is composition-root wiring rather than a detection rule, but these files are the only places where the app names a detector, each recorded as a touch point exception. If another feature needs startup consent, replace this with a typed consent contract in `:core`.
 
 ## The SDK's app zygote preload names Native Root
 

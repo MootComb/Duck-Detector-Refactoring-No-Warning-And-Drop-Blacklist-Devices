@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.virtualization.detector.Virtualization
 import com.eltavine.duckdetector.features.virtualization.ui.card.VirtualizationDetectorCard
 
 /** The Virtualization card on the dashboard. */
-val VirtualizationDetectorFeature: DetectorFeature = CardDetectorFeature(VirtualizationDetector) { model -> VirtualizationDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(VirtualizationDetector) { model -> VirtualizationDetectorCard(model = model) }

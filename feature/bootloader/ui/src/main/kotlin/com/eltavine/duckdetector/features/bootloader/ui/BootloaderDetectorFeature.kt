@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.bootloader.detector.BootloaderDetector
 import com.eltavine.duckdetector.features.bootloader.ui.card.BootloaderDetectorCard
 
 /** The Bootloader card on the dashboard. */
-val BootloaderDetectorFeature: DetectorFeature = CardDetectorFeature(BootloaderDetector) { model -> BootloaderDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(BootloaderDetector) { model -> BootloaderDetectorCard(model = model) }

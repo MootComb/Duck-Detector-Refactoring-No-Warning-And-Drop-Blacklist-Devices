@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.lsposed.detector.LSPosedDetector
 import com.eltavine.duckdetector.features.lsposed.ui.card.LSPosedDetectorCard
 
 /** The LSPosed card on the dashboard. */
-val LSPosedDetectorFeature: DetectorFeature = CardDetectorFeature(LSPosedDetector) { model -> LSPosedDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(LSPosedDetector) { model -> LSPosedDetectorCard(model = model) }

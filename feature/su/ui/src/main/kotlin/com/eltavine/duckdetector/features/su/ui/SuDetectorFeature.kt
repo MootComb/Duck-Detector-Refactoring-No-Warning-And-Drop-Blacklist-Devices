@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.su.detector.SuDetector
 import com.eltavine.duckdetector.features.su.ui.card.SuDetectorCard
 
 /** The SU card on the dashboard. */
-val SuDetectorFeature: DetectorFeature = CardDetectorFeature(SuDetector) { model -> SuDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(SuDetector) { model -> SuDetectorCard(model = model) }

@@ -22,4 +22,4 @@ import com.eltavine.duckdetector.features.mount.detector.MountDetector
 import com.eltavine.duckdetector.features.mount.ui.card.MountDetectorCard
 
 /** The Mount card on the dashboard. */
-val MountDetectorFeature: DetectorFeature = CardDetectorFeature(MountDetector) { model -> MountDetectorCard(model = model) }
+val detectorFeature: DetectorFeature = CardDetectorFeature(MountDetector) { model -> MountDetectorCard(model = model) }

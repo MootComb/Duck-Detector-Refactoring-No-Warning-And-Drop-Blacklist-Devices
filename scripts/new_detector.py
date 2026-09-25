@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Create a detector: its five modules under feature/<name>/ and its two registration lines.
+"""Create a detector: its five modules under feature/<name>/ and its one registration line.
 
     python3 scripts/new_detector.py NAME --description "what it looks for and why that is evidence"
         [--class-name ClassName] [--id detector_id] [--title "Card title"] [--native]
@@ -21,6 +21,9 @@
 NAME is the directory and package segment, such as "debugger". The new detector builds and passes
 the boundary, dependency, touch point and native checks as generated. Until its probe observes the
 device it reports "Not evaluated", so an unfinished detector never reads as a clean result.
+
+The registration is the detector's entry in DetectorCatalog, which fixes the order scans start.
+The app generates its list of dashboard cards from the ui modules, so it needs no entry.
 
 --native adds a native unit with its JNI bridge, and registers it in the SDK's native build and in
 the native boundary policy. Nothing outside feature/<name>/ changes except those registrations.
@@ -39,12 +42,10 @@ import sys
 TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "detector_template")
 PACKAGE_ROOT = "com.eltavine.duckdetector.features"
 CATALOG = "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt"
-FEATURES = "app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt"
 NATIVE_CMAKE = "sdk/runtime/src/main/cpp/CMakeLists.txt"
 NATIVE_POLICY = ".github/policies/native-boundaries.json"
 
 CATALOG_LIST = ("    public val all: List<Detector<*, *>> = listOf(", "    )")
-FEATURES_LIST = ("    private val cards: Map<DetectorId, DetectorFeature> = listOf(", "    ).associateBy { it.id }")
 NATIVE_REGISTRY = ("set(DUCKDETECTOR_NATIVE_UNITS", ")")
 # DetectorCatalog starts bootloader and TEE first; every other detector follows by id.
 CATALOG_FIXED_ENTRIES = 2
@@ -253,15 +254,6 @@ def register_in_catalog(text: str, spec: Spec, ids: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
-def register_card(text: str, spec: Spec) -> str:
-    lines = text.split("\n")
-    add_import(lines, f"import {spec.package}.ui.{spec.class_name}DetectorFeature", FEATURES)
-    first, end = list_bounds(lines, FEATURES_LIST, FEATURES)
-    entry = f"        {spec.class_name}DetectorFeature,"
-    lines.insert(next((index for index in range(first, end) if lines[index] > entry), end), entry)
-    return "\n".join(lines)
-
-
 def register_native_unit(text: str, spec: Spec) -> str:
     lines = text.split("\n")
     first, end = list_bounds(lines, NATIVE_REGISTRY, NATIVE_CMAKE)
@@ -303,10 +295,7 @@ def plan(spec: Spec, repo_root: str) -> tuple[dict[str, str], dict[str, str]]:
         with open(os.path.join(repo_root, relative), encoding="utf-8") as handle:
             return handle.read()
 
-    edits = {
-        CATALOG: register_in_catalog(read(CATALOG), spec, ids),
-        FEATURES: register_card(read(FEATURES), spec),
-    }
+    edits = {CATALOG: register_in_catalog(read(CATALOG), spec, ids)}
     if spec.native:
         edits[NATIVE_CMAKE] = register_native_unit(read(NATIVE_CMAKE), spec)
         edits[NATIVE_POLICY] = register_native_policy(read(NATIVE_POLICY), spec)
