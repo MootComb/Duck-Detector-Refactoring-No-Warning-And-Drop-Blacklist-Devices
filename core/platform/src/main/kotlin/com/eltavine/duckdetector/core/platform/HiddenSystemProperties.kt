@@ -29,13 +29,15 @@ public object HiddenSystemProperties {
 
     /** `SystemProperties.get(key)`, or the failure that prevented the read. */
     public fun read(key: String): Result<String?> = runCatching {
-        Class.forName(CLASS_NAME).getMethod("get", String::class.java).invoke(null, key) as? String
+        systemProperties().getMethod("get", String::class.java).invoke(null, key) as? String
     }
 
     /** `SystemProperties.get(key, default)`, or the failure that prevented the read. */
     public fun read(key: String, default: String): Result<String?> = runCatching {
-        Class.forName(CLASS_NAME)
+        systemProperties()
             .getMethod("get", String::class.java, String::class.java)
             .invoke(null, key, default) as? String
     }
+
+    private fun systemProperties(): Class<*> = Class.forName(CLASS_NAME)
 }
