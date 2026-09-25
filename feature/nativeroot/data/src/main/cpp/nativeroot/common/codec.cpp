@@ -90,6 +90,8 @@ namespace duckdetector::nativeroot {
         output << "KSU_SUPERCALL_MANAGER=" << (snapshot.ksu_supercall_manager ? '1' : '0')
                << '\n';
         output << "SUSFS_HIT=" << (snapshot.susfs_probe_hit ? '1' : '0') << '\n';
+        output << "SUSFS_OUTCOME=" << snapshot.susfs_probe_outcome << '\n';
+        output << "SUSFS_DETAIL=" << escape_value(snapshot.susfs_probe_detail) << '\n';
         output << "SELF_SU_DOMAIN=" << (snapshot.self_su_domain ? '1' : '0') << '\n';
         output << "SELF_CONTEXT=" << escape_value(snapshot.self_context) << '\n';
         output << "SELF_KSU_DRIVER_FDS=" << snapshot.self_ksu_driver_fd_count << '\n';

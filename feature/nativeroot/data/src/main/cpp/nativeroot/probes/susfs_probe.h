@@ -21,6 +21,17 @@
 
 namespace duckdetector::nativeroot {
 
+    // How the kernel answered the child's setresuid, carried in
+    // ProbeResult::numeric_value. Bionic's app seccomp filter allows setresuid
+    // (libc/SECCOMP_BLOCKLIST_APP.TXT), so the call reaches the kernel, which
+    // denies it with EPERM for an unprivileged app.
+    enum class SusfsOutcome : long {
+        kNotObserved = 0,
+        kDenied = 1,
+        kKilled = 2,
+        kChangedUid = 3,
+    };
+
     ProbeResult run_susfs_probe();
 
 }  // namespace duckdetector::nativeroot

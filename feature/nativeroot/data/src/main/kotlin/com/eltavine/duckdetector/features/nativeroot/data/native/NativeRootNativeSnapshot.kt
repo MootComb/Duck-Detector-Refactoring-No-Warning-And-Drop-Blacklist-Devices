@@ -60,6 +60,8 @@ data class NativeRootNativeSnapshot(
     val ksuSupercallPrBuild: Boolean = false,
     val ksuSupercallManager: Boolean = false,
     val susfsProbeHit: Boolean = false,
+    val susfsProbeOutcome: SusfsProbeOutcome = SusfsProbeOutcome.NOT_OBSERVED,
+    val susfsProbeDetail: String = "",
     val selfSuDomain: Boolean = false,
     val selfContext: String = "",
     val selfKsuDriverFdCount: Int = 0,
@@ -81,3 +83,16 @@ data class NativeRootNativeSnapshot(
      */
     val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
 )
+
+/** How the kernel answered the SUSFS probe's setresuid; the codes match native SusfsOutcome. */
+enum class SusfsProbeOutcome(private val code: Long) {
+    NOT_OBSERVED(0),
+    DENIED(1),
+    KILLED(2),
+    CHANGED_UID(3),
+    ;
+
+    companion object {
+        fun fromCode(code: Long?): SusfsProbeOutcome = entries.firstOrNull { it.code == code } ?: NOT_OBSERVED
+    }
+}

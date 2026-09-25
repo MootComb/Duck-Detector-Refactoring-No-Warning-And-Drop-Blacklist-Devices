@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.nativeroot.data.repository
 
 import com.eltavine.duckdetector.features.nativeroot.data.native.NativeRootNativeSnapshot
+import com.eltavine.duckdetector.features.nativeroot.data.native.SusfsProbeOutcome
 import com.eltavine.duckdetector.features.nativeroot.data.probes.CgroupProcessLeakProbeResult
 import com.eltavine.duckdetector.features.nativeroot.data.probes.KernelSuManagerFingerprintProbeResult
 import com.eltavine.duckdetector.features.nativeroot.data.probes.KernelSuThroneHuntProbeResult
@@ -196,17 +197,24 @@ internal fun buildMethods(
         ),
         NativeRootMethodResult(
             label = "susfsSideChannel",
-            summary = when {
-                snapshot.susfsProbeHit -> "SIGKILL"
-                snapshot.available -> "Normal"
-                else -> "Unavailable"
+            summary = when (snapshot.susfsProbeOutcome) {
+                SusfsProbeOutcome.KILLED -> "SIGKILL"
+                SusfsProbeOutcome.CHANGED_UID -> "UID changed"
+                SusfsProbeOutcome.DENIED -> "Normal"
+                SusfsProbeOutcome.NOT_OBSERVED -> "Unavailable"
             },
-            outcome = when {
-                snapshot.susfsProbeHit -> NativeRootMethodOutcome.DETECTED
-                snapshot.available -> NativeRootMethodOutcome.CLEAN
-                else -> NativeRootMethodOutcome.SUPPORT
+            outcome = when (snapshot.susfsProbeOutcome) {
+                SusfsProbeOutcome.KILLED, SusfsProbeOutcome.CHANGED_UID -> NativeRootMethodOutcome.DETECTED
+                SusfsProbeOutcome.DENIED -> NativeRootMethodOutcome.CLEAN
+                SusfsProbeOutcome.NOT_OBSERVED -> NativeRootMethodOutcome.SUPPORT
             },
-            detail = "Fork child and attempt setresuid to a lower UID. Old SUSFS/KSU hooks can kill the child instead of returning EPERM.",
+            detail = buildString {
+                append("Fork child and attempt setresuid to a lower UID. Old SUSFS/KSU hooks can kill the child instead of returning EPERM.")
+                if (snapshot.susfsProbeDetail.isNotBlank()) {
+                    append("\nTest Result: ")
+                    append(snapshot.susfsProbeDetail)
+                }
+            },
         ),
         NativeRootMethodResult(
             label = "selfProcessIoc",

@@ -121,6 +121,8 @@ class NativeRootNativeBridge(
             "KSU_SUPERCALL_PR_BUILD" -> copy(ksuSupercallPrBuild = value.asBool())
             "KSU_SUPERCALL_MANAGER" -> copy(ksuSupercallManager = value.asBool())
             "SUSFS_HIT" -> copy(susfsProbeHit = value.asBool())
+            "SUSFS_OUTCOME" -> copy(susfsProbeOutcome = SusfsProbeOutcome.fromCode(value.toLongOrNull()))
+            "SUSFS_DETAIL" -> copy(susfsProbeDetail = value.decodeValue())
             "SELF_SU_DOMAIN" -> copy(selfSuDomain = value.asBool())
             "SELF_CONTEXT" -> copy(selfContext = value.decodeValue())
             "SELF_KSU_DRIVER_FDS" -> copy(

@@ -86,6 +86,8 @@ namespace duckdetector::nativeroot {
         bool ksu_supercall_pr_build = false;
         bool ksu_supercall_manager = false;
         bool susfs_probe_hit = false;
+        long susfs_probe_outcome = 0;
+        std::string susfs_probe_detail;
         bool self_su_domain = false;
         std::string self_context;
         int self_ksu_driver_fd_count = 0;

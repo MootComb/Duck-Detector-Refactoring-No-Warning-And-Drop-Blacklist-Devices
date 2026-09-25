@@ -62,6 +62,8 @@ class NativeRootNativeBridgeTest {
                 KSU_SUPERCALL_PR_BUILD=0
                 KSU_SUPERCALL_MANAGER=0
                 SUSFS_HIT=0
+                SUSFS_OUTCOME=1
+                SUSFS_DETAIL=Current UID 10123, attempted setresuid(10000).
                 SELF_SU_DOMAIN=1
                 SELF_CONTEXT=u:r:su:s0
                 SELF_KSU_DRIVER_FDS=1
@@ -91,6 +93,8 @@ class NativeRootNativeBridgeTest {
         assertTrue(snapshot.kernelPatchSideChannel)
         assertTrue(snapshot.kernelPatchSideChannelAvailable)
         assertEquals(11, snapshot.pathDeniedCount)
+        assertEquals(SusfsProbeOutcome.DENIED, snapshot.susfsProbeOutcome)
+        assertTrue(snapshot.susfsProbeDetail.startsWith("Current UID"))
         assertTrue(snapshot.kernelPatchSuperkey)
         assertTrue(snapshot.kernelPatchSuperkeyAvailable)
         assertEquals(4, snapshot.kernelPatchSuperkeyCheckedCount)

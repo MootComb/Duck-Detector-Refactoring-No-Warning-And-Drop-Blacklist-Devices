@@ -108,6 +108,8 @@ namespace duckdetector::nativeroot {
         snapshot.ksu_supercall_pr_build =
                 (ksu_supercall_probe.extra_numeric_value & (1U << 3)) != 0;
         snapshot.susfs_probe_hit = susfs_probe.flags.susfs;
+        snapshot.susfs_probe_outcome = susfs_probe.numeric_value;
+        snapshot.susfs_probe_detail = susfs_probe.extra_text;
         snapshot.self_context = self_process_ioc_probe.extra_text;
         snapshot.self_su_domain = self_process_ioc_probe.aux_flags != 0;
         snapshot.self_ksu_driver_fd_count = static_cast<int>(self_process_ioc_probe.numeric_value);
