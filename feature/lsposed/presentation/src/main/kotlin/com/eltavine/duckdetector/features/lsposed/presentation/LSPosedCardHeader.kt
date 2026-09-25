@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFactModel
@@ -158,6 +159,7 @@ private fun LSPosedReport.hasPolicySignals(): Boolean {
 private fun LSPosedReport.hasLsposedPolicySignal(): Boolean {
     return signals.any {
         it.group == LSPosedSignalGroup.POLICY &&
+            it.severity == LSPosedSignalSeverity.DANGER &&
             it.label.contains("lsposed", ignoreCase = true)
     }
 }

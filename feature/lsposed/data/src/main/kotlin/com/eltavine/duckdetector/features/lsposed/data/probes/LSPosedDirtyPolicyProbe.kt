@@ -24,7 +24,10 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 
 data class LSPosedDirtyPolicyProbeResult(
+    /** At least one oracle passed its own checks, so its allowed edges describe the live policy. */
     val available: Boolean,
+    /** At least one oracle ran in the expected carrier, whether or not it passed its checks. */
+    val oracleReportable: Boolean = available,
     val probeAttempted: Boolean,
     val carrierContext: String?,
     val carrierMatchesExpected: Boolean,
@@ -37,6 +40,8 @@ data class LSPosedDirtyPolicyProbeResult(
     val magiskBinderCallAllowed: Boolean?,
     val ksuFileReadAllowed: Boolean?,
     val lsposedFileReadAllowed: Boolean?,
+    /** The LSPosed rule verdict came from an oracle that passed its own checks. */
+    val lsposedFileReadTrusted: Boolean = false,
     val failureReason: String?,
     val notes: List<String>,
     val signals: List<LSPosedSignal>,
@@ -53,9 +58,13 @@ data class LSPosedDirtyPolicyProbeResult(
 
     val summary: String
         get() = when {
-            lsposedFileReadAllowed == true && carrierState == DedicatedCarrierState.OK -> "LSPosed rule present"
+            lsposedFileReadAllowed == true && lsposedFileReadTrusted && carrierState == DedicatedCarrierState.OK ->
+                "LSPosed rule present"
+
+            lsposedFileReadAllowed == true && carrierState == DedicatedCarrierState.OK -> "LSPosed rule (untrusted oracle)"
             hitCount > 0 -> "$hitCount dirty rule(s)"
             carrierState == DedicatedCarrierState.UNTRUSTED -> "Untrusted carrier"
+            !available && oracleReportable -> "Untrusted oracle"
             !available && carrierState == DedicatedCarrierState.OK -> "Oracle unavailable"
             !available -> "Carrier failed"
             else -> "Clean"
@@ -120,31 +129,12 @@ class LSPosedDirtyPolicyProbe {
         val javaTrack = dirtyPolicyTrack(snapshot, source = "java")
         val tracks = listOf(nativeTrack, javaTrack)
         val reportable = tracks.any { it.reportable }
+        val trusted = tracks.any { it.trusted }
         val aggregatedSignals = buildAggregatedSignals(nativeTrack, javaTrack)
-        val systemServerExecmemAllowed = aggregateReportedVerdict(
-            nativeTrack,
-            nativeTrack.systemServerExecmemAllowed,
-            javaTrack,
-            javaTrack.systemServerExecmemAllowed,
-        )
-        val magiskBinderCallAllowed = aggregateReportedVerdict(
-            nativeTrack,
-            nativeTrack.magiskBinderCallAllowed,
-            javaTrack,
-            javaTrack.magiskBinderCallAllowed,
-        )
-        val ksuFileReadAllowed = aggregateReportedVerdict(
-            nativeTrack,
-            nativeTrack.ksuFileReadAllowed,
-            javaTrack,
-            javaTrack.ksuFileReadAllowed,
-        )
-        val lsposedFileReadAllowed = aggregateReportedVerdict(
-            nativeTrack,
-            nativeTrack.lsposedFileReadAllowed,
-            javaTrack,
-            javaTrack.lsposedFileReadAllowed,
-        )
+        val systemServerExecmemAllowed = ruleVerdict(nativeTrack, nativeTrack.systemServerExecmemAllowed, javaTrack, javaTrack.systemServerExecmemAllowed)?.allowed
+        val magiskBinderCallAllowed = ruleVerdict(nativeTrack, nativeTrack.magiskBinderCallAllowed, javaTrack, javaTrack.magiskBinderCallAllowed)?.allowed
+        val ksuFileReadAllowed = ruleVerdict(nativeTrack, nativeTrack.ksuFileReadAllowed, javaTrack, javaTrack.ksuFileReadAllowed)?.allowed
+        val lsposedFileRead = ruleVerdict(nativeTrack, nativeTrack.lsposedFileReadAllowed, javaTrack, javaTrack.lsposedFileReadAllowed)
         val carrierContext = nativeTrack.carrierContext ?: javaTrack.carrierContext
         val carrierMatchesExpected = nativeTrack.carrierMatchesExpected || javaTrack.carrierMatchesExpected
         val controlsPassed = tracks.any { it.reportable && it.controlsPassed }
@@ -159,7 +149,8 @@ class LSPosedDirtyPolicyProbe {
         }
 
         return LSPosedDirtyPolicyProbeResult(
-            available = reportable,
+            available = trusted,
+            oracleReportable = reportable,
             probeAttempted = tracks.any { it.probeAttempted },
             carrierContext = carrierContext,
             carrierMatchesExpected = carrierMatchesExpected,
@@ -175,7 +166,8 @@ class LSPosedDirtyPolicyProbe {
             systemServerExecmemAllowed = systemServerExecmemAllowed,
             magiskBinderCallAllowed = magiskBinderCallAllowed,
             ksuFileReadAllowed = ksuFileReadAllowed,
-            lsposedFileReadAllowed = lsposedFileReadAllowed,
+            lsposedFileReadAllowed = lsposedFileRead?.allowed,
+            lsposedFileReadTrusted = lsposedFileRead?.trusted == true,
             failureReason = failureReason,
             notes = notes,
             signals = aggregatedSignals.distinctBy { it.id },
@@ -189,52 +181,52 @@ class LSPosedDirtyPolicyProbe {
         val sources = listOf(nativeTrack.source, javaTrack.source)
             .distinct()
             .joinToString(" + ")
-        return buildList {
-            if (aggregateReportedVerdict(nativeTrack, nativeTrack.systemServerExecmemAllowed, javaTrack, javaTrack.systemServerExecmemAllowed) == true) {
-                add(
-                    policySignal(
-                        id = "policy_system_server_execmem",
-                        label = "system_server execmem",
-                        value = "Allowed",
-                        severity = LSPosedSignalSeverity.WARNING,
-                        detail = "The $sources app_zygote SELinux access oracle reported system_server -> system_server:process execmem as allowed.",
-                    ),
-                )
-            }
-            if (aggregateReportedVerdict(nativeTrack, nativeTrack.magiskBinderCallAllowed, javaTrack, javaTrack.magiskBinderCallAllowed) == true) {
-                add(
-                    policySignal(
-                        id = "policy_magisk_binder_call",
-                        label = "Magisk binder",
-                        value = "Allowed",
-                        severity = LSPosedSignalSeverity.WARNING,
-                        detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> magisk:binder call as allowed. This is supporting dirty-policy evidence, not an LSPosed-specific rule.",
-                    ),
-                )
-            }
-            if (aggregateReportedVerdict(nativeTrack, nativeTrack.ksuFileReadAllowed, javaTrack, javaTrack.ksuFileReadAllowed) == true) {
-                add(
-                    policySignal(
-                        id = "policy_ksu_file_read",
-                        label = "KernelSU file read",
-                        value = "Allowed",
-                        severity = LSPosedSignalSeverity.WARNING,
-                        detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> ksu_file:file read as allowed. This is supporting dirty-policy evidence, not an LSPosed-specific rule.",
-                    ),
-                )
-            }
-            if (aggregateReportedVerdict(nativeTrack, nativeTrack.lsposedFileReadAllowed, javaTrack, javaTrack.lsposedFileReadAllowed) == true) {
-                add(
-                    policySignal(
-                        id = "policy_lsposed_file_read",
-                        label = "LSPosed file read",
-                        value = "Allowed",
-                        severity = LSPosedSignalSeverity.DANGER,
-                        detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> lsposed_file:file read as allowed.",
-                    ),
-                )
-            }
-        }
+        return listOfNotNull(
+            policySignal(
+                verdict = ruleVerdict(nativeTrack, nativeTrack.systemServerExecmemAllowed, javaTrack, javaTrack.systemServerExecmemAllowed),
+                id = "policy_system_server_execmem",
+                label = "system_server execmem",
+                severity = LSPosedSignalSeverity.WARNING,
+                detail = "The $sources app_zygote SELinux access oracle reported system_server -> system_server:process execmem as allowed.",
+            ),
+            policySignal(
+                verdict = ruleVerdict(nativeTrack, nativeTrack.magiskBinderCallAllowed, javaTrack, javaTrack.magiskBinderCallAllowed),
+                id = "policy_magisk_binder_call",
+                label = "Magisk binder",
+                severity = LSPosedSignalSeverity.WARNING,
+                detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> magisk:binder call as allowed. This is supporting dirty-policy evidence, not an LSPosed-specific rule.",
+            ),
+            policySignal(
+                verdict = ruleVerdict(nativeTrack, nativeTrack.ksuFileReadAllowed, javaTrack, javaTrack.ksuFileReadAllowed),
+                id = "policy_ksu_file_read",
+                label = "KernelSU file read",
+                severity = LSPosedSignalSeverity.WARNING,
+                detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> ksu_file:file read as allowed. This is supporting dirty-policy evidence, not an LSPosed-specific rule.",
+            ),
+            policySignal(
+                verdict = ruleVerdict(nativeTrack, nativeTrack.lsposedFileReadAllowed, javaTrack, javaTrack.lsposedFileReadAllowed),
+                id = "policy_lsposed_file_read",
+                label = "LSPosed file read",
+                severity = LSPosedSignalSeverity.DANGER,
+                detail = "The $sources app_zygote SELinux access oracle reported untrusted_app -> lsposed_file:file read as allowed.",
+            ),
+        )
+    }
+
+    private data class RuleVerdict(val allowed: Boolean, val trusted: Boolean)
+
+    // An oracle that passed its own controls decides. An answer from one that failed them is kept,
+    // but only at lower confidence: its allowed edges may describe a broken query path.
+    private fun ruleVerdict(
+        nativeTrack: DirtyPolicyTrack,
+        nativeValue: Boolean?,
+        javaTrack: DirtyPolicyTrack,
+        javaValue: Boolean?,
+    ): RuleVerdict? {
+        aggregateVerdict(nativeValue.takeIf { nativeTrack.trusted }, javaValue.takeIf { javaTrack.trusted })
+            ?.let { return RuleVerdict(allowed = it, trusted = true) }
+        return aggregateReportedVerdict(nativeTrack, nativeValue, javaTrack, javaValue)
+            ?.let { RuleVerdict(allowed = it, trusted = false) }
     }
 
     private fun aggregateReportedVerdict(
@@ -285,6 +277,7 @@ class LSPosedDirtyPolicyProbe {
         return if (source == "native") {
             DirtyPolicyTrack(
                 source = source,
+                trusted = snapshot.dirtyPolicyTrusted,
                 available = snapshot.dirtyPolicyAvailable,
                 probeAttempted = snapshot.dirtyPolicyProbeAttempted,
                 carrierContext = snapshot.dirtyPolicyCarrierContext,
@@ -303,6 +296,7 @@ class LSPosedDirtyPolicyProbe {
         } else {
             DirtyPolicyTrack(
                 source = source,
+                trusted = snapshot.javaDirtyPolicyTrusted,
                 available = snapshot.javaDirtyPolicyAvailable,
                 probeAttempted = snapshot.javaDirtyPolicyProbeAttempted,
                 carrierContext = snapshot.javaDirtyPolicyCarrierContext,
@@ -323,6 +317,7 @@ class LSPosedDirtyPolicyProbe {
 
     private data class DirtyPolicyTrack(
         val source: String,
+        val trusted: Boolean,
         val available: Boolean,
         val probeAttempted: Boolean,
         val carrierContext: String?,
@@ -343,7 +338,13 @@ class LSPosedDirtyPolicyProbe {
 
         fun summary(): String {
             return buildString {
-                append(if (reportable) "reportable" else "unavailable")
+                append(
+                    when {
+                        trusted -> "trusted"
+                        reportable -> "untrusted"
+                        else -> "unavailable"
+                    },
+                )
                 append(" carrier=")
                 append(carrierContext ?: "<unreadable>")
                 append(" controls=")
@@ -359,19 +360,26 @@ class LSPosedDirtyPolicyProbe {
     }
 
     private fun policySignal(
+        verdict: RuleVerdict?,
         id: String,
         label: String,
-        value: String,
         severity: LSPosedSignalSeverity,
         detail: String,
-    ): LSPosedSignal {
+    ): LSPosedSignal? {
+        if (verdict?.allowed != true) {
+            return null
+        }
         return LSPosedSignal(
             id = id,
             label = label,
-            value = value,
+            value = "Allowed",
             group = LSPosedSignalGroup.POLICY,
-            severity = severity,
-            detail = detail,
+            severity = if (verdict.trusted) severity else LSPosedSignalSeverity.WARNING,
+            detail = if (verdict.trusted) {
+                detail
+            } else {
+                "$detail The oracle failed its own controls, so this is lower-confidence evidence."
+            },
         )
     }
 }

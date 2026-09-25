@@ -93,7 +93,7 @@ class LSPosedDirtyPolicyProbeTest {
     }
 
     @Test
-    fun `lsposed file rule stays visible when the oracle self test is imperfect`() {
+    fun `lsposed file rule from an oracle that failed its controls stays visible at lower confidence`() {
         val result = probe.run(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
@@ -110,11 +110,13 @@ class LSPosedDirtyPolicyProbeTest {
             ),
         )
 
-        assertTrue(result.available)
-        assertEquals("LSPosed rule present", result.summary)
-        assertEquals(LSPosedMethodOutcome.DETECTED, result.outcome)
+        assertFalse(result.available)
+        assertEquals("LSPosed rule (untrusted oracle)", result.summary)
+        assertEquals(LSPosedMethodOutcome.WARNING, result.outcome)
         assertEquals(1, result.hitCount)
-        assertTrue(result.signals.any { it.label == "LSPosed file read" })
+        val signal = result.signals.single { it.label == "LSPosed file read" }
+        assertEquals(LSPosedSignalSeverity.WARNING, signal.severity)
+        assertTrue(signal.detail.contains("lower-confidence"))
         assertTrue(result.detail.contains("controls=failed"))
     }
 
@@ -167,6 +169,8 @@ class LSPosedDirtyPolicyProbeTest {
                 dirtyPolicyCarrierMatchesExpected = true,
                 dirtyPolicyControlsPassed = true,
                 dirtyPolicyStable = true,
+                dirtyPolicyAccessControlAllowed = true,
+                dirtyPolicyNegativeControlRejected = true,
                 dirtyPolicyLsposedFileReadAllowed = true,
                 javaDirtyPolicyAvailable = true,
                 javaDirtyPolicyProbeAttempted = true,
@@ -174,6 +178,8 @@ class LSPosedDirtyPolicyProbeTest {
                 javaDirtyPolicyCarrierMatchesExpected = true,
                 javaDirtyPolicyControlsPassed = true,
                 javaDirtyPolicyStable = true,
+                javaDirtyPolicyAccessControlAllowed = true,
+                javaDirtyPolicyNegativeControlRejected = true,
                 javaDirtyPolicyMagiskBinderCallAllowed = true,
             ),
         )
@@ -196,6 +202,8 @@ class LSPosedDirtyPolicyProbeTest {
                 dirtyPolicyCarrierMatchesExpected = true,
                 dirtyPolicyControlsPassed = true,
                 dirtyPolicyStable = true,
+                dirtyPolicyAccessControlAllowed = true,
+                dirtyPolicyNegativeControlRejected = true,
                 dirtyPolicyLsposedFileReadAllowed = true,
                 javaDirtyPolicyAvailable = true,
                 javaDirtyPolicyProbeAttempted = true,
@@ -203,6 +211,8 @@ class LSPosedDirtyPolicyProbeTest {
                 javaDirtyPolicyCarrierMatchesExpected = true,
                 javaDirtyPolicyControlsPassed = true,
                 javaDirtyPolicyStable = true,
+                javaDirtyPolicyAccessControlAllowed = true,
+                javaDirtyPolicyNegativeControlRejected = true,
                 javaDirtyPolicyLsposedFileReadAllowed = false,
             ),
         )
@@ -210,6 +220,37 @@ class LSPosedDirtyPolicyProbeTest {
         assertTrue(result.available)
         assertEquals(0, result.hitCount)
         assertEquals(null, result.lsposedFileReadAllowed)
+        assertEquals(LSPosedMethodOutcome.CLEAN, result.outcome)
+    }
+
+    @Test
+    fun `a trusted denial outweighs an untrusted oracle's allowed answer`() {
+        val result = probe.run(
+            SelinuxContextValiditySnapshot(
+                dirtyPolicyAvailable = true,
+                dirtyPolicyProbeAttempted = true,
+                dirtyPolicyCarrierContext = "u:r:app_zygote:s0:c1,c2",
+                dirtyPolicyCarrierMatchesExpected = true,
+                dirtyPolicyControlsPassed = true,
+                dirtyPolicyStable = true,
+                dirtyPolicyAccessControlAllowed = true,
+                dirtyPolicyNegativeControlRejected = true,
+                dirtyPolicyLsposedFileReadAllowed = false,
+                javaDirtyPolicyAvailable = true,
+                javaDirtyPolicyProbeAttempted = true,
+                javaDirtyPolicyCarrierContext = "u:r:app_zygote:s0:c1,c2",
+                javaDirtyPolicyCarrierMatchesExpected = true,
+                javaDirtyPolicyControlsPassed = false,
+                javaDirtyPolicyStable = true,
+                javaDirtyPolicyAccessControlAllowed = true,
+                javaDirtyPolicyNegativeControlRejected = false,
+                javaDirtyPolicyLsposedFileReadAllowed = true,
+            ),
+        )
+
+        assertTrue(result.available)
+        assertEquals(false, result.lsposedFileReadAllowed)
+        assertTrue(result.signals.isEmpty())
         assertEquals(LSPosedMethodOutcome.CLEAN, result.outcome)
     }
 }
