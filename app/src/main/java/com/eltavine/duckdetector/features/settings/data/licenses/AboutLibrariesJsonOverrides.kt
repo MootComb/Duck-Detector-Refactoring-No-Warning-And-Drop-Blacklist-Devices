@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.licenses.data
+package com.eltavine.duckdetector.features.settings.data.licenses
 
 import org.json.JSONArray
 import org.json.JSONObject

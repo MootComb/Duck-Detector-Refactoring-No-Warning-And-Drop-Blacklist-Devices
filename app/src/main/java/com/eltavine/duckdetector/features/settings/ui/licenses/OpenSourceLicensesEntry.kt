@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.licenses.ui
+package com.eltavine.duckdetector.features.settings.ui.licenses
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

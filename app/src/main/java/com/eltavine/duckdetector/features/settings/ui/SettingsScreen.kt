@@ -50,8 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.features.licenses.ui.OpenSourceLicensesEntry
-import com.eltavine.duckdetector.features.licenses.ui.OpenSourceLicensesScreen
+import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicensesEntry
+import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicensesScreen
 import com.eltavine.duckdetector.features.settings.ui.components.AboutCard
 import com.eltavine.duckdetector.features.settings.ui.components.AuthorCard
 import com.eltavine.duckdetector.features.settings.ui.model.SettingsUiState

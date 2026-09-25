@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.licenses.ui
+package com.eltavine.duckdetector.features.settings.ui.licenses
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -68,7 +68,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.features.licenses.data.AboutLibrariesJsonOverrides
+import com.eltavine.duckdetector.features.settings.data.licenses.AboutLibrariesJsonOverrides
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
