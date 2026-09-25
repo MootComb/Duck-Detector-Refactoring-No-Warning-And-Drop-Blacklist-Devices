@@ -84,6 +84,7 @@ set(PRELOAD_SOURCES
     preload/early_detector.cpp
     preload/virtualization_early_detector.cpp
     preload/preload_entry.cpp
+    preload/preload_jni.cpp
 )
 
 set(MEMORY_SOURCES

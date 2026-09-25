@@ -1,6 +1,4 @@
 {
   "schema_version": 1,
-  "files": {
-    "app/src/main/cpp/preload/preload_entry.cpp": 700
-  }
+  "files": {}
 }
