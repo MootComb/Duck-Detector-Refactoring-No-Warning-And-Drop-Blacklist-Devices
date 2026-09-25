@@ -522,7 +522,9 @@
     },
     ":feature:mount:domain": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":feature:mount:presentation": {
       "kind": "jvm",

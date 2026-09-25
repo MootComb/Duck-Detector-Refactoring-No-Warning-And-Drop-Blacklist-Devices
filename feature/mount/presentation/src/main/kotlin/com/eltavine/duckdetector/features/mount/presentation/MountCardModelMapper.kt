@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.mount.presentation
 
 import com.eltavine.duckdetector.features.mount.domain.MountReport
+import com.eltavine.duckdetector.features.mount.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.mount.presentation.model.MountCardModel
 
 class MountCardModelMapper {
