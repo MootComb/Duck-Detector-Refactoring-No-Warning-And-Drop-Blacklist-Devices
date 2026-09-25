@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
+import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethod
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodOutcome
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodResult
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
@@ -73,7 +74,7 @@ class NativeRootCardModelMapperTest {
             propertyCheckCount = 5,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "cgroupLeakage",
+                    method = NativeRootMethod.CGROUP_LEAKAGE,
                     summary = "1 hit(s)",
                     outcome = NativeRootMethodOutcome.DETECTED,
                     detail = "Enumerate per-UID cgroup trees and compare native vs Java visibility.",
@@ -122,7 +123,7 @@ class NativeRootCardModelMapperTest {
             propertyCheckCount = 5,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "ksuReadonlySupercall",
+                    method = NativeRootMethod.KSU_READONLY_SUPERCALL,
                     summary = "Blocked",
                     outcome = NativeRootMethodOutcome.SUPPORT,
                     detail = "reboot() helper was blocked by seccomp.",
@@ -151,7 +152,7 @@ class NativeRootCardModelMapperTest {
             stage = NativeRootStage.READY,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "ksuThroneHunt",
+                    method = NativeRootMethod.KSU_THRONE_HUNT,
                     summary = "STIMULUS_FAILED",
                     outcome = NativeRootMethodOutcome.SUPPORT,
                     detail = "PM binder diagnostic",
@@ -240,13 +241,13 @@ class NativeRootCardModelMapperTest {
             propertyCheckCount = 5,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "isolatedMountDrift",
+                    method = NativeRootMethod.ISOLATED_MOUNT_DRIFT,
                     summary = "1 anchor(s)",
                     outcome = NativeRootMethodOutcome.WARNING,
                     detail = "Compared mount anchors.",
                 ),
                 NativeRootMethodResult(
-                    label = "ksuManagerFingerprint",
+                    method = NativeRootMethod.KSU_MANAGER_FINGERPRINT,
                     summary = "3/3 traits",
                     outcome = NativeRootMethodOutcome.WARNING,
                     detail = "Manager manifest fingerprint.",
@@ -373,7 +374,7 @@ class NativeRootCardModelMapperTest {
             propertyCheckCount = 5,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "tempRootArtifacts",
+                    method = NativeRootMethod.TEMP_ROOT_ARTIFACTS,
                     summary = "CVE-2026-43499",
                     outcome = NativeRootMethodOutcome.DETECTED,
                     detail = "Scans /data/local/tmp for temp root exploit artifacts.",
@@ -437,7 +438,7 @@ class NativeRootCardModelMapperTest {
             propertyCheckCount = 5,
             methods = listOf(
                 NativeRootMethodResult(
-                    label = "tempRootArtifacts",
+                    method = NativeRootMethod.TEMP_ROOT_ARTIFACTS,
                     summary = "1 hit(s)",
                     outcome = NativeRootMethodOutcome.DETECTED,
                     detail = "Scans /data/local/tmp for temp root exploit artifacts.",

@@ -26,6 +26,7 @@ import com.eltavine.duckdetector.features.nativeroot.data.probes.TempRootArtifac
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
+import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethod
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodOutcome
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodResult
 
@@ -53,7 +54,7 @@ internal fun buildMethods(
 
     return listOf(
         NativeRootMethodResult(
-            label = "ksuReadonlySupercall",
+            method = NativeRootMethod.KSU_READONLY_SUPERCALL,
             summary = when {
                 snapshot.ksuSupercallProbeHit && snapshot.kernelSuVersion > 0L -> "v${snapshot.kernelSuVersion}"
                 snapshot.ksuSupercallProbeHit -> "Detected"
@@ -89,7 +90,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "__NR_supercall probe",
+            method = NativeRootMethod.NR_SUPERCALL_PROBE,
             summary = when {
                 snapshot.kernelPatchSideChannel -> "Detected"
                 snapshot.kernelPatchSideChannelAvailable -> "No pre-fix delay"
@@ -109,7 +110,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "kernelpatch superkey",
+            method = NativeRootMethod.KERNELPATCH_SUPERKEY,
             summary = when {
                 snapshot.kernelPatchSuperkey -> "Detected"
                 !snapshot.kernelPatchSuperkeyAvailable -> "Unavailable"
@@ -131,7 +132,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "devpts permission check",
+            method = NativeRootMethod.DEVPTS_PERMISSION_CHECK,
             summary = when {
                 snapshot.devptsAbnormalPermission -> "Detected"
                 snapshot.devptsAbnormalPermissionCheckedCount == 0 -> "Unavailable"
@@ -161,7 +162,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "permission boundary check",
+            method = NativeRootMethod.PERMISSION_BOUNDARY_CHECK,
             summary = when {
                 snapshot.permissionBoundaryDetected -> "Detected"
                 !snapshot.permissionBoundaryAvailable -> "Unavailable"
@@ -181,7 +182,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "prctlProbe",
+            method = NativeRootMethod.PRCTL_PROBE,
             summary = when {
                 snapshot.prctlProbeHit && snapshot.kernelSuVersion > 0L -> "v${snapshot.kernelSuVersion}"
                 snapshot.prctlProbeHit -> "Detected"
@@ -196,7 +197,7 @@ internal fun buildMethods(
             detail = "KernelSU magic prctl probe using option 0xDEADBEEF.",
         ),
         NativeRootMethodResult(
-            label = "susfsSideChannel",
+            method = NativeRootMethod.SUSFS_SIDE_CHANNEL,
             summary = when (snapshot.susfsProbeOutcome) {
                 SusfsProbeOutcome.KILLED -> "SIGKILL"
                 SusfsProbeOutcome.CHANGED_UID -> "UID changed"
@@ -217,7 +218,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "selfProcessIoc",
+            method = NativeRootMethod.SELF_PROCESS_IOC,
             summary = when {
                 snapshot.selfSuDomain -> "su domain"
                 snapshot.selfKsuDriverFdCount + snapshot.selfKsuFdwrapperFdCount > 0 -> "FD residue"
@@ -246,7 +247,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "isolatedMountDrift",
+            method = NativeRootMethod.ISOLATED_MOUNT_DRIFT,
             summary = when {
                 mountNamespaceResult.signalCount > 0 && mountNamespaceResult.mountAnchorDriftCount > 0 ->
                     "${mountNamespaceResult.mountAnchorDriftCount} anchor(s)"
@@ -270,7 +271,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "ksuManagerFingerprint",
+            method = NativeRootMethod.KSU_MANAGER_FINGERPRINT,
             summary = when {
                 managerFingerprintResult.packagePresent && managerFingerprintResult.traitHitCount > 0 ->
                     "${managerFingerprintResult.traitHitCount}/3 traits"
@@ -297,7 +298,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "ksuThroneHunt",
+            method = NativeRootMethod.KSU_THRONE_HUNT,
             summary = when {
                 throneHuntResult.hitCount > 0 -> "${throneHuntResult.hitCount} hit(s)"
                 !throneHuntResult.available -> throneHuntResult.failureStage
@@ -339,7 +340,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "runtimeArtifacts",
+            method = NativeRootMethod.RUNTIME_ARTIFACTS,
             summary = when {
                 runtimeFindings.isNotEmpty() -> "${runtimeFindings.size} hit(s)"
                 snapshot.available -> "Clean"
@@ -376,7 +377,7 @@ internal fun buildMethods(
             },
         ),
         NativeRootMethodResult(
-            label = "cgroupLeakage",
+            method = NativeRootMethod.CGROUP_LEAKAGE,
             summary = when {
                 cgroupResult.hitCount > 0 -> "${cgroupResult.hitCount} hit(s)"
                 cgroupResult.available -> "Clean"
@@ -391,7 +392,7 @@ internal fun buildMethods(
             detail = "Enumerate per-UID cgroup trees and compare native getdents visibility against Java File view, /proc/<pid>/status UID ownership, and PID liveness syscalls such as kill/getsid/getpgid/sched_getscheduler/pidfd_open. ${cgroupResult.detail}".trim(),
         ),
         NativeRootMethodResult(
-            label = "kernelTraces",
+            method = NativeRootMethod.KERNEL_TRACES,
             summary = when {
                 kernelFindings.isNotEmpty() -> "${kernelFindings.size} source(s)"
                 snapshot.available -> "Clean"
@@ -405,7 +406,7 @@ internal fun buildMethods(
             detail = "Check /proc/kallsyms, /proc/modules, and uname strings for KernelSU, APatch, KernelPatch, SuperCall, or Magisk tokens.",
         ),
         NativeRootMethodResult(
-            label = "propertyResidue",
+            method = NativeRootMethod.PROPERTY_RESIDUE,
             summary = when {
                 propertyFindings.isNotEmpty() -> "${propertyFindings.size} hit(s)"
                 snapshot.available -> "Clean"
@@ -420,7 +421,7 @@ internal fun buildMethods(
             detail = "Read a small catalog of root-specific properties such as ro.kernel.ksu and APatch/KernelPatch variants.",
         ),
         NativeRootMethodResult(
-            label = "tempRootArtifacts",
+            method = NativeRootMethod.TEMP_ROOT_ARTIFACTS,
             summary = when {
                 tempRootArtifactResult.cveExploitDetected -> "CVE-2026-43499"
                 tempRootArtifactResult.tempRootDetected -> "${tempRootArtifactResult.hitCount} hit(s)"
@@ -435,13 +436,13 @@ internal fun buildMethods(
             detail = "Scans /data/local/tmp for temp root exploit artifacts (ksud, temp_su, ksu-helper, ksu-payload, libcve43499root.so). Files matching the CVE-2026-43499 tooling show it was staged on this device; they do not show whether an escalation succeeded or is still active. Paths this process cannot stat leave the check unavailable.",
         ),
         NativeRootMethodResult(
-            label = "nativeLibrary",
+            method = NativeRootMethod.NATIVE_LIBRARY,
             summary = if (snapshot.available) "Loaded" else "Unavailable",
             outcome = if (snapshot.available) NativeRootMethodOutcome.CLEAN else NativeRootMethodOutcome.SUPPORT,
             detail = "JNI-backed native root detection module.",
         ),
         NativeRootMethodResult(
-            label = "signalSummary",
+            method = NativeRootMethod.SIGNAL_SUMMARY,
             summary = when {
                 directFindings.isNotEmpty() -> "${directFindings.size} direct"
                 findings.isNotEmpty() -> "${findings.size} indirect"

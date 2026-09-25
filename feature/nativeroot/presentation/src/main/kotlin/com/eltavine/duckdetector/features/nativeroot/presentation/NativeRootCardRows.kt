@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
+import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethod
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodOutcome
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodResult
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
@@ -180,7 +181,7 @@ internal fun buildMethodRows(report: NativeRootReport): List<NativeRootDetailRow
                 value = result.summary,
                 status = methodStatus(result),
                 detail = result.detail,
-                hiddenCopyText = if (result.label == "ksuThroneHunt") {
+                hiddenCopyText = if (result.method == NativeRootMethod.KSU_THRONE_HUNT) {
                     buildThroneHuntDiagnostics(report)
                 } else {
                     null

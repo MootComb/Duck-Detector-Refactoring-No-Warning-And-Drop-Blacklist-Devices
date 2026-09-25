@@ -59,12 +59,37 @@ data class NativeRootFinding(
     val detailMonospace: Boolean = false,
 )
 
+/** The methods a Native Root scan reports; [label] is the key each method is listed under. */
+enum class NativeRootMethod(val label: String) {
+    KSU_READONLY_SUPERCALL("ksuReadonlySupercall"),
+    NR_SUPERCALL_PROBE("__NR_supercall probe"),
+    KERNELPATCH_SUPERKEY("kernelpatch superkey"),
+    DEVPTS_PERMISSION_CHECK("devpts permission check"),
+    PERMISSION_BOUNDARY_CHECK("permission boundary check"),
+    PRCTL_PROBE("prctlProbe"),
+    SUSFS_SIDE_CHANNEL("susfsSideChannel"),
+    SELF_PROCESS_IOC("selfProcessIoc"),
+    ISOLATED_MOUNT_DRIFT("isolatedMountDrift"),
+    KSU_MANAGER_FINGERPRINT("ksuManagerFingerprint"),
+    KSU_THRONE_HUNT("ksuThroneHunt"),
+    RUNTIME_ARTIFACTS("runtimeArtifacts"),
+    CGROUP_LEAKAGE("cgroupLeakage"),
+    KERNEL_TRACES("kernelTraces"),
+    PROPERTY_RESIDUE("propertyResidue"),
+    TEMP_ROOT_ARTIFACTS("tempRootArtifacts"),
+    NATIVE_LIBRARY("nativeLibrary"),
+    SIGNAL_SUMMARY("signalSummary"),
+}
+
 data class NativeRootMethodResult(
-    val label: String,
+    val method: NativeRootMethod,
     val summary: String,
     val outcome: NativeRootMethodOutcome,
     val detail: String,
-)
+) {
+    val label: String
+        get() = method.label
+}
 
 data class NativeRootReport(
     val stage: NativeRootStage,
