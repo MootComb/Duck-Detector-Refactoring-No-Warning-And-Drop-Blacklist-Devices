@@ -55,7 +55,7 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeeCertificatesDialog(
+internal fun TeeCertificatesDialog(
     label: String,
     count: String,
     certificates: List<TeeCertificateItem>,

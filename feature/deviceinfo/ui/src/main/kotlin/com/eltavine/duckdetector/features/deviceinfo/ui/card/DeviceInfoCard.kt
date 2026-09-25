@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceIn
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoSectionModel
 
 @Composable
-fun DeviceInfoCard(
+internal fun DeviceInfoCard(
     model: DeviceInfoCardModel,
     modifier: Modifier = Modifier,
 ) {

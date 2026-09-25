@@ -59,7 +59,7 @@ import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsTargetsD
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DangerousAppsDetectorCard(
+internal fun DangerousAppsDetectorCard(
     model: DangerousAppsCardModel,
     modifier: Modifier = Modifier,
 ) {

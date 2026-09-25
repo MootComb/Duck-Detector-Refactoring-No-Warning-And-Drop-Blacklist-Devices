@@ -51,7 +51,7 @@ import com.eltavine.duckdetector.features.dangerousapps.presentation.model.Dange
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DangerousAppsTargetsDialog(
+internal fun DangerousAppsTargetsDialog(
     targets: List<DangerousAppsTargetAppModel>,
     onDismiss: () -> Unit,
 ) {

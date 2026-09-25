@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.Pl
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixImpactItemModel
 
 @Composable
-fun PlayIntegrityFixDetectorCard(
+internal fun PlayIntegrityFixDetectorCard(
     model: PlayIntegrityFixCardModel,
     modifier: Modifier = Modifier,
 ) {

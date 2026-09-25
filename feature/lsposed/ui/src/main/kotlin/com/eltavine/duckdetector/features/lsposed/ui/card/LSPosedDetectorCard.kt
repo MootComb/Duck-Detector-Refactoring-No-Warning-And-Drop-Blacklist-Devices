@@ -52,7 +52,7 @@ import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedImpa
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
-fun LSPosedDetectorCard(
+internal fun LSPosedDetectorCard(
     model: LSPosedCardModel,
     modifier: Modifier = Modifier,
 ) {

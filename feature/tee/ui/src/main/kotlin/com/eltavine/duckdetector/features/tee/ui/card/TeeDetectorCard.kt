@@ -83,7 +83,7 @@ import com.eltavine.duckdetector.features.tee.ui.TeeDetailsDialog
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeeDetectorCard(
+internal fun TeeDetectorCard(
     model: TeeCardModel,
     showDetailsDialog: Boolean,
     showCertificatesDialog: Boolean,

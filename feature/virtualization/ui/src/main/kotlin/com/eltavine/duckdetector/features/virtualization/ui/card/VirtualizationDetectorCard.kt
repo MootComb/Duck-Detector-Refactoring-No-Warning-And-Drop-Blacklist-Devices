@@ -52,7 +52,7 @@ import com.eltavine.duckdetector.features.virtualization.presentation.model.Virt
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationImpactItemModel
 
 @Composable
-fun VirtualizationDetectorCard(
+internal fun VirtualizationDetectorCard(
     model: VirtualizationCardModel,
     modifier: Modifier = Modifier,
 ) {

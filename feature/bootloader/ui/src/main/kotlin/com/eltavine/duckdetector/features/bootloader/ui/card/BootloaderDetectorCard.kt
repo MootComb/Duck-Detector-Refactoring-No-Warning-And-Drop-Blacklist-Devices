@@ -55,7 +55,7 @@ import com.eltavine.duckdetector.features.bootloader.presentation.model.Bootload
 import com.eltavine.duckdetector.features.bootloader.ui.R
 
 @Composable
-fun BootloaderDetectorCard(
+internal fun BootloaderDetectorCard(
     model: BootloaderCardModel,
     modifier: Modifier = Modifier,
 ) {

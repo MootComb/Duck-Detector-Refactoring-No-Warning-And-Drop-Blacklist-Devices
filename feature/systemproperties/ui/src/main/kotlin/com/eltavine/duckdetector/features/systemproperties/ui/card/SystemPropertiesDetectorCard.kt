@@ -53,7 +53,7 @@ import com.eltavine.duckdetector.features.systemproperties.presentation.model.Sy
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesImpactItemModel
 
 @Composable
-fun SystemPropertiesDetectorCard(
+internal fun SystemPropertiesDetectorCard(
     model: SystemPropertiesCardModel,
     modifier: Modifier = Modifier,
 ) {

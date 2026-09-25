@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRom
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomImpactItemModel
 
 @Composable
-fun CustomRomDetectorCard(
+internal fun CustomRomDetectorCard(
     model: CustomRomCardModel,
     modifier: Modifier = Modifier,
 ) {

@@ -51,7 +51,7 @@ import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelC
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckImpactItemModel
 
 @Composable
-fun KernelCheckDetectorCard(
+internal fun KernelCheckDetectorCard(
     model: KernelCheckCardModel,
     modifier: Modifier = Modifier,
 ) {

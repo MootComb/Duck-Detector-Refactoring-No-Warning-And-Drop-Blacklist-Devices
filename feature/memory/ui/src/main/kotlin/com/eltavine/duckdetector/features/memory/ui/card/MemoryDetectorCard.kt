@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeader
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryImpactItemModel
 
 @Composable
-fun MemoryDetectorCard(
+internal fun MemoryDetectorCard(
     model: MemoryCardModel,
     modifier: Modifier = Modifier,
 ) {

@@ -61,7 +61,7 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.core.ui.R as CoreUiR
 
 @Composable
-fun MountDetectorCard(
+internal fun MountDetectorCard(
     model: MountCardModel,
     modifier: Modifier = Modifier,
 ) {

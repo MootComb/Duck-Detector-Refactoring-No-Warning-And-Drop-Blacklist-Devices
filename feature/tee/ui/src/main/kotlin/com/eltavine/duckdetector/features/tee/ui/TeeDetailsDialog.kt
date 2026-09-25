@@ -52,7 +52,7 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TeeDetailsDialog(
+internal fun TeeDetailsDialog(
     exportText: String,
     certificateCount: Int,
     onDismiss: () -> Unit,

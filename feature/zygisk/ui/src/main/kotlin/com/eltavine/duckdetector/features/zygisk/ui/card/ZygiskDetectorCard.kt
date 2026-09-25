@@ -52,7 +52,7 @@ import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeader
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
 
 @Composable
-fun ZygiskDetectorCard(
+internal fun ZygiskDetectorCard(
     model: ZygiskCardModel,
     modifier: Modifier = Modifier,
 ) {

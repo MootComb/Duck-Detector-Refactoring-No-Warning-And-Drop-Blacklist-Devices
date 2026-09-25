@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactMode
 import com.eltavine.duckdetector.features.su.presentation.model.SuImpactItemModel
 
 @Composable
-fun SuDetectorCard(
+internal fun SuDetectorCard(
     model: SuCardModel,
     modifier: Modifier = Modifier,
 ) {
