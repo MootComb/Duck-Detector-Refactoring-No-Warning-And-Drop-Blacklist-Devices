@@ -7,7 +7,6 @@
     "app/src/main/cpp/selinux/context_validity_probe.cpp": 1114,
     "app/src/main/cpp/tee/trickystore/trickystore_probe.cpp": 1113,
     "app/src/main/cpp/virtualization/honeypot_traps.cpp": 921,
-    "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateGrantClient.kt": 817,
     "feature/tee/presentation/src/test/kotlin/com/eltavine/duckdetector/features/tee/presentation/TeeCardModelMapperTest.kt": 874
   }
 }
