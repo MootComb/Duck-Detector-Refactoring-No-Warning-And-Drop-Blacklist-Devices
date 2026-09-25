@@ -26,12 +26,12 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class AppZygotePreloadTest {
+class SelinuxContextValidityPreloadTest {
 
     @Test
     fun `fallback payload stays parseable`() {
-        val preload = AppZygotePreload()
-        val method = AppZygotePreload::class.java.getDeclaredMethod(
+        val preload = SelinuxContextValidityPreload()
+        val method = SelinuxContextValidityPreload::class.java.getDeclaredMethod(
             "fallbackPayload",
             String::class.java,
         )
@@ -57,7 +57,7 @@ class AppZygotePreloadTest {
 
     @Test
     fun `augment preload snapshot restores DirtySepolicy style attr and rule probes`() {
-        val snapshot = AppZygotePreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
             baseSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,
@@ -153,7 +153,7 @@ class AppZygotePreloadTest {
         var inspectCalls = 0
         var seqnoCalls = 0
 
-        val snapshot = AppZygotePreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
             baseSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,
@@ -204,7 +204,7 @@ class AppZygotePreloadTest {
 
     @Test
     fun `java carrier snapshot can recover preload gate when native base snapshot fails`() {
-        val merged = AppZygotePreload.mergeCarrierSelfCheckSnapshot(
+        val merged = SelinuxContextValidityPreload.mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = SelinuxContextValiditySnapshot(
                 available = false,
                 failureReason = "selinux native path unavailable",
@@ -235,7 +235,7 @@ class AppZygotePreloadTest {
 
     @Test
     fun `java carrier snapshot preserves native dedicated oracle verdict`() {
-        val merged = AppZygotePreload.mergeCarrierSelfCheckSnapshot(
+        val merged = SelinuxContextValidityPreload.mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,
