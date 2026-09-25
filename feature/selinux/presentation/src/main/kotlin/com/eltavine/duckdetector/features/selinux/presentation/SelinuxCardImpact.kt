@@ -18,12 +18,18 @@ package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
+import com.eltavine.duckdetector.features.selinux.domain.contextValidityResult
+import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
+import com.eltavine.duckdetector.features.selinux.domain.firstTrustedPolicyRuleHit
+import com.eltavine.duckdetector.features.selinux.domain.policyloadSeqnoResult
+import com.eltavine.duckdetector.features.selinux.domain.procAttrCurrentResult
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxImpactItemModel
 
 internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemModel> {

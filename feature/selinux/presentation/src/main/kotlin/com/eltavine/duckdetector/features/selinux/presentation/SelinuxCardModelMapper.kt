@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
+import com.eltavine.duckdetector.features.selinux.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxCardModel
 
 class SelinuxCardModelMapper {

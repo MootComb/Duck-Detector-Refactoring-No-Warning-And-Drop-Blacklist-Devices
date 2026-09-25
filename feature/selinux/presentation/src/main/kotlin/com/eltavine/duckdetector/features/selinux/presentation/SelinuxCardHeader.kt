@@ -18,12 +18,18 @@ package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
+import com.eltavine.duckdetector.features.selinux.domain.contextValidityResult
+import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
+import com.eltavine.duckdetector.features.selinux.domain.firstTrustedPolicyRuleHit
+import com.eltavine.duckdetector.features.selinux.domain.policyloadSeqnoResult
+import com.eltavine.duckdetector.features.selinux.domain.procAttrCurrentResult
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxHeaderFactModel
 
 internal fun buildSubtitle(report: SelinuxReport): String {
@@ -242,40 +248,6 @@ internal fun buildHeaderFacts(report: SelinuxReport): List<SelinuxHeaderFactMode
             },
         ),
     )
-}
-
-internal fun SelinuxReport.toDetectorStatus(): DetectorStatus {
-    val contextValidity = contextValidityResult(this)
-    val procAttrCurrent = procAttrCurrentResult(this)
-    val policyloadSeqno = policyloadSeqnoResult(this)
-    val dirtyPolicyHit = firstTrustedPolicyRuleHit(this)
-    val appZygoteCarrierState = contextValiditySupportState(contextValidity)
-    return when (stage) {
-        SelinuxStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        SelinuxStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        SelinuxStage.READY -> when (mode) {
-            SelinuxMode.ENFORCING -> when {
-                auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> DetectorStatus.danger()
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
-                policyloadSeqno?.isSecure == false -> DetectorStatus.danger()
-                procAttrCurrent?.isSecure == false -> DetectorStatus.danger()
-                dirtyPolicyHit != null -> DetectorStatus.warning()
-                appZygoteCarrierState == AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
-                appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
-                policyAnalysis?.weakness == SelinuxPolicyWeakness.SEVERE ||
-                        policyAnalysis?.weakness == SelinuxPolicyWeakness.MODERATE ||
-                        auditIntegrity?.state == SelinuxAuditIntegrityState.EXPOSED ||
-                        auditIntegrity?.state == SelinuxAuditIntegrityState.RESIDUE -> DetectorStatus.warning()
-
-                else -> DetectorStatus.allClear()
-            }
-
-            SelinuxMode.PERMISSIVE, SelinuxMode.DISABLED -> DetectorStatus.danger()
-            SelinuxMode.UNKNOWN -> DetectorStatus.info(InfoKind.ERROR)
-        }
-    }
 }
 
 internal fun modeStatus(mode: SelinuxMode): DetectorStatus {
