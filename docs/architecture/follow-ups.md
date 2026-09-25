@@ -6,6 +6,8 @@ These are known, deliberate gaps left by the module refactor. Each one was kept 
 
 Some features still branch on method labels that their own data layer produces. For example, `KernelCheckMethods.kt` in `:feature:kernelcheck:data` emits the label `"cvePatchCheck"`, and `KernelCheckCardStatus.kt` and `KernelCheckCardRows.kt` in `:feature:kernelcheck:presentation` compare against it. The protocol never crosses a feature boundary, but renaming the label silently changes the card. Replace such labels with typed method or reason identifiers in each feature's domain layer, one feature per change, with the card and export golden tests proving the output is unchanged.
 
+Two presentation layers go further and read meaning back out of report text. `TeeCardModelMapper` picks the dashboard's top finding by searching the TEE summary and item bodies for "Grant self-domain", "key visibility" and "KEY_NOT_FOUND". `buildPolicyNotes` in `SelinuxCardRows.kt` sets each policy note's severity by searching its text for "below minimum", "dangerous" or "permissive". Give the TEE report a typed grant finding and the SELinux policy analysis typed notes, each with the text beside its kind.
+
 ## Early virtualization preload matches finding labels
 
 `preload/virtualization_early_detector.cpp` derives its early flags by comparing the finding labels and groups produced by `virtualization::collect_snapshot`, such as `"ro.kernel.qemu"`, `"Emulator device node"` and `"TRANSLATION"`. This is the reason for the one include exception in `native-boundaries.json`. The include itself is legitimate, because both captures must come from one probe implementation, but the label matching is a text protocol between two native units. Give `virtualization::SnapshotFinding` a typed kind and match on it.
@@ -41,3 +43,38 @@ The startup policy screens and app shell in `:app` read and write `TeeNetworkCon
 ## Early launch capture starts a fixed activity
 
 The transparent `NativeActivity` in the `preload` unit starts `<applicationId>.MainActivity` by name after its capture. An SDK host whose launch activity has another name cannot reuse the launcher, so its Mount and Virtualization detectors report the early capture as unavailable. Reading the target activity from a `<meta-data>` entry on the `NativeActivity` would lift this; the app's behaviour must stay identical.
+
+## TEE probes that classify keystore errors by message
+
+Two TEE deep checks still read platform error text. The oversized challenge probe counts any exception as a rejection, so a busy or failing keystore reads as the expected answer. The update subcomponent probe recognises a key-not-found style failure by matching "KEY_NOT_FOUND" or "error 7" in the exception message. On Android 13 and later, `android.security.KeyStoreException.getNumericErrorCode()` gives the typed code. Classify by it where it exists, and report the probe as not completed otherwise.
+
+## The storage path filter check lives in Kernel Check
+
+`KernelCvePatchProbe` tests whether `/sdcard/Android/data` can be listed through paths with ignorable Unicode codepoints, which is MediaProvider's path handling rather than a kernel property, and the report calls it CVE-2024-43093 without a reviewed fix reference. Move it next to the Dangerous Apps directory listing methods that use the same bypass, or into a storage detector, and cite the fix. The move changes a card and the export, so it needs its own change with a golden update.
+
+## Discovery-only evidence
+
+Eleven evidence record entries start with "Discovery only:" because they rest on a tool's observed behaviour or on a source this review did not read. They are the KernelSU interfaces, the kernel token catalogs, TrickyStore's in-process signatures, the TEE timing skip signatures, SOTER, LSPosed's class and log names, Zygisk's residue patterns, the Memory prologue and handler heuristics, and the vendor-specific bootloader and Widevine behaviour. Review each tool's source, or the vendor documentation, and replace the marker with the reference, or lower the signal's confidence where the source does not support it.
+
+## "Clean" rows that mean "not observed"
+
+Most method rows say "Clean" when a probe ran and saw nothing, and several say "Normal". AGENTS.md section 19 prefers "not observed", which does not suggest the device was proven clean. Changing the word changes every card and the golden export, so it needs one cross-detector copy change rather than piecemeal edits.
+
+## SOTER environment check swallows inspector failures
+
+`SoterCapabilityProbe` wraps the environment inspector in `runCatching` and falls back to an empty snapshot. `BiometricManager.canAuthenticate` needs `USE_BIOMETRIC`, so a host without it gets an "abnormal environment" result of false instead of "not evaluated". Carry the inspector's failure into `TeeSoterState` and show the environment check as unavailable.
+
+## Device validation of the evidence review
+
+The evidence review changed what several probes report. These changes were verified with JVM tests and native builds for all four ABIs, not on devices:
+
+- the netlink boundary's applicability by release and target SDK;
+- the SUSFS outcome codes;
+- the paths now reported as not observable in Native Root, SU and SELinux;
+- the TEE deep checks that now read "Did not complete";
+- the gate on app attestation keys;
+- the operation error path grading;
+- the KernelPatch latency availability.
+
+Validate them on a stock device, a rooted device with /data/adb present, an SDK host with an old target SDK, and a non-arm64 device before relying on the new states in a release.
+
