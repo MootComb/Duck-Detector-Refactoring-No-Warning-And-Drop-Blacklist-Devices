@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import android.app.Service
 import android.content.ComponentName
@@ -22,9 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -32,12 +29,12 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
-open class SelinuxContextValidityCarrierManager(
+public open class SelinuxContextValidityCarrierManager(
     private val context: Context? = null,
     private val serviceClass: Class<out Service> = SelinuxContextValidityCarrierService::class.java,
 ) {
 
-    open suspend fun collectSnapshot(): SelinuxContextValiditySnapshot {
+    public open suspend fun collectSnapshot(): SelinuxContextValiditySnapshot {
         val appContext = context?.applicationContext ?: return carrierFailureSnapshot(
             "SELinux carrier service unavailable.",
         )
@@ -148,7 +145,7 @@ open class SelinuxContextValidityCarrierManager(
         }
     }
 
-    companion object {
+    public companion object {
         private const val DETECTION_TIMEOUT_MS = 15_000L
         private val REMOTE_CALLBACK_EXECUTOR = Dispatchers.IO.asExecutor()
     }

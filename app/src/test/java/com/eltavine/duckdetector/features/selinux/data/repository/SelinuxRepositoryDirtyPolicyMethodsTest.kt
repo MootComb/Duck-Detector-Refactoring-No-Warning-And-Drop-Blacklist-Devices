@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.selinux.data.repository
 
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

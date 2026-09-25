@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -75,11 +75,6 @@ limitations under the License.
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".features.selinux.data.service.SelinuxContextValidityCarrierService"
-            android:exported="false"
-            android:isolatedProcess="true"
-            android:useAppZygote="true" />
         <!-- The package directory watch is installed during app_zygote preload and inherited through
              fork, so this carrier only drains the event stream from the isolated child. -->
         <service

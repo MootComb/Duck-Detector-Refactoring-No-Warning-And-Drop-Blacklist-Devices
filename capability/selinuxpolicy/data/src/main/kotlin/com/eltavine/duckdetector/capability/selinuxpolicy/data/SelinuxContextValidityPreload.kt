@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.system.Os
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityPayloadCodec
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoProbe
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoResult
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentProbe
 import java.lang.reflect.Method
 
-class SelinuxContextValidityPreload {
+public class SelinuxContextValidityPreload {
 
     private val bridge = SelinuxContextValidityBridge()
     private val procAttrCurrentProbe = SelinuxProcAttrCurrentProbe()
     private val policyloadSeqnoProbe = SelinuxPolicyloadSeqnoProbe()
 
-    fun preload(appInfo: ApplicationInfo, beforeCollection: () -> Unit) {
+    public fun preload(appInfo: ApplicationInfo, beforeCollection: () -> Unit) {
         val payload = try {
             beforeCollection()
             val currentUid = Os.getuid()
@@ -203,7 +196,7 @@ class SelinuxContextValidityPreload {
         )
     }
 
-    companion object {
+    public companion object {
         private const val FALLBACK_NOTE = "Kotlin preload fallback produced a parseable SELinux snapshot."
         private const val POLICYLOAD_SEQNO_PRELOAD_NOTE =
             "zygotePreloadName is required: the policyload/access seqno oracle must run before the isolated child loses app_zygote SELinuxfs access."
@@ -238,7 +231,7 @@ class SelinuxContextValidityPreload {
             currentUid: Int,
             appUid: Int,
             isUserBuild: Boolean,
-            inspectProcAttrCurrent: () -> List<com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentResult>,
+            inspectProcAttrCurrent: () -> List<com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult>,
             inspectPolicyloadSeqno: () -> SelinuxPolicyloadSeqnoResult,
             checkAccess: (String, String, String, String) -> Boolean?,
         ): SelinuxContextValiditySnapshot {

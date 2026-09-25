@@ -16,12 +16,12 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierState
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.DedicatedCarrierState
 
 data class LSPosedDirtyPolicyProbeResult(
     val available: Boolean,

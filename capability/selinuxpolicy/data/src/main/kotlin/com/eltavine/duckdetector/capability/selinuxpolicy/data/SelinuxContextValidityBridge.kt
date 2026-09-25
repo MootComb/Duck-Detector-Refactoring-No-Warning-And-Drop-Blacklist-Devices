@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.native
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
 import com.eltavine.duckdetector.core.native.NativePayloadContract
 import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentPayloadCodec
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentResult
 
-open class SelinuxContextValidityBridge(
+public open class SelinuxContextValidityBridge(
     private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
 ) {
 
-    open fun collectLocalSnapshot(): SelinuxContextValiditySnapshot = collector.collect(
+    public open fun collectLocalSnapshot(): SelinuxContextValiditySnapshot = collector.collect(
         readPayload = ::nativeCollectContextValiditySnapshotInternal,
         parse = ::parse,
         unavailable = { status ->
@@ -202,7 +200,7 @@ open class SelinuxContextValidityBridge(
 
     private external fun nativeCloseProcessLocalAvc()
 
-    companion object {
+    public companion object {
         @Volatile
         private var preloadedRawData: String? = null
 
@@ -210,23 +208,23 @@ open class SelinuxContextValidityBridge(
             get() = DuckDetectorNativeLibrary.isLoaded
 
         @JvmStatic
-        val isNativeLibraryLoaded: Boolean
+        public val isNativeLibraryLoaded: Boolean
             get() = nativeLoaded
 
         @JvmStatic
-        fun nativeCollectContextValiditySnapshot(): String {
+        public fun nativeCollectContextValiditySnapshot(): String {
             return SelinuxContextValidityBridge().nativeCollectContextValiditySnapshotInternal()
         }
 
         @JvmStatic
-        fun closeProcessLocalAvc() {
+        public fun closeProcessLocalAvc() {
             if (nativeLoaded) {
                 runCatching { SelinuxContextValidityBridge().nativeCloseProcessLocalAvc() }
             }
         }
 
         @JvmStatic
-        fun setPreloadedRawData(raw: String) {
+        public fun setPreloadedRawData(raw: String) {
             preloadedRawData = raw
         }
 

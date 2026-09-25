@@ -16,16 +16,10 @@
 
 package com.eltavine.duckdetector.features.selinux.data.probes
 
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-
-enum class DedicatedCarrierState(
-    val label: String,
-) {
-    OK("ok"),
-    FAILED("failed"),
-    UNTRUSTED("untrusted"),
-}
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierState
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityBridge
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
 
 enum class SelinuxContextValidityState {
     CLEAN,
@@ -118,15 +112,17 @@ class SelinuxContextValidityProbe(
     }
 
     internal fun SelinuxContextValiditySnapshot.toProbeResult(): SelinuxContextValidityProbeResult {
+        val domainValid = ksuDomainValid
+        val fileValid = ksuFileValid
         val state = when {
             !available -> SelinuxContextValidityState.UNAVAILABLE
             !carrierMatchesExpected -> SelinuxContextValidityState.UNAVAILABLE
             !probeAttempted -> SelinuxContextValidityState.UNAVAILABLE
             !oracleControlsPassed -> SelinuxContextValidityState.INCONSISTENT
             !ksuResultsStable -> SelinuxContextValidityState.INCONSISTENT
-            ksuDomainValid == null || ksuFileValid == null -> SelinuxContextValidityState.UNAVAILABLE
-            ksuDomainValid && ksuFileValid -> SelinuxContextValidityState.KSU_PRESENT
-            !ksuDomainValid && !ksuFileValid -> SelinuxContextValidityState.CLEAN
+            domainValid == null || fileValid == null -> SelinuxContextValidityState.UNAVAILABLE
+            domainValid && fileValid -> SelinuxContextValidityState.KSU_PRESENT
+            !domainValid && !fileValid -> SelinuxContextValidityState.CLEAN
             else -> SelinuxContextValidityState.AMBIGUOUS
         }
 

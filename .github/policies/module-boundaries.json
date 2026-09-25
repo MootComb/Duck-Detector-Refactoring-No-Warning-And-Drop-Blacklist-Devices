@@ -67,6 +67,7 @@
         ":capability:helperprocess:data",
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
+        ":capability:selinuxpolicy:data",
         ":capability:systemproperties:data",
         ":core:detector",
         ":core:evidence",
@@ -138,6 +139,12 @@
     ":capability:packageinventory:domain": {
       "kind": "jvm",
       "allowed_project_dependencies": []
+    },
+    ":capability:selinuxpolicy:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:native"
+      ]
     },
     ":capability:systemproperties:data": {
       "kind": "android-library",

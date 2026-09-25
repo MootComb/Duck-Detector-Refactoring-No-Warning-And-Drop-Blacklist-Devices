@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import android.os.IBinder
 import android.os.Parcel
 
-class SelinuxContextValidityCarrierProxy(
+internal class SelinuxContextValidityCarrierProxy(
     private val remote: IBinder,
 ) {
 

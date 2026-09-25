@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityPayloadCodec
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertFalse

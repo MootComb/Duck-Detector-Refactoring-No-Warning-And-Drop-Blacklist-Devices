@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
-
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 internal fun SelinuxContextValiditySnapshot.applyJavaDirtyPolicyResults(
     isUserBuild: Boolean,

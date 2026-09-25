@@ -27,8 +27,8 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoProbe
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentProbe
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoProbe
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentProbe
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxDetailRowModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxHeaderFactModel

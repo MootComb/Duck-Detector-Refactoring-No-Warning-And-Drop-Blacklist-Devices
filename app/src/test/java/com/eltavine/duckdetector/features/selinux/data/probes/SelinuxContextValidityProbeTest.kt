@@ -16,8 +16,10 @@
 
 package com.eltavine.duckdetector.features.selinux.data.probes
 
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierState
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityBridge
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

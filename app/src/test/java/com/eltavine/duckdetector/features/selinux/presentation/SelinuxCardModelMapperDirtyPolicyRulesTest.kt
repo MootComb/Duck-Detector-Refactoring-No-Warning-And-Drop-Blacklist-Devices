@@ -16,9 +16,9 @@
 
 package com.eltavine.duckdetector.features.selinux.presentation
 
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode

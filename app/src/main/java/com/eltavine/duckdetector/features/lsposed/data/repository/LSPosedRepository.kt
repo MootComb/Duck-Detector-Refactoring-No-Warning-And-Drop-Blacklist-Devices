@@ -38,7 +38,7 @@ import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedRuntimeArti
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedStackProbe
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedZygotePermissionProbe
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedZygotePermissionProbeResult
-import com.eltavine.duckdetector.features.selinux.data.service.SelinuxContextValidityCarrierManager
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityCarrierManager
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility

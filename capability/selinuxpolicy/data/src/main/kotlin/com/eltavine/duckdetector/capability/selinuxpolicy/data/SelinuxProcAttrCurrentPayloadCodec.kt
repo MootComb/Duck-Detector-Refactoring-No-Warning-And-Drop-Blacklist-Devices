@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.probes
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
 
@@ -25,7 +25,7 @@ import com.eltavine.duckdetector.core.native.NativePayloadCodec
  * inside a value cannot be mistaken for a column boundary. These values come from the kernel and
  * from exception messages, so their contents are not ours to assume.
  */
-object SelinuxProcAttrCurrentPayloadCodec {
+internal object SelinuxProcAttrCurrentPayloadCodec {
 
     fun encode(result: SelinuxProcAttrCurrentResult): String {
         return listOf(

@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+plugins {
+    id("duckdetector.android.library")
+}
 
-import android.os.IBinder
+android {
+    namespace = "com.eltavine.duckdetector.capability.selinuxpolicy.data"
+}
 
-object SelinuxContextValidityCarrierProtocol {
-    const val DESCRIPTOR = "com.eltavine.duckdetector.features.selinux.context_validity"
-    const val TRANSACTION_COLLECT_SNAPSHOT = IBinder.FIRST_CALL_TRANSACTION + 0
+kotlin {
+    explicitApi()
+}
+
+dependencies {
+    implementation(project(":core:native"))
+    implementation(libs.kotlinx.coroutines.android)
 }

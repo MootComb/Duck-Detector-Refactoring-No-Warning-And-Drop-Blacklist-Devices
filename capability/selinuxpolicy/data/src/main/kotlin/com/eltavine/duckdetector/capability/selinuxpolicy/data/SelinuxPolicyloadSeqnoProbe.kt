@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.probes
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.RandomAccessFile
 
-enum class SelinuxPolicyloadSeqnoState {
+public enum class SelinuxPolicyloadSeqnoState {
     CLEAN,
     SUSPICIOUS,
     INCONCLUSIVE,
     UNAVAILABLE,
 }
 
-data class SelinuxPolicyloadSeqnoResult(
+public data class SelinuxPolicyloadSeqnoResult(
     val state: SelinuxPolicyloadSeqnoState,
     val available: Boolean,
     val probeAttempted: Boolean,
@@ -39,9 +39,9 @@ data class SelinuxPolicyloadSeqnoResult(
     val notes: List<String> = emptyList(),
 )
 
-class SelinuxPolicyloadSeqnoProbe {
+public class SelinuxPolicyloadSeqnoProbe {
 
-    fun inspect(): SelinuxPolicyloadSeqnoResult {
+    public fun inspect(): SelinuxPolicyloadSeqnoResult {
         return runCatching {
             val status = readStatusStable()
             val access = queryAccessDecision()
@@ -165,12 +165,12 @@ class SelinuxPolicyloadSeqnoProbe {
         val seqno: Long,
     )
 
-    companion object {
-        const val METHOD_LABEL = "App-zygote seqno oracle"
-        const val STATUS_CLEAN = "Clean"
-        const val STATUS_SUSPICIOUS = "Seqno split"
-        const val STATUS_INCONCLUSIVE = "Info"
-        const val STATUS_UNAVAILABLE = "Unavailable"
+    public companion object {
+        public const val METHOD_LABEL: String = "App-zygote seqno oracle"
+        public const val STATUS_CLEAN: String = "Clean"
+        public const val STATUS_SUSPICIOUS: String = "Seqno split"
+        public const val STATUS_INCONCLUSIVE: String = "Info"
+        public const val STATUS_UNAVAILABLE: String = "Unavailable"
 
         private const val SELINUX_STATUS = "/sys/fs/selinux/status"
         private const val SELINUX_ACCESS = "/sys/fs/selinux/access"

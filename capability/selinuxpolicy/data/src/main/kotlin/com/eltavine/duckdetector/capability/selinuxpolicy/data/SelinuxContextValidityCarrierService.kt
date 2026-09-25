@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.service
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import android.app.Service
 import android.content.Intent
@@ -22,12 +22,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.Parcel
 import android.system.Os
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityBridge
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValidityPayloadCodec
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
 
-class SelinuxContextValidityCarrierService : Service() {
+public class SelinuxContextValidityCarrierService : Service() {
 
     private val binder = object : Binder() {
         override fun onTransact(
@@ -69,7 +65,7 @@ class SelinuxContextValidityCarrierService : Service() {
         }
     }
 
-    companion object {
+    public companion object {
         @Volatile
         private var cachedPreloadedPayload: String? = null
 

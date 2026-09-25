@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.native
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import com.eltavine.duckdetector.core.native.NativeCollectionStatus
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentResult
 
-data class SelinuxContextValiditySnapshot(
+public data class SelinuxContextValiditySnapshot(
     val available: Boolean = false,
     val probeAttempted: Boolean = false,
     val carrierContext: String? = null,

@@ -18,16 +18,16 @@ package com.eltavine.duckdetector.features.selinux.data.repository
 
 import android.content.Context
 import android.os.Build
-import com.eltavine.duckdetector.features.selinux.data.native.SelinuxContextValiditySnapshot
-import com.eltavine.duckdetector.features.selinux.data.probes.DedicatedCarrierState
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierState
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbeResult
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityState
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoProbe
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxPolicyloadSeqnoState
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentProbe
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentResult
-import com.eltavine.duckdetector.features.selinux.data.service.SelinuxContextValidityCarrierManager
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoProbe
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoState
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentProbe
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityCarrierManager
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxAuditRuntimeProbe
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditEvidence
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityAnalysis

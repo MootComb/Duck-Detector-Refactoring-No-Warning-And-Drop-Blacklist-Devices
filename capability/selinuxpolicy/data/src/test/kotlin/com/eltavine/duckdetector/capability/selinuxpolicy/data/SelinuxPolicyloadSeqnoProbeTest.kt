@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.probes
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

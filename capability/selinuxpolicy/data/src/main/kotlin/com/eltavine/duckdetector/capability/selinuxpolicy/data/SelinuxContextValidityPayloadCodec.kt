@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.native
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
-import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxProcAttrCurrentPayloadCodec
 
 internal object SelinuxContextValidityPayloadCodec {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.selinux.data.probes
+package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import android.system.ErrnoException
 import android.system.Os
@@ -24,29 +24,29 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
-data class SelinuxProcAttrCurrentResult(
+public data class SelinuxProcAttrCurrentResult(
     val label: String,
     val targetContext: String,
     val outcomeClass: String,
     val rawMessage: String,
 ) {
-    fun detected(): Boolean {
+    public fun detected(): Boolean {
         return outcomeClass == OUTCOME_SUCCESS ||
             outcomeClass == OUTCOME_DETECTED_NON_EINVAL ||
             outcomeClass == OUTCOME_DETECTED_SECURITY_EXCEPTION
     }
 
-    companion object {
-        const val OUTCOME_SUCCESS = "SUCCESS"
-        const val OUTCOME_NORMAL_EINVAL = "NORMAL_EINVAL"
-        const val OUTCOME_DETECTED_NON_EINVAL = "DETECTED_NON_EINVAL"
-        const val OUTCOME_DETECTED_SECURITY_EXCEPTION = "DETECTED_SECURITY_EXCEPTION"
+    public companion object {
+        public const val OUTCOME_SUCCESS: String = "SUCCESS"
+        public const val OUTCOME_NORMAL_EINVAL: String = "NORMAL_EINVAL"
+        public const val OUTCOME_DETECTED_NON_EINVAL: String = "DETECTED_NON_EINVAL"
+        public const val OUTCOME_DETECTED_SECURITY_EXCEPTION: String = "DETECTED_SECURITY_EXCEPTION"
     }
 }
 
-class SelinuxProcAttrCurrentProbe {
+public class SelinuxProcAttrCurrentProbe {
 
-    fun inspect(): List<SelinuxProcAttrCurrentResult> {
+    public fun inspect(): List<SelinuxProcAttrCurrentResult> {
         return TARGETS.map { target ->
             runProbe(target.label, target.context)
         }
@@ -128,10 +128,10 @@ class SelinuxProcAttrCurrentProbe {
         val context: String,
     )
 
-    companion object {
-        const val METHOD_LABEL = "app_zygote attr/current write"
-        const val STATUS_CLEAN = "Normal EINVAL"
-        const val STATUS_UNSUPPORTED = "Unsupported"
+    public companion object {
+        public const val METHOD_LABEL: String = "app_zygote attr/current write"
+        public const val STATUS_CLEAN: String = "Normal EINVAL"
+        public const val STATUS_UNSUPPORTED: String = "Unsupported"
         private const val PROC_ATTR_CURRENT_PATH = "/proc/self/attr/current"
 
         private val TARGETS = listOf(

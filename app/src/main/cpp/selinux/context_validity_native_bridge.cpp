@@ -243,7 +243,7 @@ namespace {
 }  // namespace
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_features_selinux_data_native_SelinuxContextValidityBridge_nativeCollectContextValiditySnapshotInternal(
+Java_com_eltavine_duckdetector_capability_selinuxpolicy_data_SelinuxContextValidityBridge_nativeCollectContextValiditySnapshotInternal(
         JNIEnv *env,
         jclass clazz) {
     try {
@@ -266,7 +266,7 @@ Java_com_eltavine_duckdetector_features_selinux_data_native_SelinuxContextValidi
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_eltavine_duckdetector_features_selinux_data_native_SelinuxContextValidityBridge_nativeCloseProcessLocalAvc(
+Java_com_eltavine_duckdetector_capability_selinuxpolicy_data_SelinuxContextValidityBridge_nativeCloseProcessLocalAvc(
         JNIEnv *,
         jobject
 ) {
