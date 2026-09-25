@@ -145,8 +145,8 @@ limitations under the License.
         errorLine1="        listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;).forEach { targetPath ->"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="209" column="17" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="27" column="13" />
     </issue>
 
     <issue id="SdCardPath"
@@ -154,8 +154,8 @@ limitations under the License.
         errorLine1="        listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;).forEach { targetPath ->"
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="209" column="41" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="27" column="37" />
     </issue>
 
     <issue id="SdCardPath"
@@ -163,8 +163,8 @@ limitations under the License.
         errorLine1="        val basePath = &quot;/sdcard/Android/data/&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="222" column="25" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="40" column="21" />
     </issue>
 
     <issue id="SdCardPath"
@@ -172,8 +172,8 @@ limitations under the License.
         errorLine1="        val targetDirs = listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;)"
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="229" column="34" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="47" column="30" />
     </issue>
 
     <issue id="SdCardPath"
@@ -181,8 +181,8 @@ limitations under the License.
         errorLine1="        val targetDirs = listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;)"
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="229" column="58" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="47" column="54" />
     </issue>
 
     <issue id="SdCardPath"
@@ -190,8 +190,8 @@ limitations under the License.
         errorLine1="                    &quot;/sdcard/${bypassChar}Android/${targetPath.substringAfterLast(&quot;/&quot;)}&quot;,"
         errorLine2="                     ~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="238" column="22" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="56" column="18" />
     </issue>
 
     <issue id="SdCardPath"
@@ -199,8 +199,8 @@ limitations under the License.
         errorLine1="                    &quot;/sdcard$bypassChar/Android/${targetPath.substringAfterLast(&quot;/&quot;)}&quot;,"
         errorLine2="                     ~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="239" column="22" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="57" column="18" />
     </issue>
 
     <issue id="SdCardPath"
