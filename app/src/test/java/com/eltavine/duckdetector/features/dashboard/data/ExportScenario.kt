@@ -41,8 +41,8 @@ import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardMo
 import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.mount.presentation.model.MountCardModel
 import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
 import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxCardModel

@@ -63,6 +63,8 @@ dependencies {
     implementation(project(":feature:selinux:ui"))
     implementation(project(":feature:lsposed:data"))
     implementation(project(":feature:lsposed:ui"))
+    implementation(project(":feature:nativeroot:data"))
+    implementation(project(":feature:nativeroot:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

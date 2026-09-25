@@ -99,6 +99,10 @@
         ":feature:mount:domain",
         ":feature:mount:presentation",
         ":feature:mount:ui",
+        ":feature:nativeroot:data",
+        ":feature:nativeroot:domain",
+        ":feature:nativeroot:presentation",
+        ":feature:nativeroot:ui",
         ":feature:playintegrityfix:data",
         ":feature:playintegrityfix:domain",
         ":feature:playintegrityfix:presentation",
@@ -399,6 +403,41 @@
         ":core:ui",
         ":feature:mount:domain",
         ":feature:mount:presentation"
+      ]
+    },
+    ":feature:nativeroot:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:helperprocess:data",
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
+        ":core:native",
+        ":feature:nativeroot:domain"
+      ]
+    },
+    ":feature:nativeroot:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:nativeroot:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:nativeroot:domain"
+      ]
+    },
+    ":feature:nativeroot:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:nativeroot:domain",
+        ":feature:nativeroot:presentation"
       ]
     },
     ":feature:playintegrityfix:data": {

@@ -75,13 +75,6 @@ limitations under the License.
             </intent-filter>
         </activity>
 
-        <!-- The package directory watch is installed during app_zygote preload and inherited through
-             fork, so this carrier only drains the event stream from the isolated child. -->
-        <service
-            android:name=".features.nativeroot.data.service.ThroneHuntCarrierService"
-            android:exported="false"
-            android:isolatedProcess="true"
-            android:useAppZygote="true" />
         <service
             android:name=".features.tee.data.verification.keystore.TeeGrantDomainGranteeService"
             android:exported="false"
