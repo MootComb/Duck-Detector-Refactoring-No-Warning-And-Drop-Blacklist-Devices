@@ -24,12 +24,32 @@ package com.eltavine.duckdetector.core.platform
  * them. Their runtime class name is the only identity they have, so it is compared here and
  * nowhere else, and reports receive a literal name rather than the class name itself.
  */
-internal object HiddenPlatformFailure {
+public object HiddenPlatformFailure {
 
-    fun nameOf(failure: Throwable): String? = when (failure.javaClass.name) {
-        "android.os.ServiceSpecificException" -> "ServiceSpecificException"
-        "android.os.ParcelableException" -> "ParcelableException"
-        "android.os.DeadSystemRuntimeException" -> "DeadSystemRuntimeException"
+    private const val SERVICE_SPECIFIC = "android.os.ServiceSpecificException"
+    private const val PARCELABLE = "android.os.ParcelableException"
+    private const val DEAD_SYSTEM_RUNTIME = "android.os.DeadSystemRuntimeException"
+
+    internal fun nameOf(failure: Throwable): String? = when (failure.javaClass.name) {
+        SERVICE_SPECIFIC -> "ServiceSpecificException"
+        PARCELABLE -> "ParcelableException"
+        DEAD_SYSTEM_RUNTIME -> "DeadSystemRuntimeException"
         else -> null
+    }
+
+    public fun isServiceSpecific(failure: Throwable): Boolean = failure.javaClass.name == SERVICE_SPECIFIC
+
+    public fun isParcelable(failure: Throwable): Boolean = failure.javaClass.name == PARCELABLE
+
+    /** The public `errorCode` of a ServiceSpecificException, read reflectively because its class is hidden. */
+    public fun serviceSpecificErrorCode(failure: Throwable): Int? {
+        if (!isServiceSpecific(failure)) {
+            return null
+        }
+        return runCatching {
+            val field = failure.javaClass.getField("errorCode")
+            field.isAccessible = true
+            field.get(failure) as? Int
+        }.getOrNull()
     }
 }
