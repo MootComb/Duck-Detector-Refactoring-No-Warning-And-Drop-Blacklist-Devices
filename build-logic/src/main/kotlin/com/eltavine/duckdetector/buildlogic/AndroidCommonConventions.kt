@@ -38,6 +38,14 @@ internal fun Project.configureAndroidCommon(extension: CommonExtension) {
     extension.defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     extension.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
     extension.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+    // Every Android module pins the NDK: the module that builds the native libraries compiles with
+    // it and the application strips them with it.
+    extension.ndkVersion = requiredGradleProperty("duckdetector.android.ndk")
+    val cmakeLists = file("src/main/cpp/CMakeLists.txt")
+    if (cmakeLists.exists()) {
+        extension.externalNativeBuild.cmake.path = cmakeLists
+        extension.externalNativeBuild.cmake.version = requiredGradleProperty("duckdetector.android.cmake")
+    }
 
     val lintBaseline = layout.projectDirectory.file("lint-baseline.xml").asFile
     extension.lint.apply {

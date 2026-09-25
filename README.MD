@@ -19,7 +19,7 @@
   <a href="#compatibility"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 10 or later"></a>
   <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="Built with Kotlin"></a>
   <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose UI"></a>
-  <a href="app/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK native probes"></a>
+  <a href="sdk/runtime/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK native probes"></a>
 </p>
 
 <p align="center">
@@ -83,7 +83,8 @@ Supporting modules provide the dashboard, device information, settings, update c
 
 ```text
 Duck-Detector-Refactoring/
-├─ app/                   # Composition root: activities, detector catalog, notifications
+├─ app/                   # UI composition root: activities, dashboard cards, notifications
+├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, native libraries
 │  └─ src/main/cpp/       # Native units, one directory per owning module, with per-ABI assembly
 ├─ core/                  # Contracts: evidence, native payloads, reports, scan lifecycle, detector, UI
 ├─ capability/            # Evidence collection shared by several detectors

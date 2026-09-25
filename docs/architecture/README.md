@@ -81,7 +81,7 @@ rescan request -> publish loading state -> wait for the previous scan of the sam
 
 ## Native units
 
-Native code under `app/src/main/cpp` is split into units, one directory each ([ADR 0005](../adr/0005-native-unit-boundaries.md)). Every unit is a `duckdetector_<unit>` object library linked into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
+Native code under `sdk/runtime/src/main/cpp` is split into units, one directory each ([ADR 0005](../adr/0005-native-unit-boundaries.md)). Every unit is a `duckdetector_<unit>` object library linked into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
 
 | Unit | Owner | May include |
 |---|---|---|

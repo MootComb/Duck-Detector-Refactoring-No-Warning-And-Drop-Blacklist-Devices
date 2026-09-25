@@ -19,7 +19,7 @@
   <a href="#兼容性"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="支持 Android 10 及以上版本"></a>
   <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="使用 Kotlin 构建"></a>
   <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose 界面"></a>
-  <a href="app/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK 原生探针"></a>
+  <a href="sdk/runtime/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK 原生探针"></a>
 </p>
 
 <p align="center">

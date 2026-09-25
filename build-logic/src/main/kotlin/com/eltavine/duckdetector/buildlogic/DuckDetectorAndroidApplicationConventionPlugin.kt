@@ -77,7 +77,6 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
 
         extensions.configure<ApplicationExtension> {
             configureAndroidCommon(this)
-            ndkVersion = requiredGradleProperty("duckdetector.android.ndk")
             // The composition root is the single lint entry point, so it must analyse every module it
             // depends on; otherwise code moved out of :app silently leaves lint coverage.
             lint.checkDependencies = true
@@ -89,15 +88,6 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
                 buildConfigField("String", "BUILD_TIME_UTC", "\"${buildTimeUtc.get()}\"")
                 buildConfigField("String", "BUILD_HASH", "\"${buildHash.get()}\"")
                 buildConfigField("boolean", "isAlphaVersion", isAlphaVersion.toString())
-            }
-
-            if (file("src/main/cpp/CMakeLists.txt").exists()) {
-                externalNativeBuild {
-                    cmake {
-                        path = file("src/main/cpp/CMakeLists.txt")
-                        version = requiredGradleProperty("duckdetector.android.cmake")
-                    }
-                }
             }
 
             signingConfigs {

@@ -16,7 +16,7 @@ Some features still branch on method labels that their own data layer produces. 
 
 ## Release native builds never use the Release configuration
 
-Release variants build the native libraries with CMake's `RelWithDebInfo` configuration because nothing selects `Release`. The `$<CONFIG:Release>` flags in `app/src/main/cpp/CMakeLists.txt` therefore never reach shipped builds. These flags are `-ffunction-sections`, `-fdata-sections`, hidden visibility, `INTERPROCEDURAL_OPTIMIZATION_RELEASE` and `-Wl,--gc-sections`. The shipped `libduckdetector.so` is compiled with `-O2 -g` and default visibility; only `libmain.so` always hides its symbols. The refactor kept this behavior and verified it unchanged. Enabling the flags changes shipped binaries and the code layout of timing-sensitive probes, so it needs on-device validation of the timing and trap probes before it lands.
+Release variants build the native libraries with CMake's `RelWithDebInfo` configuration because nothing selects `Release`. The `$<CONFIG:Release>` flags in `sdk/runtime/src/main/cpp/CMakeLists.txt` therefore never reach shipped builds. These flags are `-ffunction-sections`, `-fdata-sections`, hidden visibility, `INTERPROCEDURAL_OPTIMIZATION_RELEASE` and `-Wl,--gc-sections`. The shipped `libduckdetector.so` is compiled with `-O2 -g` and default visibility; only `libmain.so` always hides its symbols. The refactor kept this behavior and verified it unchanged. Enabling the flags changes shipped binaries and the code layout of timing-sensitive probes, so it needs on-device validation of the timing and trap probes before it lands.
 
 ## Lint translation completeness is module-scoped
 

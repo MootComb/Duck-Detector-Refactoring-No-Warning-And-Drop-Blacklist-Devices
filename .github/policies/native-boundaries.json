@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "source_root": "app/src/main/cpp",
-  "cmake_lists": "app/src/main/cpp/CMakeLists.txt",
+  "source_root": "sdk/runtime/src/main/cpp",
+  "cmake_lists": "sdk/runtime/src/main/cpp/CMakeLists.txt",
   "unit_function": "duckdetector_native_unit",
   "aggregate_library": "duckdetector",
   "units": {

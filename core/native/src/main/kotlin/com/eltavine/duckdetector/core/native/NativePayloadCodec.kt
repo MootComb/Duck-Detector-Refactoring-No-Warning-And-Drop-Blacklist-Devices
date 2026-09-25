@@ -33,7 +33,7 @@ package com.eltavine.duckdetector.core.native
  * A flag travels as `1` or `0` rather than a Kotlin `Boolean`, so reading one is part of this format
  * too and lives here as [decodeFlag] instead of being restated by each bridge.
  *
- * The C++ half lives in `app/src/main/cpp/common/payload_codec.h` and `NativePayloadCodecTest` pins the two
+ * The C++ half lives in `sdk/runtime/src/main/cpp/common/payload_codec.h` and `NativePayloadCodecTest` pins the two
  * against each other. Keeping both sides on one table is what makes splitting a record on a raw
  * `\t` safe, and it is why an unescaped encoder silently truncates evidence rather than failing
  * loudly.
