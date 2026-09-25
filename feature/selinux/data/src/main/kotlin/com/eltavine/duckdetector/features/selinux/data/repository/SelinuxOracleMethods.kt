@@ -34,7 +34,7 @@ internal fun buildContextValidityMethod(
         SelinuxContextValidityState.UNAVAILABLE ->
             SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED
 
-        SelinuxContextValidityState.CLEAN -> ""
+        SelinuxContextValidityState.CLEAN -> SelinuxContextValidityLabels.BITPAIR_CLEAN
         SelinuxContextValidityState.KSU_PRESENT ->
             SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT
 

@@ -132,7 +132,7 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
                 DetectorStatus.danger(),
             )
             items += SelinuxImpactItemModel(
-                "The device is likely heavily modified or compromised.",
+                "Android compatibility requires SELinux in global enforcing mode (CDD 9.7), so this build or boot configuration departs from a compatible one.",
                 DetectorStatus.danger(),
             )
         }
@@ -216,7 +216,7 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
     if (dirtyPolicyHit != null) {
         items += SelinuxImpactItemModel(
             trustedPolicyRuleImpact(dirtyPolicyHit),
-            DetectorStatus.danger(),
+            DetectorStatus.warning(),
         )
     }
     return items
