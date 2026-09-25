@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignal
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalSeverity
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskStage
+import com.eltavine.duckdetector.features.zygisk.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetailRowModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
@@ -441,18 +442,4 @@ class ZygiskCardModelMapper {
         }
     }
 
-    private fun ZygiskReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            ZygiskStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            ZygiskStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            ZygiskStage.READY -> when {
-                fdTrapDetected -> DetectorStatus.danger()
-                nativeStrongHitCount > 0 -> DetectorStatus.danger()
-                heuristicHitCount >= 2 -> DetectorStatus.danger()
-                heuristicHitCount == 1 -> DetectorStatus.warning()
-                fullyClean -> DetectorStatus.allClear()
-                else -> DetectorStatus.info(InfoKind.SUPPORT)
-            }
-        }
-    }
 }
