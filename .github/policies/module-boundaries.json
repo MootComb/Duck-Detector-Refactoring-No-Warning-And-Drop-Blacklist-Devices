@@ -97,6 +97,10 @@
         ":feature:su:domain",
         ":feature:su:presentation",
         ":feature:su:ui",
+        ":feature:systemproperties:data",
+        ":feature:systemproperties:domain",
+        ":feature:systemproperties:presentation",
+        ":feature:systemproperties:ui",
         ":feature:zygisk:data",
         ":feature:zygisk:domain",
         ":feature:zygisk:presentation",
@@ -360,6 +364,42 @@
         ":core:ui",
         ":feature:su:domain",
         ":feature:su:presentation"
+      ]
+    },
+    ":feature:systemproperties:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:systemproperties:data",
+        ":capability:systemproperties:domain",
+        ":feature:systemproperties:domain"
+      ]
+    },
+    ":feature:systemproperties:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:systemproperties:domain"
+      ]
+    },
+    ":feature:systemproperties:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":capability:systemproperties:domain",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:systemproperties:domain"
+      ]
+    },
+    ":feature:systemproperties:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:systemproperties:domain",
+        ":feature:systemproperties:presentation"
       ]
     },
     ":feature:zygisk:data": {

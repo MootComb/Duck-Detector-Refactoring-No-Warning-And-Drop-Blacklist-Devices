@@ -36,6 +36,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.ui.PlayIntegrityFixDe
 import com.eltavine.duckdetector.features.selinux.ui.SelinuxDetectorFeature
 import com.eltavine.duckdetector.features.su.data.repository.SuRepository
 import com.eltavine.duckdetector.features.su.ui.SuDetectorFeature
+import com.eltavine.duckdetector.features.systemproperties.data.repository.SystemPropertiesRepository
 import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDetectorFeature
 import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
 import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
@@ -61,7 +62,7 @@ internal object DetectorFeatures {
     val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature { PlayIntegrityFixRepository() }
     val selinux: DetectorFeature = SelinuxDetectorFeature
     val su: DetectorFeature = SuDetectorFeature { SuRepository() }
-    val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature
+    val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature { SystemPropertiesRepository() }
     val virtualization: DetectorFeature = VirtualizationDetectorFeature
     val zygisk: DetectorFeature = ZygiskDetectorFeature { context -> ZygiskRepository(context) }
     val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature

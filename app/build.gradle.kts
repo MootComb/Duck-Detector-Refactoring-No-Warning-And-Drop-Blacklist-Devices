@@ -51,6 +51,8 @@ dependencies {
     implementation(project(":feature:customrom:ui"))
     implementation(project(":feature:dangerousapps:data"))
     implementation(project(":feature:dangerousapps:ui"))
+    implementation(project(":feature:systemproperties:data"))
+    implementation(project(":feature:systemproperties:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)
