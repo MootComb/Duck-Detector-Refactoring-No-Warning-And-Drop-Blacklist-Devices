@@ -30,9 +30,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":capability:earlypreload:data"))
     implementation(project(":capability:packageinventory:data"))
-    implementation(project(":capability:selinuxpolicy:data"))
     implementation(project(":core:evidence"))
     implementation(project(":core:report"))
     implementation(project(":core:scan"))
@@ -40,7 +38,6 @@ dependencies {
     implementation(project(":feature:dashboard:ui"))
     implementation(project(":feature:deviceinfo:data"))
     implementation(project(":feature:deviceinfo:ui"))
-    implementation(project(":feature:nativeroot:data"))
     implementation(project(":feature:settings:ui"))
     implementation(project(":feature:tee:data"))
     implementation(project(":feature:update:data"))

@@ -17,24 +17,7 @@
 package com.eltavine.duckdetector
 
 import android.app.ZygotePreload
-import android.content.pm.ApplicationInfo
-import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityPreload
-import com.eltavine.duckdetector.features.nativeroot.data.service.ThroneHuntWatchInstaller
+import com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload
 
-class AppZygotePreload : ZygotePreload {
-
-    private val selinuxContextValidity = SelinuxContextValidityPreload()
-
-    override fun doPreload(appInfo: ApplicationInfo) {
-        selinuxContextValidity.preload(appInfo) { installThroneHuntWatch(appInfo) }
-    }
-
-    // KernelSU's pkg_observer reacts to a /data/system/packages.list rewrite by running
-    // track_throne -> search_manager("/data/app", 2), which opens and iterates every package
-    // directory inode. Watching our own package directory from app_zygote is what makes that
-    // kernel-side traversal observable, so the watch is installed here rather than in the child.
-    private fun installThroneHuntWatch(appInfo: ApplicationInfo) {
-        val state = ThroneHuntWatchInstaller.install(appInfo)
-        ThroneHuntWatchInstaller.publish(state)
-    }
-}
+/** The class the manifest names in android:zygotePreloadName; the SDK owns the detection work it runs. */
+class AppZygotePreload : ZygotePreload by DuckDetectorZygotePreload()

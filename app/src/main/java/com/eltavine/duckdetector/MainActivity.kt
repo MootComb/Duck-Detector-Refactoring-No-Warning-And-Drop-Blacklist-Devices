@@ -17,9 +17,7 @@
 package com.eltavine.duckdetector
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
@@ -27,11 +25,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
-import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.core.ui.AppBuildInfo
 import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
 import com.eltavine.duckdetector.core.ui.theme.DuckDetectorTheme
+import com.eltavine.duckdetector.sdk.DuckDetector
 import com.eltavine.duckdetector.ui.DuckDetectorApp
 
 class MainActivity : ComponentActivity() {
@@ -40,10 +37,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        EarlyMountPreloadStore.capture(intent)
-        EarlyVirtualizationPreloadStore.capture(intent)
+        DuckDetector.captureLaunchEvidence(intent)
         enableEdgeToEdge()
-        procMountSampler = createProcMountSampler()
+        // Attached before Compose starts, as the SDK asks.
+        procMountSampler = DuckDetector.createProcMountSampler(this)
         val root = FrameLayout(this)
         procMountSampler?.let { sampler ->
             root.addView(sampler, FrameLayout.LayoutParams(1, 1))
@@ -69,8 +66,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        EarlyMountPreloadStore.capture(intent)
-        EarlyVirtualizationPreloadStore.capture(intent)
+        DuckDetector.captureLaunchEvidence(intent)
     }
 
     override fun onDestroy() {
@@ -88,24 +84,4 @@ class MainActivity : ComponentActivity() {
         buildTimeUtc = BuildConfig.BUILD_TIME_UTC,
         isAlphaVersion = BuildConfig.isAlphaVersion,
     )
-
-    private fun createProcMountSampler(): WebView? {
-        // Attach this before starting Compose, matching PrivIsolated's WebView-before-bind order.
-        return runCatching {
-            WebView(this).apply {
-                alpha = 0f
-                isClickable = false
-                isFocusable = false
-                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-                setBackgroundColor(Color.TRANSPARENT)
-                loadDataWithBaseURL(
-                    null,
-                    "<html><body></body></html>",
-                    "text/html",
-                    Charsets.UTF_8.name(),
-                    null,
-                )
-            }
-        }.getOrNull()
-    }
 }
