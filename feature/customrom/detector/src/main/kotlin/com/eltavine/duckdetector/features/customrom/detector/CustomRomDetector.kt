@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRepository
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
 import com.eltavine.duckdetector.features.customrom.presentation.CustomRomCardModelMapper
-import com.eltavine.duckdetector.features.customrom.presentation.CustomRomDetectorId
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.customrom.presentation.toDetectorRepor
  * domain layer, and described by [CustomRomCardModelMapper].
  */
 public object CustomRomDetector : Detector<CustomRomReport, CustomRomCardModel> {
-    override val id: DetectorId = CustomRomDetectorId
+    override val id: DetectorId = DetectorId("custom_rom")
 
     override fun createScanner(context: Context): DetectorScanner<CustomRomReport> = CustomRomRepository(context)
 

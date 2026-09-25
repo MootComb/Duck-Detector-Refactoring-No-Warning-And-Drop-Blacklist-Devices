@@ -18,37 +18,23 @@ package com.eltavine.duckdetector.ui
 
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DeviceProfileFeature
-import com.eltavine.duckdetector.features.bootloader.data.repository.BootloaderRepository
 import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
-import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRepository
 import com.eltavine.duckdetector.features.customrom.ui.CustomRomDetectorFeature
-import com.eltavine.duckdetector.features.dangerousapps.data.repository.DangerousAppsRepository
 import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetectorFeature
 import com.eltavine.duckdetector.features.deviceinfo.data.repository.DeviceInfoRepository
 import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
-import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
 import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeature
-import com.eltavine.duckdetector.features.lsposed.data.repository.LSPosedRepository
 import com.eltavine.duckdetector.features.lsposed.ui.LSPosedDetectorFeature
-import com.eltavine.duckdetector.features.memory.data.repository.MemoryRepository
 import com.eltavine.duckdetector.features.memory.ui.MemoryDetectorFeature
-import com.eltavine.duckdetector.features.mount.data.repository.MountRepository
 import com.eltavine.duckdetector.features.mount.ui.MountDetectorFeature
-import com.eltavine.duckdetector.features.nativeroot.data.repository.NativeRootRepository
 import com.eltavine.duckdetector.features.nativeroot.ui.NativeRootDetectorFeature
-import com.eltavine.duckdetector.features.playintegrityfix.data.repository.PlayIntegrityFixRepository
 import com.eltavine.duckdetector.features.playintegrityfix.ui.PlayIntegrityFixDetectorFeature
-import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.ui.SelinuxDetectorFeature
-import com.eltavine.duckdetector.features.su.data.repository.SuRepository
 import com.eltavine.duckdetector.features.su.ui.SuDetectorFeature
-import com.eltavine.duckdetector.features.systemproperties.data.repository.SystemPropertiesRepository
 import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDetectorFeature
 import com.eltavine.duckdetector.features.tee.data.repository.TeeRepository
 import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
-import com.eltavine.duckdetector.features.virtualization.data.repository.VirtualizationRepository
 import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
-import com.eltavine.duckdetector.features.zygisk.data.repository.ZygiskRepository
 import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
 
 /**
@@ -58,20 +44,20 @@ import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
  * features create.
  */
 internal object DetectorFeatures {
-    val bootloader: DetectorFeature = BootloaderDetectorFeature { context -> BootloaderRepository(context) }
+    val bootloader: DetectorFeature = BootloaderDetectorFeature
     val tee: DetectorFeature = TeeDetectorFeature { context -> TeeRepository(context) }
-    val customRom: DetectorFeature = CustomRomDetectorFeature { context -> CustomRomRepository(context) }
-    val dangerousApps: DetectorFeature = DangerousAppsDetectorFeature { context -> DangerousAppsRepository(context) }
-    val kernelCheck: DetectorFeature = KernelCheckDetectorFeature { KernelCheckRepository() }
-    val lsposed: DetectorFeature = LSPosedDetectorFeature { context -> LSPosedRepository(context) }
-    val memory: DetectorFeature = MemoryDetectorFeature { MemoryRepository() }
-    val mount: DetectorFeature = MountDetectorFeature { context -> MountRepository(context) }
-    val nativeRoot: DetectorFeature = NativeRootDetectorFeature { context -> NativeRootRepository(context) }
-    val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature { PlayIntegrityFixRepository() }
-    val selinux: DetectorFeature = SelinuxDetectorFeature { context -> SelinuxRepository(context) }
-    val su: DetectorFeature = SuDetectorFeature { SuRepository() }
-    val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature { SystemPropertiesRepository() }
-    val virtualization: DetectorFeature = VirtualizationDetectorFeature { context -> VirtualizationRepository(context) }
-    val zygisk: DetectorFeature = ZygiskDetectorFeature { context -> ZygiskRepository(context) }
+    val customRom: DetectorFeature = CustomRomDetectorFeature
+    val dangerousApps: DetectorFeature = DangerousAppsDetectorFeature
+    val kernelCheck: DetectorFeature = KernelCheckDetectorFeature
+    val lsposed: DetectorFeature = LSPosedDetectorFeature
+    val memory: DetectorFeature = MemoryDetectorFeature
+    val mount: DetectorFeature = MountDetectorFeature
+    val nativeRoot: DetectorFeature = NativeRootDetectorFeature
+    val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature
+    val selinux: DetectorFeature = SelinuxDetectorFeature
+    val su: DetectorFeature = SuDetectorFeature
+    val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature
+    val virtualization: DetectorFeature = VirtualizationDetectorFeature
+    val zygisk: DetectorFeature = ZygiskDetectorFeature
     val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature { context -> DeviceInfoRepository(context) }
 }

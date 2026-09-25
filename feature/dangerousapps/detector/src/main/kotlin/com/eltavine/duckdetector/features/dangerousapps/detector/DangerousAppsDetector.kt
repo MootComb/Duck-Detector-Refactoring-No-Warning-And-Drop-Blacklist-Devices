@@ -25,7 +25,6 @@ import com.eltavine.duckdetector.features.dangerousapps.data.repository.Dangerou
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsCardModelMapper
-import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsDetectorId
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorR
  * the domain layer, and described by [DangerousAppsCardModelMapper].
  */
 public object DangerousAppsDetector : Detector<DangerousAppsReport, DangerousAppsCardModel> {
-    override val id: DetectorId = DangerousAppsDetectorId
+    override val id: DetectorId = DetectorId("dangerous_apps")
 
     override fun createScanner(context: Context): DetectorScanner<DangerousAppsReport> = DangerousAppsRepository(context)
 

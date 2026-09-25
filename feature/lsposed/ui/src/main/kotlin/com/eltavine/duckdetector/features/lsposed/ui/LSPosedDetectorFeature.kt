@@ -16,56 +16,10 @@
 
 package com.eltavine.duckdetector.features.lsposed.ui
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.report.DetectorReport
-import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
-import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
-import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedDetectorId
-import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.lsposed.detector.LSPosedDetector
 import com.eltavine.duckdetector.features.lsposed.ui.card.LSPosedDetectorCard
-import kotlinx.coroutines.flow.StateFlow
 
-class LSPosedDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<LSPosedReport>,
-) : DetectorFeature {
-    override val id: DetectorId = LSPosedDetectorId
-
-    @Composable
-    override fun rememberSession(): DetectorSession {
-        val context = LocalContext.current
-        val viewModel: LSPosedViewModel = viewModel(
-            factory = remember(context) { LSPosedViewModel.factory { createScanner(context.applicationContext) } },
-        )
-        return remember(viewModel) { LSPosedDetectorSession(viewModel) }
-    }
-}
-
-private class LSPosedDetectorSession(
-    private val viewModel: LSPosedViewModel,
-) : DetectorSession {
-    override val id: DetectorId = LSPosedDetectorId
-
-    override val summary: StateFlow<DetectorSummary> = viewModel.summary
-
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
-
-    override fun rescan() {
-        viewModel.rescan()
-    }
-
-    @Composable
-    override fun Card() {
-        val state by viewModel.uiState.collectAsState()
-        LSPosedDetectorCard(model = state.cardModel)
-    }
-}
+/** The LSPosed card on the dashboard. */
+val LSPosedDetectorFeature: DetectorFeature = CardDetectorFeature(LSPosedDetector) { model -> LSPosedDetectorCard(model = model) }

@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.bootloader.data.repository.BootloaderRepository
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderCardModelMapper
-import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderDetectorId
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.bootloader.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.bootloader.presentation.toDetectorRepo
  * domain layer, and described by [BootloaderCardModelMapper].
  */
 public object BootloaderDetector : Detector<BootloaderReport, BootloaderCardModel> {
-    override val id: DetectorId = BootloaderDetectorId
+    override val id: DetectorId = DetectorId("bootloader")
 
     override fun createScanner(context: Context): DetectorScanner<BootloaderReport> = BootloaderRepository(context)
 

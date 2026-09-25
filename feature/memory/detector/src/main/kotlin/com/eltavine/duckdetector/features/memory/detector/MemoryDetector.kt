@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.memory.data.repository.MemoryRepository
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
 import com.eltavine.duckdetector.features.memory.presentation.MemoryCardModelMapper
-import com.eltavine.duckdetector.features.memory.presentation.MemoryDetectorId
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
 import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
  * layer, and described by [MemoryCardModelMapper].
  */
 public object MemoryDetector : Detector<MemoryReport, MemoryCardModel> {
-    override val id: DetectorId = MemoryDetectorId
+    override val id: DetectorId = DetectorId("memory")
 
     override fun createScanner(context: Context): DetectorScanner<MemoryReport> = MemoryRepository()
 

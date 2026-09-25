@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.integration.selinux
+package com.eltavine.duckdetector.features.selinux.detector
 
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus

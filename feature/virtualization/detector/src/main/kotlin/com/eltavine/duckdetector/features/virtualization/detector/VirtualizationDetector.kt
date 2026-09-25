@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.virtualization.data.repository.VirtualizationRepository
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
 import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationCardModelMapper
-import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationDetectorId
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.virtualization.presentation.toDetector
  * in the domain layer, and described by [VirtualizationCardModelMapper].
  */
 public object VirtualizationDetector : Detector<VirtualizationReport, VirtualizationCardModel> {
-    override val id: DetectorId = VirtualizationDetectorId
+    override val id: DetectorId = DetectorId("virtualization")
 
     override fun createScanner(context: Context): DetectorScanner<VirtualizationReport> = VirtualizationRepository(context)
 

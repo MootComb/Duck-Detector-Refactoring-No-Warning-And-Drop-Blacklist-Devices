@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.mount.data.repository.MountRepository
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.presentation.MountCardModelMapper
-import com.eltavine.duckdetector.features.mount.presentation.MountDetectorId
 import com.eltavine.duckdetector.features.mount.presentation.model.MountCardModel
 import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
  * layer, and described by [MountCardModelMapper].
  */
 public object MountDetector : Detector<MountReport, MountCardModel> {
-    override val id: DetectorId = MountDetectorId
+    override val id: DetectorId = DetectorId("mount")
 
     override fun createScanner(context: Context): DetectorScanner<MountReport> = MountRepository(context)
 

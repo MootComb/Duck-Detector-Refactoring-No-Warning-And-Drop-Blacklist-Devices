@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.systemproperties.data.repository.SystemPropertiesRepository
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesCardModelMapper
-import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesDetectorId
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesCardModel
 import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.systemproperties.presentation.toDetect
  * [SystemPropertiesCardModelMapper].
  */
 public object SystemPropertiesDetector : Detector<SystemPropertiesReport, SystemPropertiesCardModel> {
-    override val id: DetectorId = SystemPropertiesDetectorId
+    override val id: DetectorId = DetectorId("system_properties")
 
     override fun createScanner(context: Context): DetectorScanner<SystemPropertiesReport> = SystemPropertiesRepository()
 

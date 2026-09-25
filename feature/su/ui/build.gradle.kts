@@ -24,18 +24,11 @@ android {
 }
 
 dependencies {
-    api(project(":core:detector"))
-    api(project(":core:evidence"))
-    api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":core:ui"))
-    api(project(":feature:su:domain"))
+    implementation(project(":feature:su:detector"))
     api(project(":feature:su:presentation"))
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.kotlinx.coroutines.android)
 }

@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.presentation.SelinuxCardModelMapper
-import com.eltavine.duckdetector.features.selinux.presentation.SelinuxDetectorId
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.selinux.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.selinux.presentation.toDetectorReport
  * layer, and described by [SelinuxCardModelMapper].
  */
 public object SelinuxDetector : Detector<SelinuxReport, SelinuxCardModel> {
-    override val id: DetectorId = SelinuxDetectorId
+    override val id: DetectorId = DetectorId("selinux")
 
     override fun createScanner(context: Context): DetectorScanner<SelinuxReport> = SelinuxRepository(context)
 

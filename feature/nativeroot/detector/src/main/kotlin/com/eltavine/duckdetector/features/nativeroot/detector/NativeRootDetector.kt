@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.nativeroot.data.repository.NativeRootRepository
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootCardModelMapper
-import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootDetectorId
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
 import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorRepo
  * domain layer, and described by [NativeRootCardModelMapper].
  */
 public object NativeRootDetector : Detector<NativeRootReport, NativeRootCardModel> {
-    override val id: DetectorId = NativeRootDetectorId
+    override val id: DetectorId = DetectorId("native_root")
 
     override fun createScanner(context: Context): DetectorScanner<NativeRootReport> = NativeRootRepository(context)
 

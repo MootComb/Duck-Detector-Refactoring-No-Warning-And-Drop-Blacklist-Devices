@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.lsposed.data.repository.LSPosedRepository
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedCardModelMapper
-import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedDetectorId
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedCardModel
 import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
  * layer, and described by [LSPosedCardModelMapper].
  */
 public object LSPosedDetector : Detector<LSPosedReport, LSPosedCardModel> {
-    override val id: DetectorId = LSPosedDetectorId
+    override val id: DetectorId = DetectorId("lsposed")
 
     override fun createScanner(context: Context): DetectorScanner<LSPosedReport> = LSPosedRepository(context)
 

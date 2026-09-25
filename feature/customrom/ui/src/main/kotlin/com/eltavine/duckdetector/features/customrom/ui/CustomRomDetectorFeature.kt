@@ -16,56 +16,10 @@
 
 package com.eltavine.duckdetector.features.customrom.ui
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.report.DetectorReport
-import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
-import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
-import com.eltavine.duckdetector.features.customrom.presentation.CustomRomDetectorId
-import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.customrom.detector.CustomRomDetector
 import com.eltavine.duckdetector.features.customrom.ui.card.CustomRomDetectorCard
-import kotlinx.coroutines.flow.StateFlow
 
-class CustomRomDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<CustomRomReport>,
-) : DetectorFeature {
-    override val id: DetectorId = CustomRomDetectorId
-
-    @Composable
-    override fun rememberSession(): DetectorSession {
-        val context = LocalContext.current
-        val viewModel: CustomRomViewModel = viewModel(
-            factory = remember(context) { CustomRomViewModel.factory { createScanner(context.applicationContext) } },
-        )
-        return remember(viewModel) { CustomRomDetectorSession(viewModel) }
-    }
-}
-
-private class CustomRomDetectorSession(
-    private val viewModel: CustomRomViewModel,
-) : DetectorSession {
-    override val id: DetectorId = CustomRomDetectorId
-
-    override val summary: StateFlow<DetectorSummary> = viewModel.summary
-
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
-
-    override fun rescan() {
-        viewModel.rescan()
-    }
-
-    @Composable
-    override fun Card() {
-        val state by viewModel.uiState.collectAsState()
-        CustomRomDetectorCard(model = state.cardModel)
-    }
-}
+/** The Custom ROM card on the dashboard. */
+val CustomRomDetectorFeature: DetectorFeature = CardDetectorFeature(CustomRomDetector) { model -> CustomRomDetectorCard(model = model) }

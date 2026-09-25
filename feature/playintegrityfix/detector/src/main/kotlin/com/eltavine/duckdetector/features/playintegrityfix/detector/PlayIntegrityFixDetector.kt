@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.playintegrityfix.data.repository.PlayIntegrityFixRepository
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixReport
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixCardModelMapper
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixDetectorId
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.presentation.toDetect
  * [PlayIntegrityFixCardModelMapper].
  */
 public object PlayIntegrityFixDetector : Detector<PlayIntegrityFixReport, PlayIntegrityFixCardModel> {
-    override val id: DetectorId = PlayIntegrityFixDetectorId
+    override val id: DetectorId = DetectorId("play_integrity_fix")
 
     override fun createScanner(context: Context): DetectorScanner<PlayIntegrityFixReport> = PlayIntegrityFixRepository()
 

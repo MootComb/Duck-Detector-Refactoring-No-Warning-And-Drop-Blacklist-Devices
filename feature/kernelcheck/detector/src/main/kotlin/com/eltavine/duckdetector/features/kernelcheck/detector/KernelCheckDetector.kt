@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckCardModelMapper
-import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckDetectorId
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckCardModel
 import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorRep
  * domain layer, and described by [KernelCheckCardModelMapper].
  */
 public object KernelCheckDetector : Detector<KernelCheckReport, KernelCheckCardModel> {
-    override val id: DetectorId = KernelCheckDetectorId
+    override val id: DetectorId = DetectorId("kernel_check")
 
     override fun createScanner(context: Context): DetectorScanner<KernelCheckReport> = KernelCheckRepository()
 

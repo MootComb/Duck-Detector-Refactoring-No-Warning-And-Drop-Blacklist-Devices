@@ -16,56 +16,10 @@
 
 package com.eltavine.duckdetector.features.systemproperties.ui
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.report.DetectorReport
-import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
-import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
-import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesDetectorId
-import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.systemproperties.detector.SystemPropertiesDetector
 import com.eltavine.duckdetector.features.systemproperties.ui.card.SystemPropertiesDetectorCard
-import kotlinx.coroutines.flow.StateFlow
 
-class SystemPropertiesDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<SystemPropertiesReport>,
-) : DetectorFeature {
-    override val id: DetectorId = SystemPropertiesDetectorId
-
-    @Composable
-    override fun rememberSession(): DetectorSession {
-        val context = LocalContext.current
-        val viewModel: SystemPropertiesViewModel = viewModel(
-            factory = remember(context) { SystemPropertiesViewModel.factory { createScanner(context.applicationContext) } },
-        )
-        return remember(viewModel) { SystemPropertiesDetectorSession(viewModel) }
-    }
-}
-
-private class SystemPropertiesDetectorSession(
-    private val viewModel: SystemPropertiesViewModel,
-) : DetectorSession {
-    override val id: DetectorId = SystemPropertiesDetectorId
-
-    override val summary: StateFlow<DetectorSummary> = viewModel.summary
-
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
-
-    override fun rescan() {
-        viewModel.rescan()
-    }
-
-    @Composable
-    override fun Card() {
-        val state by viewModel.uiState.collectAsState()
-        SystemPropertiesDetectorCard(model = state.cardModel)
-    }
-}
+/** The System Properties card on the dashboard. */
+val SystemPropertiesDetectorFeature: DetectorFeature = CardDetectorFeature(SystemPropertiesDetector) { model -> SystemPropertiesDetectorCard(model = model) }

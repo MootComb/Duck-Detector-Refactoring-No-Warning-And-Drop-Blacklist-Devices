@@ -24,17 +24,10 @@ android {
 }
 
 dependencies {
-    api(project(":core:detector"))
-    api(project(":core:evidence"))
-    api(project(":core:report"))
-    api(project(":core:scan"))
     api(project(":core:ui"))
-    api(project(":feature:selinux:domain"))
+    implementation(project(":feature:selinux:detector"))
     api(project(":feature:selinux:presentation"))
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)
-    implementation(libs.kotlinx.coroutines.android)
 }

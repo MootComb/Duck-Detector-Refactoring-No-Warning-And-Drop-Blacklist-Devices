@@ -16,56 +16,10 @@
 
 package com.eltavine.duckdetector.features.playintegrityfix.ui
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.report.DetectorReport
-import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
-import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixReport
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixDetectorId
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.playintegrityfix.detector.PlayIntegrityFixDetector
 import com.eltavine.duckdetector.features.playintegrityfix.ui.card.PlayIntegrityFixDetectorCard
-import kotlinx.coroutines.flow.StateFlow
 
-class PlayIntegrityFixDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<PlayIntegrityFixReport>,
-) : DetectorFeature {
-    override val id: DetectorId = PlayIntegrityFixDetectorId
-
-    @Composable
-    override fun rememberSession(): DetectorSession {
-        val context = LocalContext.current
-        val viewModel: PlayIntegrityFixViewModel = viewModel(
-            factory = remember(context) { PlayIntegrityFixViewModel.factory { createScanner(context.applicationContext) } },
-        )
-        return remember(viewModel) { PlayIntegrityFixDetectorSession(viewModel) }
-    }
-}
-
-private class PlayIntegrityFixDetectorSession(
-    private val viewModel: PlayIntegrityFixViewModel,
-) : DetectorSession {
-    override val id: DetectorId = PlayIntegrityFixDetectorId
-
-    override val summary: StateFlow<DetectorSummary> = viewModel.summary
-
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
-
-    override fun rescan() {
-        viewModel.rescan()
-    }
-
-    @Composable
-    override fun Card() {
-        val state by viewModel.uiState.collectAsState()
-        PlayIntegrityFixDetectorCard(model = state.cardModel)
-    }
-}
+/** The Play Integrity Fix card on the dashboard. */
+val PlayIntegrityFixDetectorFeature: DetectorFeature = CardDetectorFeature(PlayIntegrityFixDetector) { model -> PlayIntegrityFixDetectorCard(model = model) }

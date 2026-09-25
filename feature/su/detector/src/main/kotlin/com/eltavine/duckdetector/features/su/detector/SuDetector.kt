@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.su.data.repository.SuRepository
 import com.eltavine.duckdetector.features.su.domain.SuReport
 import com.eltavine.duckdetector.features.su.presentation.SuCardModelMapper
-import com.eltavine.duckdetector.features.su.presentation.SuDetectorId
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
 
@@ -36,7 +35,7 @@ import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
  * described by [SuCardModelMapper].
  */
 public object SuDetector : Detector<SuReport, SuCardModel> {
-    override val id: DetectorId = SuDetectorId
+    override val id: DetectorId = DetectorId("su")
 
     override fun createScanner(context: Context): DetectorScanner<SuReport> = SuRepository()
 

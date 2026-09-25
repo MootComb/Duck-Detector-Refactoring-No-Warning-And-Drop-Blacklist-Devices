@@ -16,56 +16,10 @@
 
 package com.eltavine.duckdetector.features.dangerousapps.ui
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eltavine.duckdetector.core.detector.DetectorScanner
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.report.DetectorReport
-import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.ui.detector.CardDetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
-import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
-import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsDetectorId
-import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.dangerousapps.detector.DangerousAppsDetector
 import com.eltavine.duckdetector.features.dangerousapps.ui.card.DangerousAppsDetectorCard
-import kotlinx.coroutines.flow.StateFlow
 
-class DangerousAppsDetectorFeature(
-    private val createScanner: (Context) -> DetectorScanner<DangerousAppsReport>,
-) : DetectorFeature {
-    override val id: DetectorId = DangerousAppsDetectorId
-
-    @Composable
-    override fun rememberSession(): DetectorSession {
-        val context = LocalContext.current
-        val viewModel: DangerousAppsViewModel = viewModel(
-            factory = remember(context) { DangerousAppsViewModel.factory { createScanner(context.applicationContext) } },
-        )
-        return remember(viewModel) { DangerousAppsDetectorSession(viewModel) }
-    }
-}
-
-private class DangerousAppsDetectorSession(
-    private val viewModel: DangerousAppsViewModel,
-) : DetectorSession {
-    override val id: DetectorId = DangerousAppsDetectorId
-
-    override val summary: StateFlow<DetectorSummary> = viewModel.summary
-
-    override fun report(): DetectorReport = viewModel.uiState.value.cardModel.toDetectorReport()
-
-    override fun rescan() {
-        viewModel.rescan()
-    }
-
-    @Composable
-    override fun Card() {
-        val state by viewModel.uiState.collectAsState()
-        DangerousAppsDetectorCard(model = state.cardModel)
-    }
-}
+/** The Dangerous Apps card on the dashboard. */
+val DangerousAppsDetectorFeature: DetectorFeature = CardDetectorFeature(DangerousAppsDetector) { model -> DangerousAppsDetectorCard(model = model) }

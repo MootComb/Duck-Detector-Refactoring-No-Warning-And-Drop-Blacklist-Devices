@@ -24,7 +24,6 @@ import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.zygisk.data.repository.ZygiskRepository
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
 import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskCardModelMapper
-import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskDetectorId
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
 
@@ -37,7 +36,7 @@ import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
  * layer, and described by [ZygiskCardModelMapper].
  */
 public object ZygiskDetector : Detector<ZygiskReport, ZygiskCardModel> {
-    override val id: DetectorId = ZygiskDetectorId
+    override val id: DetectorId = DetectorId("zygisk")
 
     override fun createScanner(context: Context): DetectorScanner<ZygiskReport> = ZygiskRepository(context)
 
