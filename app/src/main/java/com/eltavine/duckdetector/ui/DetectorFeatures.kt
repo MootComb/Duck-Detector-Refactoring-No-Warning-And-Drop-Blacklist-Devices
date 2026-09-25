@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.ui
 import com.eltavine.duckdetector.core.detector.DetectorFeature
 import com.eltavine.duckdetector.core.detector.DeviceProfileFeature
 import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
+import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRepository
 import com.eltavine.duckdetector.features.customrom.ui.CustomRomDetectorFeature
 import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetectorFeature
 import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
@@ -49,7 +50,7 @@ import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
 internal object DetectorFeatures {
     val bootloader: DetectorFeature = BootloaderDetectorFeature
     val tee: DetectorFeature = TeeDetectorFeature
-    val customRom: DetectorFeature = CustomRomDetectorFeature
+    val customRom: DetectorFeature = CustomRomDetectorFeature { context -> CustomRomRepository(context) }
     val dangerousApps: DetectorFeature = DangerousAppsDetectorFeature
     val kernelCheck: DetectorFeature = KernelCheckDetectorFeature { KernelCheckRepository() }
     val lsposed: DetectorFeature = LSPosedDetectorFeature

@@ -72,6 +72,10 @@
         ":core:report",
         ":core:scan",
         ":core:ui",
+        ":feature:customrom:data",
+        ":feature:customrom:domain",
+        ":feature:customrom:presentation",
+        ":feature:customrom:ui",
         ":feature:kernelcheck:data",
         ":feature:kernelcheck:domain",
         ":feature:kernelcheck:presentation",
@@ -143,6 +147,40 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":core:evidence"
+      ]
+    },
+    ":feature:customrom:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
+        ":core:native",
+        ":feature:customrom:domain"
+      ]
+    },
+    ":feature:customrom:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:customrom:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:customrom:domain"
+      ]
+    },
+    ":feature:customrom:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:customrom:domain",
+        ":feature:customrom:presentation"
       ]
     },
     ":feature:kernelcheck:data": {

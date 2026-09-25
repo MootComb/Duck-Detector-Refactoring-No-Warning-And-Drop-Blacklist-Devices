@@ -46,6 +46,8 @@ dependencies {
     implementation(project(":feature:playintegrityfix:ui"))
     implementation(project(":feature:zygisk:data"))
     implementation(project(":feature:zygisk:ui"))
+    implementation(project(":feature:customrom:data"))
+    implementation(project(":feature:customrom:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

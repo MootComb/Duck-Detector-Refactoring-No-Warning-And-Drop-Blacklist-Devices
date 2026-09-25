@@ -32,7 +32,7 @@ limitations under the License.
         errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt"
+            file="../feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt"
             line="433" column="25" />
     </issue>
 
