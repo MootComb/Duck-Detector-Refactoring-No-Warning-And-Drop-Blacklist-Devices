@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:detector"))
     implementation(project(":core:evidence"))
     implementation(project(":core:native"))
     implementation(project(":core:report"))
