@@ -225,7 +225,7 @@ class VirtualizationRepository(
                 asmCounterTrap = asmCounterTrap,
                 asmRawSyscallTrap = asmRawSyscallTrap,
                 syscallPackResult = syscallPackResult,
-                listedServiceCount = serviceResult.listedServiceCount,
+                serviceResult = serviceResult,
             ),
             impacts = buildImpacts(signals, hostAppResult),
         )

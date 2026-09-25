@@ -134,6 +134,26 @@ class VirtualizationRepositoryTest {
     }
 
     @Test
+    fun `failed ServiceManager lookups leave the properties row partial`() = runBlocking {
+        val report = repository(
+            serviceResult = VirtualizationServiceProbeResult(0, emptyList(), failure = "SecurityException"),
+        ).scanInternal()
+
+        val row = report.methods.first { it.label == "Properties and build" }
+        assertEquals("Partial", row.summary)
+        assertEquals(VirtualizationMethodOutcome.SUPPORT, row.outcome)
+        assertTrue(row.detail.orEmpty().contains("SecurityException"))
+    }
+
+    @Test
+    fun `answered ServiceManager lookups keep the properties row clean`() = runBlocking {
+        val row = repository().scanInternal().methods.first { it.label == "Properties and build" }
+
+        assertEquals(VirtualizationMethodOutcome.CLEAN, row.outcome)
+        assertTrue(row.detail.orEmpty().contains("Listed services: 0"))
+    }
+
+    @Test
     fun `capability only signal does not count as detection`() = runBlocking {
         val report = repository(
             propertySignals = listOf(

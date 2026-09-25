@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPac
 import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbeResult
 import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbeResult
 import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationHostAppProbeResult
+import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationServiceProbeResult
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationMethodOutcome
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationMethodResult
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
@@ -48,16 +49,27 @@ internal fun buildMethods(
     asmCounterTrap: VirtualizationTrapResult,
     asmRawSyscallTrap: VirtualizationTrapResult,
     syscallPackResult: SacrificialSyscallPackResult,
-    listedServiceCount: Int,
+    serviceResult: VirtualizationServiceProbeResult,
 ): List<VirtualizationMethodResult> {
     val nativeTrapResults = listOf(nativeTimingTrap, nativeSyscallParityTrap)
     val asmTrapResults = listOf(asmCounterTrap, asmRawSyscallTrap)
     return listOf(
         VirtualizationMethodResult(
             label = "Properties and build",
-            summary = methodSummary(propertySignals),
-            outcome = methodOutcome(propertySignals),
-            detail = "Checks system properties, Build fields, and ServiceManager guest services.\nListed services: $listedServiceCount",
+            summary = if (propertySignals.isEmpty() && !serviceResult.available) "Partial" else methodSummary(propertySignals),
+            outcome = if (propertySignals.isEmpty() && !serviceResult.available) {
+                VirtualizationMethodOutcome.SUPPORT
+            } else {
+                methodOutcome(propertySignals)
+            },
+            detail = buildString {
+                append("Checks system properties, Build fields, and ServiceManager guest services.\n")
+                serviceResult.failure?.let { failure ->
+                    append("ServiceManager lookups failed with ")
+                    append(failure)
+                    append(", so guest services may be missing from this result.")
+                } ?: append("Listed services: ${serviceResult.listedServiceCount}")
+            },
         ),
         VirtualizationMethodResult(
             label = "Dex and classpath",
