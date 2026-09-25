@@ -69,65 +69,34 @@ import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirecti
 import com.eltavine.duckdetector.core.ui.components.LocalDetectorAutoExpansionDirective
 import com.eltavine.duckdetector.core.ui.components.ScreenshotWatermarkOverlay
 import com.eltavine.duckdetector.core.ui.openExternalUri
-import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderUiStage
-import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderUiState
-import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderViewModel
-import com.eltavine.duckdetector.features.customrom.presentation.CustomRomUiStage
-import com.eltavine.duckdetector.features.customrom.presentation.CustomRomUiState
-import com.eltavine.duckdetector.features.customrom.presentation.CustomRomViewModel
+import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
+import com.eltavine.duckdetector.features.customrom.ui.CustomRomDetectorFeature
+import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetectorFeature
 import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorCardEntry
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
-import com.eltavine.duckdetector.features.dashboard.ui.model.sortDashboardDetectorCards
-import com.eltavine.duckdetector.features.deviceinfo.presentation.DeviceInfoViewModel
-import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsUiStage
-import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsUiState
-import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsViewModel
-import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckUiStage
-import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckUiState
-import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckViewModel
-import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedUiStage
-import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedUiState
-import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedViewModel
-import com.eltavine.duckdetector.features.memory.presentation.MemoryUiStage
-import com.eltavine.duckdetector.features.memory.presentation.MemoryUiState
-import com.eltavine.duckdetector.features.memory.presentation.MemoryViewModel
-import com.eltavine.duckdetector.features.mount.presentation.MountUiStage
-import com.eltavine.duckdetector.features.mount.presentation.MountUiState
-import com.eltavine.duckdetector.features.mount.presentation.MountViewModel
-import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootUiStage
-import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootUiState
-import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootViewModel
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixUiStage
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixUiState
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixViewModel
-import com.eltavine.duckdetector.features.selinux.presentation.SelinuxUiStage
-import com.eltavine.duckdetector.features.selinux.presentation.SelinuxUiState
-import com.eltavine.duckdetector.features.selinux.presentation.SelinuxViewModel
+import com.eltavine.duckdetector.features.dashboard.ui.model.dashboardCardOrder
+import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
+import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeature
+import com.eltavine.duckdetector.features.lsposed.ui.LSPosedDetectorFeature
+import com.eltavine.duckdetector.features.memory.ui.MemoryDetectorFeature
+import com.eltavine.duckdetector.features.mount.ui.MountDetectorFeature
+import com.eltavine.duckdetector.features.nativeroot.ui.NativeRootDetectorFeature
+import com.eltavine.duckdetector.features.playintegrityfix.ui.PlayIntegrityFixDetectorFeature
+import com.eltavine.duckdetector.features.selinux.ui.SelinuxDetectorFeature
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
 import com.eltavine.duckdetector.features.settings.ui.model.SettingsUiState
-import com.eltavine.duckdetector.features.su.presentation.SuUiStage
-import com.eltavine.duckdetector.features.su.presentation.SuUiState
-import com.eltavine.duckdetector.features.su.presentation.SuViewModel
-import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesUiStage
-import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesUiState
-import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesViewModel
+import com.eltavine.duckdetector.features.su.ui.SuDetectorFeature
+import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDetectorFeature
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
-import com.eltavine.duckdetector.features.tee.presentation.TeeUiStage
-import com.eltavine.duckdetector.features.tee.presentation.TeeUiState
-import com.eltavine.duckdetector.features.tee.presentation.TeeViewModel
+import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
 import com.eltavine.duckdetector.features.update.presentation.UpdateViewModel
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
-import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationUiStage
-import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationUiState
-import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationViewModel
-import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskUiStage
-import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskUiState
-import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskViewModel
+import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
+import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
@@ -435,85 +404,35 @@ private fun AppReadyShell(
     var isResolvingUpdateDownload by remember { mutableStateOf(false) }
     val notifier = remember(appContext) { ScanProgressNotifier(appContext) }
     val updateFactory = remember(context) { UpdateViewModel.factory(context) }
-    val bootloaderFactory = remember(context) { BootloaderViewModel.factory(context) }
-    val teeFactory = remember(context) { TeeViewModel.factory(context) }
-    val customRomFactory = remember(context) { CustomRomViewModel.factory(context) }
-    val dangerousAppsFactory = remember(context) { DangerousAppsViewModel.factory(context) }
-    val deviceInfoFactory = remember(context) { DeviceInfoViewModel.factory(context) }
-    val kernelCheckFactory = remember { KernelCheckViewModel.factory() }
-    val lsposedFactory = remember(context) { LSPosedViewModel.factory(context) }
-    val memoryFactory = remember { MemoryViewModel.factory() }
-    val mountFactory = remember(context) { MountViewModel.factory(context) }
-    val nativeRootFactory = remember(context) { NativeRootViewModel.factory(context) }
-    val playIntegrityFixFactory = remember { PlayIntegrityFixViewModel.factory() }
-    val selinuxFactory = remember(context) { SelinuxViewModel.factory(context) }
-    val suFactory = remember { SuViewModel.factory() }
-    val systemPropertiesFactory = remember { SystemPropertiesViewModel.factory() }
-    val virtualizationFactory = remember(context) { VirtualizationViewModel.factory(context) }
-    val zygiskFactory = remember(context) { ZygiskViewModel.factory(context) }
     val updateViewModel: UpdateViewModel = viewModel(factory = updateFactory)
-    val bootloaderViewModel: BootloaderViewModel = viewModel(factory = bootloaderFactory)
-    val teeViewModel: TeeViewModel = viewModel(factory = teeFactory)
-    val customRomViewModel: CustomRomViewModel = viewModel(factory = customRomFactory)
-    val dangerousAppsViewModel: DangerousAppsViewModel = viewModel(factory = dangerousAppsFactory)
-    val deviceInfoViewModel: DeviceInfoViewModel = viewModel(factory = deviceInfoFactory)
-    val kernelCheckViewModel: KernelCheckViewModel = viewModel(factory = kernelCheckFactory)
-    val lsposedViewModel: LSPosedViewModel = viewModel(factory = lsposedFactory)
-    val memoryViewModel: MemoryViewModel = viewModel(factory = memoryFactory)
-    val mountViewModel: MountViewModel = viewModel(factory = mountFactory)
-    val nativeRootViewModel: NativeRootViewModel = viewModel(factory = nativeRootFactory)
-    val playIntegrityFixViewModel: PlayIntegrityFixViewModel =
-        viewModel(factory = playIntegrityFixFactory)
-    val selinuxViewModel: SelinuxViewModel = viewModel(factory = selinuxFactory)
-    val suViewModel: SuViewModel = viewModel(factory = suFactory)
-    val systemPropertiesViewModel: SystemPropertiesViewModel =
-        viewModel(factory = systemPropertiesFactory)
-    val virtualizationViewModel: VirtualizationViewModel =
-        viewModel(factory = virtualizationFactory)
-    val zygiskViewModel: ZygiskViewModel = viewModel(factory = zygiskFactory)
-    val teeUiState by teeViewModel.uiState.collectAsState()
-    val customRomUiState by customRomViewModel.uiState.collectAsState()
-    val dangerousAppsUiState by dangerousAppsViewModel.uiState.collectAsState()
-    val deviceInfoUiState by deviceInfoViewModel.uiState.collectAsState()
-    val kernelCheckUiState by kernelCheckViewModel.uiState.collectAsState()
-    val lsposedUiState by lsposedViewModel.uiState.collectAsState()
-    val memoryUiState by memoryViewModel.uiState.collectAsState()
-    val mountUiState by mountViewModel.uiState.collectAsState()
-    val nativeRootUiState by nativeRootViewModel.uiState.collectAsState()
-    val playIntegrityFixUiState by playIntegrityFixViewModel.uiState.collectAsState()
-    val selinuxUiState by selinuxViewModel.uiState.collectAsState()
-    val suUiState by suViewModel.uiState.collectAsState()
-    val systemPropertiesUiState by systemPropertiesViewModel.uiState.collectAsState()
-    val virtualizationUiState by virtualizationViewModel.uiState.collectAsState()
-    val zygiskUiState by zygiskViewModel.uiState.collectAsState()
-    val bootloaderUiState by bootloaderViewModel.uiState.collectAsState()
+    // Every detector view model starts scanning when it is created, so this order is the order in
+    // which detector scans begin; it is kept exactly as it was when the shell created them itself.
+    val bootloader = BootloaderDetectorFeature.rememberSession()
+    val tee = TeeDetectorFeature.rememberSession()
+    val customRom = CustomRomDetectorFeature.rememberSession()
+    val dangerousApps = DangerousAppsDetectorFeature.rememberSession()
+    val deviceProfile = DeviceInfoProfileFeature.rememberSession()
+    val kernelCheck = KernelCheckDetectorFeature.rememberSession()
+    val lsposed = LSPosedDetectorFeature.rememberSession()
+    val memory = MemoryDetectorFeature.rememberSession()
+    val mount = MountDetectorFeature.rememberSession()
+    val nativeRoot = NativeRootDetectorFeature.rememberSession()
+    val playIntegrityFix = PlayIntegrityFixDetectorFeature.rememberSession()
+    val selinux = SelinuxDetectorFeature.rememberSession()
+    val su = SuDetectorFeature.rememberSession()
+    val systemProperties = SystemPropertiesDetectorFeature.rememberSession()
+    val virtualization = VirtualizationDetectorFeature.rememberSession()
+    val zygisk = ZygiskDetectorFeature.rememberSession()
+    val detectors = remember(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk) {
+        listOf(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk)
+    }
     val updateUiState by updateViewModel.uiState.collectAsState()
 
     LaunchedEffect(updateViewModel) {
         updateViewModel.checkAutomatically()
     }
     val scanViewModel: DetectorScanViewModel = viewModel(
-        factory = remember {
-            DetectorScanViewModel.factory(
-                listOf(
-                    bootloaderViewModel.summary,
-                    customRomViewModel.summary,
-                    dangerousAppsViewModel.summary,
-                    kernelCheckViewModel.summary,
-                    lsposedViewModel.summary,
-                    memoryViewModel.summary,
-                    mountViewModel.summary,
-                    nativeRootViewModel.summary,
-                    playIntegrityFixViewModel.summary,
-                    selinuxViewModel.summary,
-                    suViewModel.summary,
-                    systemPropertiesViewModel.summary,
-                    teeViewModel.summary,
-                    virtualizationViewModel.summary,
-                    zygiskViewModel.summary,
-                ),
-            )
-        },
+        factory = remember { DetectorScanViewModel.factory(detectors.map { it.summary }) },
     )
     val scanState by scanViewModel.coordinator.state.collectAsState()
     val detectorSummaries = scanState.detectors
@@ -526,22 +445,6 @@ private fun AppReadyShell(
         dashboardScanDurationMillis,
         dashboardScanCompletedAtEpochMillis,
         isDashboardLoading,
-        deviceInfoUiState,
-        bootloaderUiState,
-        teeUiState,
-        customRomUiState,
-        dangerousAppsUiState,
-        kernelCheckUiState,
-        lsposedUiState,
-        memoryUiState,
-        mountUiState,
-        nativeRootUiState,
-        playIntegrityFixUiState,
-        selinuxUiState,
-        suUiState,
-        systemPropertiesUiState,
-        virtualizationUiState,
-        zygiskUiState,
     ) {
         DashboardUiState(
             overview = buildDashboardOverview(
@@ -550,26 +453,7 @@ private fun AppReadyShell(
                 scanCompletedAtEpochMillis = dashboardScanCompletedAtEpochMillis,
             ),
             topFindings = buildDashboardFindings(detectorSummaries),
-            detectorCards = sortDashboardDetectorCards(
-                listOf(
-                    DashboardDetectorCardEntry.Bootloader(bootloaderUiState.cardModel),
-                    DashboardDetectorCardEntry.CustomRom(customRomUiState.cardModel),
-                    DashboardDetectorCardEntry.DangerousApps(dangerousAppsUiState.cardModel),
-                    DashboardDetectorCardEntry.KernelCheck(kernelCheckUiState.cardModel),
-                    DashboardDetectorCardEntry.LSPosed(lsposedUiState.cardModel),
-                    DashboardDetectorCardEntry.Memory(memoryUiState.cardModel),
-                    DashboardDetectorCardEntry.Mount(mountUiState.cardModel),
-                    DashboardDetectorCardEntry.NativeRoot(nativeRootUiState.cardModel),
-                    DashboardDetectorCardEntry.PlayIntegrityFix(playIntegrityFixUiState.cardModel),
-                    DashboardDetectorCardEntry.Selinux(selinuxUiState.cardModel),
-                    DashboardDetectorCardEntry.Su(suUiState.cardModel),
-                    DashboardDetectorCardEntry.SystemProperties(systemPropertiesUiState.cardModel),
-                    DashboardDetectorCardEntry.Tee(teeUiState.cardModel),
-                    DashboardDetectorCardEntry.Virtualization(virtualizationUiState.cardModel),
-                    DashboardDetectorCardEntry.Zygisk(zygiskUiState.cardModel),
-                ),
-            ),
-            deviceInfoCard = deviceInfoUiState.cardModel,
+            cardOrder = dashboardCardOrder(detectorSummaries),
             isLoading = isDashboardLoading,
         )
     }
@@ -655,12 +539,8 @@ private fun AppReadyShell(
                 ) {
                     DashboardScreen(
                         uiState = dashboardState,
-                        showTeeDetailsDialog = teeUiState.showDetailsDialog,
-                        showTeeCertificatesDialog = teeUiState.showCertificatesDialog,
-                        onTeeExpandedChange = teeViewModel::onExpandedChange,
-                        onTeeFooterAction = teeViewModel::onFooterAction,
-                        onDismissTeeDetails = teeViewModel::dismissDetails,
-                        onDismissTeeCertificates = teeViewModel::dismissCertificates,
+                        detectors = detectors,
+                        deviceProfile = deviceProfile,
                     )
                 }
             }
@@ -671,7 +551,7 @@ private fun AppReadyShell(
                     onCrlNetworkingChange = { enabled ->
                         scope.launch {
                             consentStore.setConsent(enabled)
-                            teeViewModel.rescan()
+                            tee.rescan()
                         }
                     },
                     onCheckForUpdates = updateViewModel::onSettingsUpdateAction,

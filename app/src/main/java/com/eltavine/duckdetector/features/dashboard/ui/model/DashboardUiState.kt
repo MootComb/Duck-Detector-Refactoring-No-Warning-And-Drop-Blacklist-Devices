@@ -17,25 +17,10 @@
 package com.eltavine.duckdetector.features.dashboard.ui.model
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.core.scan.DetectorSummary
-import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardModel
-import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomCardModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
-import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
-import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckCardModel
-import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedCardModel
-import com.eltavine.duckdetector.features.memory.ui.model.MemoryCardModel
-import com.eltavine.duckdetector.features.mount.ui.model.MountCardModel
-import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootCardModel
-import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrityFixCardModel
-import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxCardModel
-import com.eltavine.duckdetector.features.su.ui.model.SuCardModel
-import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesCardModel
-import com.eltavine.duckdetector.features.tee.ui.model.TeeCardModel
-import com.eltavine.duckdetector.features.virtualization.ui.model.VirtualizationCardModel
-import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskCardModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -63,121 +48,11 @@ data class DashboardFindingModel(
     val status: DetectorStatus,
 )
 
-sealed interface DashboardDetectorCardEntry {
-    val id: String
-    val status: DetectorStatus
-
-    data class Bootloader(
-        val model: BootloaderCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "bootloader"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Mount(
-        val model: MountCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "mount"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Memory(
-        val model: MemoryCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "memory"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class LSPosed(
-        val model: LSPosedCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "lsposed"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Selinux(
-        val model: SelinuxCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "selinux"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class DangerousApps(
-        val model: DangerousAppsCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "dangerous_apps"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class PlayIntegrityFix(
-        val model: PlayIntegrityFixCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "play_integrity_fix"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class NativeRoot(
-        val model: NativeRootCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "native_root"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Tee(
-        val model: TeeCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "tee"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Su(
-        val model: SuCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "su"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class CustomRom(
-        val model: CustomRomCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "custom_rom"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class KernelCheck(
-        val model: KernelCheckCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "kernel_check"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class SystemProperties(
-        val model: SystemPropertiesCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "system_properties"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Zygisk(
-        val model: ZygiskCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "zygisk"
-        override val status: DetectorStatus = model.status
-    }
-
-    data class Virtualization(
-        val model: VirtualizationCardModel,
-    ) : DashboardDetectorCardEntry {
-        override val id: String = "virtualization"
-        override val status: DetectorStatus = model.status
-    }
-}
-
 data class DashboardUiState(
     val overview: DashboardOverviewModel,
     val topFindings: List<DashboardFindingModel>,
-    val detectorCards: List<DashboardDetectorCardEntry>,
-    val deviceInfoCard: DeviceInfoCardModel,
+    /** Detector cards in display order: most severe first, then by title. */
+    val cardOrder: List<DetectorId>,
     val isLoading: Boolean,
 )
 
@@ -336,32 +211,14 @@ private fun prioritizedContributions(
     )
 }
 
-fun sortDashboardDetectorCards(
-    entries: List<DashboardDetectorCardEntry>,
-): List<DashboardDetectorCardEntry> {
-    return entries.sortedWith(
-        compareBy<DashboardDetectorCardEntry> { entry ->
-            detectorPriority(entry.status)
-        }.thenBy { entry ->
-            when (entry) {
-                is DashboardDetectorCardEntry.Bootloader -> entry.model.title
-                is DashboardDetectorCardEntry.CustomRom -> entry.model.title
-                is DashboardDetectorCardEntry.DangerousApps -> entry.model.title
-                is DashboardDetectorCardEntry.KernelCheck -> entry.model.title
-                is DashboardDetectorCardEntry.LSPosed -> entry.model.title
-                is DashboardDetectorCardEntry.Memory -> entry.model.title
-                is DashboardDetectorCardEntry.Mount -> entry.model.title
-                is DashboardDetectorCardEntry.NativeRoot -> entry.model.title
-                is DashboardDetectorCardEntry.PlayIntegrityFix -> entry.model.title
-                is DashboardDetectorCardEntry.Selinux -> entry.model.title
-                is DashboardDetectorCardEntry.Su -> entry.model.title
-                is DashboardDetectorCardEntry.SystemProperties -> entry.model.title
-                is DashboardDetectorCardEntry.Tee -> entry.model.title
-                is DashboardDetectorCardEntry.Virtualization -> entry.model.title
-                is DashboardDetectorCardEntry.Zygisk -> entry.model.title
-            }
-        },
-    )
+fun dashboardCardOrder(
+    summaries: List<DetectorSummary>,
+): List<DetectorId> {
+    return summaries.sortedWith(
+        compareBy<DetectorSummary> { summary ->
+            detectorPriority(summary.status)
+        }.thenBy { summary -> summary.title },
+    ).map { it.id }
 }
 
 private fun detectorPriority(

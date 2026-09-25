@@ -50,6 +50,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,36 +60,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.eltavine.duckdetector.BuildConfig
 import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.core.detector.DetectorSession
+import com.eltavine.duckdetector.core.detector.DeviceProfileSession
+import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.features.bootloader.ui.card.BootloaderDetectorCard
-import com.eltavine.duckdetector.features.customrom.ui.card.CustomRomDetectorCard
-import com.eltavine.duckdetector.features.dangerousapps.ui.card.DangerousAppsDetectorCard
-import com.eltavine.duckdetector.features.dashboard.data.DashboardExportFormatter
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorCardEntry
+import com.eltavine.duckdetector.features.dashboard.data.DashboardExport
+import com.eltavine.duckdetector.features.dashboard.data.DashboardReportRenderer
+import com.eltavine.duckdetector.features.dashboard.data.ExportHeader
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardFindingModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewMetricModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
-import com.eltavine.duckdetector.features.deviceinfo.ui.card.DeviceInfoCard
-import com.eltavine.duckdetector.features.kernelcheck.ui.card.KernelCheckDetectorCard
-import com.eltavine.duckdetector.features.lsposed.ui.card.LSPosedDetectorCard
-import com.eltavine.duckdetector.features.memory.ui.card.MemoryDetectorCard
-import com.eltavine.duckdetector.features.mount.ui.card.MountDetectorCard
-import com.eltavine.duckdetector.features.nativeroot.ui.card.NativeRootDetectorCard
-import com.eltavine.duckdetector.features.playintegrityfix.ui.card.PlayIntegrityFixDetectorCard
-import com.eltavine.duckdetector.features.selinux.ui.card.SelinuxDetectorCard
-import com.eltavine.duckdetector.features.su.ui.card.SuDetectorCard
-import com.eltavine.duckdetector.features.systemproperties.ui.card.SystemPropertiesDetectorCard
-import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
-import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionId
-import com.eltavine.duckdetector.features.virtualization.ui.card.VirtualizationDetectorCard
-import com.eltavine.duckdetector.features.zygisk.ui.card.ZygiskDetectorCard
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -98,22 +85,36 @@ import java.util.TimeZone
 @Composable
 fun DashboardScreen(
     uiState: DashboardUiState,
-    showTeeDetailsDialog: Boolean,
-    showTeeCertificatesDialog: Boolean,
-    onTeeExpandedChange: (Boolean) -> Unit,
-    onTeeFooterAction: (TeeFooterActionId) -> Unit,
-    onDismissTeeDetails: () -> Unit,
-    onDismissTeeCertificates: () -> Unit,
+    detectors: List<DetectorSession>,
+    deviceProfile: DeviceProfileSession,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val buildInfo = LocalAppBuildInfo.current
+    val orderedDetectors = remember(uiState.cardOrder, detectors) {
+        val detectorsById = detectors.associateBy { it.id }
+        uiState.cardOrder.mapNotNull { detectorsById[it] }
+    }
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/plain"),
     ) { uri ->
         if (uri != null) {
             try {
-                val formatter = DashboardExportFormatter()
-                val text = formatter.format(uiState)
+                val text = DashboardReportRenderer.render(
+                    DashboardExport(
+                        header = ExportHeader(
+                            versionName = buildInfo.versionName,
+                            versionCode = buildInfo.versionCode,
+                            buildHash = buildInfo.buildHash,
+                            buildTime = formatBuildTimeUtc(buildInfo.buildTimeUtc),
+                            reportTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss (z)", Locale.US).format(Date()),
+                        ),
+                        overview = uiState.overview,
+                        topFindings = uiState.topFindings,
+                        detectors = orderedDetectors.map { it.report() },
+                        device = deviceProfile.report(),
+                    ),
+                )
                 context.contentResolver.openOutputStream(uri)?.use { stream ->
                     stream.write(text.toByteArray(Charsets.UTF_8))
                 }
@@ -166,81 +167,13 @@ fun DashboardScreen(
                 )
             }
             items(
-                items = uiState.detectorCards,
-                key = { entry -> entry.id },
-            ) { entry ->
-                when (entry) {
-                    is DashboardDetectorCardEntry.Bootloader -> {
-                        BootloaderDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Mount -> {
-                        MountDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.CustomRom -> {
-                        CustomRomDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Selinux -> {
-                        SelinuxDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.DangerousApps -> {
-                        DangerousAppsDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.KernelCheck -> {
-                        KernelCheckDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Memory -> {
-                        MemoryDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.LSPosed -> {
-                        LSPosedDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.NativeRoot -> {
-                        NativeRootDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.PlayIntegrityFix -> {
-                        PlayIntegrityFixDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Tee -> {
-                        TeeDetectorCard(
-                            model = entry.model,
-                            showDetailsDialog = showTeeDetailsDialog,
-                            showCertificatesDialog = showTeeCertificatesDialog,
-                            onExpandedChange = onTeeExpandedChange,
-                            onFooterAction = onTeeFooterAction,
-                            onDismissDetails = onDismissTeeDetails,
-                            onDismissCertificates = onDismissTeeCertificates,
-                        )
-                    }
-
-                    is DashboardDetectorCardEntry.Su -> {
-                        SuDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.SystemProperties -> {
-                        SystemPropertiesDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Virtualization -> {
-                        VirtualizationDetectorCard(model = entry.model)
-                    }
-
-                    is DashboardDetectorCardEntry.Zygisk -> {
-                        ZygiskDetectorCard(model = entry.model)
-                    }
-                }
+                items = orderedDetectors,
+                key = { detector -> detector.id.value },
+            ) { detector ->
+                detector.Card()
             }
             item {
-                DeviceInfoCard(model = uiState.deviceInfoCard)
+                deviceProfile.Card()
             }
         }
     }
@@ -304,6 +237,7 @@ private fun DashboardLoadingOverlay(
 @Composable
 private fun BrandHeader() {
     val context = LocalContext.current
+    val buildInfo = LocalAppBuildInfo.current
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -347,12 +281,12 @@ private fun BrandHeader() {
                 )
                 BrandMetaLine(
                     icon = Icons.Rounded.Badge,
-                    text = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})",
+                    text = "${buildInfo.versionName}(${buildInfo.versionCode})",
                 )
                 BuildTimeMetaBlock(
                     icon = Icons.Rounded.Schedule,
                     label = "Build Time (UTC)",
-                    time = formatBuildTimeUtc(BuildConfig.BUILD_TIME_UTC),
+                    time = formatBuildTimeUtc(buildInfo.buildTimeUtc),
                 )
             }
         }

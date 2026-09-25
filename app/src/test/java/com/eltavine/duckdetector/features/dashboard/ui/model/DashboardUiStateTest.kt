@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.dashboard.ui.model
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -99,6 +100,33 @@ class DashboardUiStateTest {
         assertEquals(
             "Grant self-domain certificate chain diverged; open TEE details for stage diagnostics.",
             findings.single().detail,
+        )
+    }
+    @Test
+    fun `cards order by severity then title`() {
+        fun summary(id: String, title: String, status: DetectorStatus) = DetectorSummary(
+            id = DetectorId(id),
+            title = title,
+            status = status,
+            headline = "",
+            summary = "",
+            ready = true,
+        )
+
+        val order = dashboardCardOrder(
+            listOf(
+                summary("clear_b", "B clear", DetectorStatus.allClear()),
+                summary("support", "Support", DetectorStatus.info(InfoKind.SUPPORT)),
+                summary("clear_a", "A clear", DetectorStatus.allClear()),
+                summary("error", "Error", DetectorStatus.info(InfoKind.ERROR)),
+                summary("warning", "Warning", DetectorStatus.warning()),
+                summary("danger", "Danger", DetectorStatus.danger()),
+            ),
+        )
+
+        assertEquals(
+            listOf("danger", "warning", "error", "support", "clear_a", "clear_b").map(::DetectorId),
+            order,
         )
     }
 }

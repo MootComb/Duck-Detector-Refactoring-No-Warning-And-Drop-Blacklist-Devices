@@ -28,8 +28,6 @@ import com.eltavine.duckdetector.features.customrom.presentation.toDetectorRepor
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorCardEntry
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
@@ -60,26 +58,26 @@ import com.eltavine.duckdetector.features.virtualization.ui.model.Virtualization
 import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskCardModel
 
-/** One fully populated dashboard, available both as legacy UI state and as typed reports. */
+/** One fully populated dashboard export built from generated card models. */
 internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListSize: Int = 0) {
 
     private val fixtures = CardFixtures(seed, minListSize)
-    private val cards: List<Pair<DashboardDetectorCardEntry, DetectorReport>> = listOf(
-        fixtures.create(BootloaderCardModel::class.java).let { DashboardDetectorCardEntry.Bootloader(it) to it.toDetectorReport() },
-        fixtures.create(CustomRomCardModel::class.java).let { DashboardDetectorCardEntry.CustomRom(it) to it.toDetectorReport() },
-        fixtures.create(DangerousAppsCardModel::class.java).let { DashboardDetectorCardEntry.DangerousApps(it) to it.toDetectorReport() },
-        fixtures.create(KernelCheckCardModel::class.java).let { DashboardDetectorCardEntry.KernelCheck(it) to it.toDetectorReport() },
-        fixtures.create(LSPosedCardModel::class.java).let { DashboardDetectorCardEntry.LSPosed(it) to it.toDetectorReport() },
-        fixtures.create(MemoryCardModel::class.java).let { DashboardDetectorCardEntry.Memory(it) to it.toDetectorReport() },
-        fixtures.create(MountCardModel::class.java).let { DashboardDetectorCardEntry.Mount(it) to it.toDetectorReport() },
-        fixtures.create(NativeRootCardModel::class.java).let { DashboardDetectorCardEntry.NativeRoot(it) to it.toDetectorReport() },
-        fixtures.create(PlayIntegrityFixCardModel::class.java).let { DashboardDetectorCardEntry.PlayIntegrityFix(it) to it.toDetectorReport() },
-        fixtures.create(SelinuxCardModel::class.java).let { DashboardDetectorCardEntry.Selinux(it) to it.toDetectorReport() },
-        fixtures.create(SuCardModel::class.java).let { DashboardDetectorCardEntry.Su(it) to it.toDetectorReport() },
-        fixtures.create(SystemPropertiesCardModel::class.java).let { DashboardDetectorCardEntry.SystemProperties(it) to it.toDetectorReport() },
-        fixtures.create(TeeCardModel::class.java).let { DashboardDetectorCardEntry.Tee(it) to it.toDetectorReport() },
-        fixtures.create(VirtualizationCardModel::class.java).let { DashboardDetectorCardEntry.Virtualization(it) to it.toDetectorReport() },
-        fixtures.create(ZygiskCardModel::class.java).let { DashboardDetectorCardEntry.Zygisk(it) to it.toDetectorReport() },
+    private val reports: List<DetectorReport> = listOf(
+        fixtures.create(BootloaderCardModel::class.java).toDetectorReport(),
+        fixtures.create(CustomRomCardModel::class.java).toDetectorReport(),
+        fixtures.create(DangerousAppsCardModel::class.java).toDetectorReport(),
+        fixtures.create(KernelCheckCardModel::class.java).toDetectorReport(),
+        fixtures.create(LSPosedCardModel::class.java).toDetectorReport(),
+        fixtures.create(MemoryCardModel::class.java).toDetectorReport(),
+        fixtures.create(MountCardModel::class.java).toDetectorReport(),
+        fixtures.create(NativeRootCardModel::class.java).toDetectorReport(),
+        fixtures.create(PlayIntegrityFixCardModel::class.java).toDetectorReport(),
+        fixtures.create(SelinuxCardModel::class.java).toDetectorReport(),
+        fixtures.create(SuCardModel::class.java).toDetectorReport(),
+        fixtures.create(SystemPropertiesCardModel::class.java).toDetectorReport(),
+        fixtures.create(TeeCardModel::class.java).toDetectorReport(),
+        fixtures.create(VirtualizationCardModel::class.java).toDetectorReport(),
+        fixtures.create(ZygiskCardModel::class.java).toDetectorReport(),
     )
     private val device = fixtures.create(DeviceInfoCardModel::class.java).let { generated ->
         val identity = when (seed % 3) {
@@ -89,7 +87,7 @@ internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListS
         }
         generated.copy(headerFacts = identity + generated.headerFacts)
     }
-    private val summaries = cards.mapIndexed { index, (_, report) ->
+    private val summaries = reports.mapIndexed { index, report ->
         DetectorSummary(
             id = DetectorId("detector_$index"),
             title = report.title,
@@ -106,19 +104,11 @@ internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListS
     )
     private val findings = buildDashboardFindings(summaries)
 
-    val uiState = DashboardUiState(
-        overview = overview,
-        topFindings = findings,
-        detectorCards = cards.map { it.first },
-        deviceInfoCard = device,
-        isLoading = false,
-    )
-
     fun export(header: ExportHeader): DashboardExport = DashboardExport(
         header = header,
         overview = overview,
         topFindings = findings,
-        detectors = cards.map { it.second },
+        detectors = reports,
         device = device.toDeviceReport(),
     )
 
