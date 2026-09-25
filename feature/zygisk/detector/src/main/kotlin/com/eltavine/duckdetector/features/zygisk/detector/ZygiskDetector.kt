@@ -29,7 +29,7 @@ import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
 
 /**
  * Zygisk: looks for Zygisk injection in this process through native linker, maps, file
- * descriptor, thread, seccomp and heap probes, and a file descriptor trap in a separate
+ * descriptor, thread and heap probes, and a file descriptor trap in a separate
  * process.
  *
  * Collected by [ZygiskRepository], judged by `ZygiskReport.toDetectorStatus()` in the domain

@@ -28,7 +28,6 @@ data class ZygiskNativeTrace(
 data class ZygiskNativeSnapshot(
     val available: Boolean = false,
     val heapAvailable: Boolean = false,
-    val seccompSupported: Boolean = false,
     val tracerPid: Int = 0,
     val strongHitCount: Int = 0,
     val heuristicHitCount: Int = 0,
@@ -38,8 +37,6 @@ data class ZygiskNativeSnapshot(
     val smapsHitCount: Int = 0,
     val namespaceHitCount: Int = 0,
     val linkerHookHitCount: Int = 0,
-    val stackLeakHitCount: Int = 0,
-    val seccompHitCount: Int = 0,
     val heapHitCount: Int = 0,
     val threadHitCount: Int = 0,
     val fdHitCount: Int = 0,

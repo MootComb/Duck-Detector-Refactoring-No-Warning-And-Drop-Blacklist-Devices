@@ -54,7 +54,7 @@ class ZygiskCardModelMapper {
         report: ZygiskReport,
     ): String {
         return when (report.stage) {
-            ZygiskStage.LOADING -> "cross-process fd trap + linker/maps/heap/seccomp/runtime"
+            ZygiskStage.LOADING -> "cross-process fd trap + linker/maps/heap/runtime"
             ZygiskStage.FAILED -> "zygote injection scan failed"
             ZygiskStage.READY -> "${report.strongHitCount} strong · ${report.heuristicHitCount} heuristic · ${report.signals.size} signal(s)"
         }
@@ -82,7 +82,7 @@ class ZygiskCardModelMapper {
     ): String {
         return when (report.stage) {
             ZygiskStage.LOADING ->
-                "The detector is collecting cross-process specialization evidence first, then correlating environment, linker, namespace, maps, smaps, thread, fd, stack, seccomp, and heap traces from the current process."
+                "The detector is collecting cross-process specialization evidence first, then correlating environment, linker, namespace, maps, smaps, thread, fd, and heap traces from the current process."
 
             ZygiskStage.FAILED ->
                 report.errorMessage ?: "Zygisk detection failed before evidence could be assembled."
@@ -190,7 +190,7 @@ class ZygiskCardModelMapper {
                     label = "Strong signals",
                     value = report.strongHitCount.toString(),
                     status = if (report.strongHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
-                    detail = "Direct strong signals include FD trap, NeoZygisk TMP_PATH leakage, namespace bypass, linker hook, TracerPid, and seccomp trap positives.",
+                    detail = "Direct strong signals include FD trap, NeoZygisk TMP_PATH leakage, namespace bypass, linker hook, and TracerPid positives.",
                 ),
                 ZygiskDetailRowModel(
                     label = "Heuristic signals",
@@ -264,7 +264,7 @@ class ZygiskCardModelMapper {
                         status = DetectorStatus.info(InfoKind.SUPPORT),
                     ),
                     ZygiskImpactItemModel(
-                        text = "Unavailable service binding, unsupported seccomp or heap helpers, or a missing native snapshot can all reduce confidence without implying a positive detection.",
+                        text = "Unavailable service binding, an unsupported heap helper, or a missing native snapshot can all reduce confidence without implying a positive detection.",
                         status = DetectorStatus.info(InfoKind.SUPPORT),
                     ),
                 )
@@ -280,11 +280,10 @@ class ZygiskCardModelMapper {
                 listOf(
                     "Cross-process FD trap",
                     "Native snapshot",
-                    "Seccomp syscall trap",
                     "Linker and namespace",
                     "Maps and smaps",
                     "Threads and FDs",
-                    "Solist, atexit, stack, heap",
+                    "Solist, atexit, heap",
                 ),
                 DetectorStatus.info(InfoKind.SUPPORT),
                 "Pending",
@@ -294,11 +293,10 @@ class ZygiskCardModelMapper {
                 listOf(
                     "Cross-process FD trap",
                     "Native snapshot",
-                    "Seccomp syscall trap",
                     "Linker and namespace",
                     "Maps and smaps",
                     "Threads and FDs",
-                    "Solist, atexit, stack, heap",
+                    "Solist, atexit, heap",
                 ),
                 DetectorStatus.info(InfoKind.ERROR),
                 "Error",

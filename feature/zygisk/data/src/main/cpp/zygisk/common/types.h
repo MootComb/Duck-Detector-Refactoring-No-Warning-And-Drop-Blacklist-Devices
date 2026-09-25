@@ -63,7 +63,6 @@ namespace duckdetector::zygisk {
     struct Snapshot {
         bool available = false;
         bool heap_available = false;
-        bool seccomp_supported = false;
         int tracer_pid = 0;
         int strong_hits = 0;
         int heuristic_hits = 0;
@@ -73,8 +72,6 @@ namespace duckdetector::zygisk {
         int smaps_hits = 0;
         int namespace_hits = 0;
         int linker_hook_hits = 0;
-        int stack_leak_hits = 0;
-        int seccomp_hits = 0;
         int heap_hits = 0;
         int thread_hits = 0;
         int fd_hits = 0;

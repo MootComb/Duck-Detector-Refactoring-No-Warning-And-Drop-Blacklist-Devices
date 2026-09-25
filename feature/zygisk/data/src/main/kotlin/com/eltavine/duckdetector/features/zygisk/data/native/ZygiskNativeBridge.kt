@@ -79,7 +79,6 @@ class ZygiskNativeBridge(
         return when (key) {
             "AVAILABLE" -> copy(available = value.asBool())
             "HEAP_AVAILABLE" -> copy(heapAvailable = value.asBool())
-            "SECCOMP_SUPPORTED" -> copy(seccompSupported = value.asBool())
             "TRACER_PID" -> copy(tracerPid = value.toIntOrNull() ?: tracerPid)
             "STRONG_HITS" -> copy(strongHitCount = value.toIntOrNull() ?: strongHitCount)
             "HEURISTIC_HITS" -> copy(heuristicHitCount = value.toIntOrNull() ?: heuristicHitCount)
@@ -92,8 +91,6 @@ class ZygiskNativeBridge(
                 linkerHookHitCount = value.toIntOrNull() ?: linkerHookHitCount
             )
 
-            "STACK_LEAK_HITS" -> copy(stackLeakHitCount = value.toIntOrNull() ?: stackLeakHitCount)
-            "SECCOMP_HITS" -> copy(seccompHitCount = value.toIntOrNull() ?: seccompHitCount)
             "HEAP_HITS" -> copy(heapHitCount = value.toIntOrNull() ?: heapHitCount)
             "THREAD_HITS" -> copy(threadHitCount = value.toIntOrNull() ?: threadHitCount)
             "FD_HITS" -> copy(fdHitCount = value.toIntOrNull() ?: fdHitCount)

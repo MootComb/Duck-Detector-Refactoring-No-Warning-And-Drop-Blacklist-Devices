@@ -70,7 +70,6 @@ data class ZygiskReport(
     val fdTrapDetected: Boolean,
     val nativeAvailable: Boolean,
     val heapAvailable: Boolean,
-    val seccompSupported: Boolean,
     val nativeStrongHitCount: Int,
     val heuristicHitCount: Int,
     val tracerPid: Int,
@@ -114,7 +113,6 @@ data class ZygiskReport(
                 fdTrapDetected = false,
                 nativeAvailable = false,
                 heapAvailable = false,
-                seccompSupported = false,
                 nativeStrongHitCount = 0,
                 heuristicHitCount = 0,
                 tracerPid = 0,
@@ -134,7 +132,7 @@ data class ZygiskReport(
         fun defaultReferences(): List<String> {
             return listOf(
                 "Cross-process FD trap looks for deleted-path descriptors that should survive clean specialization but may be silently closed by Zygisk-style FD sanitization.",
-                "Native runtime probes correlate NeoZygisk TMP_PATH leakage, linker ownership, restricted-path loading, /proc maps and smaps drift, suspicious thread or fd residue, seccomp trap behavior, and heap entropy.",
+                "Native runtime probes correlate NeoZygisk TMP_PATH leakage, linker ownership, restricted-path loading, /proc maps and smaps drift, suspicious thread or fd residue, and heap entropy.",
                 "Read this card together with Mount and Memory because those cards can still show corroborating Zygisk-facing traces even when this process keeps only partial residue.",
             )
         }

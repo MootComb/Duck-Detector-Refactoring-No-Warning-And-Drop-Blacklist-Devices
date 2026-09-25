@@ -75,7 +75,6 @@ class ZygiskRepository(
             fdTrapDetected = fdTrap.detected,
             nativeAvailable = snapshot.available,
             heapAvailable = snapshot.heapAvailable,
-            seccompSupported = snapshot.seccompSupported,
             nativeStrongHitCount = snapshot.strongHitCount,
             heuristicHitCount = snapshot.heuristicHitCount,
             tracerPid = snapshot.tracerPid,
@@ -131,7 +130,6 @@ class ZygiskRepository(
             snapshot.vmapHitCount,
             snapshot.atexitHitCount,
             snapshot.smapsHitCount,
-            snapshot.stackLeakHitCount,
             snapshot.heapHitCount,
             snapshot.threadHitCount,
             snapshot.fdHitCount,
@@ -167,22 +165,7 @@ class ZygiskRepository(
                     snapshot.heuristicHitCount > 0 -> ZygiskMethodOutcome.WARNING
                     else -> ZygiskMethodOutcome.CLEAN
                 },
-                detail = "Collects linker, namespace, maps, smaps, stack, thread, fd, seccomp, and heap traces from the current app process.",
-            ),
-            ZygiskMethodResult(
-                label = "Seccomp syscall trap",
-                summary = when {
-                    !snapshot.available -> "Unavailable"
-                    !snapshot.seccompSupported -> "Unsupported"
-                    snapshot.seccompHitCount > 0 -> "Triggered"
-                    else -> "Clean"
-                },
-                outcome = when {
-                    !snapshot.available || !snapshot.seccompSupported -> ZygiskMethodOutcome.SUPPORT
-                    snapshot.seccompHitCount > 0 -> ZygiskMethodOutcome.DETECTED
-                    else -> ZygiskMethodOutcome.CLEAN
-                },
-                detail = "Runs a thread-local seccomp trap around pthread_attr_setstacksize to catch syscall-emitting libc hooks used by self-unloading Zygisk variants.",
+                detail = "Collects linker, namespace, maps, smaps, thread, fd, and heap traces from the current app process.",
             ),
             ZygiskMethodResult(
                 label = "Linker and namespace",
@@ -228,7 +211,7 @@ class ZygiskRepository(
                 detail = "Correlates TracerPid, suspicious thread names, and open descriptor targets that frequently survive runtime tampering stacks.",
             ),
             ZygiskMethodResult(
-                label = "Solist, atexit, stack, heap",
+                label = "Solist, atexit, heap",
                 summary = when {
                     !snapshot.available -> "Unavailable"
                     heuristicFamilies > 0 -> "Drift"
@@ -239,7 +222,7 @@ class ZygiskRepository(
                     heuristicFamilies > 0 -> ZygiskMethodOutcome.WARNING
                     else -> ZygiskMethodOutcome.CLEAN
                 },
-                detail = "Uses weaker corroboration probes for module unload drift, atexit routing, residual stack strings, and jemalloc free-kept entropy.",
+                detail = "Uses weaker corroboration probes for module unload drift, atexit routing, and jemalloc free-kept entropy.",
             ),
         )
     }
@@ -314,7 +297,6 @@ class ZygiskRepository(
             "Namespace bypass",
             "Linker hook",
             "NeoZygisk environment marker",
-            "Seccomp trap",
         )
     }
 

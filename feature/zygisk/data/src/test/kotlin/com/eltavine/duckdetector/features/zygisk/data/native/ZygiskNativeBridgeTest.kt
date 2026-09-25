@@ -31,7 +31,6 @@ class ZygiskNativeBridgeTest {
             """
                 AVAILABLE=1
                 HEAP_AVAILABLE=1
-                SECCOMP_SUPPORTED=1
                 TRACER_PID=42
                 STRONG_HITS=1
                 HEURISTIC_HITS=2
@@ -45,7 +44,6 @@ class ZygiskNativeBridgeTest {
 
         assertTrue(snapshot.available)
         assertTrue(snapshot.heapAvailable)
-        assertTrue(snapshot.seccompSupported)
         assertEquals(42, snapshot.tracerPid)
         assertEquals(1, snapshot.strongHitCount)
         assertEquals(2, snapshot.heuristicHitCount)

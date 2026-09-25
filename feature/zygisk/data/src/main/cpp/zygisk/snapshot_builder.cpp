@@ -63,7 +63,6 @@ namespace duckdetector::zygisk {
         const auto fd = collect_fd_probe();
 
         snapshot.heap_available = heap.supported;
-        snapshot.seccomp_supported = false;
         snapshot.tracer_pid = threads.numeric_value;
 
         snapshot.solist_hits = solist.hit_count;
@@ -72,8 +71,6 @@ namespace duckdetector::zygisk {
         snapshot.smaps_hits = smaps.hit_count;
         snapshot.namespace_hits = namespace_probe.hit_count;
         snapshot.linker_hook_hits = linker_hook.hit_count;
-        snapshot.stack_leak_hits = 0;
-        snapshot.seccomp_hits = 0;
         snapshot.heap_hits = heap.hit_count;
         snapshot.thread_hits = threads.hit_count;
         snapshot.fd_hits = fd.hit_count;

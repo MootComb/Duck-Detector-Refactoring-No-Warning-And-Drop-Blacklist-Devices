@@ -64,7 +64,6 @@ namespace duckdetector::zygisk {
         std::ostringstream output;
         output << "AVAILABLE=" << (snapshot.available ? '1' : '0') << '\n';
         output << "HEAP_AVAILABLE=" << (snapshot.heap_available ? '1' : '0') << '\n';
-        output << "SECCOMP_SUPPORTED=" << (snapshot.seccomp_supported ? '1' : '0') << '\n';
         output << "TRACER_PID=" << snapshot.tracer_pid << '\n';
         output << "STRONG_HITS=" << snapshot.strong_hits << '\n';
         output << "HEURISTIC_HITS=" << snapshot.heuristic_hits << '\n';
@@ -74,8 +73,6 @@ namespace duckdetector::zygisk {
         output << "SMAPS_HITS=" << snapshot.smaps_hits << '\n';
         output << "NAMESPACE_HITS=" << snapshot.namespace_hits << '\n';
         output << "LINKER_HOOK_HITS=" << snapshot.linker_hook_hits << '\n';
-        output << "STACK_LEAK_HITS=" << snapshot.stack_leak_hits << '\n';
-        output << "SECCOMP_HITS=" << snapshot.seccomp_hits << '\n';
         output << "HEAP_HITS=" << snapshot.heap_hits << '\n';
         output << "THREAD_HITS=" << snapshot.thread_hits << '\n';
         output << "FD_HITS=" << snapshot.fd_hits << '\n';

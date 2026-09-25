@@ -111,7 +111,6 @@ class ZygiskCardModelMapperTest {
             fdTrapDetected = fdTrapDetected,
             nativeAvailable = nativeAvailable,
             heapAvailable = true,
-            seccompSupported = true,
             nativeStrongHitCount = nativeStrongHitCount,
             heuristicHitCount = heuristicHitCount,
             tracerPid = 0,
