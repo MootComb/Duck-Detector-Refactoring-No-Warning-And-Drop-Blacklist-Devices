@@ -62,16 +62,6 @@
       "reason": "Tests the startup policy state, which carries the TEE network consent."
     },
     {
-      "path": "capability/helperprocess/data/src/main/kotlin/com/eltavine/duckdetector/capability/helperprocess/data/VirtualizationProbeProtocol.kt",
-      "detectors": ["virtualization"],
-      "reason": "The Binder descriptor keeps the name it had before the helper process capability was extracted (follow-ups: historical names in the helper process capability)."
-    },
-    {
-      "path": "capability/selinuxpolicy/data/src/main/kotlin/com/eltavine/duckdetector/capability/selinuxpolicy/data/SelinuxContextValidityCarrierProtocol.kt",
-      "detectors": ["selinux"],
-      "reason": "The Binder descriptor keeps the name it had before the SELinux policy capability was extracted."
-    },
-    {
       "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
       "detectors": ["su"],
       "reason": "Shows a consumer using one detector's typed object through the SDK."

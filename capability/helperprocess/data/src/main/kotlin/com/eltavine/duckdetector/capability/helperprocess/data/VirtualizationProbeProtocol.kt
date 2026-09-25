@@ -19,7 +19,7 @@ package com.eltavine.duckdetector.capability.helperprocess.data
 import android.os.IBinder
 
 internal object VirtualizationProbeProtocol {
-    const val DESCRIPTOR: String = "com.eltavine.duckdetector.features.virtualization.probe"
+    const val DESCRIPTOR: String = "com.eltavine.duckdetector.capability.helperprocess.probe"
     const val TRANSACTION_COLLECT_SNAPSHOT: Int = IBinder.FIRST_CALL_TRANSACTION + 0
     const val TRANSACTION_IS_NATIVE_AVAILABLE: Int = IBinder.FIRST_CALL_TRANSACTION + 1
     const val TRANSACTION_RUN_SACRIFICIAL_SYSCALL_PACK: Int = IBinder.FIRST_CALL_TRANSACTION + 2
