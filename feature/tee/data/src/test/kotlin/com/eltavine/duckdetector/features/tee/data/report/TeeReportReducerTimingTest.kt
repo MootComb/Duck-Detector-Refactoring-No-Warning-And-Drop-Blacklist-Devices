@@ -236,10 +236,10 @@ class TeeReportReducerTimingTest {
 
         assertEquals(TeeVerdict.CONSISTENT, report.verdict)
         assertEquals(1, report.supplementaryIndicatorCount)
-        assertTrue(report.summary.contains("Detected malicious-module fingerprint during timing skip", ignoreCase = true))
+        assertTrue(report.summary.contains("matched a known keystore-interception module", ignoreCase = true))
         assertTrue(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Timing side-channel" &&
-                    it.body.contains("Detected malicious-module fingerprint") &&
+                    it.body.contains("Matched a known keystore-interception module") &&
                     it.body.contains("Register timer") &&
                     it.body.contains("bound_cpu0") &&
                     it.level == TeeSignalLevel.FAIL
@@ -283,10 +283,10 @@ class TeeReportReducerTimingTest {
 
         assertEquals(TeeVerdict.CONSISTENT, report.verdict)
         assertEquals(1, report.supplementaryIndicatorCount)
-        assertTrue(report.summary.contains("Detected malicious-module fingerprint during timing skip", ignoreCase = true))
+        assertTrue(report.summary.contains("matched a known keystore-interception module", ignoreCase = true))
         assertTrue(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Timing side-channel" &&
-                    it.body.contains("Detected malicious-module fingerprint") &&
+                    it.body.contains("Matched a known keystore-interception module") &&
                     it.body.contains("Fallback timer") &&
                     it.body.contains("not_requested") &&
                     it.level == TeeSignalLevel.FAIL
@@ -328,10 +328,10 @@ class TeeReportReducerTimingTest {
 
         assertEquals(TeeVerdict.CONSISTENT, report.verdict)
         assertEquals(2, report.supplementaryIndicatorCount)
-        assertTrue(report.summary.contains("Detected malicious-module fingerprint during timing skip", ignoreCase = true))
+        assertTrue(report.summary.contains("matched a known keystore-interception module", ignoreCase = true))
         assertTrue(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Timing side-channel" &&
-                    it.body.contains("Detected malicious-module fingerprint") &&
+                    it.body.contains("Matched a known keystore-interception module") &&
                     it.body.contains("Fallback timer") &&
                     it.body.contains("not_requested") &&
                     it.level == TeeSignalLevel.FAIL
@@ -359,6 +359,7 @@ class TeeReportReducerTimingTest {
                     timerSource = "clock_monotonic",
                     affinity = "not_requested",
                     failureReason = "security level probe failed",
+                    appAttestKeyAdvertised = true,
                     stackCopyPayload = """
                         phase=securityLevel.generateKey
                         summary=ServiceSpecificException(code -1)
@@ -385,6 +386,35 @@ class TeeReportReducerTimingTest {
         })
         assertFalse(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Timing side-channel" && it.body.contains("Measurement unavailable")
+        })
+    }
+
+    @Test
+    fun `parcel trio is not a finding where app attestation keys are not advertised`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                timingSideChannel = TimingSideChannelResult(
+                    probeRan = true,
+                    measurementAvailable = false,
+                    appAttestKeyAdvertised = false,
+                    failureReason = "security level probe failed",
+                    stackCopyPayload = """
+                        phase=securityLevel.generateKey
+                        summary=ServiceSpecificException(code -2)
+
+                        android.os.ServiceSpecificException (code -2)
+                        	at android.os.Parcel.createExceptionOrNull(Parcel.java:3270)
+                        	at android.os.Parcel.createException(Parcel.java:3240)
+                        	at android.os.Parcel.readException(Parcel.java:3223)
+                    """.trimIndent(),
+                    detail = "ATTEST_KEY refused",
+                ),
+            ),
+        )
+
+        assertEquals(0, report.supplementaryIndicatorCount)
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "Timing side-channel" && it.level == TeeSignalLevel.INFO
         })
     }
 

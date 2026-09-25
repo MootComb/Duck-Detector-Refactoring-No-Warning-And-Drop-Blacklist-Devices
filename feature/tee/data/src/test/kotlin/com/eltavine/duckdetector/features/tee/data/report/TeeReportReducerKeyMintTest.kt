@@ -181,7 +181,7 @@ class TeeReportReducerKeyMintTest {
                     available = true,
                     matched = true,
                     diagnosticCopyText = "reply raw hex dump",
-                    detail = "malicious-module generate-mode parcel fingerprint observed",
+                    detail = "generate-mode parcel fingerprint observed",
                 ),
             ),
         )

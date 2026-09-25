@@ -64,7 +64,10 @@ internal fun timingSideChannelSkipSignature(
 
         // 如果所有更具体的 patch/generate 组合都没有命中，但仍然看到 Parcel 三连异常，就保留一个 warning 级别的私有 binder 兜底信号。
         // If no more specific patch/generate signature matches, keep a warning-level private-binder fallback when the Parcel exception trio is still present.
-        payload.containsAllNeedles(
+        // Every ServiceSpecificException that crosses binder carries this trio, and a device without
+        // FEATURE_KEYSTORE_APP_ATTEST_KEY is expected to refuse the probe's ATTEST_KEY, so the
+        // fallback only applies where that key should have been accepted.
+        result.appAttestKeyAdvertised && payload.containsAllNeedles(
             listOf(
                 "at android.os.Parcel.createExceptionOrNull",
                 "at android.os.Parcel.createException",
@@ -84,15 +87,17 @@ internal enum class TimingSideChannelSkipSignature(
     // 这些标签只在“测量未建立”的 skip 语义里生效，用来把静态栈特征提升成可见的 patch-mode 结论。
     // These labels only apply to skip semantics where measurement never started, promoting static stack signatures into visible patch-mode outcomes.
     TRICKY_STORE_PATCH_MODE(
-        // 用户可见文案统一收敛成“恶意模块指纹”，避免把具体模块/模式名暴露给最终展示层。
-        // User-visible wording is intentionally collapsed into a generic malicious-module fingerprint message so the UI does not expose vendor/module-specific labels.
-        summary = "Detected malicious-module fingerprint during timing skip.",
-        rowLabel = "Detected malicious-module fingerprint",
+        // 用户可见文案统一收敛成通用的“已知 keystore 拦截模块”，避免把具体模块/模式名暴露给最终展示层。
+        // User-visible wording is intentionally collapsed into a generic known keystore-interception module
+        // message so the UI does not expose module-specific labels. The match is a stack signature, so the
+        // copy names what matched rather than judging the module's intent.
+        summary = "Keystore errors during timing skip matched a known keystore-interception module.",
+        rowLabel = "Matched a known keystore-interception module",
         level = TeeSignalLevel.FAIL,
     ),
     TEE_SIMULATOR_PATCH_MODE(
-        summary = "Detected malicious-module fingerprint during timing skip.",
-        rowLabel = "Detected malicious-module fingerprint",
+        summary = "Keystore errors during timing skip matched a known keystore-interception module.",
+        rowLabel = "Matched a known keystore-interception module",
         level = TeeSignalLevel.FAIL,
     ),
     PRIVATE_BINDER_EXCEPTION(

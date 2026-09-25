@@ -32,6 +32,7 @@ class TimingSideChannelProbe(
     fun inspect(
         useStrongBox: Boolean = false,
         nativeSnapshot: NativeTeeSnapshot = NativeTeeSnapshot(),
+        appAttestKeyAdvertised: Boolean = false,
     ): TimingSideChannelResult {
         val initialTimerMetadata = resolveTimerMetadata(nativeSnapshot)
         val measurementContext = bindMeasurementContext(initialTimerMetadata)
@@ -150,6 +151,7 @@ class TimingSideChannelProbe(
                 TimingSideChannelResult(
                     probeRan = true,
                     measurementAvailable = true,
+                    appAttestKeyAdvertised = appAttestKeyAdvertised,
                     suspicious = suspicious,
                     sampleCount = filteredSeries.pairedSampleCount,
                     attemptedPairCount = pairedSeries.attemptedPairCount,
@@ -210,6 +212,7 @@ class TimingSideChannelProbe(
             TimingSideChannelResult(
                 probeRan = true,
                 measurementAvailable = false,
+                appAttestKeyAdvertised = appAttestKeyAdvertised,
                 sampleCount = 0,
                 warmupCount = WARMUP_COUNT,
                 source = "keystore2_security_level_proxy",

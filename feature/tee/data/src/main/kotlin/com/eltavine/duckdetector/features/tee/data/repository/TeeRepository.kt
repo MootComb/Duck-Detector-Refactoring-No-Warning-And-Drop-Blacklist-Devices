@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.repository
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
@@ -187,6 +188,7 @@ class TeeRepository(
             val timingSideChannel = timingSideChannelProbe.inspect(
                 useStrongBox = false,
                 nativeSnapshot = native,
+                appAttestKeyAdvertised = appAttestKeyAdvertised(),
             )
             val deepChecks = collectDeepChecks(
                 useStrongBox = snapshot.tier == TeeTier.STRONGBOX,
@@ -251,6 +253,11 @@ class TeeRepository(
             TeeReport.failed(throwable.message ?: "TEE scan failed.")
         }
     }
+
+    // FEATURE_KEYSTORE_APP_ATTEST_KEY arrived with keystore2 in API 31; earlier releases have no ATTEST_KEY purpose.
+    private fun appAttestKeyAdvertised(): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            appContext.packageManager.hasSystemFeature(PackageManager.FEATURE_KEYSTORE_APP_ATTEST_KEY)
 
     private suspend fun collectDeepChecks(
         useStrongBox: Boolean,

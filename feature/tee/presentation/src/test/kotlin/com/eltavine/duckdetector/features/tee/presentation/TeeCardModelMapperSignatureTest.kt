@@ -41,7 +41,7 @@ class TeeCardModelMapperSignatureTest {
                 verdict = TeeVerdict.CONSISTENT,
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
-                summary = "Detected malicious-module fingerprint during timing skip. Attestation and trust-path checks still aligned.",
+                summary = "Keystore errors during timing skip matched a known keystore-interception module. Attestation and trust-path checks still aligned.",
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -62,7 +62,7 @@ class TeeCardModelMapperSignatureTest {
                         items = listOf(
                             TeeEvidenceItem(
                                 "Timing side-channel",
-                                "Detected malicious-module fingerprint • Register timer • bound_cpu0",
+                                "Matched a known keystore-interception module • Register timer • bound_cpu0",
                                 TeeSignalLevel.FAIL,
                             ),
                         ),
@@ -84,7 +84,7 @@ class TeeCardModelMapperSignatureTest {
                 verdict = TeeVerdict.CONSISTENT,
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
-                summary = "Detected malicious-module fingerprint during timing skip. Attestation and trust-path checks still aligned.",
+                summary = "Keystore errors during timing skip matched a known keystore-interception module. Attestation and trust-path checks still aligned.",
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -105,7 +105,7 @@ class TeeCardModelMapperSignatureTest {
                         items = listOf(
                             TeeEvidenceItem(
                                 "Timing side-channel",
-                                "Detected malicious-module fingerprint • Fallback timer • not_requested",
+                                "Matched a known keystore-interception module • Fallback timer • not_requested",
                                 TeeSignalLevel.FAIL,
                             ),
                         ),

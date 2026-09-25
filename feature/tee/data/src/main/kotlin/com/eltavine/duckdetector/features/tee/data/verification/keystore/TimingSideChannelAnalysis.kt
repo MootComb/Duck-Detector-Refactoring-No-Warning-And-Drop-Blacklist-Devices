@@ -186,6 +186,11 @@ data class TimingSideChannelResult(
     // 这里保存的是给人工静态审查用的原始异常 payload，不参与阈值计算，但会驱动 skip->patch-mode 的静态签名判定。
     // This stores the raw exception payload for human/static review; it does not affect timing math directly, but it does drive skip-to-patch-mode signature matching.
     val stackCopyPayload: String = "null",
+    /**
+     * Whether the device advertises app attestation keys (PackageManager.FEATURE_KEYSTORE_APP_ATTEST_KEY).
+     * The probe provisions a PURPOSE_ATTEST_KEY key, so without the feature a binder error is expected.
+     */
+    val appAttestKeyAdvertised: Boolean = false,
     val detail: String,
 ) {
     fun avgAttestedMicros(): Int? = avgAttestedMillis?.times(1_000)?.roundToInt()
