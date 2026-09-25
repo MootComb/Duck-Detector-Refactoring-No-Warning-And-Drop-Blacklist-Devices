@@ -51,7 +51,7 @@ import com.eltavine.duckdetector.core.ui.R as CoreUiR
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
-import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
+import com.eltavine.duckdetector.features.settings.ui.model.SettingsUpdateStatus
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 private const val ABOUT_WEBSITE = "eltavine.com"
@@ -65,7 +65,7 @@ fun AboutCard(
     versionCode: Int,
     buildTimeUtc: String,
     buildHash: String,
-    updateStatus: UpdateCheckStatus,
+    updateStatus: SettingsUpdateStatus,
     onCheckForUpdates: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -79,11 +79,11 @@ fun AboutCard(
     val clipboardBuildHashLine = stringResource(R.string.about_clipboard_build_hash_line, buildHash)
     val copyToast = stringResource(R.string.about_copy_toast)
     val updateStatusText = when (updateStatus) {
-        UpdateCheckStatus.IDLE -> stringResource(R.string.update_status_idle)
-        UpdateCheckStatus.CHECKING -> stringResource(R.string.update_status_checking)
-        UpdateCheckStatus.CURRENT -> stringResource(R.string.update_status_current)
-        UpdateCheckStatus.AVAILABLE -> stringResource(R.string.update_status_available)
-        UpdateCheckStatus.FAILED -> stringResource(R.string.update_status_failed)
+        SettingsUpdateStatus.IDLE -> stringResource(R.string.update_status_idle)
+        SettingsUpdateStatus.CHECKING -> stringResource(R.string.update_status_checking)
+        SettingsUpdateStatus.CURRENT -> stringResource(R.string.update_status_current)
+        SettingsUpdateStatus.AVAILABLE -> stringResource(R.string.update_status_available)
+        SettingsUpdateStatus.FAILED -> stringResource(R.string.update_status_failed)
     }
 
     Surface(
@@ -144,7 +144,7 @@ fun AboutCard(
                     value = updateStatusText,
                     icon = Icons.Rounded.SystemUpdate,
                     onClick = onCheckForUpdates.takeUnless {
-                        updateStatus == UpdateCheckStatus.CHECKING
+                        updateStatus == SettingsUpdateStatus.CHECKING
                     },
                 )
                 AboutInfoRow(

@@ -450,7 +450,7 @@ private fun AppReadyShell(
             versionCode = BuildConfig.VERSION_CODE,
             buildTimeUtc = BuildConfig.BUILD_TIME_UTC,
             buildHash = BuildConfig.BUILD_HASH,
-            updateStatus = updateUiState.status,
+            updateStatus = updateUiState.status.toSettingsUpdateStatus(),
         )
     }
     val detectorResultNoticeKey = remember(isDashboardLoading, dashboardState.overview) {
