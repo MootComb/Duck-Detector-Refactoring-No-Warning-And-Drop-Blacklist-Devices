@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.integration.dashboard
 
+import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
@@ -29,12 +30,16 @@ import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDash
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
-import com.eltavine.duckdetector.sdk.DetectorCatalog
 
-/** One fully populated dashboard export built from generated card models. */
-internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListSize: Int = 0) {
+/** One fully populated dashboard export built from generated card models of [detectors]. */
+internal class ExportScenario(
+    seed: Int,
+    detectors: List<Detector<*, *>>,
+    withScanTime: Boolean = false,
+    minListSize: Int = 0,
+) {
 
-    private val reports: List<DetectorReport> = DetectorCatalog.all
+    private val reports: List<DetectorReport> = detectors
         .sortedBy { it.id.value }
         .map { detector -> CardFixtures(seed, minListSize, stream = detector.id.value).export(detector) }
     private val device = CardFixtures(seed, minListSize, stream = "device").create(DeviceInfoCardModel::class.java).let { generated ->
