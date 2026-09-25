@@ -87,6 +87,10 @@
         ":feature:kernelcheck:domain",
         ":feature:kernelcheck:presentation",
         ":feature:kernelcheck:ui",
+        ":feature:lsposed:data",
+        ":feature:lsposed:domain",
+        ":feature:lsposed:presentation",
+        ":feature:lsposed:ui",
         ":feature:memory:data",
         ":feature:memory:domain",
         ":feature:memory:presentation",
@@ -294,6 +298,41 @@
         ":core:ui",
         ":feature:kernelcheck:domain",
         ":feature:kernelcheck:presentation"
+      ]
+    },
+    ":feature:lsposed:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
+        ":capability:selinuxpolicy:data",
+        ":core:native",
+        ":feature:lsposed:domain"
+      ]
+    },
+    ":feature:lsposed:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:lsposed:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:lsposed:domain"
+      ]
+    },
+    ":feature:lsposed:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:lsposed:domain",
+        ":feature:lsposed:presentation"
       ]
     },
     ":feature:memory:data": {
