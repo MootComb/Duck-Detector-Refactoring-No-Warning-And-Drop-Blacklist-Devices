@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.nativeroot.data.probes
 
 import android.system.ErrnoException
 import android.system.Os
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
@@ -62,7 +63,7 @@ class ShellTmpMetadataProbe {
                 available = false,
                 checkedCount = CHECK_COUNT,
                 findings = emptyList(),
-                detail = "Could not stat $SHELL_TMP_PATH: ${error.javaClass.simpleName}.",
+                detail = "Could not stat $SHELL_TMP_PATH: ${PlatformFailureName.of(error)}.",
             )
         }
 

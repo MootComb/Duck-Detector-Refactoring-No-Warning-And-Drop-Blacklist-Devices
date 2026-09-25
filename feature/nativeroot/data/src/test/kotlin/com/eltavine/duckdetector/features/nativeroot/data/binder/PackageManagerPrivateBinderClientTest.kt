@@ -90,6 +90,7 @@ class PackageManagerPrivateBinderClientTest {
         val result = client.setMimeGroup("com.example", "group", listOf("a"))
 
         assertEquals(PackageManagerPrivateCallStatus.INVOCATION_FAILED, result.status)
+        assertEquals("setMimeGroup failed: IllegalStateException: boom", result.detail)
     }
 
     private class FakeTransport(

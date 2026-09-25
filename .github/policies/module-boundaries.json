@@ -542,6 +542,7 @@
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
         ":core:native",
+        ":core:platform",
         ":feature:nativeroot:domain"
       ]
     },

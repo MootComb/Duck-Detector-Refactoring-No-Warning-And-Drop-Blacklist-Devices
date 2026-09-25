@@ -27,6 +27,7 @@ dependencies {
     api(project(":capability:packageinventory:data"))
     api(project(":capability:packageinventory:domain"))
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
     api(project(":feature:nativeroot:domain"))
     implementation(libs.hiddenapibypass)
     implementation(libs.kotlinx.coroutines.android)

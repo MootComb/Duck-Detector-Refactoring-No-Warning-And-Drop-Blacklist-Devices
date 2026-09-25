@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.nativeroot.data.probes
 
 import android.content.Context
 import android.os.Build
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import com.eltavine.duckdetector.features.nativeroot.data.binder.PackageManagerPrivateBinderClient
 import com.eltavine.duckdetector.features.nativeroot.data.binder.PackageManagerPrivateCallResult
 
@@ -139,7 +140,7 @@ class ThroneHuntStimulus(
         }.getOrElse { throwable ->
             ThroneHuntStimulusOutcome(
                 applied = false,
-                detail = "${throwable.javaClass.simpleName}: ${throwable.message}",
+                detail = "${PlatformFailureName.of(throwable)}: ${throwable.message}",
             )
         }
     }

@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.nativeroot.data.binder
 
 import android.os.Build
 import android.os.IBinder
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Executable
@@ -206,10 +207,9 @@ class PackageManagerPrivateBinderClient internal constructor(
         operation: String,
         cause: Throwable,
     ): PackageManagerPrivateCallResult<T> {
-        val message = cause.message?.takeIf(String::isNotBlank)
         return unavailable(
             PackageManagerPrivateCallStatus.INVOCATION_FAILED,
-            "$operation failed: ${cause::class.java.simpleName}${message?.let { ": $it" }.orEmpty()}",
+            "$operation failed: ${PlatformFailureName.describe(cause)}",
         )
     }
 
