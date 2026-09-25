@@ -259,8 +259,8 @@ limitations under the License.
         errorLine1="        if (filesystemActive &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/selinux/data/repository/SelinuxRepository.kt"
-            line="697" column="33" />
+            file="src/main/java/com/eltavine/duckdetector/features/selinux/data/repository/SelinuxStatusProbes.kt"
+            line="365" column="29" />
     </issue>
 
     <issue id="ObsoleteSdkInt" message="Unnecessary; `SDK_INT` is always >= 29"

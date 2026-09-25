@@ -23,11 +23,9 @@ import org.junit.Test
 
 class SelinuxRepositoryDirtyPolicyMethodsTest {
 
-    private val repository = SelinuxRepository()
-
     @Test
     fun `dirty policy methods expose explicit rule rows`() {
-        val methods = repository.buildDirtyPolicyMethods(
+        val methods = buildDirtyPolicyMethods(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
                 dirtyPolicyProbeAttempted = true,
@@ -125,7 +123,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
             Triple(null, true, "Allowed"),
         )
         cases.forEach { (nativeAllowed, javaAllowed, expectedStatus) ->
-            val methods = repository.buildDirtyPolicyMethods(
+            val methods = buildDirtyPolicyMethods(
                 SelinuxContextValiditySnapshot(
                     dirtyPolicyAvailable = true,
                     dirtyPolicyProbeAttempted = true,
@@ -160,7 +158,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
 
     @Test
     fun `unstable dirty policy oracle downgrades all rule rows to unavailable`() {
-        val methods = repository.buildDirtyPolicyMethods(
+        val methods = buildDirtyPolicyMethods(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
                 dirtyPolicyProbeAttempted = true,
@@ -195,7 +193,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
 
     @Test
     fun `stable dirty policy rules remain visible even when controls fail`() {
-        val methods = repository.buildDirtyPolicyMethods(
+        val methods = buildDirtyPolicyMethods(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
                 dirtyPolicyProbeAttempted = true,
@@ -229,7 +227,7 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
 
     @Test
     fun `conflicting native and java dirty policy verdicts do not collapse to allowed`() {
-        val methods = repository.buildDirtyPolicyMethods(
+        val methods = buildDirtyPolicyMethods(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
                 dirtyPolicyProbeAttempted = true,

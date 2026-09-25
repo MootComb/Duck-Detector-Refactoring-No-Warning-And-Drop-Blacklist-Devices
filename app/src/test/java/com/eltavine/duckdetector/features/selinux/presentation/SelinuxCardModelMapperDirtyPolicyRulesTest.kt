@@ -19,7 +19,7 @@ package com.eltavine.duckdetector.features.selinux.presentation
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
-import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
+import com.eltavine.duckdetector.features.selinux.data.repository.buildDirtyPolicyMethods
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
@@ -252,7 +252,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
     }
 
     private fun fsckPolicyMethods(allowed: Boolean?, magiskAllowed: Boolean = false): List<SelinuxCheckResult> {
-        return SelinuxRepository().buildDirtyPolicyMethods(
+        return buildDirtyPolicyMethods(
             SelinuxContextValiditySnapshot(
                 dirtyPolicyAvailable = true,
                 dirtyPolicyProbeAttempted = true,
