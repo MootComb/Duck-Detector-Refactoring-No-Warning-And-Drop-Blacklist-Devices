@@ -51,10 +51,14 @@ jobs:
           set -euo pipefail
 
           python3 .github/scripts/test-jni-contracts.py
+          python3 .github/scripts/test-native-boundaries.py
           python3 .github/scripts/test-source-file-length.py
 
       - name: Verify JNI bindings
         run: python3 .github/scripts/check-jni-contracts.py
+
+      - name: Verify native unit boundaries
+        run: python3 .github/scripts/check-native-boundaries.py
 
       - name: Verify source file length
         run: python3 .github/scripts/check-source-file-length.py
