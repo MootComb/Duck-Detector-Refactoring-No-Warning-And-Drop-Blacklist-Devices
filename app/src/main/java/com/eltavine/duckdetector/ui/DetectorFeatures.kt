@@ -29,6 +29,7 @@ import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeat
 import com.eltavine.duckdetector.features.lsposed.ui.LSPosedDetectorFeature
 import com.eltavine.duckdetector.features.memory.data.repository.MemoryRepository
 import com.eltavine.duckdetector.features.memory.ui.MemoryDetectorFeature
+import com.eltavine.duckdetector.features.mount.data.repository.MountRepository
 import com.eltavine.duckdetector.features.mount.ui.MountDetectorFeature
 import com.eltavine.duckdetector.features.nativeroot.ui.NativeRootDetectorFeature
 import com.eltavine.duckdetector.features.playintegrityfix.data.repository.PlayIntegrityFixRepository
@@ -58,7 +59,7 @@ internal object DetectorFeatures {
     val kernelCheck: DetectorFeature = KernelCheckDetectorFeature { KernelCheckRepository() }
     val lsposed: DetectorFeature = LSPosedDetectorFeature
     val memory: DetectorFeature = MemoryDetectorFeature { MemoryRepository() }
-    val mount: DetectorFeature = MountDetectorFeature
+    val mount: DetectorFeature = MountDetectorFeature { context -> MountRepository(context) }
     val nativeRoot: DetectorFeature = NativeRootDetectorFeature
     val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature { PlayIntegrityFixRepository() }
     val selinux: DetectorFeature = SelinuxDetectorFeature

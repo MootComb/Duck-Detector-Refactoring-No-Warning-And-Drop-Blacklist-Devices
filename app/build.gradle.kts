@@ -56,6 +56,8 @@ dependencies {
     implementation(project(":feature:systemproperties:ui"))
     implementation(project(":feature:virtualization:data"))
     implementation(project(":feature:virtualization:ui"))
+    implementation(project(":feature:mount:data"))
+    implementation(project(":feature:mount:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

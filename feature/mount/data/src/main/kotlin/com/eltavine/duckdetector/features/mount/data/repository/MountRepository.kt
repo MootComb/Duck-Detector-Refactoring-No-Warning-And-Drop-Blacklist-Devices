@@ -1,0 +1,416 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.mount.data.repository
+
+import android.content.Context
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadResult
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
+import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
+import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
+import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbe
+import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbeResult
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextMountMarker
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeManager
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeResult
+import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeState
+import com.eltavine.duckdetector.features.mount.domain.MountFinding
+import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
+import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
+import com.eltavine.duckdetector.features.mount.domain.MountImpact
+import com.eltavine.duckdetector.features.mount.domain.MountReport
+import com.eltavine.duckdetector.features.mount.domain.MountScanner
+import com.eltavine.duckdetector.features.mount.domain.MountStage
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextExposure
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextNamespaceAssessment
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
+import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class MountRepository(
+    context: Context? = null,
+    private val nativeBridge: MountNativeBridge = MountNativeBridge(),
+    private val preloadResultProvider: () -> EarlyMountPreloadResult = EarlyMountPreloadStore::currentResult,
+    private val shellTmpConcealmentProbe: ShellTmpConcealmentProbe = ShellTmpConcealmentProbe(),
+    private val isolatedProbeManager: VirtualizationIsolatedProbeManager =
+        VirtualizationIsolatedProbeManager(context?.applicationContext),
+    private val zygoteNextProbeManager: ZygoteNextProbeManager =
+        ZygoteNextProbeManager(context?.applicationContext),
+) : MountScanner {
+    override suspend fun scan(): MountReport = withContext(Dispatchers.IO) {
+        runCatching { scanInternal() }
+            .getOrElse { throwable ->
+                MountReport.failed(throwable.message ?: "Mount scan failed.")
+            }
+    }
+
+    private suspend fun scanInternal(): MountReport {
+        val snapshotResult = runCatching(nativeBridge::collectSnapshot)
+        val procMountView = isolatedProbeManager.collectProcMountView()
+        val zygoteNext = zygoteNextProbeManager.collect().toMountReport()
+        val snapshot = snapshotResult.getOrElse { throwable ->
+            return buildFailedReport(
+                message = throwable.message ?: "Native mount snapshot failed.",
+                procMountView = procMountView,
+                zygoteNext = zygoteNext,
+            )
+        }
+        val preloadResult = sanitizePreloadResult(
+            result = preloadResultProvider(),
+            snapshot = snapshot,
+        )
+        val shellTmpResult = shellTmpConcealmentProbe.run()
+        if (!snapshot.available) {
+            return buildFailedReport(
+                message = snapshot.collection.explain("Native mount snapshot was unavailable"),
+                procMountView = procMountView,
+                zygoteNext = zygoteNext,
+            )
+        }
+
+        val findings = buildFindings(snapshot, preloadResult, shellTmpResult, zygoteNext)
+        val impacts = buildImpacts(snapshot, findings)
+        val methods = buildMethods(snapshot, preloadResult, shellTmpResult, zygoteNext)
+
+        return MountReport(
+            stage = MountStage.READY,
+            nativeAvailable = snapshot.available,
+            mountsReadable = snapshot.mountsReadable,
+            mountInfoReadable = snapshot.mountInfoReadable,
+            mapsReadable = snapshot.mapsReadable,
+            filesystemsReadable = snapshot.filesystemsReadable,
+            initNamespaceReadable = snapshot.initNamespaceReadable,
+            statxSupported = snapshot.statxSupported,
+            permissionTotal = snapshot.permissionTotal,
+            permissionDenied = snapshot.permissionDenied,
+            permissionAccessible = snapshot.permissionAccessible,
+            mountEntryCount = snapshot.mountEntryCount,
+            mountInfoEntryCount = snapshot.mountInfoEntryCount,
+            mapLineCount = snapshot.mapLineCount,
+            earlyPreloadAvailable = preloadResult.available,
+            earlyPreloadDetected = preloadResult.detected,
+            earlyPreloadContextValid = preloadResult.isContextValid,
+            earlyPreloadFindingCount = preloadResult.findingCount,
+            findings = findings,
+            impacts = impacts,
+            methods = methods,
+            zygoteNext = zygoteNext,
+        ).withProcMountView(procMountView)
+    }
+
+    private fun buildFailedReport(
+        message: String,
+        procMountView: VirtualizationRemoteSnapshot,
+        zygoteNext: MountZygoteNextReport,
+    ): MountReport {
+        return MountReport.failed(message).copy(
+            findings = buildZygoteNextFindings(zygoteNext),
+            methods = listOf(buildZygoteNextMethod(zygoteNext)),
+            zygoteNext = zygoteNext,
+        ).withProcMountView(procMountView)
+    }
+
+    private fun MountReport.withProcMountView(snapshot: VirtualizationRemoteSnapshot): MountReport {
+        val available = snapshot.profile == VirtualizationRemoteProfile.ISOLATED &&
+                snapshot.procMountViewAvailable
+        return copy(
+            procMountViewProbeAvailable = available,
+            procMountViewDistinctCount = snapshot.procMountViewCount,
+            procMountViewExpectedCount = snapshot.procMountViewExpected,
+            procMountViewPidCount = snapshot.procMountViewPidCount,
+            procMountViewDivergent = snapshot.procMountViewDivergent,
+            procMountViewTokenHit = snapshot.procMountViewTokenHit,
+            procMountViewTokenKind = snapshot.procMountViewTokenKind,
+            procMountViewTokenDetail = snapshot.procMountViewTokenDetail,
+            procMountViewDetail = snapshot.procMountViewDetail.ifBlank { snapshot.errorDetail },
+        )
+    }
+
+    private fun buildFindings(
+        snapshot: MountNativeSnapshot,
+        preloadResult: EarlyMountPreloadResult,
+        shellTmpResult: ShellTmpConcealmentProbeResult,
+        zygoteNext: MountZygoteNextReport,
+    ): List<MountFinding> {
+        val mapped = snapshot.findings.mapIndexed { index, finding ->
+            MountFinding(
+                id = "native_$index",
+                label = finding.label,
+                value = finding.value,
+                group = finding.group.toGroup(),
+                severity = finding.severity.toSeverity(),
+                detail = finding.detail.takeIf { it.isNotBlank() },
+                detailMonospace = shouldRenderMonospace(finding),
+            )
+        }
+
+        val informational = buildList {
+            if (!snapshot.initNamespaceReadable) {
+                add(
+                    MountFinding(
+                        id = "init_namespace_scope",
+                        label = "Init namespace access",
+                        value = "Restricted",
+                        group = MountFindingGroup.CONSISTENCY,
+                        severity = MountFindingSeverity.INFO,
+                        detail = "Reading /proc/1/ns/mnt is normally blocked for unprivileged apps, so namespace comparison coverage is partial.",
+                    ),
+                )
+            }
+            if (snapshot.permissionTotal > 0 && snapshot.permissionDenied > 0) {
+                add(
+                    MountFinding(
+                        id = "permission_coverage",
+                        label = "Path coverage",
+                        value = "${coveragePercent(snapshot)}%",
+                        group = MountFindingGroup.CONSISTENCY,
+                        severity = if (snapshot.permissionDenied * 2 >= snapshot.permissionTotal) {
+                            MountFindingSeverity.WARNING
+                        } else {
+                            MountFindingSeverity.INFO
+                        },
+                        detail = "Accessible checks: ${snapshot.permissionAccessible}/${snapshot.permissionTotal}. Permission-denied checks: ${snapshot.permissionDenied}.",
+                    ),
+                )
+            }
+            if (snapshot.overlayfsKernelSupport && mapped.none { it.label == "Overlayfs kernel support" }) {
+                add(
+                    MountFinding(
+                        id = "overlayfs_support",
+                        label = "Overlayfs kernel support",
+                        value = "Present",
+                        group = MountFindingGroup.FILESYSTEM,
+                        severity = MountFindingSeverity.INFO,
+                        detail = "Kernel overlayfs support exists. This only matters when combined with suspicious mount behavior.",
+                    ),
+                )
+            }
+        }
+
+        val runtimeAndInformational = mapped + informational + buildZygoteNextFindings(zygoteNext)
+        val withShellTmp = runtimeAndInformational + shellTmpResult.findings
+        val preloadFindings = buildPreloadFindings(preloadResult)
+        val merged = mergePreloadFindings(
+            baseFindings = withShellTmp,
+            preloadFindings = preloadFindings,
+        )
+
+        return merged.sortedWith(
+            compareBy<MountFinding> { severityPriority(it.severity) }
+                .thenBy { groupPriority(it.group) }
+                .thenBy { it.label },
+        )
+    }
+
+    private fun buildZygoteNextFindings(
+        zygoteNext: MountZygoteNextReport,
+    ): List<MountFinding> {
+        return buildList {
+            if (zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.PRIVATE_ANOMALY ||
+                zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.INCONSISTENT
+            ) {
+                add(
+                    MountFinding(
+                        id = "zygote_next_namespace_anomaly",
+                        label = "Zygote next namespace anomaly",
+                        value = zygoteNext.namespaceAssessment.name,
+                        group = MountFindingGroup.CONSISTENCY,
+                        severity = MountFindingSeverity.WARNING,
+                        detail = zygoteNext.namespaceAssessmentDetail,
+                    ),
+                )
+            }
+            if (zygoteNext.exposure == MountZygoteNextExposure.ROOT_MOUNT_EXPOSURE) {
+                add(
+                    MountFinding(
+                        id = "zygote_next_root_mount_exposure",
+                        label = "Root mount exposure",
+                        value = "ROOT_MOUNT_EXPOSURE",
+                        group = MountFindingGroup.RUNTIME,
+                        severity = MountFindingSeverity.DANGER,
+                        detail = zygoteNext.dangerousMarkers.joinToString("\n") { marker ->
+                            "${marker.labels.joinToString("+")}: ${marker.mountPoint} " +
+                                "[${marker.fileSystemType}; root=${marker.mountRoot}; source=${marker.source}]"
+                        },
+                        detailMonospace = true,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun buildImpacts(
+        snapshot: MountNativeSnapshot,
+        findings: List<MountFinding>,
+    ): List<MountImpact> {
+        return buildList {
+            if (findings.any { it.severity == MountFindingSeverity.DANGER }) {
+                add(
+                    MountImpact(
+                        text = "Mount-layer anomalies are strong signals because they describe how the current process actually sees filesystems, overlays, and root-managed bind mounts at runtime.",
+                        severity = MountFindingSeverity.DANGER,
+                    ),
+                )
+            }
+            if (snapshot.zygiskCacheDetected || snapshot.magiskMountDetected || snapshot.dataAdbDetected) {
+                add(
+                    MountImpact(
+                        text = "Magisk, Zygisk, KernelSU, or APatch-style mount artifacts can be used to present a cleaner filesystem view to selected apps while keeping root tooling active elsewhere.",
+                        severity = MountFindingSeverity.DANGER,
+                    ),
+                )
+            }
+            if (snapshot.systemRwDetected || snapshot.overlayMountDetected || snapshot.bindMountDetected || snapshot.dmVerityBypassDetected) {
+                add(
+                    MountImpact(
+                        text = "Writable or overlaid system partitions weaken stock verified-boot expectations and often indicate systemless or direct partition modification.",
+                        severity = MountFindingSeverity.DANGER,
+                    ),
+                )
+            }
+            if (snapshot.mountIdLoopholeDetected || snapshot.inconsistentMountDetected || snapshot.statxMntIdMismatch || snapshot.statxMountRootAnomaly) {
+                add(
+                    MountImpact(
+                        text = "Mount-info and statx contradictions are harder to explain away than a single suspicious path because different kernel-visible mount views disagree.",
+                        severity = MountFindingSeverity.DANGER,
+                    ),
+                )
+            }
+            if (findings.any { it.severity == MountFindingSeverity.WARNING } && none { it.severity == MountFindingSeverity.DANGER }) {
+                add(
+                    MountImpact(
+                        text = "The mount layer is not clean enough to ignore, but the current evidence is weaker than a direct root-managed overlay or writable-system hit.",
+                        severity = MountFindingSeverity.WARNING,
+                    ),
+                )
+            }
+            if (isEmpty()) {
+                add(
+                    MountImpact(
+                        text = "No suspicious mount, overlay, namespace, or root-managed filesystem artifact was visible from the current app context.",
+                        severity = MountFindingSeverity.SAFE,
+                    ),
+                )
+            }
+            add(
+                MountImpact(
+                    text = "Permission-restricted paths and namespace boundaries can hide part of the mount picture, so combine this card with SU, TEE, kernel, and package detectors.",
+                    severity = if (snapshot.permissionDenied > 0) MountFindingSeverity.INFO else MountFindingSeverity.INFO,
+                ),
+            )
+        }
+    }
+
+    private fun ZygoteNextProbeResult.toMountReport(): MountZygoteNextReport {
+        return MountZygoteNextReport(
+            state = when (state) {
+                ZygoteNextProbeState.UNSUPPORTED -> MountZygoteNextState.UNSUPPORTED
+                ZygoteNextProbeState.UNAVAILABLE -> MountZygoteNextState.UNAVAILABLE
+                ZygoteNextProbeState.READY -> MountZygoteNextState.READY
+            },
+            sdkInt = sdkInt,
+            mainNamespaceInode = mainProcess.mountNamespaceInode,
+            mainUid = mainProcess.uid,
+            mainPropagation = mainProcess.rootPropagation,
+            mainRootMountId = mainProcess.rootMountId,
+            mainMinimumMountId = mainProcess.minimumMountId,
+            mainMaximumMountId = mainProcess.maximumMountId,
+            mainMountCount = mainProcess.mountCount,
+            mainMountIdsByPoint = mainProcess.mountIdsByPoint,
+            mainMarkers = mainProcess.markers.map { it.toMountMarker() },
+            isolatedNamespaceInode = isolatedProcess.mountNamespaceInode,
+            isolatedParentPid = isolatedProcess.parentPid,
+            isolatedUid = isolatedProcess.uid,
+            isolatedPropagation = isolatedProcess.rootPropagation,
+            isolatedRootMountId = isolatedProcess.rootMountId,
+            isolatedMinimumMountId = isolatedProcess.minimumMountId,
+            isolatedMaximumMountId = isolatedProcess.maximumMountId,
+            isolatedMountCount = isolatedProcess.mountCount,
+            isolatedMountIdsByPoint = isolatedProcess.mountIdsByPoint,
+            isolatedMarkers = isolatedProcess.markers.map { it.toMountMarker() },
+            errorDetail = errorDetail,
+        )
+    }
+
+    private fun ZygoteNextMountMarker.toMountMarker(): MountZygoteNextMarker {
+        return MountZygoteNextMarker(
+            labels = labels,
+            mountPoint = mountPoint,
+            mountRoot = mountRoot,
+            fileSystemType = fileSystemType,
+            source = source,
+            rawLine = rawLine,
+        )
+    }
+
+    private fun shouldRenderMonospace(finding: MountNativeFinding): Boolean {
+        return finding.detail.contains("/proc/") ||
+                finding.detail.contains("/system/") ||
+                finding.detail.contains("/data/adb") ||
+                finding.detail.contains("0x")
+    }
+
+    private fun String.toGroup(): MountFindingGroup {
+        return when (uppercase()) {
+            "ARTIFACTS" -> MountFindingGroup.ARTIFACTS
+            "RUNTIME" -> MountFindingGroup.RUNTIME
+            "FILESYSTEM" -> MountFindingGroup.FILESYSTEM
+            "CONSISTENCY" -> MountFindingGroup.CONSISTENCY
+            else -> MountFindingGroup.CONSISTENCY
+        }
+    }
+
+    private fun String.toSeverity(): MountFindingSeverity {
+        return when (uppercase()) {
+            "DANGER" -> MountFindingSeverity.DANGER
+            "WARNING" -> MountFindingSeverity.WARNING
+            "SAFE" -> MountFindingSeverity.SAFE
+            else -> MountFindingSeverity.INFO
+        }
+    }
+
+    private fun severityPriority(severity: MountFindingSeverity): Int {
+        return when (severity) {
+            MountFindingSeverity.DANGER -> 0
+            MountFindingSeverity.WARNING -> 1
+            MountFindingSeverity.INFO -> 2
+            MountFindingSeverity.SAFE -> 3
+        }
+    }
+
+    private fun groupPriority(group: MountFindingGroup): Int {
+        return when (group) {
+            MountFindingGroup.ARTIFACTS -> 0
+            MountFindingGroup.RUNTIME -> 1
+            MountFindingGroup.FILESYSTEM -> 2
+            MountFindingGroup.CONSISTENCY -> 3
+        }
+    }
+
+    private fun coveragePercent(snapshot: MountNativeSnapshot): Int {
+        return if (snapshot.permissionTotal <= 0) {
+            100
+        } else {
+            ((snapshot.permissionAccessible.toDouble() / snapshot.permissionTotal.toDouble()) * 100.0).toInt()
+        }
+    }
+}
