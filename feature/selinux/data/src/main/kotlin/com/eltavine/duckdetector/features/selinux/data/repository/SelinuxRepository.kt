@@ -18,6 +18,8 @@ package com.eltavine.duckdetector.features.selinux.data.repository
 
 import android.content.Context
 import android.os.Build
+import com.eltavine.duckdetector.core.platform.PathState
+import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityCarrierManager
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxAuditRuntimeProbe
@@ -118,6 +120,9 @@ class SelinuxRepository(
     }
 
     private fun analyzeAuditIntegrity(): SelinuxAuditIntegrityAnalysis {
+        val residueObservable = AUDITPATCH_RESIDUE_RULES.none { rule ->
+            PathStat.of(rule.path) == PathState.NOT_OBSERVABLE
+        }
         val residueHits = findAuditResidueHits()
         val runtimeProbe = auditRuntimeProbe.inspect()
         val notes = mutableListOf<String>()
@@ -154,10 +159,11 @@ class SelinuxRepository(
             notes += "Readable AVC denials also referenced su-related actor strings such as comm/exe/path tokens. Treat this as supporting visibility evidence, not direct proof of a live root daemon."
         }
 
-        if (residueHits.isNotEmpty()) {
-            notes += "Readable auditpatch residue suggests logd audit output may be rewritten before apps inspect it."
-        } else {
-            notes += "No readable auditpatch residue surfaced under common module locations."
+        notes += when {
+            residueHits.isNotEmpty() ->
+                "Readable auditpatch residue suggests logd audit output may be rewritten before apps inspect it."
+            residueObservable -> "No auditpatch residue exists under common module locations."
+            else -> "Common auditpatch module locations could not be checked from this app."
         }
         notes += "Absence of residue is not proof of absence because ordinary apps often cannot traverse /data/adb."
 
@@ -172,6 +178,7 @@ class SelinuxRepository(
         return SelinuxAuditIntegrityAnalysis(
             state = state,
             residueHits = residueHits,
+            residueObservable = residueObservable,
             runtimeHits = runtimeProbe.hits,
             sideChannelHits = runtimeProbe.sideChannelHits,
             suspiciousActorHits = runtimeProbe.suspiciousActorHits,
@@ -185,7 +192,7 @@ class SelinuxRepository(
         return AUDITPATCH_RESIDUE_RULES.mapNotNull { rule ->
             val target = File(rule.path)
             runCatching {
-                if (!target.exists()) {
+                if (PathStat.of(rule.path) != PathState.PRESENT) {
                     return@mapNotNull null
                 }
                 SelinuxAuditEvidence(

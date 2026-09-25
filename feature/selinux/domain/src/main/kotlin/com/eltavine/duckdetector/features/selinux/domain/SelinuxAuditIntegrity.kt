@@ -34,6 +34,8 @@ data class SelinuxAuditEvidence(
 data class SelinuxAuditIntegrityAnalysis(
     val state: SelinuxAuditIntegrityState,
     val residueHits: List<SelinuxAuditEvidence>,
+    /** False when a residue location could not be stat-ed, so finding none does not show absence. */
+    val residueObservable: Boolean = true,
     val runtimeHits: List<SelinuxAuditEvidence>,
     val sideChannelHits: List<SelinuxAuditEvidence>,
     val suspiciousActorHits: List<SelinuxAuditEvidence> = emptyList(),

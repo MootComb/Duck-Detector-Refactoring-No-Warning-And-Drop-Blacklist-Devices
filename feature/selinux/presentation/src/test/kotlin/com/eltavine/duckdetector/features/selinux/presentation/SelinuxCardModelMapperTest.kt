@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.selinux.presentation
 
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditEvidence
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityAnalysis
@@ -79,6 +80,39 @@ class SelinuxCardModelMapperTest {
         assertTrue(model.auditRows.any { it.label == "AVC side-channel" && it.value == "1 hit(s)" })
         assertTrue(model.auditRows.any { it.label == "su-related AVC" && it.value == "1 hit(s)" })
         assertTrue(model.auditNotes.any { it.text.contains("not direct root-process proof") })
+    }
+
+    @Test
+    fun `residue locations this app cannot stat are not shown as clear`() {
+        fun residueRow(observable: Boolean) = mapper.map(
+            SelinuxReport(
+                stage = SelinuxStage.READY,
+                mode = SelinuxMode.ENFORCING,
+                resolvedStatusLabel = "Enforcing",
+                filesystemMounted = true,
+                paradoxDetected = false,
+                methods = emptyList(),
+                processContext = "u:r:untrusted_app:s0:c1,c2",
+                contextType = "untrusted_app",
+                policyAnalysis = null,
+                auditIntegrity = SelinuxAuditIntegrityAnalysis(
+                    state = SelinuxAuditIntegrityState.INCONCLUSIVE,
+                    residueHits = emptyList(),
+                    residueObservable = observable,
+                    runtimeHits = emptyList(),
+                    sideChannelHits = emptyList(),
+                    logcatChecked = false,
+                    notes = emptyList(),
+                ),
+                androidVersion = "16",
+                apiLevel = 36,
+            ),
+        ).auditRows.first { it.label == "Residue paths" }
+
+        assertEquals("Not observable", residueRow(observable = false).value)
+        assertEquals(DetectionSeverity.INFO, residueRow(observable = false).status.severity)
+        assertEquals("None", residueRow(observable = true).value)
+        assertEquals(DetectionSeverity.ALL_CLEAR, residueRow(observable = true).status.severity)
     }
 
     @Test

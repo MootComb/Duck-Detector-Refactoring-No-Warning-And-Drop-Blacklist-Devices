@@ -109,16 +109,21 @@ internal fun buildAuditRows(analysis: SelinuxAuditIntegrityAnalysis?): List<Seli
         ),
         SelinuxDetailRowModel(
             label = "Residue paths",
-            value = if (analysis.residueHits.isNotEmpty()) "${analysis.residueHits.size} hit(s)" else "None",
+            value = when {
+                analysis.residueHits.isNotEmpty() -> "${analysis.residueHits.size} hit(s)"
+                analysis.residueObservable -> "None"
+                else -> "Not observable"
+            },
             status = when {
                 analysis.residueHits.any { it.strongSignal } -> DetectorStatus.warning()
                 analysis.residueHits.isNotEmpty() -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
+                analysis.residueObservable -> DetectorStatus.allClear()
+                else -> DetectorStatus.info(InfoKind.SUPPORT)
             },
-            detail = if (analysis.residueHits.isNotEmpty()) {
-                "Readable module residue matched common ZN-AuditPatch locations."
-            } else {
-                "No readable auditpatch residue surfaced under common module paths."
+            detail = when {
+                analysis.residueHits.isNotEmpty() -> "Readable module residue matched common ZN-AuditPatch locations."
+                analysis.residueObservable -> "No auditpatch residue exists under common module paths."
+                else -> "Common module paths sit under /data/adb, which this app cannot search, so residue there is not visible."
             },
         ),
     )
