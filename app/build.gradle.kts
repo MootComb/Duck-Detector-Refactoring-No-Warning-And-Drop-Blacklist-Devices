@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":capability:packageinventory:data"))
     implementation(project(":core:detector"))
     implementation(project(":core:evidence"))
     implementation(project(":core:native"))

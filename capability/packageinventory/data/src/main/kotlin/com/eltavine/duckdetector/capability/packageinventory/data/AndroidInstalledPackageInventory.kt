@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.packagevisibility
+package com.eltavine.duckdetector.capability.packageinventory.data
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import com.eltavine.duckdetector.capability.packageinventory.domain.DefaultInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationQueryOptions
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationRecord
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationsQueryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationsSource
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailure
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailureKind
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironment
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironmentProvider
 
 private const val QUERY_ALL_PACKAGES_PERMISSION = "android.permission.QUERY_ALL_PACKAGES"
 
 /** Android adapter; all PackageManager API-level branching is owned here. */
-class AndroidInstalledApplicationsSource(
+public class AndroidInstalledApplicationsSource(
     context: Context,
     private val options: InstalledApplicationQueryOptions = InstalledApplicationQueryOptions(),
 ) : InstalledApplicationsSource {
@@ -84,7 +95,7 @@ class AndroidInstalledApplicationsSource(
     }
 }
 
-class AndroidPackageVisibilityEnvironmentProvider(
+public class AndroidPackageVisibilityEnvironmentProvider(
     context: Context,
 ) : PackageVisibilityEnvironmentProvider {
 
@@ -122,7 +133,7 @@ class AndroidPackageVisibilityEnvironmentProvider(
     }
 }
 
-class AndroidInstalledPackageInventoryReader(
+public class AndroidInstalledPackageInventoryReader(
     context: Context,
     queryOptions: InstalledApplicationQueryOptions = InstalledApplicationQueryOptions(),
     applicationsSource: InstalledApplicationsSource =

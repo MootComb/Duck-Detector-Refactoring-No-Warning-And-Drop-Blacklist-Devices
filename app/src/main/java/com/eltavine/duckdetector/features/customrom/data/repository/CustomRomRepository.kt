@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.customrom.data.repository
 import android.content.Context
 import android.os.Build
 import android.os.IBinder
-import com.eltavine.duckdetector.core.packagevisibility.AndroidInstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.features.customrom.data.native.CustomRomNativeBridge
 import com.eltavine.duckdetector.features.customrom.data.rules.CustomRomCatalog
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomFinding

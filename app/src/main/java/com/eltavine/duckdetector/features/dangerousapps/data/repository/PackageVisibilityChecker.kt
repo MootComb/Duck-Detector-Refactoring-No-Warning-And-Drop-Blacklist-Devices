@@ -17,11 +17,11 @@
 package com.eltavine.duckdetector.features.dangerousapps.data.repository
 
 import android.content.Context
-import com.eltavine.duckdetector.core.packagevisibility.AndroidInstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibilityChecker
+import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousPackageVisibility
 
 data class DangerousPackageInventory(

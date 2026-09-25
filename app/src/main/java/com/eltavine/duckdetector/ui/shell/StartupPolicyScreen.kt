@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens

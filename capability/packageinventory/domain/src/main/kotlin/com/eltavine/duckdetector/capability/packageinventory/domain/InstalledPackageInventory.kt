@@ -14,49 +14,49 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.packagevisibility
+package com.eltavine.duckdetector.capability.packageinventory.domain
 
 /** Platform-neutral projection of the ApplicationInfo fields used by package-based probes. */
-data class InstalledApplicationRecord(
+public data class InstalledApplicationRecord(
     val packageName: String,
     val label: String,
     val metadataKeys: Set<String>,
 )
 
-data class InstalledApplicationQueryOptions(
+public data class InstalledApplicationQueryOptions(
     val includeMetadata: Boolean = false,
     val resolveLabelsForMetadataKeys: Set<String> = emptySet(),
 )
 
-enum class PackageInventoryFailureKind {
+public enum class PackageInventoryFailureKind {
     PLATFORM_QUERY_FAILED,
     VISIBILITY_ENVIRONMENT_FAILED,
 }
 
-data class PackageInventoryFailure(
+public data class PackageInventoryFailure(
     val kind: PackageInventoryFailureKind,
     val detail: String,
 )
 
-sealed interface InstalledApplicationsQueryResult {
-    data class Available(
+public sealed interface InstalledApplicationsQueryResult {
+    public data class Available(
         val applications: List<InstalledApplicationRecord>,
     ) : InstalledApplicationsQueryResult
 
-    data class Unavailable(
+    public data class Unavailable(
         val failure: PackageInventoryFailure,
     ) : InstalledApplicationsQueryResult
 }
 
-fun interface InstalledApplicationsSource {
-    fun query(): InstalledApplicationsQueryResult
+public fun interface InstalledApplicationsSource {
+    public fun query(): InstalledApplicationsQueryResult
 }
 
-fun interface PackageVisibilityEnvironmentProvider {
-    fun read(): PackageVisibilityEnvironment
+public fun interface PackageVisibilityEnvironmentProvider {
+    public fun read(): PackageVisibilityEnvironment
 }
 
-data class InstalledPackageInventory(
+public data class InstalledPackageInventory(
     val applications: List<InstalledApplicationRecord>,
     val visibility: InstalledPackageVisibility,
     val suspiciouslyLowInventory: Boolean,
@@ -66,21 +66,21 @@ data class InstalledPackageInventory(
         get() = packageNames.size
 }
 
-sealed interface InstalledPackageInventoryResult {
-    data class Available(
+public sealed interface InstalledPackageInventoryResult {
+    public data class Available(
         val inventory: InstalledPackageInventory,
     ) : InstalledPackageInventoryResult
 
-    data class Unavailable(
+    public data class Unavailable(
         val failure: PackageInventoryFailure,
     ) : InstalledPackageInventoryResult
 }
 
-fun interface InstalledPackageInventoryReader {
-    fun read(): InstalledPackageInventoryResult
+public fun interface InstalledPackageInventoryReader {
+    public fun read(): InstalledPackageInventoryResult
 }
 
-class DefaultInstalledPackageInventoryReader(
+public class DefaultInstalledPackageInventoryReader(
     private val callerPackageName: String,
     private val applicationsSource: InstalledApplicationsSource,
     private val environmentProvider: PackageVisibilityEnvironmentProvider,

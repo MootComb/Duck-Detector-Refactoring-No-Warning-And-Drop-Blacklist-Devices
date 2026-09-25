@@ -63,6 +63,8 @@
     ":app": {
       "kind": "android-application",
       "allowed_project_dependencies": [
+        ":capability:packageinventory:data",
+        ":capability:packageinventory:domain",
         ":core:detector",
         ":core:evidence",
         ":core:native",
@@ -90,6 +92,17 @@
         ":feature:zygisk:presentation",
         ":feature:zygisk:ui"
       ]
+    },
+    ":capability:packageinventory:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:packageinventory:domain",
+        ":core:native"
+      ]
+    },
+    ":capability:packageinventory:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
     },
     ":core:detector": {
       "kind": "android-library",

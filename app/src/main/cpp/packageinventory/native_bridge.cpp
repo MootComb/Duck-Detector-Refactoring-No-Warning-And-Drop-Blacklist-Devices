@@ -51,7 +51,7 @@ namespace {
 }  // namespace
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_eltavine_duckdetector_features_dangerousapps_data_native_DangerousAppsNativeBridge_nativeStatPackages(
+Java_com_eltavine_duckdetector_capability_packageinventory_data_PackageDataDirectoryProbe_nativeStatPackages(
         JNIEnv *env,
         jobject,
         jobjectArray package_names) {

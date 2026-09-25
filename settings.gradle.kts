@@ -42,6 +42,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Duck Detector"
 include(":app")
+include(":capability:packageinventory:data")
+include(":capability:packageinventory:domain")
 include(":core:detector")
 include(":core:evidence")
 include(":core:native")

@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.dangerousapps.data.native
+package com.eltavine.duckdetector.capability.packageinventory.data
 
 import com.eltavine.duckdetector.core.native.DuckDetectorNativeLibrary
 
-class DangerousAppsNativeBridge {
+/**
+ * Checks for installed packages by stat-ing their data directories through raw syscalls.
+ *
+ * An error other than ENOENT counts as present, so the answer does not depend on
+ * PackageManager's package visibility filtering.
+ */
+public class PackageDataDirectoryProbe {
 
-    fun statPackages(packageNames: List<String>): Set<String> {
+    public fun statPackages(packageNames: List<String>): Set<String> {
         if (packageNames.isEmpty()) {
             return emptySet()
         }

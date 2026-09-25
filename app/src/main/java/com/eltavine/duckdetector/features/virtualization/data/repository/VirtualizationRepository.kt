@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.virtualization.data.repository
 
 import android.content.Context
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadResult
 import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadSignal
 import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadStore

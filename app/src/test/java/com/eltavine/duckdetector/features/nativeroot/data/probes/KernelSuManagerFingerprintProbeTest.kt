@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.nativeroot.data.probes
 
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

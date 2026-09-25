@@ -26,9 +26,9 @@ import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.text.TextUtils
-import com.eltavine.duckdetector.core.packagevisibility.AndroidInstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryReader
-import com.eltavine.duckdetector.features.dangerousapps.data.native.DangerousAppsNativeBridge
+import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.CreatePackageContextZipProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.OpenApkFdPackageProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneDebugfsContextProbe
@@ -51,7 +51,7 @@ class DangerousAppsRepository(
     private val context: Context,
     private val packageInventoryReader: InstalledPackageInventoryReader =
         AndroidInstalledPackageInventoryReader(context.applicationContext),
-    private val nativeBridge: DangerousAppsNativeBridge = DangerousAppsNativeBridge(),
+    private val nativeBridge: PackageDataDirectoryProbe = PackageDataDirectoryProbe(),
     private val createPackageContextZipProbe: CreatePackageContextZipProbe =
         CreatePackageContextZipProbe(context),
     private val openApkFdPackageProbe: OpenApkFdPackageProbe = OpenApkFdPackageProbe(),

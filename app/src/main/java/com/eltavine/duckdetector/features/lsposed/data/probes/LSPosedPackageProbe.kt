@@ -17,11 +17,11 @@
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
 import android.content.Context
-import com.eltavine.duckdetector.core.packagevisibility.AndroidInstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledApplicationQueryOptions
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryReader
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationQueryOptions
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup

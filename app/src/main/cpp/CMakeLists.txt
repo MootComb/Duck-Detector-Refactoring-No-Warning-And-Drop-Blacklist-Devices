@@ -27,8 +27,8 @@ set(TEE_DER_SOURCES
     tee/der/der_probe.cpp
 )
 
-set(DANGEROUS_APPS_SOURCES
-    dangerousapps/native_bridge.cpp
+set(PACKAGE_INVENTORY_SOURCES
+    packageinventory/native_bridge.cpp
 )
 
 set(SU_SOURCES
@@ -175,7 +175,7 @@ add_library(duckdetector SHARED
     ${TEE_KEYSTORE_SOURCES}
     ${TEE_TRICKYSTORE_SOURCES}
     ${TEE_DER_SOURCES}
-    ${DANGEROUS_APPS_SOURCES}
+    ${PACKAGE_INVENTORY_SOURCES}
     ${SU_SOURCES}
     ${SELINUX_SOURCES}
     ${CUSTOM_ROM_SOURCES}

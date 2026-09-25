@@ -56,9 +56,9 @@ import com.eltavine.duckdetector.core.notifications.ScanProgressNotificationSnap
 import com.eltavine.duckdetector.core.notifications.ScanProgressNotifier
 import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationConsentStore
 import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibilityChecker
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewPrefs
 import com.eltavine.duckdetector.core.packagevisibility.preferences.PackageVisibilityReviewStore
 import com.eltavine.duckdetector.core.startup.legal.AgreementAcceptancePrefs

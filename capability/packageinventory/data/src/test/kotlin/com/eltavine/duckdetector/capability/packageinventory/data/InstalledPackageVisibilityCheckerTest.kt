@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.packagevisibility
+package com.eltavine.duckdetector.capability.packageinventory.data
 
 import android.os.Build
+import com.eltavine.duckdetector.capability.packageinventory.domain.DefaultInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationRecord
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationsQueryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationsSource
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailure
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailureKind
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironment
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageVisibilityEnvironmentProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -16,12 +16,12 @@
 
 package com.eltavine.duckdetector.features.lsposed.data.probes
 
-import com.eltavine.duckdetector.core.packagevisibility.InstalledApplicationRecord
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventory
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
-import com.eltavine.duckdetector.core.packagevisibility.PackageInventoryFailure
-import com.eltavine.duckdetector.core.packagevisibility.PackageInventoryFailureKind
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledApplicationRecord
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventory
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailure
+import com.eltavine.duckdetector.capability.packageinventory.domain.PackageInventoryFailureKind
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
 import org.junit.Assert.assertEquals
 import org.junit.Test

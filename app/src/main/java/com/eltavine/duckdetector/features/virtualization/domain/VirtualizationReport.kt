@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.virtualization.domain
 
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 
 enum class VirtualizationStage {
     LOADING,
