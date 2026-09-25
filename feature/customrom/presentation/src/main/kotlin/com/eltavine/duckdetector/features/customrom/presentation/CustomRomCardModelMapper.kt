@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.customrom.presentation
 
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
+import com.eltavine.duckdetector.features.customrom.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
 
 class CustomRomCardModelMapper {

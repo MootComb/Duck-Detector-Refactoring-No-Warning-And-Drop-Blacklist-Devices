@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomPackageVisibility
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomStage
+import com.eltavine.duckdetector.features.customrom.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFactModel
 
 internal fun buildSubtitle(report: CustomRomReport): String {
@@ -192,11 +193,4 @@ internal fun buildVerdictBody(report: CustomRomReport): String {
         report.hasReducedCoverage() -> "Custom ROM scan has reduced coverage"
         else -> "No custom ROM signatures"
     }
-}
-
-internal fun CustomRomReport.hasReducedCoverage(): Boolean {
-    return !nativeAvailable ||
-            !propertyAreaAvailable ||
-            !symbolScanAvailable ||
-            packageVisibility != CustomRomPackageVisibility.FULL
 }

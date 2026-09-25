@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomPackageVisibility
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomStage
+import com.eltavine.duckdetector.features.customrom.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomImpactItemModel
 
 internal fun buildImpactItems(report: CustomRomReport): List<CustomRomImpactItemModel> {
@@ -103,18 +104,6 @@ internal fun buildImpactItems(report: CustomRomReport): List<CustomRomImpactItem
                     ),
                 )
             }
-        }
-    }
-}
-
-internal fun CustomRomReport.toDetectorStatus(): DetectorStatus {
-    return when (stage) {
-        CustomRomStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-        CustomRomStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-        CustomRomStage.READY -> when {
-            hasIndicators -> DetectorStatus.warning()
-            hasReducedCoverage() -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.allClear()
         }
     }
 }
