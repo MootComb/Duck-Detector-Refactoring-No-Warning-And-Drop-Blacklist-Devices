@@ -4,6 +4,7 @@
     "composition_root": ":app",
     "dependency_direction": [
       ":app",
+      ":sdk",
       ":feature",
       ":capability",
       ":core"
@@ -133,7 +134,8 @@
       "allowed_project_dependencies": [
         ":capability:*:*",
         ":core:*",
-        ":feature:*:*"
+        ":feature:*:*",
+        ":sdk:*"
       ]
     },
     ":core:detector": {
@@ -186,6 +188,16 @@
         ":core:evidence",
         ":core:report",
         ":core:scan"
+      ]
+    },
+    ":sdk:runtime": {
+      "kind": "android-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":capability:*:data",
+        ":capability:*:domain",
+        ":core:*",
+        ":feature:*:detector"
       ]
     }
   }

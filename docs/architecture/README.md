@@ -5,7 +5,7 @@ Duck Detector 使用 ports-and-adapters 边界。Android framework、Binder、Ke
 ## Module dependency direction
 
 ```text
-:app -> :feature:<unit>:<layer> -> :capability:<unit>:<layer> -> :core:<unit>
+:app -> :sdk:<unit> -> :feature:<unit>:<layer> -> :capability:<unit>:<layer> -> :core:<unit>
 
 inside one feature unit:     data -> domain
                              presentation -> domain
@@ -38,6 +38,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:feature:<unit>:ui` | Compose card, view model, the `DetectorFeature` implementation and dialogs | Probes, JNI, other features' models |
 | `:feature:dashboard:*` | Card ordering, overview, findings and export rendering over `DetectorSession` lists | Any specific detector |
 | `:feature:settings:*`, `:feature:update:*`, `:feature:deviceinfo:*` | Supporting features with the same layering | Detector internals |
+| `:sdk:runtime` | The headless composition root: `DetectorCatalog`, the one list of detectors in scan-start order, and `DuckDetector`, which runs them without any UI | Compose, UI modules, per-detector branching |
 | `:app` | Composition root: detector catalog, activities, zygote preload entry, notifications, startup policy, package visibility, adapter wiring | Detection rules, report semantics, per-detector branching |
 
 ### Capabilities and their consumers
