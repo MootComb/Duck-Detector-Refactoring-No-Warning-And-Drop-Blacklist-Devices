@@ -790,6 +790,7 @@
         ":capability:helperprocess:data",
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
+        ":core:platform",
         ":feature:virtualization:domain"
       ]
     },

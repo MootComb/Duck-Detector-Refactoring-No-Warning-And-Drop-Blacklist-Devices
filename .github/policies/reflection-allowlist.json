@@ -238,13 +238,6 @@
       "reason": "Calls the hidden Keystore2 supplementary attestation info method through HiddenApiBypass."
     },
     {
-      "path": "feature/virtualization/data/src/main/kotlin/com/eltavine/duckdetector/features/virtualization/data/probes/VirtualizationPropertyProbe.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "feature/virtualization/data/src/main/kotlin/com/eltavine/duckdetector/features/virtualization/data/probes/VirtualizationServiceProbe.kt",
       "uses": [
         "operations"

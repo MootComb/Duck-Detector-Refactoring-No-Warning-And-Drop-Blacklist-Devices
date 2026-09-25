@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.virtualization.data.probes
 
 import android.os.Build
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalGroup
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalSeverity
@@ -121,10 +122,6 @@ open class VirtualizationPropertyProbe {
     }
 
     protected open fun readProperty(name: String): String {
-        return runCatching {
-            val clazz = Class.forName("android.os.SystemProperties")
-            val method = clazz.getMethod("get", String::class.java)
-            (method.invoke(null, name) as? String).orEmpty().trim()
-        }.getOrDefault("")
+        return HiddenSystemProperties.read(name).getOrNull().orEmpty().trim()
     }
 }
