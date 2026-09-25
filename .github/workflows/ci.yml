@@ -52,6 +52,7 @@ jobs:
 
           python3 .github/scripts/test-jni-contracts.py
           python3 .github/scripts/test-native-boundaries.py
+          python3 .github/scripts/test-reflection-boundaries.py
           python3 .github/scripts/test-source-file-length.py
 
       - name: Verify JNI bindings
@@ -59,6 +60,9 @@ jobs:
 
       - name: Verify native unit boundaries
         run: python3 .github/scripts/check-native-boundaries.py
+
+      - name: Verify reflection boundaries
+        run: python3 .github/scripts/check-reflection-boundaries.py
 
       - name: Verify source file length
         run: python3 .github/scripts/check-source-file-length.py

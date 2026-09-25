@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "scan_roots": [
+    "app",
+    "core",
+    "capability",
+    "feature",
+    "build-logic"
+  ],
+  "allowed": [
+    {
+      "path": "app/src/test/java/com/eltavine/duckdetector/integration/dashboard/CardFixtures.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Test fixture generator that fills every constructor of every card model, so the export golden test covers every field without a hand-written builder per model."
+    },
+    {
+      "path": "build-logic/src/main/kotlin/com/eltavine/duckdetector/buildlogic/GenerateGithubContributorsAssetTask.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "Build tooling on the host JVM that names a failure in a Gradle warning; it is never shipped or minified."
+    },
+    {
+      "path": "build-logic/src/main/kotlin/com/eltavine/duckdetector/buildlogic/GenerateTeeCrlAssetTask.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "Build tooling on the host JVM that names a failure in a Gradle warning; it is never shipped or minified."
+    },
+    {
+      "path": "capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/BootConsistencyProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "capability/helperprocess/data/src/main/kotlin/com/eltavine/duckdetector/capability/helperprocess/data/DexPathCollector.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads the hidden pathList and dexElements fields of the app class loader to list the dex files actually loaded."
+    },
+    {
+      "path": "capability/selinuxpolicy/data/src/main/kotlin/com/eltavine/duckdetector/capability/selinuxpolicy/data/SelinuxContextValidityPreload.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Calls the hidden android.os.SELinux context methods, which are absent from the SDK."
+    },
+    {
+      "path": "capability/selinuxpolicy/data/src/test/kotlin/com/eltavine/duckdetector/capability/selinuxpolicy/data/SelinuxContextValidityPreloadTest.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Calls a private preload helper under test."
+    },
+    {
+      "path": "capability/systemproperties/data/src/main/kotlin/com/eltavine/duckdetector/capability/systemproperties/data/SystemPropertyReadUtils.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "core/platform/src/main/kotlin/com/eltavine/duckdetector/core/platform/HiddenPlatformFailure.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Single owner of hidden platform failure identity: ServiceSpecificException, ParcelableException and DeadSystemRuntimeException are absent from the SDK, so only their full class name identifies them, and the public errorCode of a ServiceSpecificException can only be read reflectively."
+    },
+    {
+      "path": "feature/bootloader/data/src/test/kotlin/com/eltavine/duckdetector/features/bootloader/data/widevine/WidevineCredentialProbeTest.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Privacy guard asserting that the snapshot type declares no field that could retain the device unique ID or key request data."
+    },
+    {
+      "path": "feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomPropertyReader.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Queries the hidden android.os.ServiceManager and reads the hidden framework fields named by custom ROM signatures; the presence of those fields is the evidence."
+    },
+    {
+      "path": "feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Queries android.os.ServiceManager, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBinderProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Obtains the activity service binder from the hidden android.os.ServiceManager to probe the LSPosed bridge transaction."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBridgeFieldProbe.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Loads XposedBridge when a framework injected it and reads its fields; the classes of the values found are the evidence."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedClassLoaderProbe.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "The implementation classes of the class loaders in the parent chain are the evidence of an injected loader."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedClassProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Resolving the Xposed framework classes through a class loader is the detection."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedHookCallbackProbe.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "The class of an installed hook callback is the evidence."
+    },
+    {
+      "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedStackProbe.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "Skips its own stack frames by comparing frame class names with its own class name, which minification renames consistently in both."
+    },
+    {
+      "path": "feature/mount/data/src/test/kotlin/com/eltavine/duckdetector/features/mount/data/zygotenext/ZygoteNextProbeManagerTest.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Creates an inert IBinder on the JVM, where the framework Binder cannot be constructed."
+    },
+    {
+      "path": "feature/nativeroot/data/src/main/kotlin/com/eltavine/duckdetector/features/nativeroot/data/binder/PackageManagerPrivateBinderClient.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Calls hidden PackageManager binder methods through HiddenApiBypass; the service class and method signatures reported when a method is missing distinguish a vendor signature change from reflection filtering."
+    },
+    {
+      "path": "feature/nativeroot/data/src/test/kotlin/com/eltavine/duckdetector/features/nativeroot/data/binder/PackageManagerPrivateBinderClientTest.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Exercises the reflective method gateway against fake service methods."
+    },
+    {
+      "path": "feature/playintegrityfix/data/src/main/kotlin/com/eltavine/duckdetector/features/playintegrityfix/data/utils/PlayIntegrityPropertyReadUtils.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeyMintCapabilityProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Calls a hidden Keystore2 grant method to probe KeyMint capabilities."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeyStoreGrantJavaApi.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reaches the KeyStoreManager grant methods that are hidden below Android 16 through HiddenApiBypass."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2BinderProxies.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Wraps the hidden Keystore2 service and security level binders through their hidden proxy constructors."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2GrantReflection.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Hidden Keystore2 grant helpers: hidden class loading through HiddenApiBypass and hidden response field reads."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2KeyParameterReflection.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Builds hidden KeyParameter arrays and calls the hidden generateKey signature; the security level class named when the signature is missing is evidence of which implementation answered."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2MetadataAccess.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads hidden KeyMetadata accessors and KeyParameter tag constants."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateBinderClient.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Calls hidden Keystore2 service methods reflectively; the binder proxy class named when a hidden method is missing is evidence of which keystore implementation answered."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateGrantClient.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Issues hidden Keystore2 grant calls and reads hidden response fields."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2Reflection.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Shared hidden Keystore2 helpers: hidden class loading through HiddenApiBypass, field access and parcel argument construction."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2ReplyCapture.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Captures hidden Keystore2 replies through java.lang.reflect.Method handles."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeystoreBinderCaptureHook.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Installs a dynamic proxy on the hidden Keystore2 binder to capture raw transactions, which needs HiddenApiBypass, hidden fields and proxies."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/OperationErrorPathProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/RawRsaOaepMgf1Checks.kt",
+      "uses": [
+        "class_identity"
+      ],
+      "reason": "Reports the runtime classes of the Keystore2 service, security level and operation binders, which identify a replaced keystore implementation."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/SupplementaryAttestationInfoProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Calls the hidden Keystore2 supplementary attestation info method through HiddenApiBypass."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/VendorApiLevel.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/virtualization/data/src/main/kotlin/com/eltavine/duckdetector/features/virtualization/data/probes/VirtualizationPropertyProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
+    },
+    {
+      "path": "feature/virtualization/data/src/main/kotlin/com/eltavine/duckdetector/features/virtualization/data/probes/VirtualizationServiceProbe.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Queries android.os.ServiceManager, which is hidden from the SDK, through reflection."
+    }
+  ]
+}
