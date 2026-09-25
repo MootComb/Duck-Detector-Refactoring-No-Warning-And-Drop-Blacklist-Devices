@@ -18,7 +18,6 @@ package com.eltavine.duckdetector.ui
 
 import android.Manifest
 import android.os.Build
-import android.os.SystemClock
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -78,7 +77,6 @@ import com.eltavine.duckdetector.features.customrom.presentation.CustomRomUiStat
 import com.eltavine.duckdetector.features.customrom.presentation.CustomRomViewModel
 import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorCardEntry
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
@@ -139,6 +137,7 @@ import com.eltavine.duckdetector.ui.shell.FloatingAppTabSwitcher
 import com.eltavine.duckdetector.ui.shell.StartupGateState
 import com.eltavine.duckdetector.ui.shell.StartupPackageVisibilityState
 import com.eltavine.duckdetector.ui.shell.StartupPolicyScreen
+import com.eltavine.duckdetector.ui.scan.DetectorScanViewModel
 import com.eltavine.duckdetector.ui.shell.resolveStartupGateState
 import com.eltavine.duckdetector.ui.shell.shouldShowDetectorResultNotice
 import com.eltavine.duckdetector.ui.shell.shouldCreateDetectorViewModels
@@ -493,67 +492,37 @@ private fun AppReadyShell(
     LaunchedEffect(updateViewModel) {
         updateViewModel.checkAutomatically()
     }
-    val contributions = remember(
-        bootloaderUiState,
-        teeUiState,
-        customRomUiState,
-        dangerousAppsUiState,
-        deviceInfoUiState,
-        kernelCheckUiState,
-        lsposedUiState,
-        memoryUiState,
-        mountUiState,
-        nativeRootUiState,
-        playIntegrityFixUiState,
-        selinuxUiState,
-        suUiState,
-        systemPropertiesUiState,
-        virtualizationUiState,
-        zygiskUiState,
-    ) {
-        listOf(
-            buildBootloaderContribution(bootloaderUiState),
-            buildCustomRomContribution(customRomUiState),
-            buildDangerousAppsContribution(dangerousAppsUiState),
-            buildKernelCheckContribution(kernelCheckUiState),
-            buildLsposedContribution(lsposedUiState),
-            buildMemoryContribution(memoryUiState),
-            buildMountContribution(mountUiState),
-            buildNativeRootContribution(nativeRootUiState),
-            buildPlayIntegrityFixContribution(playIntegrityFixUiState),
-            buildSelinuxContribution(selinuxUiState),
-            buildSuContribution(suUiState),
-            buildSystemPropertiesContribution(systemPropertiesUiState),
-            buildTeeContribution(teeUiState),
-            buildVirtualizationContribution(virtualizationUiState),
-            buildZygiskContribution(zygiskUiState),
-        )
-    }
-    val isDashboardLoading = contributions.any { !it.ready }
-    var dashboardScanStartedAt by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
-    var dashboardScanFinishedAt by remember { mutableStateOf<Long?>(null) }
-    var dashboardScanCompletedAtEpoch by remember { mutableStateOf<Long?>(null) }
-
-    LaunchedEffect(isDashboardLoading) {
-        if (isDashboardLoading) {
-            if (dashboardScanFinishedAt != null) {
-                dashboardScanStartedAt = SystemClock.elapsedRealtime()
-                dashboardScanFinishedAt = null
-                dashboardScanCompletedAtEpoch = null
-            }
-        } else if (dashboardScanFinishedAt == null) {
-            dashboardScanFinishedAt = SystemClock.elapsedRealtime()
-            dashboardScanCompletedAtEpoch = System.currentTimeMillis()
-        }
-    }
-
-    val dashboardScanDurationMillis = dashboardScanFinishedAt
-        ?.minus(dashboardScanStartedAt)
-        ?.coerceAtLeast(0L)
-    val dashboardScanCompletedAtEpochMillis = dashboardScanCompletedAtEpoch
+    val scanViewModel: DetectorScanViewModel = viewModel(
+        factory = remember {
+            DetectorScanViewModel.factory(
+                listOf(
+                    bootloaderViewModel.summary,
+                    customRomViewModel.summary,
+                    dangerousAppsViewModel.summary,
+                    kernelCheckViewModel.summary,
+                    lsposedViewModel.summary,
+                    memoryViewModel.summary,
+                    mountViewModel.summary,
+                    nativeRootViewModel.summary,
+                    playIntegrityFixViewModel.summary,
+                    selinuxViewModel.summary,
+                    suViewModel.summary,
+                    systemPropertiesViewModel.summary,
+                    teeViewModel.summary,
+                    virtualizationViewModel.summary,
+                    zygiskViewModel.summary,
+                ),
+            )
+        },
+    )
+    val scanState by scanViewModel.coordinator.state.collectAsState()
+    val detectorSummaries = scanState.detectors
+    val isDashboardLoading = scanState.isLoading
+    val dashboardScanDurationMillis = scanState.timeline.durationMillis
+    val dashboardScanCompletedAtEpochMillis = scanState.timeline.completedAtEpochMillis
 
     val dashboardState = remember(
-        contributions,
+        detectorSummaries,
         dashboardScanDurationMillis,
         dashboardScanCompletedAtEpochMillis,
         isDashboardLoading,
@@ -576,11 +545,11 @@ private fun AppReadyShell(
     ) {
         DashboardUiState(
             overview = buildDashboardOverview(
-                contributions = contributions,
+                contributions = detectorSummaries,
                 scanDurationMillis = dashboardScanDurationMillis,
                 scanCompletedAtEpochMillis = dashboardScanCompletedAtEpochMillis,
             ),
-            topFindings = buildDashboardFindings(contributions),
+            topFindings = buildDashboardFindings(detectorSummaries),
             detectorCards = sortDashboardDetectorCards(
                 listOf(
                     DashboardDetectorCardEntry.Bootloader(bootloaderUiState.cardModel),
@@ -637,8 +606,8 @@ private fun AppReadyShell(
         }
     }
     var dismissedDetectorResultNoticeKey by rememberSaveable { mutableStateOf<String?>(null) }
-    val detectorTitlesNeedingAttention = remember(contributions) {
-        attentionDetectorTitles(contributions)
+    val detectorTitlesNeedingAttention = remember(detectorSummaries) {
+        attentionDetectorTitles(detectorSummaries)
     }
     var pendingAttentionExpansionTitles by rememberSaveable { mutableStateOf(emptyList<String>()) }
 
@@ -652,14 +621,14 @@ private fun AppReadyShell(
     }
 
     val notificationSnapshot = remember(
-        contributions.size,
-        contributions.count { it.ready },
+        detectorSummaries.size,
+        detectorSummaries.count { it.ready },
         dashboardState.overview,
         isDashboardLoading,
     ) {
         ScanProgressNotificationSnapshot(
-            totalDetectorCount = contributions.size,
-            readyDetectorCount = contributions.count { it.ready },
+            totalDetectorCount = detectorSummaries.size,
+            readyDetectorCount = detectorSummaries.count { it.ready },
             dashboardOverview = dashboardState.overview,
             scanning = isDashboardLoading,
         )
@@ -813,200 +782,4 @@ private fun StartupBootstrapLoadingScreen(
             )
         }
     }
-}
-
-private fun buildBootloaderContribution(
-    bootloaderUiState: BootloaderUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "bootloader",
-        title = bootloaderUiState.cardModel.title,
-        status = bootloaderUiState.cardModel.status,
-        headline = bootloaderUiState.cardModel.verdict,
-        summary = bootloaderUiState.cardModel.summary,
-        ready = bootloaderUiState.stage != BootloaderUiStage.LOADING,
-    )
-}
-
-private fun buildCustomRomContribution(
-    customRomUiState: CustomRomUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "custom_rom",
-        title = customRomUiState.cardModel.title,
-        status = customRomUiState.cardModel.status,
-        headline = customRomUiState.cardModel.verdict,
-        summary = customRomUiState.cardModel.summary,
-        ready = customRomUiState.stage != CustomRomUiStage.LOADING,
-    )
-}
-
-private fun buildSelinuxContribution(
-    selinuxUiState: SelinuxUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "selinux",
-        title = selinuxUiState.cardModel.title,
-        status = selinuxUiState.cardModel.status,
-        headline = selinuxUiState.cardModel.verdict,
-        summary = selinuxUiState.cardModel.summary,
-        ready = selinuxUiState.stage != SelinuxUiStage.LOADING,
-    )
-}
-
-private fun buildKernelCheckContribution(
-    kernelCheckUiState: KernelCheckUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "kernel_check",
-        title = kernelCheckUiState.cardModel.title,
-        status = kernelCheckUiState.cardModel.status,
-        headline = kernelCheckUiState.cardModel.verdict,
-        summary = kernelCheckUiState.cardModel.summary,
-        ready = kernelCheckUiState.stage != KernelCheckUiStage.LOADING,
-    )
-}
-
-private fun buildMountContribution(
-    mountUiState: MountUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "mount",
-        title = mountUiState.cardModel.title,
-        status = mountUiState.cardModel.status,
-        headline = mountUiState.cardModel.verdict,
-        summary = mountUiState.cardModel.summary,
-        ready = mountUiState.stage != MountUiStage.LOADING,
-    )
-}
-
-private fun buildMemoryContribution(
-    memoryUiState: MemoryUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "memory",
-        title = memoryUiState.cardModel.title,
-        status = memoryUiState.cardModel.status,
-        headline = memoryUiState.cardModel.verdict,
-        summary = memoryUiState.cardModel.summary,
-        ready = memoryUiState.stage != MemoryUiStage.LOADING,
-    )
-}
-
-private fun buildLsposedContribution(
-    lsposedUiState: LSPosedUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "lsposed",
-        title = lsposedUiState.cardModel.title,
-        status = lsposedUiState.cardModel.status,
-        headline = lsposedUiState.cardModel.verdict,
-        summary = lsposedUiState.cardModel.summary,
-        ready = lsposedUiState.stage != LSPosedUiStage.LOADING,
-    )
-}
-
-private fun buildPlayIntegrityFixContribution(
-    playIntegrityFixUiState: PlayIntegrityFixUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "play_integrity_fix",
-        title = playIntegrityFixUiState.cardModel.title,
-        status = playIntegrityFixUiState.cardModel.status,
-        headline = playIntegrityFixUiState.cardModel.verdict,
-        summary = playIntegrityFixUiState.cardModel.summary,
-        ready = playIntegrityFixUiState.stage != PlayIntegrityFixUiStage.LOADING,
-    )
-}
-
-private fun buildNativeRootContribution(
-    nativeRootUiState: NativeRootUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "native_root",
-        title = nativeRootUiState.cardModel.title,
-        status = nativeRootUiState.cardModel.status,
-        headline = nativeRootUiState.cardModel.verdict,
-        summary = nativeRootUiState.cardModel.summary,
-        ready = nativeRootUiState.stage != NativeRootUiStage.LOADING,
-    )
-}
-
-private fun buildDangerousAppsContribution(
-    dangerousAppsUiState: DangerousAppsUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "dangerous_apps",
-        title = dangerousAppsUiState.cardModel.title,
-        status = dangerousAppsUiState.cardModel.status,
-        headline = dangerousAppsUiState.cardModel.verdict,
-        summary = dangerousAppsUiState.cardModel.summary,
-        ready = dangerousAppsUiState.stage != DangerousAppsUiStage.LOADING,
-    )
-}
-
-private fun buildTeeContribution(
-    teeUiState: TeeUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "tee",
-        title = teeUiState.cardModel.title,
-        status = teeUiState.cardModel.status,
-        headline = teeUiState.cardModel.verdict,
-        summary = teeUiState.cardModel.summary,
-        findingDetail = teeUiState.cardModel.findingDetail,
-        ready = teeUiState.stage != TeeUiStage.LOADING,
-    )
-}
-
-private fun buildSuContribution(
-    suUiState: SuUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "su",
-        title = suUiState.cardModel.title,
-        status = suUiState.cardModel.status,
-        headline = suUiState.cardModel.verdict,
-        summary = suUiState.cardModel.summary,
-        ready = suUiState.stage != SuUiStage.LOADING,
-    )
-}
-
-private fun buildSystemPropertiesContribution(
-    systemPropertiesUiState: SystemPropertiesUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "system_properties",
-        title = systemPropertiesUiState.cardModel.title,
-        status = systemPropertiesUiState.cardModel.status,
-        headline = systemPropertiesUiState.cardModel.verdict,
-        summary = systemPropertiesUiState.cardModel.summary,
-        ready = systemPropertiesUiState.stage != SystemPropertiesUiStage.LOADING,
-    )
-}
-
-private fun buildZygiskContribution(
-    zygiskUiState: ZygiskUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "zygisk",
-        title = zygiskUiState.cardModel.title,
-        status = zygiskUiState.cardModel.status,
-        headline = zygiskUiState.cardModel.verdict,
-        summary = zygiskUiState.cardModel.summary,
-        ready = zygiskUiState.stage != ZygiskUiStage.LOADING,
-    )
-}
-
-private fun buildVirtualizationContribution(
-    virtualizationUiState: VirtualizationUiState,
-): DashboardDetectorContribution {
-    return DashboardDetectorContribution(
-        id = "virtualization",
-        title = virtualizationUiState.cardModel.title,
-        status = virtualizationUiState.cardModel.status,
-        headline = virtualizationUiState.cardModel.verdict,
-        summary = virtualizationUiState.cardModel.summary,
-        ready = virtualizationUiState.stage != VirtualizationUiStage.LOADING,
-    )
 }

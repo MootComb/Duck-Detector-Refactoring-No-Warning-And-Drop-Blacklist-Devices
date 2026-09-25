@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.dashboard.ui.model
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
@@ -60,18 +61,6 @@ data class DashboardFindingModel(
     val headline: String,
     val detail: String,
     val status: DetectorStatus,
-)
-
-data class DashboardDetectorContribution(
-    val id: String,
-    val title: String,
-    val status: DetectorStatus,
-    val headline: String,
-    val summary: String,
-    val ready: Boolean,
-    // Optional summary override for compact Dashboard findings; detector cards keep their full detail.
-    // Dashboard 顶层 findings 的可选短摘要；detector 卡片仍保留完整细节。
-    val findingDetail: String? = null,
 )
 
 sealed interface DashboardDetectorCardEntry {
@@ -193,7 +182,7 @@ data class DashboardUiState(
 )
 
 fun buildDashboardOverview(
-    contributions: List<DashboardDetectorContribution>,
+    contributions: List<DetectorSummary>,
     scanDurationMillis: Long? = null,
     scanCompletedAtEpochMillis: Long? = null,
 ): DashboardOverviewModel {
@@ -292,7 +281,7 @@ private fun formatScanDuration(
 }
 
 fun buildDashboardFindings(
-    contributions: List<DashboardDetectorContribution>,
+    contributions: List<DetectorSummary>,
 ): List<DashboardFindingModel> {
     val prioritized = prioritizedContributions(contributions)
     val attentionFindings = prioritized.filter { contribution ->
@@ -337,10 +326,10 @@ fun buildDashboardFindings(
 }
 
 private fun prioritizedContributions(
-    contributions: List<DashboardDetectorContribution>,
-): List<DashboardDetectorContribution> {
+    contributions: List<DetectorSummary>,
+): List<DetectorSummary> {
     return contributions.sortedWith(
-        compareBy<DashboardDetectorContribution> { contribution ->
+        compareBy<DetectorSummary> { contribution ->
             detectorPriority(contribution.status)
         }.thenBy { if (it.ready) 0 else 1 }
             .thenBy { it.title },

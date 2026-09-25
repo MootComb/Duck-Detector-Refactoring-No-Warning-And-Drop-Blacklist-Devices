@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.dashboard.ui.preview
 
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderCardModelMapper
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
@@ -27,7 +29,6 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsRepo
 import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsCardModelMapper
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorCardEntry
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
 import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
@@ -95,120 +96,120 @@ object DashboardPreviewData {
         val virtualizationCard = virtualizationMapper.map(VirtualizationReport.loading())
         val zygiskCard = zygiskMapper.map(ZygiskReport.loading())
         val contributions = listOf(
-            DashboardDetectorContribution(
-                id = "bootloader",
+            DetectorSummary(
+                id = DetectorId("bootloader"),
                 title = bootloaderCard.title,
                 status = bootloaderCard.status,
                 headline = bootloaderCard.verdict,
                 summary = bootloaderCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "custom_rom",
+            DetectorSummary(
+                id = DetectorId("custom_rom"),
                 title = customRomCard.title,
                 status = customRomCard.status,
                 headline = customRomCard.verdict,
                 summary = customRomCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "dangerous_apps",
+            DetectorSummary(
+                id = DetectorId("dangerous_apps"),
                 title = dangerousAppsCard.title,
                 status = dangerousAppsCard.status,
                 headline = dangerousAppsCard.verdict,
                 summary = dangerousAppsCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "kernel_check",
+            DetectorSummary(
+                id = DetectorId("kernel_check"),
                 title = kernelCheckCard.title,
                 status = kernelCheckCard.status,
                 headline = kernelCheckCard.verdict,
                 summary = kernelCheckCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "lsposed",
+            DetectorSummary(
+                id = DetectorId("lsposed"),
                 title = lsposedCard.title,
                 status = lsposedCard.status,
                 headline = lsposedCard.verdict,
                 summary = lsposedCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "memory",
+            DetectorSummary(
+                id = DetectorId("memory"),
                 title = memoryCard.title,
                 status = memoryCard.status,
                 headline = memoryCard.verdict,
                 summary = memoryCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "mount",
+            DetectorSummary(
+                id = DetectorId("mount"),
                 title = mountCard.title,
                 status = mountCard.status,
                 headline = mountCard.verdict,
                 summary = mountCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "selinux",
+            DetectorSummary(
+                id = DetectorId("selinux"),
                 title = selinuxCard.title,
                 status = selinuxCard.status,
                 headline = selinuxCard.verdict,
                 summary = selinuxCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "play_integrity_fix",
+            DetectorSummary(
+                id = DetectorId("play_integrity_fix"),
                 title = playIntegrityFixCard.title,
                 status = playIntegrityFixCard.status,
                 headline = playIntegrityFixCard.verdict,
                 summary = playIntegrityFixCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "native_root",
+            DetectorSummary(
+                id = DetectorId("native_root"),
                 title = nativeRootCard.title,
                 status = nativeRootCard.status,
                 headline = nativeRootCard.verdict,
                 summary = nativeRootCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "su",
+            DetectorSummary(
+                id = DetectorId("su"),
                 title = suCard.title,
                 status = suCard.status,
                 headline = suCard.verdict,
                 summary = suCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "system_properties",
+            DetectorSummary(
+                id = DetectorId("system_properties"),
                 title = systemPropertiesCard.title,
                 status = systemPropertiesCard.status,
                 headline = systemPropertiesCard.verdict,
                 summary = systemPropertiesCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "tee",
+            DetectorSummary(
+                id = DetectorId("tee"),
                 title = teeCard.title,
                 status = teeCard.status,
                 headline = teeCard.verdict,
                 summary = teeCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "virtualization",
+            DetectorSummary(
+                id = DetectorId("virtualization"),
                 title = virtualizationCard.title,
                 status = virtualizationCard.status,
                 headline = virtualizationCard.verdict,
                 summary = virtualizationCard.summary,
                 ready = false,
             ),
-            DashboardDetectorContribution(
-                id = "zygisk",
+            DetectorSummary(
+                id = DetectorId("zygisk"),
                 title = zygiskCard.title,
                 status = zygiskCard.status,
                 headline = zygiskCard.verdict,

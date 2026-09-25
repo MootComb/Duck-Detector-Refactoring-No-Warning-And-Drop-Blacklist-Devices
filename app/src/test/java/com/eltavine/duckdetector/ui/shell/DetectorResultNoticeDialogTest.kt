@@ -16,8 +16,9 @@
 
 package com.eltavine.duckdetector.ui.shell
 
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -71,32 +72,32 @@ class DetectorResultNoticeDialogTest {
     fun `returns titles for ready danger and warning detectors only`() {
         val titles = attentionDetectorTitles(
             listOf(
-                DashboardDetectorContribution(
-                    id = "bootloader",
+                DetectorSummary(
+                    id = DetectorId("bootloader"),
                     title = "Bootloader",
                     status = DetectorStatus.danger(),
                     headline = "Danger",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "tee",
+                DetectorSummary(
+                    id = DetectorId("tee"),
                     title = "TEE",
                     status = DetectorStatus.warning(),
                     headline = "Warning",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "memory",
+                DetectorSummary(
+                    id = DetectorId("memory"),
                     title = "Memory",
                     status = DetectorStatus.allClear(),
                     headline = "OK",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "virtualization",
+                DetectorSummary(
+                    id = DetectorId("virtualization"),
                     title = "Virtualization",
                     status = DetectorStatus.danger(),
                     headline = "Danger",

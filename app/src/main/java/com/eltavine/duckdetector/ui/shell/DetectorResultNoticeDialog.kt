@@ -38,7 +38,7 @@ import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import kotlinx.coroutines.delay
 
 internal const val RESULT_NOTICE_LOCK_SECONDS = 5
@@ -57,7 +57,7 @@ internal fun shouldShowDetectorResultNotice(
 }
 
 internal fun attentionDetectorTitles(
-    contributions: List<DashboardDetectorContribution>,
+    contributions: List<DetectorSummary>,
 ): Set<String> {
     return contributions
         .filter { contribution ->

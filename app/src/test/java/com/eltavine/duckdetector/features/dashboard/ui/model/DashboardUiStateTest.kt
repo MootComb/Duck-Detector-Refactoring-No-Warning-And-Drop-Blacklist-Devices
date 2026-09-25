@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.dashboard.ui.model
 
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -26,16 +28,16 @@ class DashboardUiStateTest {
     fun `danger tee card status propagates to dashboard overview`() {
         val overview = buildDashboardOverview(
             contributions = listOf(
-                DashboardDetectorContribution(
-                    id = "tee",
+                DetectorSummary(
+                    id = DetectorId("tee"),
                     title = "TEE",
                     status = DetectorStatus.danger(),
                     headline = "Attestation aligned; local probes need review",
                     summary = "ImportKey retained attestation narrative detected.",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "bootloader",
+                DetectorSummary(
+                    id = DetectorId("bootloader"),
                     title = "Bootloader",
                     status = DetectorStatus.allClear(),
                     headline = "Locked",
@@ -54,16 +56,16 @@ class DashboardUiStateTest {
     fun `danger contribution after warning still dominates dashboard overview`() {
         val overview = buildDashboardOverview(
             contributions = listOf(
-                DashboardDetectorContribution(
-                    id = "soter",
+                DetectorSummary(
+                    id = DetectorId("soter"),
                     title = "Soter",
                     status = DetectorStatus.warning(),
                     headline = "Local review",
                     summary = "Soter local environment needs review.",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "tee",
+                DetectorSummary(
+                    id = DetectorId("tee"),
                     title = "TEE",
                     status = DetectorStatus.danger(),
                     headline = "Attestation aligned; local probes need review",
@@ -82,8 +84,8 @@ class DashboardUiStateTest {
     fun `top findings use compact finding detail when detector provides one`() {
         val findings = buildDashboardFindings(
             contributions = listOf(
-                DashboardDetectorContribution(
-                    id = "tee",
+                DetectorSummary(
+                    id = DetectorId("tee"),
                     title = "TEE",
                     status = DetectorStatus.danger(),
                     headline = "Attestation aligned; local probes need review",
