@@ -30,10 +30,19 @@ dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.json)
     implementation(libs.kotlin.gradle.plugin)
+    testImplementation(libs.junit)
+}
+
+tasks.test {
+    useJUnit()
 }
 
 gradlePlugin {
     plugins {
+        register("duckDetectorModuleBoundaries") {
+            id = "duckdetector.module-boundaries"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.boundaries.DuckDetectorModuleBoundariesPlugin"
+        }
         register("duckDetectorAndroidApplication") {
             id = "duckdetector.android.application"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidApplicationConventionPlugin"
