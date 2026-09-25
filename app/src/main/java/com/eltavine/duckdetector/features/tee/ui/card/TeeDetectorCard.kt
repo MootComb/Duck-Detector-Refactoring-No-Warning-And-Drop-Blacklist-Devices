@@ -63,11 +63,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.ui.R as CoreUiR
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.tee.ui.TeeCertificatesDialog
 import com.eltavine.duckdetector.features.tee.ui.TeeDetailsDialog
 import com.eltavine.duckdetector.features.tee.ui.model.TeeCardModel
@@ -78,8 +80,6 @@ import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHighlightSignalModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
-import com.eltavine.duckdetector.core.ui.R as CoreUiR
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

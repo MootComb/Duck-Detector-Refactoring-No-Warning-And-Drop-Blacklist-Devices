@@ -43,11 +43,11 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun SuDetectorCard(

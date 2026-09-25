@@ -47,12 +47,12 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardAssessment
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderDetailRowModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun BootloaderDetectorCard(

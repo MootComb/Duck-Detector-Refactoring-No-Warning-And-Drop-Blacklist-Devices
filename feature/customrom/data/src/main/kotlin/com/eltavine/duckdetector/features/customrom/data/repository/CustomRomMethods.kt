@@ -17,9 +17,9 @@
 package com.eltavine.duckdetector.features.customrom.data.repository
 
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomFinding
-import com.eltavine.duckdetector.features.customrom.domain.CustomRomModificationFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomMethodOutcome
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomMethodResult
+import com.eltavine.duckdetector.features.customrom.domain.CustomRomModificationFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomPackageVisibility
 
 internal fun buildMethods(

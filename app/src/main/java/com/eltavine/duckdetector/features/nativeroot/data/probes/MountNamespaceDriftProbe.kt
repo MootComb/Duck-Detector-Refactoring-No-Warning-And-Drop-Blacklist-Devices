@@ -19,12 +19,12 @@ package com.eltavine.duckdetector.features.nativeroot.data.probes
 import android.content.Context
 import android.system.ErrnoException
 import android.system.Os
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import java.io.File
 
 data class MountNamespaceDriftProbeResult(

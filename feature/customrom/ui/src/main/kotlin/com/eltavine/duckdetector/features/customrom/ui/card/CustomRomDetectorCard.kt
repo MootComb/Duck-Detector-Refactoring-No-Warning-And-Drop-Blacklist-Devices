@@ -43,11 +43,11 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomDetailRowModel
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFactModel
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun CustomRomDetectorCard(

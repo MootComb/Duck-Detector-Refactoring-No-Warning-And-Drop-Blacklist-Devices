@@ -45,11 +45,11 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetailRowModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun ZygiskDetectorCard(

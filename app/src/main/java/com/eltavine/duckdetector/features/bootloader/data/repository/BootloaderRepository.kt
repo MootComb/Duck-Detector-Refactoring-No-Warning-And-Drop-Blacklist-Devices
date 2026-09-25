@@ -18,6 +18,14 @@ package com.eltavine.duckdetector.features.bootloader.data.repository
 
 import android.content.Context
 import android.os.Build
+import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyConsistencyUtils
+import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyReadUtils
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import com.eltavine.duckdetector.features.bootloader.data.rules.BootloaderCatalog
 import com.eltavine.duckdetector.features.bootloader.data.widevine.WidevineBootContext
 import com.eltavine.duckdetector.features.bootloader.data.widevine.WidevineBootloaderEvidence
@@ -32,14 +40,6 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodResu
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
-import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
-import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyConsistencyUtils
-import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyReadUtils
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import com.eltavine.duckdetector.features.tee.data.attestation.AndroidAttestationCollector
 import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
 import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyProbe

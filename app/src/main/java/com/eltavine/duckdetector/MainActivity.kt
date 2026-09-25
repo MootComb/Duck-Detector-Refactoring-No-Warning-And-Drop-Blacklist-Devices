@@ -31,8 +31,8 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadS
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.core.ui.AppBuildInfo
 import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
-import com.eltavine.duckdetector.ui.DuckDetectorApp
 import com.eltavine.duckdetector.core.ui.theme.DuckDetectorTheme
+import com.eltavine.duckdetector.ui.DuckDetectorApp
 
 class MainActivity : ComponentActivity() {
 

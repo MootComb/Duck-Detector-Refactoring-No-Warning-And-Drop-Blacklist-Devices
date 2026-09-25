@@ -17,19 +17,19 @@
 package com.eltavine.duckdetector.features.systemproperties.data.repository
 
 import android.os.Build
-import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
-import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertiesCatalog
-import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertyRule
-import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
 import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyConsistencyUtils
 import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyReadUtils
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesScanner
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertiesCatalog
+import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertyRule
+import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
+import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesScanner
+import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

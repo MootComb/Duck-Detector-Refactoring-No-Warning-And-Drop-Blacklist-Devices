@@ -45,11 +45,11 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationDetailRowModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationHeaderFactModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun VirtualizationDetectorCard(

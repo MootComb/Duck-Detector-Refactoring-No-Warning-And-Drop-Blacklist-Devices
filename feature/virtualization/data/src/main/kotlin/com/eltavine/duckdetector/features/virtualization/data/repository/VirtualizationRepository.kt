@@ -21,8 +21,10 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizatio
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadSignal
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.capability.helperprocess.data.SacrificialSyscallPackResult
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeBridge
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmCounterTrapProbe
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmRawSyscallTrapProbe
@@ -35,8 +37,6 @@ import com.eltavine.duckdetector.features.virtualization.data.probes.Virtualizat
 import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationHostAppProbeResult
 import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationPropertyProbe
 import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationServiceProbe
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
-import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeManager
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationImpact
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationScanner

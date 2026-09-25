@@ -18,10 +18,10 @@ package com.eltavine.duckdetector.features.virtualization.data.probes
 
 import android.content.Context
 import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
+import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
-import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
 import com.eltavine.duckdetector.features.virtualization.data.rules.VirtualizationHostAppTarget
 import com.eltavine.duckdetector.features.virtualization.data.rules.VirtualizationHostAppsCatalog
 import java.io.File

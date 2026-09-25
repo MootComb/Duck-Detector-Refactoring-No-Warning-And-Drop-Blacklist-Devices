@@ -16,11 +16,11 @@
 
 package com.eltavine.duckdetector.capability.systemproperties.data
 
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import java.util.concurrent.TimeUnit
-import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
 
 public class SystemPropertyReadUtils(
     private val nativeBridge: SystemPropertiesNativeBridge = SystemPropertiesNativeBridge(),

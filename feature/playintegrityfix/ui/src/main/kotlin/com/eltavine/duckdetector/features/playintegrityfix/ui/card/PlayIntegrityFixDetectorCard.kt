@@ -43,11 +43,11 @@ import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixDetailRowModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFactModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixImpactItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun PlayIntegrityFixDetectorCard(

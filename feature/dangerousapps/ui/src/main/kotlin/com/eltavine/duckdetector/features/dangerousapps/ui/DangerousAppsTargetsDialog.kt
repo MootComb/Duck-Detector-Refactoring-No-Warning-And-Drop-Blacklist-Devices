@@ -46,8 +46,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsTargetAppModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsTargetAppModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

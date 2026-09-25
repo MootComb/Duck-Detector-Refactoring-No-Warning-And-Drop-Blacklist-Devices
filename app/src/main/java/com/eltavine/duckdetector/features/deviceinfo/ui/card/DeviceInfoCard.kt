@@ -43,11 +43,11 @@ import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoRowModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoSectionModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun DeviceInfoCard(
