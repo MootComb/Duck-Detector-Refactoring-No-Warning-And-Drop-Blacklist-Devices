@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.dashboard.data
+package com.eltavine.duckdetector.integration.dashboard
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorId
@@ -28,6 +28,8 @@ import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRom
 import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
+import com.eltavine.duckdetector.features.dashboard.data.DashboardExport
+import com.eltavine.duckdetector.features.dashboard.data.ExportHeader
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
