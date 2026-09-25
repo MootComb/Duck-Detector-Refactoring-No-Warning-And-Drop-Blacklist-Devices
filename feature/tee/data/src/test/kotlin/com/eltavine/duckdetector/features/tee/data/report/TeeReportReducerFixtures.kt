@@ -110,6 +110,7 @@ internal fun baseArtifacts(
     aesGcm: AesGcmRoundTripResult = AesGcmRoundTripResult(
         executed = true,
         roundTripSucceeded = true,
+        authorizationChecked = true,
         keyInfoLevel = "TEE",
         insideSecureHardware = true,
         encryptMicros = 1600,

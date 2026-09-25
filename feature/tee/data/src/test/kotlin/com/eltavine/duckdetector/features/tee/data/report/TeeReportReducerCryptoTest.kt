@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.features.tee.data.verification.certificate.Dual
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.AesGcmRoundTripResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.IdAttestationResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.OversizedChallengeResult
+import com.eltavine.duckdetector.features.tee.data.verification.keystore.aesGcmFailureResult
 import com.eltavine.duckdetector.features.tee.data.verification.strongbox.StrongBoxBehaviorResult
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
@@ -29,6 +30,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.security.ProviderException
+import javax.crypto.AEADBadTagException
 
 class TeeReportReducerCryptoTest {
 
@@ -282,6 +285,54 @@ class TeeReportReducerCryptoTest {
             it.title == "AES-GCM" &&
                     it.body.contains("Round-trip failed") &&
                     it.level == TeeSignalLevel.FAIL
+        })
+    }
+
+    @Test
+    fun `aes gcm probe that threw before a result stays informational`() {
+        val report = reducer.reduce(
+            baseArtifacts(aesGcm = aesGcmFailureResult(ProviderException("Keystore backend busy"))),
+        )
+
+        assertEquals(TeeVerdict.CONSISTENT, report.verdict)
+        assertEquals(0, report.supplementaryIndicatorCount)
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "AES-GCM" &&
+                    it.body == "Did not complete • Keystore backend busy" &&
+                    it.level == TeeSignalLevel.INFO
+        })
+    }
+
+    @Test
+    fun `aes gcm tag failure on its own ciphertext stays a fail`() {
+        val result = aesGcmFailureResult(AEADBadTagException("mac check failed"))
+
+        assertTrue(result.executed)
+        assertFalse(result.roundTripSucceeded)
+        val report = reducer.reduce(baseArtifacts(aesGcm = result))
+        assertEquals(1, report.supplementaryIndicatorCount)
+    }
+
+    @Test
+    fun `aes gcm round trip without authorization checks is not a pass`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                aesGcm = AesGcmRoundTripResult(
+                    executed = true,
+                    roundTripSucceeded = true,
+                    authorizationChecked = false,
+                    keyInfoLevel = "TEE",
+                    insideSecureHardware = true,
+                    detail = "auth=not run",
+                ),
+            ),
+        )
+
+        assertEquals(0, report.supplementaryIndicatorCount)
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "AES-GCM" &&
+                    it.body.endsWith("authorization checks did not run") &&
+                    it.level == TeeSignalLevel.INFO
         })
     }
 

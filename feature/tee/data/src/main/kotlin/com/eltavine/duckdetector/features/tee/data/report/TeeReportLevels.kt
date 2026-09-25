@@ -40,6 +40,7 @@ internal fun aesGcmLevel(artifacts: TeeScanArtifacts): TeeSignalLevel {
         !artifacts.aesGcm.roundTripSucceeded -> TeeSignalLevel.FAIL
         aesGcmAuthorizationFailures(artifacts.aesGcm).isNotEmpty() -> TeeSignalLevel.FAIL
         artifacts.aesGcm.insideSecureHardware == false -> TeeSignalLevel.WARN
+        !artifacts.aesGcm.authorizationChecked -> TeeSignalLevel.INFO
         else -> TeeSignalLevel.PASS
     }
 }

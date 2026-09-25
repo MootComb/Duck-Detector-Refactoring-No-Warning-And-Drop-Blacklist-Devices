@@ -43,7 +43,7 @@ internal fun aesGcmValue(artifacts: TeeScanArtifacts): String {
     val result = artifacts.aesGcm
     val authorizationFailures = aesGcmAuthorizationFailures(result)
     return when {
-        !result.executed -> "Skipped"
+        !result.executed -> result.probeError?.let { "Did not complete • $it" } ?: "Skipped"
         !result.roundTripSucceeded -> buildString {
             append("Round-trip failed")
             result.keyInfoLevel?.let {
@@ -69,6 +69,7 @@ internal fun aesGcmValue(artifacts: TeeScanArtifacts): String {
                 append(it)
                 append("us enc")
             }
+            appendAuthorizationNotChecked(result)
         }
 
         else -> buildString {
@@ -77,8 +78,13 @@ internal fun aesGcmValue(artifacts: TeeScanArtifacts): String {
                 append(" • ")
                 append(it)
             }
+            appendAuthorizationNotChecked(result)
         }
     }
+}
+
+private fun StringBuilder.appendAuthorizationNotChecked(result: AesGcmRoundTripResult) {
+    if (!result.authorizationChecked) append(" • authorization checks did not run")
 }
 
 internal fun aesGcmAuthorizationFailures(result: AesGcmRoundTripResult): List<String> {

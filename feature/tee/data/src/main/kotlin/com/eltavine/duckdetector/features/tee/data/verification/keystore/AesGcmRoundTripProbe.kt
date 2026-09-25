@@ -23,6 +23,7 @@ import android.security.keystore.KeyProperties
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.security.KeyStore
 import java.security.spec.AlgorithmParameterSpec
+import javax.crypto.AEADBadTagException
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -86,6 +87,7 @@ class AesGcmRoundTripProbe {
             AesGcmRoundTripResult(
                 executed = true,
                 roundTripSucceeded = roundTripSucceeded,
+                authorizationChecked = auth.ran,
                 cbcRejected = auth.cbcRejected.ok,
                 cbcRejectedDetail = auth.cbcRejected.detail,
                 mac64Rejected = auth.mac64Rejected.ok,
@@ -113,15 +115,16 @@ class AesGcmRoundTripProbe {
                     append(", roundTrip=")
                     append(if (roundTripSucceeded) "ok" else "failed")
                     append(", auth=")
-                    append(if (auth.ok) "ok" else "failed")
+                    append(
+                        when {
+                            !auth.ran -> "not run"
+                            auth.ok -> "ok"
+                            else -> "failed"
+                        },
+                    )
                 },
             )
-        }.getOrElse { throwable ->
-            AesGcmRoundTripResult(
-                executed = true,
-                detail = throwable.message ?: "AES-GCM keystore round-trip probe failed.",
-            )
-        }.also {
+        }.getOrElse(::aesGcmFailureResult).also {
             AndroidKeyStoreTools.safeDelete(keyStore, alias)
         }
     }
@@ -132,6 +135,7 @@ class AesGcmRoundTripProbe {
         return try {
             val key = generateGcmKey(alias, useStrongBox, randomizedEncryptionRequired = false)
             AesGcmAuthorizationChecks(
+                ran = true,
                 cbcRejected = rejectEncrypt(key, "AES/CBC/PKCS7Padding"),
                 mac64Rejected = rejectEncrypt(
                     key,
@@ -145,8 +149,8 @@ class AesGcmRoundTripProbe {
                 ),
             )
         } catch (throwable: Throwable) {
-            val skipped = CheckResult(true, throwable.message ?: "AES-GCM authorization checks unavailable.")
-            AesGcmAuthorizationChecks(skipped, skipped, skipped)
+            val notRun = CheckResult(true, throwable.message ?: "AES-GCM authorization checks unavailable.")
+            AesGcmAuthorizationChecks(ran = false, notRun, notRun, notRun)
         } finally {
             AndroidKeyStoreTools.safeDelete(keyStore, alias)
         }
@@ -187,9 +191,30 @@ class AesGcmRoundTripProbe {
     }
 }
 
+/**
+ * Keystore2 fails operation creation with BACKEND_BUSY and prunes a caller's own sibling operations
+ * when KeyMint runs out of operation slots (system/security keystore2/src/operation.rs), and this
+ * probe runs alongside other keystore probes. So only a tag that fails on the key's own ciphertext
+ * shows a broken round trip; any other exception means the probe did not complete.
+ */
+internal fun aesGcmFailureResult(throwable: Throwable): AesGcmRoundTripResult =
+    if (throwable is AEADBadTagException) {
+        AesGcmRoundTripResult(
+            executed = true,
+            detail = throwable.message ?: "AES-GCM tag verification failed on the probe's own ciphertext.",
+        )
+    } else {
+        val reason = throwable.message ?: "AES-GCM keystore round-trip probe did not complete."
+        AesGcmRoundTripResult(executed = false, probeError = reason, detail = reason)
+    }
+
 data class AesGcmRoundTripResult(
     val executed: Boolean,
     val roundTripSucceeded: Boolean = false,
+    /** Null unless the probe started and then threw before it had a round-trip result. */
+    val probeError: String? = null,
+    /** False when the key the CBC, MAC and nonce rejection checks need could not be generated. */
+    val authorizationChecked: Boolean = false,
     val cbcRejected: Boolean = true,
     val cbcRejectedDetail: String = "AES-GCM CBC authorization skipped.",
     val mac64Rejected: Boolean = true,
@@ -205,6 +230,7 @@ data class AesGcmRoundTripResult(
 )
 
 private data class AesGcmAuthorizationChecks(
+    val ran: Boolean,
     val cbcRejected: CheckResult,
     val mac64Rejected: CheckResult,
     val shortNonceRejected: CheckResult,
