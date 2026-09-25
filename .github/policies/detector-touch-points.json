@@ -67,11 +67,6 @@
       "reason": "Tests the startup policy state, which carries the TEE network consent."
     },
     {
-      "path": "app/src/test/java/com/eltavine/duckdetector/integration/dashboard/ExportScenario.kt",
-      "detectors": ["bootloader", "customrom", "dangerousapps", "kernelcheck", "lsposed", "memory", "mount", "nativeroot", "playintegrityfix", "selinux", "su", "systemproperties", "tee", "virtualization", "zygisk"],
-      "reason": "The golden export renders the report of every detector that existed when it was recorded; a new detector does not have to join it."
-    },
-    {
       "path": "build-logic/src/test/kotlin/com/eltavine/duckdetector/buildlogic/boundaries/ModuleBoundaryPolicyTest.kt",
       "detectors": ["su"],
       "reason": "Boundary policy fixtures use real module paths as examples."

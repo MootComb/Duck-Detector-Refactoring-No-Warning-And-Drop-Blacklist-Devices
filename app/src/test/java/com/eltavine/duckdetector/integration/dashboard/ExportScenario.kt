@@ -22,12 +22,6 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
-import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
-import com.eltavine.duckdetector.features.bootloader.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
-import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
-import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.dashboard.presentation.export.DashboardExport
 import com.eltavine.duckdetector.features.dashboard.presentation.export.ExportHeader
 import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardFindings
@@ -35,52 +29,16 @@ import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDash
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
-import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckCardModel
-import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedCardModel
-import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
-import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.mount.presentation.model.MountCardModel
-import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
-import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
-import com.eltavine.duckdetector.features.playintegrityfix.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxCardModel
-import com.eltavine.duckdetector.features.selinux.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
-import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesCardModel
-import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.tee.presentation.model.TeeCardModel
-import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationCardModel
-import com.eltavine.duckdetector.features.virtualization.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
-import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
+import com.eltavine.duckdetector.sdk.DetectorCatalog
 
 /** One fully populated dashboard export built from generated card models. */
 internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListSize: Int = 0) {
 
     private val fixtures = CardFixtures(seed, minListSize)
-    private val reports: List<DetectorReport> = listOf(
-        fixtures.create(BootloaderCardModel::class.java).toDetectorReport(),
-        fixtures.create(CustomRomCardModel::class.java).toDetectorReport(),
-        fixtures.create(DangerousAppsCardModel::class.java).toDetectorReport(),
-        fixtures.create(KernelCheckCardModel::class.java).toDetectorReport(),
-        fixtures.create(LSPosedCardModel::class.java).toDetectorReport(),
-        fixtures.create(MemoryCardModel::class.java).toDetectorReport(),
-        fixtures.create(MountCardModel::class.java).toDetectorReport(),
-        fixtures.create(NativeRootCardModel::class.java).toDetectorReport(),
-        fixtures.create(PlayIntegrityFixCardModel::class.java).toDetectorReport(),
-        fixtures.create(SelinuxCardModel::class.java).toDetectorReport(),
-        fixtures.create(SuCardModel::class.java).toDetectorReport(),
-        fixtures.create(SystemPropertiesCardModel::class.java).toDetectorReport(),
-        fixtures.create(TeeCardModel::class.java).toDetectorReport(),
-        fixtures.create(VirtualizationCardModel::class.java).toDetectorReport(),
-        fixtures.create(ZygiskCardModel::class.java).toDetectorReport(),
-    )
+    // Every card model is drawn from the one seeded sequence, so the golden export depends on this order.
+    private val reports: List<DetectorReport> = DetectorCatalog.all
+        .sortedBy { it.id.value }
+        .map(fixtures::export)
     private val device = fixtures.create(DeviceInfoCardModel::class.java).let { generated ->
         val identity = when (seed % 3) {
             1 -> listOf(fact("Brand", "Duck"), fact("Model", "Pond 7"), fact("Android", "17"), fact("SDK", "37"))

@@ -16,9 +16,12 @@
 
 package com.eltavine.duckdetector.integration.dashboard
 
+import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.core.report.DetectorHeadline
+import com.eltavine.duckdetector.core.report.DetectorReport
 import java.lang.reflect.Constructor
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -42,6 +45,21 @@ internal class CardFixtures(
     private var counter = 0
 
     fun <T : Any> create(type: Class<T>): T = requireNotNull(type.cast(build(type)))
+
+    /** Exports a generated card model of [detector] the way the detector exports a scanned one. */
+    fun export(detector: Detector<*, *>): DetectorReport = exportModel(detector)
+
+    private fun <M : DetectorHeadline> exportModel(detector: Detector<*, M>): DetectorReport {
+        @Suppress("UNCHECKED_CAST")
+        val model = create(cardModelType(detector) as Class<M>)
+        return detector.export(model)
+    }
+
+    private fun cardModelType(detector: Detector<*, *>): Class<*> =
+        detector.javaClass.genericInterfaces
+            .filterIsInstance<ParameterizedType>()
+            .single { it.rawType == Detector::class.java }
+            .actualTypeArguments[1] as Class<*>
 
     private fun build(type: Type): Any = when {
         type == String::class.java -> nextString()
