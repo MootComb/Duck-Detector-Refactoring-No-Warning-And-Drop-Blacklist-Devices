@@ -34,6 +34,12 @@ class DuckDetectorAndroidLibraryConventionPlugin : Plugin<Project> {
                 if (consumerRules.exists()) {
                     defaultConfig.consumerProguardFiles(consumerRules)
                 }
+                // The fused SDK AAR publishes the sources of every module it contains.
+                publishing {
+                    singleVariant("release") {
+                        withSourcesJar()
+                    }
+                }
             }
 
             dependencies.add("testImplementation", libs.findBundle("test-unit").get())

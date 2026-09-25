@@ -136,6 +136,12 @@ For the standard local validation path:
 ./gradlew unitTest :app:assembleDebug :app:lintDebug
 ```
 
+The same build also produces the headless SDK as one AAR, without any UI, published to `sdk/aar/build/repository`:
+
+```bash
+./gradlew :sdk:aar:publish
+```
+
 Before contributing, read [`CODING_STANDARDS.md`](./CODING_STANDARDS.md).
 
 ## Release signing

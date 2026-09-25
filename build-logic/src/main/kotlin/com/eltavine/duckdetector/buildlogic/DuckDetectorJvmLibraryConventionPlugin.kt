@@ -37,6 +37,8 @@ class DuckDetectorJvmLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<JavaPluginExtension> {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
+                // The fused SDK AAR publishes the sources of every module it contains.
+                withSourcesJar()
             }
             extensions.configure<KotlinJvmProjectExtension> {
                 compilerOptions {

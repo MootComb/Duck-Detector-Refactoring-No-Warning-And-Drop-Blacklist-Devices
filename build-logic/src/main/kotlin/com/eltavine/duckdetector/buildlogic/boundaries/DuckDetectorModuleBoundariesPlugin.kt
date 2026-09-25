@@ -74,6 +74,7 @@ class DuckDetectorModuleBoundariesPlugin : Plugin<Project> {
         val kind = when {
             pluginManager.hasPlugin("com.android.application") -> ModuleKind.ANDROID_APPLICATION
             pluginManager.hasPlugin("com.android.library") -> ModuleKind.ANDROID_LIBRARY
+            pluginManager.hasPlugin("com.android.fused-library") -> ModuleKind.ANDROID_FUSED_LIBRARY
             pluginManager.hasPlugin("org.jetbrains.kotlin.jvm") -> ModuleKind.JVM
             else -> null
         }

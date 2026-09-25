@@ -99,6 +99,16 @@ jobs:
             unitTest \
             :app:assembleDebug
 
+      # The UI-free SDK is the second artifact of the same build. Publishing it to the build
+      # directory fuses every headless module, and verifySdkAar fails if a project module is left
+      # out or a UI library reaches it.
+      - name: Assemble and verify the SDK AAR
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace :sdk:aar:publish :sdk:aar:verifySdkAar
+
       # Gating. lintDebug reports zero errors, so any new one fails the pull request. Translation
       # completeness is reported as a warning instead (see the lint block in the convention plugin),
       # because a locale that has not caught up with a new string must not block unrelated work.
@@ -119,5 +129,6 @@ jobs:
             **/build/reports/tests/
             app/build/reports/lint-results-debug.html
             app/build/reports/lint-results-debug.txt
+            sdk/aar/build/reports/fused_library_report/
           if-no-files-found: ignore
           retention-days: 7

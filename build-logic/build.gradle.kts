@@ -63,5 +63,9 @@ gradlePlugin {
             id = "duckdetector.android.apk-artifacts"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorApkArtifactsConventionPlugin"
         }
+        register("duckDetectorSdkDistribution") {
+            id = "duckdetector.sdk.distribution"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorSdkDistributionPlugin"
+        }
     }
 }

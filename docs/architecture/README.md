@@ -39,6 +39,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:feature:dashboard:*` | Card ordering, overview, findings and export rendering over `DetectorSession` lists | Any specific detector |
 | `:feature:settings:*`, `:feature:update:*`, `:feature:deviceinfo:*` | Supporting features with the same layering | Detector internals |
 | `:sdk:runtime` | The headless composition root: `DetectorCatalog`, the one list of detectors in scan-start order; `DuckDetector`, which runs them without any UI; the native libraries; and the process-level hooks a host wires in: `DuckDetectorZygotePreload`, launch evidence capture and the mount-view sampler | Compose, UI modules, per-detector branching |
+| `:sdk:aar` | The distributable: fuses `:sdk:runtime` and every headless module it is made of into one AAR with its native libraries and services; `verifySdkAar` fails when a project module is left unfused or a UI library reaches it | Code of its own |
 | `:app` | The UI composition root: activities, the dashboard cards of `DetectorFeatures`, notifications, startup policy and package visibility; it names the SDK's zygote preload and calls its launch hooks | Detection rules, probes, report semantics, per-detector branching |
 
 ### Capabilities and their consumers
@@ -62,6 +63,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit, include direction, per-unit CMake targets, JNI exports owned by the unit's module | `test-native-boundaries.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
+| `:sdk:aar:verifySdkAar` | The SDK AAR fuses every project module it needs and reaches no UI library, directly or through an external dependency | Runs on the Fused Library report |
 | `DashboardExportGoldenTest` | Export output of every detector stays byte-identical | Golden fixtures in `app/src/test/.../integration/dashboard` |
 
 The CI `contracts` job runs the Python checkers and their self-tests; the `verify` job runs `:build-logic:test`, every module's `unitTest`, `:app:assembleDebug` for all four ABIs and `:app:lintDebug`, which analyses every dependency of `:app`.

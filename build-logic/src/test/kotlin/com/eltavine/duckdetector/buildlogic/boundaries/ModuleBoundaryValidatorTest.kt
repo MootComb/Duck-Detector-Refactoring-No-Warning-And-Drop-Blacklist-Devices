@@ -99,6 +99,16 @@ class ModuleBoundaryValidatorTest {
     }
 
     @Test
+    fun `lets a fused library fuse headless modules but never a UI module`() {
+        val headless = policy(withMember(":core:bundle", "android-fused-library", ":core:scan", ":core:evidence"))
+        val withUi = policy(withMember(":core:bundle", "android-fused-library", ":core:scan", ":core:ui"))
+
+        assertEquals(ModuleKind.ANDROID_FUSED_LIBRARY, headless.members.getValue(":core:bundle").kind)
+        assertEquals(emptyList<String>(), ModuleBoundaryValidator.validatePolicy(headless))
+        assertPolicyError(withUi, ":core:bundle is not a UI module and may not depend on the UI module :core:ui")
+    }
+
+    @Test
     fun `rejects member dependency cycles`() {
         assertPolicyError(
             policy(withMember(":core:evidence", "jvm", ":core:scan")),

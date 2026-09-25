@@ -23,6 +23,9 @@ import org.json.JSONObject
 enum class ModuleKind(val id: String) {
     ANDROID_APPLICATION("android-application"),
     ANDROID_LIBRARY("android-library"),
+
+    /** Packages other library modules into one published AAR and holds no code of its own. */
+    ANDROID_FUSED_LIBRARY("android-fused-library"),
     JVM("jvm"),
     ;
 

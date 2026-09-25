@@ -190,6 +190,19 @@
         ":core:scan"
       ]
     },
+    ":sdk:aar": {
+      "kind": "android-fused-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":capability:*:*",
+        ":core:*",
+        ":feature:*:data",
+        ":feature:*:detector",
+        ":feature:*:domain",
+        ":feature:*:presentation",
+        ":sdk:runtime"
+      ]
+    },
     ":sdk:runtime": {
       "kind": "android-library",
       "ui": false,
