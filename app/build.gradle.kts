@@ -75,12 +75,10 @@ dependencies {
     implementation(project(":feature:deviceinfo:ui"))
     implementation(project(":feature:update:data"))
     implementation(project(":feature:update:ui"))
+    implementation(project(":feature:settings:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)
-    implementation(libs.aboutlibraries.compose.m3) {
-        exclude(group = "com.github.skydoves", module = "compose-stability-runtime")
-    }
     implementation(libs.bundles.app.security)
     testImplementation(libs.bundles.test.unit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

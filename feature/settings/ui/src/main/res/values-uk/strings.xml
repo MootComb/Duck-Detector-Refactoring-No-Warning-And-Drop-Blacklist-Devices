@@ -1,0 +1,74 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="about_clipboard_build_hash_line">Хеш збірки: %1$s</string>
+    <string name="about_clipboard_build_time_line">Час збірки (UTC): %1$s UTC</string>
+    <string name="about_clipboard_label">Інформація про збірку Duck Detector</string>
+    <string name="about_clipboard_version_line">Версія: %1$s (%2$d)</string>
+    <string name="about_copy_build_info_summary">Копіювати версію, час збірки та хеш збірки</string>
+    <string name="about_copy_toast">Інформацію про збірку скопійовано</string>
+    <string name="about_label_build_hash">Хеш збірки</string>
+    <string name="about_label_build_time">Час збірки</string>
+    <string name="about_label_copy_build_info">Копіювати інформацію про збірку</string>
+    <string name="about_label_email">Електронна пошта</string>
+    <string name="about_label_privacy">Конфіденційність / Використання даних</string>
+    <string name="about_label_version">Версія</string>
+    <string name="about_label_website">Веб-сайт</string>
+    <string name="about_privacy_summary">Перевірки виконуються локально, результати не надсилаються. Застосунок один раз за холодного запуску звертається до GitHub по метадані Nightly. Онлайн-оновлення CRL залишається необов’язковим.</string>
+    <string name="about_subtitle">Посилання на проект та метадані збірки.</string>
+    <string name="about_title">Про програму</string>
+    <string name="about_value_build_time">%1$s UTC</string>
+    <string name="about_value_version">%1$s (%2$d)</string>
+    <string name="author_boundary_toast">Кінець списку</string>
+    <string name="author_summary_alex">SELinux (C++, Kotlin)</string>
+    <string name="author_summary_baka">TEE та Zygisk</string>
+    <string name="author_summary_eltavine">Зробив внесок в UI, C++, ASM та Kotlin.</string>
+    <string name="author_summary_lingqing">TEE</string>
+    <string name="author_summary_mirin">UI</string>
+    <string name="author_summary_sqmy">Kotlin</string>
+    <string name="author_summary_victor">CI</string>
+    <string name="author_summary_wxx">CI (Kotlin)</string>
+    <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
+    <string name="author_swipe_hint_paged">Проведіть пальцем вліво або вправо, щоб переглянути авторів. %1$d/%2$d</string>
+    <string name="author_swipe_hint_single">Проведіть пальцем вліво або вправо, щоб переглянути авторів.</string>
+    <string name="licenses_dialog_close">Закрити</string>
+    <string name="licenses_dialog_home_page">Домашня сторінка</string>
+    <string name="licenses_dialog_licenses">Ліцензії: %1$s</string>
+    <string name="licenses_dialog_no_license_text">Текст ліцензії відсутній.</string>
+    <string name="licenses_dialog_open">Відкрити</string>
+    <string name="licenses_dialog_source_repo">Репозиторій коду</string>
+    <string name="licenses_dialog_version">Версія %1$s</string>
+    <string name="licenses_entry_label">Прозорість</string>
+    <string name="licenses_entry_subtitle">Переглянути вбудовані сторонні проекти та ознайомитися з їхніми ліцензіями.</string>
+    <string name="licenses_entry_title">Бібліотеки з відкритим кодом</string>
+    <string name="licenses_inventory_subtitle">Натисніть на будь-яку залежність, щоб переглянути текст ліцензії та посилання на проект.</string>
+    <string name="licenses_inventory_title">Інвентар вбудованих бібліотек</string>
+    <string name="licenses_screen_back">Назад</string>
+    <string name="licenses_screen_subtitle">Сторонні компоненти, включені в цю збірку.</string>
+    <string name="licenses_screen_title">Ліцензії відкритого коду</string>
+    <string name="settings_crl_footer">Зміни негайно застосовуються до онлайн-оновлення. Вбудовані перевірки відкликання TEE залишаються ввімкненими.</string>
+    <string name="settings_crl_summary">Перевірки відкликання TEE завжди використовують вбудований знімок; цей перемикач лише дозволяє отримувати найновіший канал відкликання атестації Google.</string>
+    <string name="settings_crl_title">Дозволити онлайн-оновлення CRL</string>
+    <string name="settings_subtitle">Керування онлайн-перевіркою та стан оновлення GitHub Nightly.</string>
+    <string name="settings_title">Налаштування</string>
+    <string name="update_settings_label">Перевірити оновлення</string>
+    <string name="update_status_available">Доступна новіша збірка Nightly; торкніться для подробиць</string>
+    <string name="update_status_checking">Перевірка GitHub…</string>
+    <string name="update_status_current">У вас найновіша збірка Nightly</string>
+    <string name="update_status_failed">Не вдалося перевірити GitHub; торкніться, щоб повторити</string>
+    <string name="update_status_idle">GitHub Main Nightly перевіряється після холодного запуску; торкніться, щоб перевірити зараз</string>
+</resources>

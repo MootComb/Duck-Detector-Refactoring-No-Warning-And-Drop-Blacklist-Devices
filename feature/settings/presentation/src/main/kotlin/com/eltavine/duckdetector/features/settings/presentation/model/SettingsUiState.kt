@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.ui
+package com.eltavine.duckdetector.features.settings.presentation.model
 
-import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUpdateStatus
-import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
+data class SettingsUiState(
+    val isCrlNetworkingEnabled: Boolean,
+    val versionName: String,
+    val versionCode: Int,
+    val buildTimeUtc: String,
+    val buildHash: String,
+    val updateStatus: SettingsUpdateStatus,
+)
 
-internal fun UpdateCheckStatus.toSettingsUpdateStatus(): SettingsUpdateStatus = when (this) {
-    UpdateCheckStatus.IDLE -> SettingsUpdateStatus.IDLE
-    UpdateCheckStatus.CHECKING -> SettingsUpdateStatus.CHECKING
-    UpdateCheckStatus.CURRENT -> SettingsUpdateStatus.CURRENT
-    UpdateCheckStatus.AVAILABLE -> SettingsUpdateStatus.AVAILABLE
-    UpdateCheckStatus.FAILED -> SettingsUpdateStatus.FAILED
+enum class SettingsUpdateStatus {
+    IDLE,
+    CHECKING,
+    CURRENT,
+    AVAILABLE,
+    FAILED,
 }

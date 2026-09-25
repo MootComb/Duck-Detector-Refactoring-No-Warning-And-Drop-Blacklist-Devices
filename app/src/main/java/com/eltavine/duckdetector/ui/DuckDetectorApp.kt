@@ -76,7 +76,7 @@ import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardFindi
 import com.eltavine.duckdetector.features.dashboard.ui.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.dashboard.ui.model.dashboardCardOrder
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
-import com.eltavine.duckdetector.features.settings.ui.model.SettingsUiState
+import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution

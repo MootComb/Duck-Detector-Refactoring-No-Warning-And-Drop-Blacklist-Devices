@@ -121,6 +121,8 @@
         ":feature:selinux:domain",
         ":feature:selinux:presentation",
         ":feature:selinux:ui",
+        ":feature:settings:presentation",
+        ":feature:settings:ui",
         ":feature:su:data",
         ":feature:su:domain",
         ":feature:su:presentation",
@@ -598,6 +600,17 @@
         ":core:ui",
         ":feature:selinux:domain",
         ":feature:selinux:presentation"
+      ]
+    },
+    ":feature:settings:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:settings:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:ui",
+        ":feature:settings:presentation"
       ]
     },
     ":feature:su:data": {
