@@ -30,6 +30,8 @@ class MemoryNativeBridgeTest {
         val snapshot = bridge.parse(
             """
                 AVAILABLE=1
+                HOOK_CHECKS_RAN=1
+                ENTRY_CHECKS_SUPPORTED=1
                 GOT_PLT_HOOK=1
                 MODIFIED_FUNCTION_COUNT=2
                 HIGH_COUNT=1
@@ -41,6 +43,8 @@ class MemoryNativeBridgeTest {
 
         assertTrue(snapshot.available)
         assertTrue(snapshot.gotPltHook)
+        assertTrue(snapshot.hookChecksRan)
+        assertTrue(snapshot.entryChecksSupported)
         assertEquals(2, snapshot.modifiedFunctionCount)
         assertEquals(2, snapshot.findings.size)
         assertEquals("HOOK", snapshot.findings[0].section)

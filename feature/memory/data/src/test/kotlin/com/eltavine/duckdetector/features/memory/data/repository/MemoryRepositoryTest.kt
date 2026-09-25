@@ -29,6 +29,36 @@ class MemoryRepositoryTest {
     private val repository = MemoryRepository()
 
     @Test
+    fun `entry prologue is unsupported on ABIs without its instruction patterns`() {
+        val methods = repository.buildMethods(
+            MemoryNativeSnapshot(available = true, hookChecksRan = true, entryChecksSupported = false),
+        )
+
+        assertEquals(MemoryMethodOutcome.CLEAN, methods.first { it.label == "GOT/PLT resolution" }.outcome)
+        val prologue = methods.first { it.label == "Entry prologue" }
+        assertEquals("Unsupported ABI", prologue.summary)
+        assertEquals(MemoryMethodOutcome.SUPPORT, prologue.outcome)
+    }
+
+    @Test
+    fun `hook rows are unavailable when symbol resolution never ran`() {
+        val methods = repository.buildMethods(MemoryNativeSnapshot(available = true, entryChecksSupported = true))
+
+        listOf("GOT/PLT resolution", "Entry prologue").forEach { label ->
+            assertEquals(label, MemoryMethodOutcome.SUPPORT, methods.first { it.label == label }.outcome)
+        }
+    }
+
+    @Test
+    fun `hook rows stay clean when both checks ran on a supported ABI`() {
+        val methods = repository.buildMethods(
+            MemoryNativeSnapshot(available = true, hookChecksRan = true, entryChecksSupported = true),
+        )
+
+        assertEquals(MemoryMethodOutcome.CLEAN, methods.first { it.label == "Entry prologue" }.outcome)
+    }
+
+    @Test
     fun `sanitizes benign zygote jit swapped pages`() {
         val snapshot = MemoryNativeSnapshot(
             available = true,

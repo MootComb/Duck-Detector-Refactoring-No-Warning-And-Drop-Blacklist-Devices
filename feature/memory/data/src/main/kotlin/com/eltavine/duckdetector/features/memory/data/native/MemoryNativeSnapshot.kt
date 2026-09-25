@@ -28,6 +28,8 @@ data class MemoryNativeFinding(
 
 data class MemoryNativeSnapshot(
     val available: Boolean = false,
+    val hookChecksRan: Boolean = false,
+    val entryChecksSupported: Boolean = false,
     val gotPltHook: Boolean = false,
     val inlineHook: Boolean = false,
     val prologueModified: Boolean = false,

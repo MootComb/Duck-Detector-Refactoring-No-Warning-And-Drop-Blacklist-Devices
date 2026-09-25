@@ -77,6 +77,8 @@ namespace duckdetector::memory {
     std::string encode_snapshot(const Snapshot &snapshot) {
         std::ostringstream output;
         output << "AVAILABLE=" << (snapshot.available ? '1' : '0') << '\n';
+        output << "HOOK_CHECKS_RAN=" << (snapshot.hooks.checks_ran ? '1' : '0') << '\n';
+        output << "ENTRY_CHECKS_SUPPORTED=" << (snapshot.hooks.entry_checks_supported ? '1' : '0') << '\n';
         output << "GOT_PLT_HOOK=" << (snapshot.hooks.got_plt_hook ? '1' : '0') << '\n';
         output << "INLINE_HOOK=" << (snapshot.hooks.inline_hook ? '1' : '0') << '\n';
         output << "PROLOGUE_MODIFIED=" << (snapshot.hooks.prologue_modified ? '1' : '0') << '\n';

@@ -73,6 +73,8 @@ class MemoryNativeBridge(
     ): MemoryNativeSnapshot {
         return when (key) {
             "AVAILABLE" -> copy(available = value.asBool())
+            "HOOK_CHECKS_RAN" -> copy(hookChecksRan = value.asBool())
+            "ENTRY_CHECKS_SUPPORTED" -> copy(entryChecksSupported = value.asBool())
             "GOT_PLT_HOOK" -> copy(gotPltHook = value.asBool())
             "INLINE_HOOK" -> copy(inlineHook = value.asBool())
             "PROLOGUE_MODIFIED" -> copy(prologueModified = value.asBool())

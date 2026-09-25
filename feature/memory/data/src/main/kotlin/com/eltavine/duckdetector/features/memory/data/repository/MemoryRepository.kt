@@ -101,10 +101,12 @@ class MemoryRepository(
                 label = "GOT/PLT resolution",
                 summary = when {
                     snapshot.gotPltHook -> "Mismatch"
+                    !snapshot.hookChecksRan -> "Unavailable"
                     else -> "Clean"
                 },
                 outcome = when {
                     snapshot.gotPltHook -> MemoryMethodOutcome.DETECTED
+                    !snapshot.hookChecksRan -> MemoryMethodOutcome.SUPPORT
                     else -> MemoryMethodOutcome.CLEAN
                 },
                 detail = "Checks whether critical libc and linker symbols still resolve into their expected native modules.",
@@ -114,14 +116,17 @@ class MemoryRepository(
                 summary = when {
                     snapshot.inlineHook || snapshot.prologueModified -> "Hook-like"
                     snapshot.trampoline -> "Jump entry"
+                    !snapshot.hookChecksRan -> "Unavailable"
+                    !snapshot.entryChecksSupported -> "Unsupported ABI"
                     else -> "Clean"
                 },
                 outcome = when {
                     snapshot.inlineHook || snapshot.prologueModified -> MemoryMethodOutcome.DETECTED
                     snapshot.trampoline -> MemoryMethodOutcome.REVIEW
+                    !snapshot.hookChecksRan || !snapshot.entryChecksSupported -> MemoryMethodOutcome.SUPPORT
                     else -> MemoryMethodOutcome.CLEAN
                 },
-                detail = "Looks for branch-heavy entry bytes and trampoline-style handoff patterns at sensitive function starts.",
+                detail = "Looks for branch-heavy entry bytes and trampoline-style handoff patterns at sensitive function starts. The byte patterns are arm64 and x86_64 instructions, so other ABIs report this check as unsupported.",
             ),
             MemoryMethodResult(
                 label = "maps + smaps",

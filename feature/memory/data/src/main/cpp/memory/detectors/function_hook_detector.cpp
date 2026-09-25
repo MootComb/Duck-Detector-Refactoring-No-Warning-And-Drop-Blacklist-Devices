@@ -181,10 +181,14 @@ namespace duckdetector::memory {
                                                               {"libdl.so", "linker64", "linker"}},
                                                      }};
 
+#if defined(__aarch64__) || defined(__x86_64__)
+        signals.entry_checks_supported = true;
+#endif
         void *global_handle = dlopen(nullptr, RTLD_NOW);
         if (global_handle == nullptr) {
             return signals;
         }
+        signals.checks_ran = true;
 
         std::set<std::string> modified_functions;
         for (const FunctionTarget &target: targets) {

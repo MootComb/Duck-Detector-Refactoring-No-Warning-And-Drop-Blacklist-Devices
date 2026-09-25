@@ -58,6 +58,10 @@ namespace duckdetector::memory {
     };
 
     struct HookSignals {
+        // Set once dlopen(nullptr) gave a handle to resolve the targets through.
+        bool checks_ran = false;
+        // The entry-byte heuristics decode arm64 and x86_64 instructions only.
+        bool entry_checks_supported = false;
         bool got_plt_hook = false;
         bool inline_hook = false;
         bool prologue_modified = false;
