@@ -63,10 +63,15 @@
     ":app": {
       "kind": "android-application",
       "allowed_project_dependencies": [
-        ":core:evidence"
+        ":core:evidence",
+        ":core:native"
       ]
     },
     ":core:evidence": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":core:native": {
       "kind": "jvm",
       "allowed_project_dependencies": []
     }

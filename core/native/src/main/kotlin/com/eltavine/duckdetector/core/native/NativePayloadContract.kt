@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.core.native
 
 /** Thrown when a payload arrived without a key the parser depends on. */
-class NativePayloadContractViolation(
+public class NativePayloadContractViolation(
     message: String,
 ) : IllegalArgumentException(message)
 
@@ -34,9 +34,9 @@ class NativePayloadContractViolation(
  * parser answers it with a default snapshot first, so this function has no case for it and treats it
  * like any other payload whose keys are absent.
  */
-object NativePayloadContract {
+public object NativePayloadContract {
 
-    fun requireKeys(
+    public fun requireKeys(
         payload: String,
         vararg keys: String,
     ) {

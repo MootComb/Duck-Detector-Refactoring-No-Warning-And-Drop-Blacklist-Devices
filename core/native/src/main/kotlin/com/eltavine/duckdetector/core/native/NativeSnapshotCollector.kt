@@ -34,11 +34,11 @@ import kotlin.coroutines.cancellation.CancellationException
  * `Throwable` catch. [CancellationException] is rethrown so that a scan cancelled mid-probe still
  * unwinds instead of being recorded as a probe failure.
  */
-class NativeSnapshotCollector(
+public class NativeSnapshotCollector(
     private val library: NativeLibraryHandle = DuckDetectorNativeLibrary,
 ) {
 
-    fun <P, T> collect(
+    public fun <P, T> collect(
         readPayload: () -> P,
         parse: (P) -> T,
         unavailable: (NativeCollectionStatus) -> T,
@@ -73,8 +73,8 @@ class NativeSnapshotCollector(
         }
     }
 
-    companion object {
+    public companion object {
 
-        val Default: NativeSnapshotCollector = NativeSnapshotCollector()
+        public val Default: NativeSnapshotCollector = NativeSnapshotCollector()
     }
 }

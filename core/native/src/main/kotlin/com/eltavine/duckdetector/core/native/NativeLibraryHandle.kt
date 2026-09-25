@@ -20,12 +20,12 @@ package com.eltavine.duckdetector.core.native
  * Load state of the shared native library, injectable so that collection failure paths can be
  * exercised on the JVM where no `.so` exists.
  */
-interface NativeLibraryHandle {
+public interface NativeLibraryHandle {
 
-    val isLoaded: Boolean
+    public val isLoaded: Boolean
 
     /** Empty when [isLoaded] is true. */
-    val loadFailureDetail: String
+    public val loadFailureDetail: String
 }
 
 /**
@@ -36,7 +36,7 @@ interface NativeLibraryHandle {
  * same as a device with nothing to report. Loading here once keeps that decision in one place and
  * lets [NativeSnapshotCollector] name the failure.
  */
-object DuckDetectorNativeLibrary : NativeLibraryHandle {
+public object DuckDetectorNativeLibrary : NativeLibraryHandle {
 
     private const val LIBRARY_NAME = "duckdetector"
 

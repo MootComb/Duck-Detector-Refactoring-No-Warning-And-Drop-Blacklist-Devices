@@ -24,7 +24,7 @@ package com.eltavine.duckdetector.core.native
  * snapshots therefore carry an outcome next to their data instead of silently degrading to
  * default field values.
  */
-enum class NativeCollectionOutcome {
+public enum class NativeCollectionOutcome {
 
     /** The bridge produced a payload and the parser accepted it. */
     COLLECTED,
@@ -41,7 +41,7 @@ enum class NativeCollectionOutcome {
     ;
 
     /** Only [COLLECTED] snapshots may be read as statements about the device. */
-    val isTrustworthy: Boolean
+    public val isTrustworthy: Boolean
         get() = this == COLLECTED
 }
 
@@ -52,12 +52,12 @@ enum class NativeCollectionOutcome {
  * for the exported report, where a reader needs to tell "StrongBox is absent" apart from "we could
  * not ask about StrongBox".
  */
-data class NativeCollectionStatus(
-    val outcome: NativeCollectionOutcome = NativeCollectionOutcome.COLLECTED,
-    val detail: String = "",
+public data class NativeCollectionStatus(
+    public val outcome: NativeCollectionOutcome = NativeCollectionOutcome.COLLECTED,
+    public val detail: String = "",
 ) {
 
-    val isTrustworthy: Boolean
+    public val isTrustworthy: Boolean
         get() = outcome.isTrustworthy
 
     /**
@@ -68,15 +68,15 @@ data class NativeCollectionStatus(
      * library, an aborted probe, and an unparsable payload never read identically in an exported
      * report regardless of which detector produced them.
      */
-    fun explain(summary: String): String {
+    public fun explain(summary: String): String {
         return if (detail.isBlank()) "$summary." else "$summary: $detail"
     }
 
-    companion object {
+    public companion object {
 
-        val Collected: NativeCollectionStatus = NativeCollectionStatus()
+        public val Collected: NativeCollectionStatus = NativeCollectionStatus()
 
-        fun failed(
+        public fun failed(
             outcome: NativeCollectionOutcome,
             cause: Throwable,
         ): NativeCollectionStatus {
