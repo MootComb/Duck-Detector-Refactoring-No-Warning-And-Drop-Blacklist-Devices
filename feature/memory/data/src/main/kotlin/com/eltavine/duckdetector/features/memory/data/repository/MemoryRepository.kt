@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.memory.data.native.MemoryNativeSnapsho
 import com.eltavine.duckdetector.features.memory.domain.MemoryFinding
 import com.eltavine.duckdetector.features.memory.domain.MemoryFindingSection
 import com.eltavine.duckdetector.features.memory.domain.MemoryFindingSeverity
+import com.eltavine.duckdetector.features.memory.domain.MemoryMethod
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodOutcome
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodResult
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
@@ -98,7 +99,7 @@ class MemoryRepository(
     internal fun buildMethods(snapshot: MemoryNativeSnapshot): List<MemoryMethodResult> {
         return listOf(
             MemoryMethodResult(
-                label = "GOT/PLT resolution",
+                method = MemoryMethod.GOT_PLT_RESOLUTION,
                 summary = when {
                     snapshot.gotPltHook -> "Mismatch"
                     !snapshot.hookChecksRan -> "Unavailable"
@@ -112,7 +113,7 @@ class MemoryRepository(
                 detail = "Checks whether critical libc and linker symbols still resolve into their expected native modules.",
             ),
             MemoryMethodResult(
-                label = "Entry prologue",
+                method = MemoryMethod.ENTRY_PROLOGUE,
                 summary = when {
                     snapshot.inlineHook || snapshot.prologueModified -> "Hook-like"
                     snapshot.trampoline -> "Jump entry"
@@ -129,7 +130,7 @@ class MemoryRepository(
                 detail = "Looks for branch-heavy entry bytes and trampoline-style handoff patterns at sensitive function starts. The byte patterns are arm64 and x86_64 instructions, so other ABIs report this check as unsupported.",
             ),
             MemoryMethodResult(
-                label = "maps + smaps",
+                method = MemoryMethod.MAPS_SMAPS,
                 summary = when {
                     snapshot.writableExec || snapshot.anonymousExec || snapshot.sharedDirtyExec -> "Anomaly"
                     snapshot.swappedExec -> "Review"
@@ -143,7 +144,7 @@ class MemoryRepository(
                 detail = "Scans non-ART executable mappings for writable code, unexpected swapped pages, and shared-dirty system code.",
             ),
             MemoryMethodResult(
-                label = "FD-backed code",
+                method = MemoryMethod.FD_BACKED_CODE,
                 summary = when {
                     snapshot.deletedSo || snapshot.suspiciousMemfd -> "Suspicious"
                     snapshot.execAshmem || snapshot.devZeroExec -> "Review"
@@ -157,7 +158,7 @@ class MemoryRepository(
                 detail = "Cross-checks executable mappings and live file descriptors for deleted libraries, memfd loaders, ashmem, and /dev/zero execution.",
             ),
             MemoryMethodResult(
-                label = "Signal handlers",
+                method = MemoryMethod.SIGNAL_HANDLERS,
                 summary = when {
                     snapshot.fridaSignal || snapshot.anonymousSignal -> "Suspicious"
                     snapshot.signalHandler -> "Review"
@@ -171,7 +172,7 @@ class MemoryRepository(
                 detail = "Enumerates SIGTRAP/SIGBUS/SIGSEGV/SIGILL handlers and checks whether they point into anonymous or loader-suspicious memory.",
             ),
             MemoryMethodResult(
-                label = "Loader visibility",
+                method = MemoryMethod.LOADER_VISIBILITY,
                 summary = when {
                     snapshot.hiddenModule || snapshot.deletedLibrary -> "Mismatch"
                     snapshot.mapsOnlyModule || snapshot.vdsoRemapped || snapshot.vdsoUnusualBase -> "Review"

@@ -50,12 +50,19 @@ data class MemoryHeaderFactModel(
     val label: String get() = fact.label
 }
 
+/** A row icon that names what the row is about; rows without one show their status icon. */
+enum class MemoryRowIcon {
+    VDSO,
+    SIGNAL_HANDLER,
+}
+
 data class MemoryDetailRowModel(
     val label: String,
     val value: String,
     val status: DetectorStatus,
     val detail: String? = null,
     val detailMonospace: Boolean = false,
+    val icon: MemoryRowIcon? = null,
 )
 
 data class MemoryImpactItemModel(

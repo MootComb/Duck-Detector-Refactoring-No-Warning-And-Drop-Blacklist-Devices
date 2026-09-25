@@ -57,12 +57,25 @@ data class MemoryFinding(
     val detailMonospace: Boolean,
 )
 
+/** The methods a memory scan reports, in report order; [label] is the key each method is listed under. */
+enum class MemoryMethod(val label: String) {
+    GOT_PLT_RESOLUTION("GOT/PLT resolution"),
+    ENTRY_PROLOGUE("Entry prologue"),
+    MAPS_SMAPS("maps + smaps"),
+    FD_BACKED_CODE("FD-backed code"),
+    SIGNAL_HANDLERS("Signal handlers"),
+    LOADER_VISIBILITY("Loader visibility"),
+}
+
 data class MemoryMethodResult(
-    val label: String,
+    val method: MemoryMethod,
     val summary: String,
     val outcome: MemoryMethodOutcome,
     val detail: String,
-)
+) {
+    val label: String
+        get() = method.label
+}
 
 data class MemoryReport(
     val stage: MemoryStage,

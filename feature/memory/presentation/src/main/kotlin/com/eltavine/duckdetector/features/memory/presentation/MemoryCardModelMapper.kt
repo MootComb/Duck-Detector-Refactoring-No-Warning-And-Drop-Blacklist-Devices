@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.memory.domain.MemoryFinding
 import com.eltavine.duckdetector.features.memory.domain.MemoryFindingSection
 import com.eltavine.duckdetector.features.memory.domain.MemoryFindingSeverity
+import com.eltavine.duckdetector.features.memory.domain.MemoryMethod
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodOutcome
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodResult
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
@@ -31,6 +32,7 @@ import com.eltavine.duckdetector.features.memory.presentation.model.MemoryDetail
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFact
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFactModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryImpactItemModel
+import com.eltavine.duckdetector.features.memory.presentation.model.MemoryRowIcon
 
 class MemoryCardModelMapper {
 
@@ -286,31 +288,9 @@ class MemoryCardModelMapper {
 
     private fun buildMethodRows(report: MemoryReport): List<MemoryDetailRowModel> {
         return when (report.stage) {
-            MemoryStage.LOADING -> placeholderRows(
-                listOf(
-                    "GOT/PLT resolution",
-                    "Entry prologue",
-                    "maps + smaps",
-                    "FD-backed code",
-                    "Signal handlers",
-                    "Loader visibility"
-                ),
-                DetectorStatus.info(InfoKind.SUPPORT),
-                "Pending",
-            )
+            MemoryStage.LOADING -> placeholderMethodRows(DetectorStatus.info(InfoKind.SUPPORT), "Pending")
 
-            MemoryStage.FAILED -> placeholderRows(
-                listOf(
-                    "GOT/PLT resolution",
-                    "Entry prologue",
-                    "maps + smaps",
-                    "FD-backed code",
-                    "Signal handlers",
-                    "Loader visibility"
-                ),
-                DetectorStatus.info(InfoKind.ERROR),
-                "Error",
-            )
+            MemoryStage.FAILED -> placeholderMethodRows(DetectorStatus.info(InfoKind.ERROR), "Error")
 
             MemoryStage.READY -> report.methods.map { method ->
                 MemoryDetailRowModel(
@@ -318,6 +298,7 @@ class MemoryCardModelMapper {
                     value = method.summary,
                     status = methodStatus(method),
                     detail = method.detail,
+                    icon = method.method.rowIcon(),
                 )
             }
         }
@@ -411,7 +392,33 @@ class MemoryCardModelMapper {
             },
             detail = finding.detail,
             detailMonospace = finding.detailMonospace,
+            icon = finding.section.rowIcon(),
         )
+    }
+
+    private fun placeholderMethodRows(
+        status: DetectorStatus,
+        value: String,
+    ): List<MemoryDetailRowModel> {
+        return MemoryMethod.entries.map { method ->
+            MemoryDetailRowModel(
+                label = method.label,
+                value = value,
+                status = status,
+                icon = method.rowIcon(),
+            )
+        }
+    }
+
+    private fun MemoryFindingSection.rowIcon(): MemoryRowIcon? = when (this) {
+        MemoryFindingSection.VDSO -> MemoryRowIcon.VDSO
+        MemoryFindingSection.SIGNAL -> MemoryRowIcon.SIGNAL_HANDLER
+        else -> null
+    }
+
+    private fun MemoryMethod.rowIcon(): MemoryRowIcon? = when (this) {
+        MemoryMethod.SIGNAL_HANDLERS -> MemoryRowIcon.SIGNAL_HANDLER
+        else -> null
     }
 
     private fun placeholderFacts(

@@ -49,6 +49,7 @@ import com.eltavine.duckdetector.features.memory.presentation.model.MemoryDetail
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFact
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFactModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryImpactItemModel
+import com.eltavine.duckdetector.features.memory.presentation.model.MemoryRowIcon
 
 @Composable
 internal fun MemoryDetectorCard(
@@ -231,10 +232,10 @@ private fun MemoryDetailRow(
         status = row.status,
         detail = row.detail,
         detailMonospace = row.detailMonospace,
-        statusIcon = when {
-            row.label.contains("vDSO", ignoreCase = true) -> Icons.Rounded.Memory
-            row.label.contains("signal", ignoreCase = true) -> Icons.Rounded.Visibility
-            else -> appearance.icon
+        statusIcon = when (row.icon) {
+            MemoryRowIcon.VDSO -> Icons.Rounded.Memory
+            MemoryRowIcon.SIGNAL_HANDLER -> Icons.Rounded.Visibility
+            null -> appearance.icon
         },
     )
 }
