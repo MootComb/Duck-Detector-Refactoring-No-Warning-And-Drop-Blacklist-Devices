@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class SelinuxViewModel(
     private val repository: SelinuxRepository,
@@ -43,30 +43,35 @@ class SelinuxViewModel(
     )
     val uiState: StateFlow<SelinuxUiState> = _uiState.asStateFlow()
 
+    private val scans = ScanSessionRunner(viewModelScope)
+
     init {
         rescan()
     }
 
     fun rescan() {
-        viewModelScope.launch {
-            val loading = SelinuxReport.loading()
-            _uiState.update {
-                it.copy(
-                    stage = SelinuxUiStage.LOADING,
-                    report = loading,
-                    cardModel = mapper.map(loading),
-                )
-            }
-
-            val report = repository.scan()
-            _uiState.update {
-                it.copy(
-                    stage = if (report.stage == SelinuxStage.FAILED) SelinuxUiStage.FAILED else SelinuxUiStage.READY,
-                    report = report,
-                    cardModel = mapper.map(report),
-                )
-            }
-        }
+        scans.launch(
+            begin = {
+                val loading = SelinuxReport.loading()
+                _uiState.update {
+                    it.copy(
+                        stage = SelinuxUiStage.LOADING,
+                        report = loading,
+                        cardModel = mapper.map(loading),
+                    )
+                }
+            },
+            collect = { repository.scan() },
+            publish = { report ->
+                _uiState.update {
+                    it.copy(
+                        stage = if (report.stage == SelinuxStage.FAILED) SelinuxUiStage.FAILED else SelinuxUiStage.READY,
+                        report = report,
+                        cardModel = mapper.map(report),
+                    )
+                }
+            },
+        )
     }
 
     companion object {
