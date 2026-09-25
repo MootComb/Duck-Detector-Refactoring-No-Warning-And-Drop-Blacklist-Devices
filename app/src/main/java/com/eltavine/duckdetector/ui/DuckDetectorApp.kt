@@ -103,6 +103,7 @@ import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeEffect
 import com.eltavine.duckdetector.ui.shell.attentionDetectorIds
+import com.eltavine.duckdetector.ui.shell.detectorResultNoticeKey
 import com.eltavine.duckdetector.ui.shell.FloatingAppTabSwitcher
 import com.eltavine.duckdetector.ui.shell.StartupGateState
 import com.eltavine.duckdetector.ui.shell.StartupPackageVisibilityState
@@ -468,26 +469,11 @@ private fun AppReadyShell(
             updateStatus = updateUiState.status,
         )
     }
-    val detectorResultNoticeKey = remember(
-        isDashboardLoading,
-        dashboardState.overview.status,
-        dashboardState.overview.summary,
-        dashboardState.overview.metrics,
-    ) {
+    val detectorResultNoticeKey = remember(isDashboardLoading, dashboardState.overview) {
         if (!shouldShowDetectorResultNotice(isDashboardLoading, dashboardState.overview.status)) {
             null
         } else {
-            buildString {
-                append(dashboardState.overview.headline)
-                append('|')
-                append(dashboardState.overview.summary)
-                dashboardState.overview.metrics.forEach { metric ->
-                    append('|')
-                    append(metric.label)
-                    append('=')
-                    append(metric.value)
-                }
-            }
+            detectorResultNoticeKey(dashboardState.overview)
         }
     }
     var dismissedDetectorResultNoticeKey by rememberSaveable { mutableStateOf<String?>(null) }

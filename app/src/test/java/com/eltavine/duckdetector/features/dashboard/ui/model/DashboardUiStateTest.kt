@@ -129,4 +129,29 @@ class DashboardUiStateTest {
             order,
         )
     }
+    @Test
+    fun `overview exposes the typed outcome its wording describes`() {
+        fun summary(id: String, status: DetectorStatus, ready: Boolean) = DetectorSummary(
+            id = DetectorId(id),
+            title = id,
+            status = status,
+            headline = "",
+            summary = "",
+            ready = ready,
+        )
+
+        val overview = buildDashboardOverview(
+            contributions = listOf(
+                summary("warning_one", DetectorStatus.warning(), ready = true),
+                summary("danger_one", DetectorStatus.danger(), ready = true),
+                summary("clear_one", DetectorStatus.allClear(), ready = false),
+            ),
+        )
+
+        assertEquals(OverviewVerdict.DANGER, overview.verdict)
+        assertEquals("Danger", overview.headline)
+        assertEquals(listOf(DetectorId("danger_one"), DetectorId("warning_one")), overview.focusDetectorIds)
+        assertEquals(OverviewCounts(danger = 1, warning = 1, ready = 2, pending = 1), overview.counts)
+        assertEquals(false, overview.titleDescribesCompletedScan)
+    }
 }

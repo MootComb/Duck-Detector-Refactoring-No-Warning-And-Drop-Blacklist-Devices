@@ -40,6 +40,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardOverviewModel
 import kotlinx.coroutines.delay
 
 internal const val RESULT_NOTICE_LOCK_SECONDS = 5
@@ -55,6 +56,23 @@ internal fun shouldShowDetectorResultNotice(
         DetectionSeverity.INFO,
         DetectionSeverity.ALL_CLEAR -> false
     }
+}
+
+/**
+ * Identifies the finding a result notice was shown for, so a dismissed notice stays dismissed
+ * until the outcome itself changes. Built from typed overview data; rewording the overview does
+ * not produce a new key.
+ */
+internal fun detectorResultNoticeKey(overview: DashboardOverviewModel): String {
+    val counts = overview.counts
+    return listOf(
+        overview.verdict.name,
+        overview.focusDetectorIds.joinToString(",") { it.value },
+        "danger=${counts.danger}",
+        "warning=${counts.warning}",
+        "ready=${counts.ready}",
+        "pending=${counts.pending}",
+    ).joinToString("|")
 }
 
 internal fun attentionDetectorIds(

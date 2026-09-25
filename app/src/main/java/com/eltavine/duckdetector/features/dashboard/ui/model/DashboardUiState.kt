@@ -51,7 +51,17 @@ data class DashboardOverviewModel(
     val verdict: OverviewVerdict,
     /** True when [title] reports the completion time and duration of a finished scan. */
     val titleDescribesCompletedScan: Boolean,
+    /** The detectors [summary] points the reader to first, most urgent first. */
+    val focusDetectorIds: List<DetectorId>,
+    val counts: OverviewCounts,
     val showTitleIcon: Boolean = false,
+)
+
+data class OverviewCounts(
+    val danger: Int,
+    val warning: Int,
+    val ready: Int,
+    val pending: Int,
 )
 
 data class DashboardFindingModel(
@@ -83,9 +93,8 @@ fun buildDashboardOverview(
         it.status.severity == DetectionSeverity.INFO && it.status.infoKind == InfoKind.ERROR
     }
 
-    val focusTitles = prioritizedContributions(contributions)
-        .take(2)
-        .map { it.title }
+    val focus = prioritizedContributions(contributions).take(2)
+    val focusTitles = focus.map { it.title }
 
     val verdict = when {
         dangerCount > 0 -> OverviewVerdict.DANGER
@@ -138,6 +147,13 @@ fun buildDashboardOverview(
         status = overviewStatus,
         verdict = verdict,
         titleDescribesCompletedScan = titleDescribesCompletedScan,
+        focusDetectorIds = focus.map { it.id },
+        counts = OverviewCounts(
+            danger = dangerCount,
+            warning = warningCount,
+            ready = readyCount,
+            pending = pendingCount,
+        ),
         metrics = listOf(
             DashboardOverviewMetricModel(
                 label = "Danger",
