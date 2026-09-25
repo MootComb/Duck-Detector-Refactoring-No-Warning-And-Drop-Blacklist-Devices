@@ -68,7 +68,11 @@
         ":core:native",
         ":core:report",
         ":core:scan",
-        ":core:ui"
+        ":core:ui",
+        ":feature:su:data",
+        ":feature:su:domain",
+        ":feature:su:presentation",
+        ":feature:su:ui"
       ]
     },
     ":core:detector": {
@@ -103,6 +107,38 @@
       "kind": "android-library",
       "allowed_project_dependencies": [
         ":core:evidence"
+      ]
+    },
+    ":feature:su:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:native",
+        ":feature:su:domain"
+      ]
+    },
+    ":feature:su:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:su:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:su:domain"
+      ]
+    },
+    ":feature:su:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:su:domain",
+        ":feature:su:presentation"
       ]
     }
   }

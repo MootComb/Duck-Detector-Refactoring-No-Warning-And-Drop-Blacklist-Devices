@@ -49,3 +49,7 @@ include(":core:report")
 include(":core:scan")
 include(":core:ui")
  
+include(":feature:su:domain")
+include(":feature:su:data")
+include(":feature:su:presentation")
+include(":feature:su:ui")

@@ -48,7 +48,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrit
 import com.eltavine.duckdetector.features.selinux.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
-import com.eltavine.duckdetector.features.su.ui.model.SuCardModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesCardModel
 import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport

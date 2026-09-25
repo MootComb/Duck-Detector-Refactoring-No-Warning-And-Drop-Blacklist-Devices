@@ -34,6 +34,8 @@ dependencies {
     implementation(project(":core:report"))
     implementation(project(":core:scan"))
     implementation(project(":core:ui"))
+    implementation(project(":feature:su:data"))
+    implementation(project(":feature:su:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)
