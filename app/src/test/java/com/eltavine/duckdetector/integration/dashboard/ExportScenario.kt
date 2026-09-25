@@ -34,12 +34,10 @@ import com.eltavine.duckdetector.sdk.DetectorCatalog
 /** One fully populated dashboard export built from generated card models. */
 internal class ExportScenario(seed: Int, withScanTime: Boolean = false, minListSize: Int = 0) {
 
-    private val fixtures = CardFixtures(seed, minListSize)
-    // Every card model is drawn from the one seeded sequence, so the golden export depends on this order.
     private val reports: List<DetectorReport> = DetectorCatalog.all
         .sortedBy { it.id.value }
-        .map(fixtures::export)
-    private val device = fixtures.create(DeviceInfoCardModel::class.java).let { generated ->
+        .map { detector -> CardFixtures(seed, minListSize, stream = detector.id.value).export(detector) }
+    private val device = CardFixtures(seed, minListSize, stream = "device").create(DeviceInfoCardModel::class.java).let { generated ->
         val identity = when (seed % 3) {
             1 -> listOf(fact("Brand", "Duck"), fact("Model", "Pond 7"), fact("Android", "17"), fact("SDK", "37"))
             2 -> listOf(fact("brand", "Duck"), fact("MODEL", "Pond 7"), fact("Android", "17"))

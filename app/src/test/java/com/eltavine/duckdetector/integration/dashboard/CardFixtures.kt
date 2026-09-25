@@ -35,13 +35,17 @@ import java.util.Random
  * generator over the shapes the report layout treats differently (blank, padded, multi-line,
  * over-long, containing " = " or " | "); with [minListSize] of at least one, every list is
  * populated, so a mapper that drops or reorders a block changes the rendered report.
+ *
+ * Each [stream] has its own sequence, so the models of one detector can change without changing
+ * the values generated for any other.
  */
 internal class CardFixtures(
     seed: Int,
     private val minListSize: Int = 0,
+    stream: String = "",
 ) {
 
-    private val random = Random(seed.toLong())
+    private val random = Random(31L * seed + stream.hashCode())
     private var counter = 0
 
     fun <T : Any> create(type: Class<T>): T = requireNotNull(type.cast(build(type)))
