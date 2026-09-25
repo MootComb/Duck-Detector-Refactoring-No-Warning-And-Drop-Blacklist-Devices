@@ -28,6 +28,7 @@ kotlin {
 }
 
 dependencies {
+    api(project(":core:detector"))
     api(project(":core:evidence"))
     api(project(":core:report"))
     api(project(":core:scan"))
@@ -37,4 +38,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlinx.coroutines.android)
 }

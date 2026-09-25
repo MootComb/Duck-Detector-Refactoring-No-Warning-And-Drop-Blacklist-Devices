@@ -174,13 +174,15 @@
       "kind": "jvm",
       "ui": false,
       "allowed_project_dependencies": [
-        ":core:evidence"
+        ":core:evidence",
+        ":core:report"
       ]
     },
     ":core:ui": {
       "kind": "android-library",
       "ui": true,
       "allowed_project_dependencies": [
+        ":core:detector",
         ":core:evidence",
         ":core:report",
         ":core:scan"
