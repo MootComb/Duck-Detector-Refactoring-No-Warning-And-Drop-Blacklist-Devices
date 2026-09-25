@@ -40,6 +40,8 @@ dependencies {
     implementation(project(":feature:memory:ui"))
     implementation(project(":feature:kernelcheck:data"))
     implementation(project(":feature:kernelcheck:ui"))
+    implementation(project(":feature:playintegrityfix:data"))
+    implementation(project(":feature:playintegrityfix:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

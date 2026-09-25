@@ -77,6 +77,10 @@
         ":feature:memory:domain",
         ":feature:memory:presentation",
         ":feature:memory:ui",
+        ":feature:playintegrityfix:data",
+        ":feature:playintegrityfix:domain",
+        ":feature:playintegrityfix:presentation",
+        ":feature:playintegrityfix:ui",
         ":feature:su:data",
         ":feature:su:domain",
         ":feature:su:presentation",
@@ -179,6 +183,38 @@
         ":core:ui",
         ":feature:memory:domain",
         ":feature:memory:presentation"
+      ]
+    },
+    ":feature:playintegrityfix:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:native",
+        ":feature:playintegrityfix:domain"
+      ]
+    },
+    ":feature:playintegrityfix:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:playintegrityfix:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":feature:playintegrityfix:domain"
+      ]
+    },
+    ":feature:playintegrityfix:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan",
+        ":core:ui",
+        ":feature:playintegrityfix:domain",
+        ":feature:playintegrityfix:presentation"
       ]
     },
     ":feature:su:data": {
