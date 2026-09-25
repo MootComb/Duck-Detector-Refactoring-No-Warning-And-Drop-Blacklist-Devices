@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "rules": {
+    "composition_root": ":app",
+    "dependency_direction": [":app", ":feature", ":capability", ":core"],
+    "isolated_groups": [":feature", ":capability"],
+    "group_layers": {
+      ":feature": {
+        "domain": { "kind": "jvm", "may_depend_on": [] },
+        "data": { "kind": "android-library", "may_depend_on": ["domain"] },
+        "presentation": { "kind": "jvm", "may_depend_on": ["domain"] },
+        "ui": { "kind": "android-library", "may_depend_on": ["domain", "presentation"] }
+      },
+      ":capability": {
+        "domain": { "kind": "jvm", "may_depend_on": [] },
+        "data": { "kind": "android-library", "may_depend_on": ["domain"] }
+      }
+    },
+    "jvm_forbidden_dependencies": [
+      "androidx.*:*",
+      "com.android.*:*",
+      "com.google.android.*:*",
+      "org.jetbrains.compose.*:*",
+      "org.jetbrains.kotlinx:kotlinx-coroutines-android"
+    ]
+  },
+  "members": {
+    ":app": {
+      "kind": "android-application",
+      "allowed_project_dependencies": []
+    }
+  }
+}
