@@ -17,19 +17,20 @@
 package com.eltavine.duckdetector.features.dangerousapps.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class DangerousAppsCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<DangerousAppsHeaderFactModel>,
     val hmaAlert: DangerousAppsHmaAlertModel? = null,
     val packageItems: List<DangerousAppsPackageItemModel>,
     val context: List<DangerousAppsContextItemModel>,
     val targetApps: List<DangerousAppsTargetAppModel>,
-)
+) : DetectorHeadline
 
 data class DangerousAppsHeaderFactModel(
     val label: String,

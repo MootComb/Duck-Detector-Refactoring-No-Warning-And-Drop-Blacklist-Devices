@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.mount.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class MountCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<MountHeaderFactModel>,
     val procMountViewRows: List<MountDetailRowModel>,
     val artifactRows: List<MountDetailRowModel>,
@@ -33,7 +34,7 @@ data class MountCardModel(
     val impactItems: List<MountImpactItemModel>,
     val methodRows: List<MountDetailRowModel>,
     val scanRows: List<MountDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class MountHeaderFactModel(
     val label: String,

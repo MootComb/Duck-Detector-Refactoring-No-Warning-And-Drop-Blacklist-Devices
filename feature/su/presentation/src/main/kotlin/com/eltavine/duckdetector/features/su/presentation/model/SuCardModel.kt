@@ -17,20 +17,21 @@
 package com.eltavine.duckdetector.features.su.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class SuCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<SuHeaderFactModel>,
     val artifactRows: List<SuDetailRowModel>,
     val contextRows: List<SuDetailRowModel>,
     val impactItems: List<SuImpactItemModel>,
     val methodRows: List<SuDetailRowModel>,
     val scanRows: List<SuDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class SuHeaderFactModel(
     val label: String,

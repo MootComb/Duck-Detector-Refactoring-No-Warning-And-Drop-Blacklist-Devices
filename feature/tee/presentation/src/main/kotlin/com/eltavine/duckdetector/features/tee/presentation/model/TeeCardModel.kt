@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.presentation.model
 
 import com.eltavine.duckdetector.capability.attestation.domain.TeeCertificateItem
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 enum class TeeFactIcon {
     TRUST,
@@ -91,14 +92,14 @@ data class TeeNetworkStateModel(
 )
 
 data class TeeCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     // Compact top-finding copy only; the TEE card keeps the full reducer summary and hidden diagnostics.
     // 仅用于 Dashboard 顶层 finding 的短文案；TEE 卡片保留完整 reducer 摘要和隐藏诊断。
-    val findingDetail: String? = null,
+    override val findingDetail: String? = null,
     val isExpanded: Boolean,
     val headerFacts: List<TeeHeaderFactModel>,
     val highlightSignals: List<TeeHighlightSignalModel>,
@@ -108,4 +109,4 @@ data class TeeCardModel(
     val networkState: TeeNetworkStateModel,
     val exportText: String,
     val rkpBadgeLabel: String? = null,
-)
+) : DetectorHeadline

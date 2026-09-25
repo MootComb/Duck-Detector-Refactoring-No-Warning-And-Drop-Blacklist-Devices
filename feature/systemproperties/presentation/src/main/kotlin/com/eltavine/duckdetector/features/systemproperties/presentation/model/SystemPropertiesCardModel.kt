@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.systemproperties.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class SystemPropertiesCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<SystemPropertiesHeaderFactModel>,
     val coreRows: List<SystemPropertiesDetailRowModel>,
     val bootRows: List<SystemPropertiesDetailRowModel>,
@@ -34,7 +35,7 @@ data class SystemPropertiesCardModel(
     val impactItems: List<SystemPropertiesImpactItemModel>,
     val methodRows: List<SystemPropertiesDetailRowModel>,
     val scanRows: List<SystemPropertiesDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class SystemPropertiesHeaderFactModel(
     val label: String,

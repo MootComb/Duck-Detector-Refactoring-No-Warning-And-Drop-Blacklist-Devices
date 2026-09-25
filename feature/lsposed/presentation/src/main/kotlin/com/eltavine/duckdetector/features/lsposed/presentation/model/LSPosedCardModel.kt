@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.lsposed.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class LSPosedCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<LSPosedHeaderFactModel>,
     val runtimeRows: List<LSPosedDetailRowModel>,
     val binderRows: List<LSPosedDetailRowModel>,
@@ -33,7 +34,7 @@ data class LSPosedCardModel(
     val impactItems: List<LSPosedImpactItemModel>,
     val methodRows: List<LSPosedDetailRowModel>,
     val scanRows: List<LSPosedDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class LSPosedHeaderFactModel(
     val label: String,

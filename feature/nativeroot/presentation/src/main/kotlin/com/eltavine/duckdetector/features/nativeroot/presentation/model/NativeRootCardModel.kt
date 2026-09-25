@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.nativeroot.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class NativeRootCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<NativeRootHeaderFactModel>,
     val nativeRows: List<NativeRootDetailRowModel>,
     val runtimeRows: List<NativeRootDetailRowModel>,
@@ -32,7 +33,7 @@ data class NativeRootCardModel(
     val impactItems: List<NativeRootImpactItemModel>,
     val methodRows: List<NativeRootDetailRowModel>,
     val scanRows: List<NativeRootDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class NativeRootHeaderFactModel(
     val label: String,

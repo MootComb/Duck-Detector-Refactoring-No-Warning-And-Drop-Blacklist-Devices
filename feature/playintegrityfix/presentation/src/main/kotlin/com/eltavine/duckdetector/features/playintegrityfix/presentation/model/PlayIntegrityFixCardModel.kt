@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.playintegrityfix.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class PlayIntegrityFixCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<PlayIntegrityFixHeaderFactModel>,
     val propertyRows: List<PlayIntegrityFixDetailRowModel>,
     val consistencyRows: List<PlayIntegrityFixDetailRowModel>,
@@ -31,7 +32,7 @@ data class PlayIntegrityFixCardModel(
     val impactItems: List<PlayIntegrityFixImpactItemModel>,
     val methodRows: List<PlayIntegrityFixDetailRowModel>,
     val scanRows: List<PlayIntegrityFixDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class PlayIntegrityFixHeaderFactModel(
     val label: String,

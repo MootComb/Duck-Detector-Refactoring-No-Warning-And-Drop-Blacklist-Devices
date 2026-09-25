@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.selinux.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class SelinuxCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<SelinuxHeaderFactModel>,
     val stateRows: List<SelinuxDetailRowModel>,
     val impactItems: List<SelinuxImpactItemModel>,
@@ -34,7 +35,7 @@ data class SelinuxCardModel(
     val auditNotes: List<SelinuxImpactItemModel>,
     val deviceRows: List<SelinuxDetailRowModel>,
     val references: List<String>,
-)
+) : DetectorHeadline
 
 data class SelinuxHeaderFactModel(
     val label: String,

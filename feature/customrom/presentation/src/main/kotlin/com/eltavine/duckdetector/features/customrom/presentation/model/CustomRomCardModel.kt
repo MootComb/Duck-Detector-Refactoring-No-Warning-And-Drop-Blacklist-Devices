@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.customrom.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class CustomRomCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<CustomRomHeaderFactModel>,
     val buildRows: List<CustomRomDetailRowModel>,
     val runtimeRows: List<CustomRomDetailRowModel>,
@@ -31,7 +32,7 @@ data class CustomRomCardModel(
     val impactItems: List<CustomRomImpactItemModel>,
     val methodRows: List<CustomRomDetailRowModel>,
     val scanRows: List<CustomRomDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class CustomRomHeaderFactModel(
     val label: String,

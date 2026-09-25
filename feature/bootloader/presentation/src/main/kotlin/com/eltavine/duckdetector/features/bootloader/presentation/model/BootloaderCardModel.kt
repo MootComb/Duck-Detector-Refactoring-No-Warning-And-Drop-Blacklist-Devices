@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.bootloader.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 enum class BootloaderCardAssessment {
     AUTHORITATIVE,
@@ -25,12 +26,12 @@ enum class BootloaderCardAssessment {
 }
 
 data class BootloaderCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
+    override val status: DetectorStatus,
     val assessment: BootloaderCardAssessment,
-    val verdict: String,
-    val summary: String,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<BootloaderHeaderFactModel>,
     val stateRows: List<BootloaderDetailRowModel>,
     val attestationRows: List<BootloaderDetailRowModel>,
@@ -39,7 +40,7 @@ data class BootloaderCardModel(
     val impactItems: List<BootloaderImpactItemModel>,
     val methodRows: List<BootloaderDetailRowModel>,
     val scanRows: List<BootloaderDetailRowModel>,
-) {
+) : DetectorHeadline {
     val showConsistencyQuestionIcon: Boolean
         get() = assessment != BootloaderCardAssessment.AUTHORITATIVE
 

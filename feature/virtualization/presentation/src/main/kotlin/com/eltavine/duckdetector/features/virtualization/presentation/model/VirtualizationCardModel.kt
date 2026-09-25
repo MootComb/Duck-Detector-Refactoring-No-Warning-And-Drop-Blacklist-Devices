@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.virtualization.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class VirtualizationCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<VirtualizationHeaderFactModel>,
     val environmentRows: List<VirtualizationDetailRowModel>,
     val runtimeRows: List<VirtualizationDetailRowModel>,
@@ -34,7 +35,7 @@ data class VirtualizationCardModel(
     val methodRows: List<VirtualizationDetailRowModel>,
     val scanRows: List<VirtualizationDetailRowModel>,
     val references: List<String>,
-)
+) : DetectorHeadline
 
 data class VirtualizationHeaderFactModel(
     val label: String,

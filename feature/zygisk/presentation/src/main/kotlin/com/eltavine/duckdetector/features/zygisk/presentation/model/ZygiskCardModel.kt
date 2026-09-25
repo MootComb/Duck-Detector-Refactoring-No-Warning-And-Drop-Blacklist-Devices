@@ -17,20 +17,21 @@
 package com.eltavine.duckdetector.features.zygisk.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class ZygiskCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<ZygiskHeaderFactModel>,
     val stateRows: List<ZygiskDetailRowModel>,
     val impactItems: List<ZygiskImpactItemModel>,
     val methodRows: List<ZygiskDetailRowModel>,
     val signalRows: List<ZygiskDetailRowModel>,
     val references: List<String>,
-)
+) : DetectorHeadline
 
 data class ZygiskHeaderFactModel(
     val label: String,

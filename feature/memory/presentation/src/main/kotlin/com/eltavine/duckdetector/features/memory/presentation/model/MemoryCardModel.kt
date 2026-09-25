@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.memory.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class MemoryCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<MemoryHeaderFactModel>,
     val hookRows: List<MemoryDetailRowModel>,
     val mappingRows: List<MemoryDetailRowModel>,
@@ -31,7 +32,7 @@ data class MemoryCardModel(
     val impactItems: List<MemoryImpactItemModel>,
     val methodRows: List<MemoryDetailRowModel>,
     val scanRows: List<MemoryDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class MemoryHeaderFactModel(
     val label: String,

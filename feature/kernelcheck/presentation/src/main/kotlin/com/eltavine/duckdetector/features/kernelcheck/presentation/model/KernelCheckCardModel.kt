@@ -17,13 +17,14 @@
 package com.eltavine.duckdetector.features.kernelcheck.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
 
 data class KernelCheckCardModel(
-    val title: String,
+    override val title: String,
     val subtitle: String,
-    val status: DetectorStatus,
-    val verdict: String,
-    val summary: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
     val headerFacts: List<KernelCheckHeaderFactModel>,
     val identityRows: List<KernelCheckDetailRowModel>,
     val anomalyRows: List<KernelCheckDetailRowModel>,
@@ -31,7 +32,7 @@ data class KernelCheckCardModel(
     val impactItems: List<KernelCheckImpactItemModel>,
     val methodRows: List<KernelCheckDetailRowModel>,
     val scanRows: List<KernelCheckDetailRowModel>,
-)
+) : DetectorHeadline
 
 data class KernelCheckHeaderFactModel(
     val label: String,
