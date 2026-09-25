@@ -18,11 +18,11 @@ package com.eltavine.duckdetector.features.customrom.data.repository
 
 import android.content.Context
 import android.os.Build
-import android.os.IBinder
 import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.features.customrom.data.native.CustomRomNativeBridge
 import com.eltavine.duckdetector.features.customrom.data.rules.CustomRomCatalog
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomFinding
@@ -228,7 +228,6 @@ class CustomRomRepository(
         }.distinct()
     }
 
-    @Suppress("PrivateApi")
     private fun detectServiceFindings(
         isPixel: Boolean,
     ): Pair<List<CustomRomFinding>, Int> {
@@ -236,11 +235,8 @@ class CustomRomRepository(
         var listedServiceCount = 0
 
         runCatching {
-            val serviceManagerClass = Class.forName("android.os.ServiceManager")
-            val getServiceMethod = serviceManagerClass.getMethod("getService", String::class.java)
-
             CustomRomCatalog.specificServices.forEach { signature ->
-                val binder = getServiceMethod.invoke(null, signature.serviceName) as? IBinder
+                val binder = HiddenServiceManager.getService(signature.serviceName).getOrThrow()
                 if (binder != null && !shouldSkip(signature.romName, isPixel)) {
                     findings += CustomRomFinding(
                         romName = signature.romName,
@@ -251,9 +247,7 @@ class CustomRomRepository(
             }
 
             runCatching {
-                val listServicesMethod = serviceManagerClass.getMethod("listServices")
-                val services = listServicesMethod.invoke(null) as? Array<*>
-                val serviceNames = services?.filterIsInstance<String>().orEmpty()
+                val serviceNames = HiddenServiceManager.listServices().getOrThrow()
                 listedServiceCount = serviceNames.size
                 serviceNames.forEach { serviceName ->
                     val lower = serviceName.lowercase()

@@ -77,7 +77,7 @@
       "uses": [
         "operations"
       ],
-      "reason": "Queries the hidden android.os.ServiceManager and reads the hidden framework fields named by custom ROM signatures; the presence of those fields is the evidence."
+      "reason": "Reads the hidden framework fields named by custom ROM signatures; the presence of those fields is the evidence."
     },
     {
       "path": "feature/lsposed/data/src/main/kotlin/com/eltavine/duckdetector/features/lsposed/data/probes/LSPosedBridgeFieldProbe.kt",
