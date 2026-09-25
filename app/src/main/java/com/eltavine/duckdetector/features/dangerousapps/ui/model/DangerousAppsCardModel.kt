@@ -16,7 +16,6 @@
 
 package com.eltavine.duckdetector.features.dangerousapps.ui.model
 
-import com.eltavine.duckdetector.core.ui.model.ContextItemModel
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 
 data class DangerousAppsCardModel(
@@ -28,7 +27,7 @@ data class DangerousAppsCardModel(
     val headerFacts: List<DangerousAppsHeaderFactModel>,
     val hmaAlert: DangerousAppsHmaAlertModel? = null,
     val packageItems: List<DangerousAppsPackageItemModel>,
-    val context: List<ContextItemModel>,
+    val context: List<DangerousAppsContextItemModel>,
     val targetApps: List<DangerousAppsTargetAppModel>,
 )
 
@@ -36,6 +35,11 @@ data class DangerousAppsHeaderFactModel(
     val label: String,
     val value: String,
     val status: DetectorStatus,
+)
+
+data class DangerousAppsContextItemModel(
+    val label: String,
+    val value: String,
 )
 
 data class DangerousAppsHmaAlertModel(

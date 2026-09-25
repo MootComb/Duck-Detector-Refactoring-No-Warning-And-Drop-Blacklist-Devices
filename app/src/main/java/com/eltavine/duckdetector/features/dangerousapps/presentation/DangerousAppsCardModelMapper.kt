@@ -16,7 +16,6 @@
 
 package com.eltavine.duckdetector.features.dangerousapps.presentation
 
-import com.eltavine.duckdetector.core.ui.model.ContextItemModel
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFinding
@@ -24,6 +23,7 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsRepo
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousPackageVisibility
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
+import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsContextItemModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHeaderFactModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHiddenPackageItemModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHmaAlertModel
@@ -208,7 +208,7 @@ class DangerousAppsCardModelMapper {
         }
     }
 
-    private fun buildContext(report: DangerousAppsReport): List<ContextItemModel> {
+    private fun buildContext(report: DangerousAppsReport): List<DangerousAppsContextItemModel> {
         val categories = report.findings
             .map { it.target.category.displayName }
             .distinct()
@@ -228,9 +228,9 @@ class DangerousAppsCardModelMapper {
         }
 
         return listOf(
-            ContextItemModel("Inventory", "${report.targets.size} legacy packages"),
-            ContextItemModel("PackageManager", visibilityLongLabel(report.packageVisibility)),
-            ContextItemModel(
+            DangerousAppsContextItemModel("Inventory", "${report.targets.size} legacy packages"),
+            DangerousAppsContextItemModel("PackageManager", visibilityLongLabel(report.packageVisibility)),
+            DangerousAppsContextItemModel(
                 "Visible packages",
                 if (report.packageManagerVisibleCount > 0) {
                     report.packageManagerVisibleCount.toString()
@@ -238,8 +238,8 @@ class DangerousAppsCardModelMapper {
                     "Unavailable"
                 },
             ),
-            ContextItemModel("Categories", categories),
-            ContextItemModel("Probe families", probeSummary),
+            DangerousAppsContextItemModel("Categories", categories),
+            DangerousAppsContextItemModel("Probe families", probeSummary),
         )
     }
 

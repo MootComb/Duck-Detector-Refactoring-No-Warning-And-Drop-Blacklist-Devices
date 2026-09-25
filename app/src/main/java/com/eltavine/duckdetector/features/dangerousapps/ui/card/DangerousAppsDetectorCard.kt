@@ -47,6 +47,7 @@ import com.eltavine.duckdetector.core.ui.components.ContextLine
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
+import com.eltavine.duckdetector.core.ui.model.ContextItemModel
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsTargetsDialog
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsCardModel
@@ -118,7 +119,7 @@ fun DangerousAppsDetectorCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 model.context.forEach { contextItem ->
-                    ContextLine(item = contextItem)
+                    ContextLine(item = ContextItemModel(label = contextItem.label, value = contextItem.value))
                 }
             }
         }
