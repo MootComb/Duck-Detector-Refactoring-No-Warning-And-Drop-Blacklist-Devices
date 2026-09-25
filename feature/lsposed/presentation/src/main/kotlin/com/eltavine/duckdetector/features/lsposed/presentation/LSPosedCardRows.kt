@@ -112,7 +112,7 @@ private fun signalStatus(signal: LSPosedSignal): DetectorStatus {
 
 private fun LSPosedReport.sectionUnavailable(group: LSPosedSignalGroup): Boolean {
     return when (group) {
-        LSPosedSignalGroup.NATIVE -> !nativeAvailable || !nativeHeapAvailable
+        LSPosedSignalGroup.NATIVE -> !nativeAvailable || !nativeMapsAvailable || !nativeHeapAvailable
         LSPosedSignalGroup.PACKAGES -> packageVisibility != LSPosedPackageVisibility.FULL
         LSPosedSignalGroup.RUNTIME -> !runtimeArtifactAvailable || !logcatAvailable
         LSPosedSignalGroup.POLICY -> !dirtyPolicyAvailable

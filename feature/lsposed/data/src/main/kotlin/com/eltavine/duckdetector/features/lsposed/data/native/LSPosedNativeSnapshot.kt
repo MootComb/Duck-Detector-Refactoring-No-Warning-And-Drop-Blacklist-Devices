@@ -27,6 +27,7 @@ data class LSPosedNativeTrace(
 
 data class LSPosedNativeSnapshot(
     val available: Boolean = false,
+    val mapsAvailable: Boolean = false,
     val heapAvailable: Boolean = false,
     val mapsHitCount: Int = 0,
     val mapsScannedLines: Int = 0,

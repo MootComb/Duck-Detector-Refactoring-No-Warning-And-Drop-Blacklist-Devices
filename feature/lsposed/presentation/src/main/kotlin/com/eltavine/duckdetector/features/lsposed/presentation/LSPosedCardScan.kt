@@ -212,14 +212,14 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
             ),
             LSPosedDetailRowModel(
                 label = "Native maps",
-                value = if (report.nativeAvailable || report.nativeMapsHitCount > 0) {
+                value = if (report.nativeMapsAvailable || report.nativeMapsHitCount > 0) {
                     report.nativeMapsHitCount.toString()
                 } else {
                     "N/A"
                 },
                 status = when {
                     report.nativeMapsHitCount > 0 -> DetectorStatus.danger()
-                    report.nativeAvailable -> DetectorStatus.allClear()
+                    report.nativeMapsAvailable -> DetectorStatus.allClear()
                     else -> DetectorStatus.info(InfoKind.SUPPORT)
                 },
             ),

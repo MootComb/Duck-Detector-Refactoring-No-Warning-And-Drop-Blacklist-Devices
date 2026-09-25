@@ -34,6 +34,7 @@ fun LSPosedReport.toDetectorStatus(): DetectorStatus {
 
 fun LSPosedReport.hasReducedCoverage(): Boolean {
     return !nativeAvailable ||
+            !nativeMapsAvailable ||
             !nativeHeapAvailable ||
             !zygotePermissionAvailable ||
             !runtimeArtifactAvailable ||

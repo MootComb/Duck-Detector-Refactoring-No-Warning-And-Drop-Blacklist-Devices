@@ -62,6 +62,20 @@ class LSPosedCardModelMapperTest {
     }
 
     @Test
+    fun `unreadable proc maps keeps a clean signal report at support`() {
+        val report = LSPosedReport.loading().copy(
+            stage = LSPosedStage.READY,
+            packageVisibility = LSPosedPackageVisibility.FULL,
+            nativeMapsAvailable = false,
+        )
+
+        val model = mapper.map(report)
+
+        assertEquals(DetectionSeverity.INFO, model.status.severity)
+        assertEquals("N/A", model.scanRows.single { it.label == "Native maps" }.value)
+    }
+
+    @Test
     fun `dirty policy signal surfaces in policy section and methods`() {
         val report = LSPosedReport.loading().copy(
             stage = LSPosedStage.READY,

@@ -74,6 +74,7 @@ class LSPosedNativeBridge(
     ): LSPosedNativeSnapshot {
         return when (key) {
             "AVAILABLE" -> copy(available = value.asBool())
+            "MAPS_AVAILABLE" -> copy(mapsAvailable = value.asBool())
             "HEAP_AVAILABLE" -> copy(heapAvailable = value.asBool())
             "MAPS_HITS" -> copy(mapsHitCount = value.toIntOrNull() ?: mapsHitCount)
             "MAPS_SCANNED" -> copy(mapsScannedLines = value.toIntOrNull() ?: mapsScannedLines)

@@ -70,6 +70,7 @@ data class LSPosedMethodResult(
 data class LSPosedReport(
     val stage: LSPosedStage,
     val nativeAvailable: Boolean,
+    val nativeMapsAvailable: Boolean,
     val nativeHeapAvailable: Boolean,
     val zygotePermissionAvailable: Boolean,
     val runtimeArtifactAvailable: Boolean,
@@ -126,6 +127,7 @@ data class LSPosedReport(
             return LSPosedReport(
                 stage = LSPosedStage.LOADING,
                 nativeAvailable = true,
+                nativeMapsAvailable = true,
                 nativeHeapAvailable = true,
                 zygotePermissionAvailable = true,
                 runtimeArtifactAvailable = true,
@@ -154,6 +156,7 @@ data class LSPosedReport(
             return loading().copy(
                 stage = LSPosedStage.FAILED,
                 nativeAvailable = false,
+                nativeMapsAvailable = false,
                 nativeHeapAvailable = false,
                 zygotePermissionAvailable = false,
                 dirtyPolicyAvailable = false,

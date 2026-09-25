@@ -42,6 +42,7 @@ namespace duckdetector::lsposed {
     std::string encode_snapshot(const Snapshot &snapshot) {
         std::ostringstream output;
         output << "AVAILABLE=" << (snapshot.available ? '1' : '0') << '\n';
+        output << "MAPS_AVAILABLE=" << (snapshot.maps_available ? '1' : '0') << '\n';
         output << "HEAP_AVAILABLE=" << (snapshot.heap_available ? '1' : '0') << '\n';
         output << "MAPS_HITS=" << snapshot.maps_hit_count << '\n';
         output << "MAPS_SCANNED=" << snapshot.maps_scanned_lines << '\n';

@@ -30,6 +30,7 @@ class LSPosedNativeBridgeTest {
         val snapshot = bridge.parse(
             """
                 AVAILABLE=1
+                MAPS_AVAILABLE=1
                 HEAP_AVAILABLE=1
                 MAPS_HITS=2
                 MAPS_SCANNED=412
@@ -41,6 +42,7 @@ class LSPosedNativeBridgeTest {
         )
 
         assertTrue(snapshot.available)
+        assertTrue(snapshot.mapsAvailable)
         assertTrue(snapshot.heapAvailable)
         assertEquals(2, snapshot.mapsHitCount)
         assertEquals(4, snapshot.heapScannedRegions)
@@ -54,6 +56,7 @@ class LSPosedNativeBridgeTest {
         val snapshot = bridge.parse("")
 
         assertFalse(snapshot.available)
+        assertFalse(snapshot.mapsAvailable)
         assertFalse(snapshot.heapAvailable)
         assertTrue(snapshot.traces.isEmpty())
         assertEquals(0, snapshot.mapsHitCount)

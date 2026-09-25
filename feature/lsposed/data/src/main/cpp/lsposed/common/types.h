@@ -43,6 +43,7 @@ namespace duckdetector::lsposed {
 
     struct Snapshot {
         bool available = false;
+        bool maps_available = false;
         bool heap_available = false;
         int maps_hit_count = 0;
         int maps_scanned_lines = 0;

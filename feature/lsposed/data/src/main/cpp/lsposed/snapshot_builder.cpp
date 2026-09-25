@@ -48,6 +48,7 @@ namespace duckdetector::lsposed {
         const ProbeResult maps_probe = scan_runtime_maps();
         const ProbeResult heap_probe = scan_heap_residuals();
 
+        snapshot.maps_available = maps_probe.available;
         snapshot.heap_available = heap_probe.available;
         snapshot.maps_hit_count = maps_probe.hit_count;
         snapshot.maps_scanned_lines = maps_probe.scanned_count;

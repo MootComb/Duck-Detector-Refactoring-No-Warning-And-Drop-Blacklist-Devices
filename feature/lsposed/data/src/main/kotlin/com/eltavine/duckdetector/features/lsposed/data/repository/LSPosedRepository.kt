@@ -113,6 +113,7 @@ class LSPosedRepository(
         return LSPosedReport(
             stage = LSPosedStage.READY,
             nativeAvailable = nativeSnapshot.available,
+            nativeMapsAvailable = nativeSnapshot.mapsAvailable,
             nativeHeapAvailable = nativeSnapshot.heapAvailable,
             zygotePermissionAvailable = zygotePermissionResult.available,
             runtimeArtifactAvailable = runtimeArtifactResult.available,
@@ -171,6 +172,7 @@ class LSPosedRepository(
         signals: List<LSPosedSignal>,
     ): List<LSPosedMethodResult> {
         val signalSummaryReducedCoverage = !nativeSnapshot.available ||
+                !nativeSnapshot.mapsAvailable ||
                 !nativeSnapshot.heapAvailable ||
                 !zygotePermissionResult.available ||
                 !runtimeArtifactResult.available ||
@@ -289,12 +291,12 @@ class LSPosedRepository(
                 label = "Native maps",
                 summary = when {
                     nativeSnapshot.mapsHitCount > 0 -> "${nativeSnapshot.mapsHitCount} hit(s)"
-                    nativeSnapshot.available -> "Clean"
+                    nativeSnapshot.mapsAvailable -> "Clean"
                     else -> "Unavailable"
                 },
                 outcome = when {
                     nativeSnapshot.mapsHitCount > 0 -> LSPosedMethodOutcome.DETECTED
-                    nativeSnapshot.available -> LSPosedMethodOutcome.CLEAN
+                    nativeSnapshot.mapsAvailable -> LSPosedMethodOutcome.CLEAN
                     else -> LSPosedMethodOutcome.SUPPORT
                 },
                 detail = "Scans /proc/self/maps for LSPosed, XposedBridge, libXposed, LSPlant, EdXposed, and LSPatch runtime mappings.",
