@@ -66,6 +66,13 @@
       "reason": "Single owner of hidden platform failure identity: ServiceSpecificException, ParcelableException and DeadSystemRuntimeException are absent from the SDK, so only their full class name identifies them, and the public errorCode of a ServiceSpecificException can only be read reflectively."
     },
     {
+      "path": "core/platform/src/main/kotlin/com/eltavine/duckdetector/core/platform/HiddenSystemProperties.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Single owner of the android.os.SystemProperties read, which is hidden from the SDK; probes compare this Java path with native and getprop reads."
+    },
+    {
       "path": "feature/bootloader/data/src/test/kotlin/com/eltavine/duckdetector/features/bootloader/data/widevine/WidevineCredentialProbeTest.kt",
       "uses": [
         "operations"

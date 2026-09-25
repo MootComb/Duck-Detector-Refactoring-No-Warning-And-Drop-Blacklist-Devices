@@ -22,7 +22,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 |---|---|---|
 | `:core:evidence` | `DetectorId`, `DetectorStatus`, `DetectionSeverity` | Android, reports, scans, UI |
 | `:core:native` | Native library handle, payload codec and snapshot collection status shared by every JNI bridge | Android, detector semantics, specific native units |
-| `:core:platform` | Reflection-free names for public Android platform failures, layered on `FailureName` | Hidden platform types, detector semantics, UI |
+| `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity and the hidden `SystemProperties` reader | Detector semantics, verdicts, UI |
 | `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
 | `:core:detector` | `DetectorFeature` / `DetectorSession` and the device profile contract the composition root works with | Specific detectors, probes, rendering of other detectors |
