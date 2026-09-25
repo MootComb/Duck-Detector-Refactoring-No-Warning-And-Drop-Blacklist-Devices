@@ -26,6 +26,8 @@ import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationRe
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalSeverity
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationStage
+import com.eltavine.duckdetector.features.virtualization.domain.hasReducedCoverage
+import com.eltavine.duckdetector.features.virtualization.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationCardModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationDetailRowModel
 import com.eltavine.duckdetector.features.virtualization.presentation.model.VirtualizationHeaderFactModel
@@ -485,32 +487,6 @@ class VirtualizationCardModelMapper {
             VirtualizationSignalSeverity.INFO -> DetectorStatus.info(InfoKind.SUPPORT)
             VirtualizationSignalSeverity.SAFE -> DetectorStatus.allClear()
         }
-    }
-
-    private fun VirtualizationReport.toDetectorStatus(): DetectorStatus {
-        return when (stage) {
-            VirtualizationStage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
-            VirtualizationStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
-            VirtualizationStage.READY -> when {
-                dangerSignals.isNotEmpty() -> DetectorStatus.danger()
-                warningSignals.isNotEmpty() -> DetectorStatus.warning()
-                onlyHostAppCorroboration -> DetectorStatus.info(InfoKind.SUPPORT)
-                hasReducedCoverage() -> DetectorStatus.info(InfoKind.SUPPORT)
-                else -> DetectorStatus.allClear()
-            }
-        }
-    }
-
-    private fun VirtualizationReport.hasReducedCoverage(): Boolean {
-        return !nativeAvailable ||
-                !startupPreloadAvailable ||
-                !startupPreloadContextValid ||
-                !crossProcessAvailable ||
-                !isolatedProcessAvailable ||
-                !eglAvailable ||
-                !mountNamespaceAvailable ||
-                !syscallPackSupported ||
-                packageVisibility != InstalledPackageVisibility.FULL
     }
 
     private fun placeholderRows(

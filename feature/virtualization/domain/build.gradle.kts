@@ -20,4 +20,5 @@ plugins {
 
 dependencies {
     api(project(":capability:packageinventory:domain"))
+    api(project(":core:evidence"))
 }

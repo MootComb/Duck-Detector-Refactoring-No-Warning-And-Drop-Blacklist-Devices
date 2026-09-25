@@ -819,7 +819,8 @@
     ":feature:virtualization:domain": {
       "kind": "jvm",
       "allowed_project_dependencies": [
-        ":capability:packageinventory:domain"
+        ":capability:packageinventory:domain",
+        ":core:evidence"
       ]
     },
     ":feature:virtualization:presentation": {
