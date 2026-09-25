@@ -321,7 +321,7 @@ class TeeReportReducerKeystoreTest {
         )
 
         assertEquals(TeeVerdict.CONSISTENT, report.verdict)
-        assertEquals(2, report.supplementaryIndicatorCount)
+        assertEquals(1, report.supplementaryIndicatorCount)
         assertTrue(report.summary.contains("GOT", ignoreCase = true))
         assertTrue(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Native" && it.body.contains("GOT hook")

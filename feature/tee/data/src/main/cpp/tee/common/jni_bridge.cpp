@@ -54,6 +54,7 @@ Java_com_eltavine_duckdetector_features_tee_data_native_TeeNativeBridge_nativeIn
     const auto snapshot = ducktee::trickystore::inspect_process();
     ducktee::common::ResultCodec codec;
     codec.put_bool("DETECTED", snapshot.detected);
+    codec.put_bool("MAPS_HIT", snapshot.maps_hit_detected);
     codec.put_bool("GOT_HOOK", snapshot.got_hook_detected);
     codec.put_bool("SYSCALL_MISMATCH", snapshot.syscall_mismatch_detected);
     codec.put_bool("INLINE_HOOK", snapshot.inline_hook_detected);

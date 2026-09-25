@@ -56,6 +56,27 @@ class TeeReportReducerNativeTest {
     }
 
     @Test
+    fun `ioctl interception seen three ways is one finding apart from a maps hit`() {
+        val artifacts = baseArtifacts(
+            native = NativeTeeSnapshot(
+                trickyStoreDetected = true,
+                trickyStoreMapsHitDetected = true,
+                gotHookDetected = true,
+                inlineHookDetected = true,
+                honeypotDetected = true,
+                trickyStoreMethods = listOf("MAPS_NAME_HIT", "GOT_HOOK", "INLINE_HOOK", "HONEYPOT"),
+                trickyStoreDetails = "hooked",
+            ),
+        )
+
+        assertEquals(2, reducer.reduce(artifacts).supplementaryIndicatorCount)
+        val indicators = collectSupplementaryIndicators(artifacts)
+        val ioctl = indicators.single { it.title == "TrickyStore ioctl" }
+        assertTrue(ioctl.body.contains("GOT") && ioctl.body.contains("prologue") && ioctl.body.contains("honeypot"))
+        assertTrue(indicators.any { it.title == "TrickyStore" })
+    }
+
+    @Test
     fun `collected native probes keep aligned attestation all-clear`() {
         val report = reducer.reduce(baseArtifacts(tier = TeeTier.TEE))
 

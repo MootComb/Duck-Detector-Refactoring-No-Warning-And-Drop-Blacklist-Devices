@@ -62,6 +62,7 @@ class TeeNativeBridgeTest {
         assertTrue(snapshot.tracingDetected)
         assertEquals(4096, snapshot.pageSize)
         assertTrue(snapshot.trickyStoreDetected)
+        assertFalse(snapshot.trickyStoreMapsHitDetected)
         assertTrue(snapshot.gotHookDetected)
         assertTrue(snapshot.syscallMismatchDetected)
         assertTrue(snapshot.honeypotDetected)
@@ -76,6 +77,25 @@ class TeeNativeBridgeTest {
         assertEquals(167, snapshot.trickyStoreTimingMedianRatioPercent)
         assertEquals(listOf("GOT_HOOK", "HONEYPOT"), snapshot.trickyStoreMethods)
         assertTrue(snapshot.leafDerSecondaryDetected)
+    }
+
+    @Test
+    fun `decodeSnapshot reads the maps hit apart from the ioctl methods`() {
+        val snapshot = bridge.decodeSnapshot(
+            environmentRaw = "",
+            trickyRaw = """
+                DETECTED=1
+                MAPS_HIT=1
+                GOT_HOOK=0
+                METHOD=MAPS_NAME_HIT
+                DETAILS=maps
+            """.trimIndent(),
+            derRaw = "",
+        )
+
+        assertTrue(snapshot.trickyStoreDetected)
+        assertTrue(snapshot.trickyStoreMapsHitDetected)
+        assertFalse(snapshot.gotHookDetected)
     }
 
     @Test

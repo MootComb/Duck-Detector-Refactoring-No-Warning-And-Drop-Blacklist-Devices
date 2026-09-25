@@ -61,6 +61,7 @@ class TeeNativeBridge(
             tracingDetected = NativePayloadCodec.decodeFlag(env["TRACING"]),
             suspiciousMappings = env.filterKeys { it == "MAPPING" || it.startsWith("MAPPING_") }.values.toList(),
             trickyStoreDetected = NativePayloadCodec.decodeFlag(tricky["DETECTED"]),
+            trickyStoreMapsHitDetected = NativePayloadCodec.decodeFlag(tricky["MAPS_HIT"]),
             gotHookDetected = NativePayloadCodec.decodeFlag(tricky["GOT_HOOK"]),
             syscallMismatchDetected = NativePayloadCodec.decodeFlag(tricky["SYSCALL_MISMATCH"]),
             inlineHookDetected = NativePayloadCodec.decodeFlag(tricky["INLINE_HOOK"]),

@@ -25,6 +25,7 @@ namespace ducktee::trickystore {
 
     struct ProbeSnapshot {
         bool detected = false;
+        bool maps_hit_detected = false;
         bool got_hook_detected = false;
         bool syscall_mismatch_detected = false;
         bool inline_hook_detected = false;

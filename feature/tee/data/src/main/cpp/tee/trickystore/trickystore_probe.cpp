@@ -51,6 +51,7 @@ namespace ducktee::trickystore {
         std::vector<std::string> map_hits;
         if (maps_contain_trickystore(&map_hits)) {
             snapshot.detected = true;
+            snapshot.maps_hit_detected = true;
             methods.push_back("MAPS_NAME_HIT");
             if (!map_hits.empty()) {
                 findings.push_back("Suspicious process map entry: " + map_hits.front());

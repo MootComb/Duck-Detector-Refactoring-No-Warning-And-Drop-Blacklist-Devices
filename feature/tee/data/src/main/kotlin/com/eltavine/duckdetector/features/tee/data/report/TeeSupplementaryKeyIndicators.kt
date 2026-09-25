@@ -194,38 +194,27 @@ internal fun MutableList<TeeEvidenceItem>.addNativeAndStrongBoxIndicators(artifa
             )
         )
     }
-    if (artifacts.native.gotHookDetected) {
+    // The GOT, prologue and honeypot checks each observe one mechanism, an intercepted binder ioctl in
+    // this process, so together they are one finding. Only the process map hit is a separate mechanism.
+    val ioctlInterception = buildList {
+        if (artifacts.native.gotHookDetected) add("libbinder ioctl GOT entry differed from libc.")
+        if (artifacts.native.inlineHookDetected) add("ioctl prologue looked patched or redirected.")
+        if (artifacts.native.honeypotDetected) add("Keystore-style binder honeypot triggered abnormal ioctl timing.")
+    }
+    if (ioctlInterception.isNotEmpty()) {
         add(
             fact(
                 "TrickyStore ioctl",
-                "libbinder ioctl GOT entry differed from libc.",
+                ioctlInterception.joinToString(separator = " "),
                 TeeSignalLevel.FAIL
             )
         )
     }
-    if (artifacts.native.inlineHookDetected) {
-        add(
-            fact(
-                "TrickyStore ioctl",
-                "ioctl prologue looked patched or redirected.",
-                TeeSignalLevel.FAIL
-            )
-        )
-    }
-    if (artifacts.native.honeypotDetected) {
-        add(
-            fact(
-                "TrickyStore ioctl",
-                "Keystore-style binder honeypot triggered abnormal ioctl timing.",
-                TeeSignalLevel.FAIL
-            )
-        )
-    }
-    if (artifacts.native.trickyStoreDetected) {
+    if (artifacts.native.trickyStoreMapsHitDetected) {
         add(
             fact(
                 "TrickyStore",
-                "Process-side indicators matched ${nativeMethodSummary(artifacts)}.",
+                "A library mapped into this process matched TrickyStore's name.",
                 TeeSignalLevel.FAIL
             )
         )

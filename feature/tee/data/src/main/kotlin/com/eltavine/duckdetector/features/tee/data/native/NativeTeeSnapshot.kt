@@ -22,6 +22,7 @@ data class NativeTeeSnapshot(
     val tracingDetected: Boolean = false,
     val suspiciousMappings: List<String> = emptyList(),
     val trickyStoreDetected: Boolean = false,
+    val trickyStoreMapsHitDetected: Boolean = false,
     val gotHookDetected: Boolean = false,
     val syscallMismatchDetected: Boolean = false,
     val inlineHookDetected: Boolean = false,
