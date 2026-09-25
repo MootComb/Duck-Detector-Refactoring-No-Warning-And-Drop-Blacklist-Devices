@@ -37,11 +37,21 @@ data class SystemPropertiesCardModel(
     val scanRows: List<SystemPropertiesDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class SystemPropertiesHeaderFact(val label: String) {
+    CRITICAL("Critical"),
+    REVIEW("Review"),
+    BOOT("Boot"),
+    BUILD("Build"),
+}
+
 data class SystemPropertiesHeaderFactModel(
-    val label: String,
+    val fact: SystemPropertiesHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class SystemPropertiesDetailRowModel(
     val label: String,

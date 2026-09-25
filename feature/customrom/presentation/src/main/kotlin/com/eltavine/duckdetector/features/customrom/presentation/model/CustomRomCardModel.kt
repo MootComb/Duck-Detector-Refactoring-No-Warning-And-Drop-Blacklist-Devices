@@ -34,11 +34,21 @@ data class CustomRomCardModel(
     val scanRows: List<CustomRomDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class CustomRomHeaderFact(val label: String) {
+    ROMS("ROMs"),
+    BUILD("Build"),
+    RUNTIME("Runtime"),
+    NATIVE("Native"),
+}
+
 data class CustomRomHeaderFactModel(
-    val label: String,
+    val fact: CustomRomHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class CustomRomDetailRowModel(
     val label: String,

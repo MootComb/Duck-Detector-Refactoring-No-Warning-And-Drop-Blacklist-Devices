@@ -46,6 +46,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomDetailRowModel
+import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFact
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFactModel
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomImpactItemModel
 
@@ -120,10 +121,10 @@ internal fun CustomRomDetectorCard(
 private fun CustomRomCollapsedOverview(
     model: CustomRomCardModel,
 ) {
-    val roms = model.headerFacts.firstOrNull { it.label == "ROMs" } ?: return
-    val build = model.headerFacts.firstOrNull { it.label == "Build" } ?: return
-    val runtime = model.headerFacts.firstOrNull { it.label == "Runtime" } ?: return
-    val native = model.headerFacts.firstOrNull { it.label == "Native" } ?: return
+    val roms = model.headerFacts.firstOrNull { it.fact == CustomRomHeaderFact.ROMS } ?: return
+    val build = model.headerFacts.firstOrNull { it.fact == CustomRomHeaderFact.BUILD } ?: return
+    val runtime = model.headerFacts.firstOrNull { it.fact == CustomRomHeaderFact.RUNTIME } ?: return
+    val native = model.headerFacts.firstOrNull { it.fact == CustomRomHeaderFact.NATIVE } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

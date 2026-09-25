@@ -47,6 +47,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckCardModel
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckDetailRowModel
+import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckHeaderFact
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckHeaderFactModel
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckImpactItemModel
 
@@ -121,10 +122,10 @@ internal fun KernelCheckDetectorCard(
 private fun KernelCheckCollapsedOverview(
     model: KernelCheckCardModel,
 ) {
-    val identity = model.headerFacts.firstOrNull { it.label == "Identity" } ?: return
-    val boot = model.headerFacts.firstOrNull { it.label == "Boot" } ?: return
-    val behavior = model.headerFacts.firstOrNull { it.label == "Behavior" } ?: return
-    val native = model.headerFacts.firstOrNull { it.label == "Native" } ?: return
+    val identity = model.headerFacts.firstOrNull { it.fact == KernelCheckHeaderFact.IDENTITY } ?: return
+    val boot = model.headerFacts.firstOrNull { it.fact == KernelCheckHeaderFact.BOOT } ?: return
+    val behavior = model.headerFacts.firstOrNull { it.fact == KernelCheckHeaderFact.BEHAVIOR } ?: return
+    val native = model.headerFacts.firstOrNull { it.fact == KernelCheckHeaderFact.NATIVE } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

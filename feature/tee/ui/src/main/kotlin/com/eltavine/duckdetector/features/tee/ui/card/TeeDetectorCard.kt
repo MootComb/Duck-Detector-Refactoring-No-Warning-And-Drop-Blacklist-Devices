@@ -75,6 +75,7 @@ import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactIcon
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactRowModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionModel
+import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFact
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeHighlightSignalModel
 import com.eltavine.duckdetector.features.tee.ui.R
@@ -158,10 +159,10 @@ internal fun TeeDetectorCard(
 private fun TeeCollapsedOverview(
     model: TeeCardModel,
 ) {
-    val verdict = model.headerFacts.firstOrNull { it.label == "Verdict" } ?: return
-    val score = model.headerFacts.firstOrNull { it.label == "Score" } ?: return
-    val tier = model.headerFacts.firstOrNull { it.label == "Tier" } ?: return
-    val trust = model.headerFacts.firstOrNull { it.label == "Trust" } ?: return
+    val verdict = model.headerFacts.firstOrNull { it.fact == TeeHeaderFact.VERDICT } ?: return
+    val score = model.headerFacts.firstOrNull { it.fact == TeeHeaderFact.SCORE } ?: return
+    val tier = model.headerFacts.firstOrNull { it.fact == TeeHeaderFact.TIER } ?: return
+    val trust = model.headerFacts.firstOrNull { it.fact == TeeHeaderFact.TRUST } ?: return
 
     Column(
         modifier = Modifier.fillMaxWidth(),

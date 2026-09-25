@@ -33,11 +33,21 @@ data class ZygiskCardModel(
     val references: List<String>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class ZygiskHeaderFact(val label: String) {
+    STATE("State"),
+    CONFIDENCE("Confidence"),
+    FD_TRAP("FD trap"),
+    NATIVE("Native"),
+}
+
 data class ZygiskHeaderFactModel(
-    val label: String,
+    val fact: ZygiskHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class ZygiskDetailRowModel(
     val label: String,

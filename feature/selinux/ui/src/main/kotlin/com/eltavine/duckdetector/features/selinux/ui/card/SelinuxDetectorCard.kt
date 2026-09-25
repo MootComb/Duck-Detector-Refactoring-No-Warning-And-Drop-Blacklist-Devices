@@ -46,6 +46,7 @@ import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxDetailRowModel
+import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxHeaderFact
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxHeaderFactModel
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
@@ -193,10 +194,10 @@ internal fun SelinuxDetectorCard(
 private fun SelinuxCollapsedOverview(
     model: SelinuxCardModel,
 ) {
-    val mode = model.headerFacts.firstOrNull { it.label == "Mode" } ?: return
-    val policy = model.headerFacts.firstOrNull { it.label == "Policy" } ?: return
-    val audit = model.headerFacts.firstOrNull { it.label == "Audit" } ?: return
-    val context = model.headerFacts.firstOrNull { it.label == "Context" } ?: return
+    val mode = model.headerFacts.firstOrNull { it.fact == SelinuxHeaderFact.MODE } ?: return
+    val policy = model.headerFacts.firstOrNull { it.fact == SelinuxHeaderFact.POLICY } ?: return
+    val audit = model.headerFacts.firstOrNull { it.fact == SelinuxHeaderFact.AUDIT } ?: return
+    val context = model.headerFacts.firstOrNull { it.fact == SelinuxHeaderFact.CONTEXT } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

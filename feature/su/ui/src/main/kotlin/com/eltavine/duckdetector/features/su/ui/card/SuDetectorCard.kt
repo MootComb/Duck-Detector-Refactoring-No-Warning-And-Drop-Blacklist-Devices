@@ -46,6 +46,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFact
 import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuImpactItemModel
 
@@ -112,10 +113,10 @@ internal fun SuDetectorCard(
 private fun SuCollapsedOverview(
     model: SuCardModel,
 ) {
-    val artifacts = model.headerFacts.firstOrNull { it.label == "Artifacts" } ?: return
-    val daemons = model.headerFacts.firstOrNull { it.label == "Daemons" } ?: return
-    val context = model.headerFacts.firstOrNull { it.label == "Context" } ?: return
-    val processes = model.headerFacts.firstOrNull { it.label == "Processes" } ?: return
+    val artifacts = model.headerFacts.firstOrNull { it.fact == SuHeaderFact.ARTIFACTS } ?: return
+    val daemons = model.headerFacts.firstOrNull { it.fact == SuHeaderFact.DAEMONS } ?: return
+    val context = model.headerFacts.firstOrNull { it.fact == SuHeaderFact.CONTEXT } ?: return
+    val processes = model.headerFacts.firstOrNull { it.fact == SuHeaderFact.PROCESSES } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

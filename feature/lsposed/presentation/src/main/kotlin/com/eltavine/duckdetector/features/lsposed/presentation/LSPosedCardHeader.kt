@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
+import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFact
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFactModel
 
 internal fun buildSubtitle(report: LSPosedReport): String {
@@ -93,7 +94,7 @@ internal fun buildHeaderFacts(report: LSPosedReport): List<LSPosedHeaderFactMode
         LSPosedStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
         LSPosedStage.READY -> listOf(
             LSPosedHeaderFactModel(
-                label = "Critical",
+                fact = LSPosedHeaderFact.CRITICAL,
                 value = countLabel(report.dangerSignalCount, report.hasReducedCoverage()),
                 status = when {
                     report.dangerSignalCount > 0 -> DetectorStatus.danger()
@@ -102,7 +103,7 @@ internal fun buildHeaderFacts(report: LSPosedReport): List<LSPosedHeaderFactMode
                 },
             ),
             LSPosedHeaderFactModel(
-                label = "Review",
+                fact = LSPosedHeaderFact.REVIEW,
                 value = countLabel(report.warningSignalCount, report.hasReducedCoverage()),
                 status = when {
                     report.warningSignalCount > 0 -> DetectorStatus.warning()
@@ -111,12 +112,12 @@ internal fun buildHeaderFacts(report: LSPosedReport): List<LSPosedHeaderFactMode
                 },
             ),
             LSPosedHeaderFactModel(
-                label = "Bridge",
+                fact = LSPosedHeaderFact.BRIDGE,
                 value = if (report.binderHitCount > 0) report.binderHitCount.toString() else "Clean",
                 status = if (report.binderHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedHeaderFactModel(
-                label = "Packages",
+                fact = LSPosedHeaderFact.PACKAGES,
                 value = when {
                     report.packageSignalCount > 0 -> report.packageSignalCount.toString()
                     report.packageVisibility == LSPosedPackageVisibility.FULL -> "Clean"
@@ -137,10 +138,10 @@ private fun placeholderFacts(
     status: DetectorStatus,
 ): List<LSPosedHeaderFactModel> {
     return listOf(
-        LSPosedHeaderFactModel("Critical", value, status),
-        LSPosedHeaderFactModel("Review", value, status),
-        LSPosedHeaderFactModel("Bridge", value, status),
-        LSPosedHeaderFactModel("Packages", value, status),
+        LSPosedHeaderFactModel(LSPosedHeaderFact.CRITICAL, value, status),
+        LSPosedHeaderFactModel(LSPosedHeaderFact.REVIEW, value, status),
+        LSPosedHeaderFactModel(LSPosedHeaderFact.BRIDGE, value, status),
+        LSPosedHeaderFactModel(LSPosedHeaderFact.PACKAGES, value, status),
     )
 }
 

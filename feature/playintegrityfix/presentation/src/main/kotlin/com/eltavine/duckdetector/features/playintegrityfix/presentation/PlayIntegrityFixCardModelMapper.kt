@@ -28,6 +28,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityF
 import com.eltavine.duckdetector.features.playintegrityfix.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixDetailRowModel
+import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFact
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFactModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixImpactItemModel
 
@@ -113,7 +114,7 @@ class PlayIntegrityFixCardModelMapper {
 
             PlayIntegrityFixStage.READY -> listOf(
                 PlayIntegrityFixHeaderFactModel(
-                    label = "Direct",
+                    fact = PlayIntegrityFixHeaderFact.DIRECT,
                     value = countOrNone(report.dangerSignalCount),
                     status = when {
                         report.dangerSignalCount > 0 -> DetectorStatus.danger()
@@ -122,7 +123,7 @@ class PlayIntegrityFixCardModelMapper {
                     },
                 ),
                 PlayIntegrityFixHeaderFactModel(
-                    label = "Review",
+                    fact = PlayIntegrityFixHeaderFact.REVIEW,
                     value = countOrNone(report.warningSignalCount),
                     status = when {
                         report.warningSignalCount > 0 -> DetectorStatus.warning()
@@ -131,12 +132,12 @@ class PlayIntegrityFixCardModelMapper {
                     },
                 ),
                 PlayIntegrityFixHeaderFactModel(
-                    label = "Props",
+                    fact = PlayIntegrityFixHeaderFact.PROPS,
                     value = countOrClean(report.directPropertyCount),
                     status = if (report.directPropertyCount > 0) propertyStatus(report) else DetectorStatus.allClear(),
                 ),
                 PlayIntegrityFixHeaderFactModel(
-                    label = "Native",
+                    fact = PlayIntegrityFixHeaderFact.NATIVE,
                     value = nativeFactValue(report),
                     status = nativeFactStatus(report),
                 ),
@@ -433,10 +434,10 @@ class PlayIntegrityFixCardModelMapper {
         status: DetectorStatus,
     ): List<PlayIntegrityFixHeaderFactModel> {
         return listOf(
-            PlayIntegrityFixHeaderFactModel("Direct", value, status),
-            PlayIntegrityFixHeaderFactModel("Review", value, status),
-            PlayIntegrityFixHeaderFactModel("Props", value, status),
-            PlayIntegrityFixHeaderFactModel("Native", value, status),
+            PlayIntegrityFixHeaderFactModel(PlayIntegrityFixHeaderFact.DIRECT, value, status),
+            PlayIntegrityFixHeaderFactModel(PlayIntegrityFixHeaderFact.REVIEW, value, status),
+            PlayIntegrityFixHeaderFactModel(PlayIntegrityFixHeaderFact.PROPS, value, status),
+            PlayIntegrityFixHeaderFactModel(PlayIntegrityFixHeaderFact.NATIVE, value, status),
         )
     }
 

@@ -31,6 +31,7 @@ import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactIcon
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactRowModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionModel
+import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFact
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeHighlightSignalModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeNetworkStateModel
@@ -108,10 +109,10 @@ class TeeCardModelMapper {
             DetectorStatus.allClear()
         }
         return listOf(
-            TeeHeaderFactModel("Verdict", verdictValue(report), status),
-            TeeHeaderFactModel("Tier", report.tier.displayName(), report.tierStatus()),
-            TeeHeaderFactModel("Trust", trustRootValue(report), report.trustStatus()),
-            TeeHeaderFactModel("Score", report.tamperScore.toString(), scoreStatus),
+            TeeHeaderFactModel(TeeHeaderFact.VERDICT, verdictValue(report), status),
+            TeeHeaderFactModel(TeeHeaderFact.TIER, report.tier.displayName(), report.tierStatus()),
+            TeeHeaderFactModel(TeeHeaderFact.TRUST, trustRootValue(report), report.trustStatus()),
+            TeeHeaderFactModel(TeeHeaderFact.SCORE, report.tamperScore.toString(), scoreStatus),
         )
     }
 

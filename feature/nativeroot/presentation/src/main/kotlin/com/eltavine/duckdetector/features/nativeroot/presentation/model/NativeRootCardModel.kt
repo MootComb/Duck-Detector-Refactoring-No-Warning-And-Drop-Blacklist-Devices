@@ -35,11 +35,21 @@ data class NativeRootCardModel(
     val scanRows: List<NativeRootDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class NativeRootHeaderFact(val label: String) {
+    FLAGS("Flags"),
+    DIRECT("Direct"),
+    KERNEL("Kernel"),
+    RUNTIME("Runtime"),
+}
+
 data class NativeRootHeaderFactModel(
-    val label: String,
+    val fact: NativeRootHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class NativeRootDetailRowModel(
     val label: String,

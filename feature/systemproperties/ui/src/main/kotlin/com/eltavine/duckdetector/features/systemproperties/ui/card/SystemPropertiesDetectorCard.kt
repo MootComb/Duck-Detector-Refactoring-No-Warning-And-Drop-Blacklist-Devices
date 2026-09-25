@@ -49,6 +49,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesCardModel
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesDetailRowModel
+import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFact
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFactModel
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesImpactItemModel
 
@@ -147,10 +148,10 @@ internal fun SystemPropertiesDetectorCard(
 private fun SystemPropertiesCollapsedOverview(
     model: SystemPropertiesCardModel,
 ) {
-    val critical = model.headerFacts.firstOrNull { it.label == "Critical" } ?: return
-    val review = model.headerFacts.firstOrNull { it.label == "Review" } ?: return
-    val boot = model.headerFacts.firstOrNull { it.label == "Boot" } ?: return
-    val build = model.headerFacts.firstOrNull { it.label == "Build" } ?: return
+    val critical = model.headerFacts.firstOrNull { it.fact == SystemPropertiesHeaderFact.CRITICAL } ?: return
+    val review = model.headerFacts.firstOrNull { it.fact == SystemPropertiesHeaderFact.REVIEW } ?: return
+    val boot = model.headerFacts.firstOrNull { it.fact == SystemPropertiesHeaderFact.BOOT } ?: return
+    val build = model.headerFacts.firstOrNull { it.fact == SystemPropertiesHeaderFact.BUILD } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

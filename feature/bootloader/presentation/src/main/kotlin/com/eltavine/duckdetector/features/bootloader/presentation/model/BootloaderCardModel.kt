@@ -52,11 +52,21 @@ data class BootloaderCardModel(
         }
 }
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class BootloaderHeaderFact(val label: String) {
+    STATE("State"),
+    PROOF("Proof"),
+    TIER("Tier"),
+    TRUST("Trust"),
+}
+
 data class BootloaderHeaderFactModel(
-    val label: String,
+    val fact: BootloaderHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class BootloaderDetailRowModel(
     val label: String,

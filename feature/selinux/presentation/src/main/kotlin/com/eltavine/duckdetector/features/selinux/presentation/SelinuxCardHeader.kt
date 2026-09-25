@@ -30,6 +30,7 @@ import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportS
 import com.eltavine.duckdetector.features.selinux.domain.firstTrustedPolicyRuleHit
 import com.eltavine.duckdetector.features.selinux.domain.policyloadSeqnoResult
 import com.eltavine.duckdetector.features.selinux.domain.procAttrCurrentResult
+import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxHeaderFact
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxHeaderFactModel
 
 internal fun buildSubtitle(report: SelinuxReport): String {
@@ -224,22 +225,22 @@ internal fun buildHeaderFacts(report: SelinuxReport): List<SelinuxHeaderFactMode
     val policy = report.policyAnalysis
     return listOf(
         SelinuxHeaderFactModel(
-            label = "Mode",
+            fact = SelinuxHeaderFact.MODE,
             value = report.resolvedStatusLabel,
             status = modeStatus(report.mode),
         ),
         SelinuxHeaderFactModel(
-            label = "Policy",
+            fact = SelinuxHeaderFact.POLICY,
             value = policyWeaknessLabel(policy?.weakness),
             status = policyWeaknessStatus(policy?.weakness),
         ),
         SelinuxHeaderFactModel(
-            label = "Audit",
+            fact = SelinuxHeaderFact.AUDIT,
             value = auditIntegrityLabel(report.auditIntegrity),
             status = auditIntegrityStatus(report.auditIntegrity),
         ),
         SelinuxHeaderFactModel(
-            label = "Context",
+            fact = SelinuxHeaderFact.CONTEXT,
             value = report.contextType ?: "Unknown",
             status = when {
                 policy?.dangerousTypesFound?.isNotEmpty() == true -> DetectorStatus.danger()

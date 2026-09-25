@@ -33,11 +33,21 @@ data class SuCardModel(
     val scanRows: List<SuDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class SuHeaderFact(val label: String) {
+    ARTIFACTS("Artifacts"),
+    DAEMONS("Daemons"),
+    CONTEXT("Context"),
+    PROCESSES("Processes"),
+}
+
 data class SuHeaderFactModel(
-    val label: String,
+    val fact: SuHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class SuDetailRowModel(
     val label: String,

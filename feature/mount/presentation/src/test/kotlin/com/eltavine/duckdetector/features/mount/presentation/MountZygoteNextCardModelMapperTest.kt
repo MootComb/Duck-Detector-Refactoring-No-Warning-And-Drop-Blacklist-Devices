@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextState
+import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -123,7 +124,7 @@ class MountZygoteNextCardModelMapperTest {
         assertEquals("Root mount", row.value)
         assertEquals(DetectorStatus.danger(), row.status)
         assertEquals(DetectorStatus.danger(), model.status)
-        assertEquals("1", model.headerFacts.single { it.label == "Critical" }.value)
+        assertEquals("1", model.headerFacts.single { it.fact == MountHeaderFact.CRITICAL }.value)
         assertTrue(row.detail.orEmpty().contains("/data/adb/modules/example"))
         assertTrue(row.hiddenCopyText.orEmpty().contains("Root marker leak: true"))
     }

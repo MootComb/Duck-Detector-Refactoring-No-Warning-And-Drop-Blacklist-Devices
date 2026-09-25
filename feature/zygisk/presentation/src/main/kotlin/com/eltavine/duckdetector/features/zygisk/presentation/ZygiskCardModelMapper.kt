@@ -27,6 +27,7 @@ import com.eltavine.duckdetector.features.zygisk.domain.ZygiskStage
 import com.eltavine.duckdetector.features.zygisk.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetailRowModel
+import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFact
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
 
@@ -115,17 +116,17 @@ class ZygiskCardModelMapper {
             ZygiskStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
             ZygiskStage.READY -> listOf(
                 ZygiskHeaderFactModel(
-                    label = "State",
+                    fact = ZygiskHeaderFact.STATE,
                     value = stateLabel(report),
                     status = report.toDetectorStatus(),
                 ),
                 ZygiskHeaderFactModel(
-                    label = "Confidence",
+                    fact = ZygiskHeaderFact.CONFIDENCE,
                     value = confidenceLabel(report),
                     status = confidenceStatus(report),
                 ),
                 ZygiskHeaderFactModel(
-                    label = "FD trap",
+                    fact = ZygiskHeaderFact.FD_TRAP,
                     value = when {
                         report.fdTrapDetected -> "Detected"
                         report.fdTrapAvailable -> "Clean"
@@ -138,7 +139,7 @@ class ZygiskCardModelMapper {
                     },
                 ),
                 ZygiskHeaderFactModel(
-                    label = "Native",
+                    fact = ZygiskHeaderFact.NATIVE,
                     value = when {
                         report.nativeAvailable -> "Ready"
                         else -> "Unavailable"
@@ -375,10 +376,10 @@ class ZygiskCardModelMapper {
         status: DetectorStatus,
     ): List<ZygiskHeaderFactModel> {
         return listOf(
-            ZygiskHeaderFactModel("State", value, status),
-            ZygiskHeaderFactModel("Confidence", value, status),
-            ZygiskHeaderFactModel("FD trap", value, status),
-            ZygiskHeaderFactModel("Native", value, status),
+            ZygiskHeaderFactModel(ZygiskHeaderFact.STATE, value, status),
+            ZygiskHeaderFactModel(ZygiskHeaderFact.CONFIDENCE, value, status),
+            ZygiskHeaderFactModel(ZygiskHeaderFact.FD_TRAP, value, status),
+            ZygiskHeaderFactModel(ZygiskHeaderFact.NATIVE, value, status),
         )
     }
 

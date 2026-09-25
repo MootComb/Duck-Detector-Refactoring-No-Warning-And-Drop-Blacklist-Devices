@@ -50,6 +50,7 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardAssessment
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderDetailRowModel
+import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFact
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderImpactItemModel
 import com.eltavine.duckdetector.features.bootloader.ui.R
@@ -148,10 +149,10 @@ internal fun BootloaderDetectorCard(
 private fun BootloaderCollapsedOverview(
     model: BootloaderCardModel,
 ) {
-    val state = model.headerFacts.firstOrNull { it.label == "State" } ?: return
-    val proof = model.headerFacts.firstOrNull { it.label == "Proof" } ?: return
-    val tier = model.headerFacts.firstOrNull { it.label == "Tier" } ?: return
-    val trust = model.headerFacts.firstOrNull { it.label == "Trust" } ?: return
+    val state = model.headerFacts.firstOrNull { it.fact == BootloaderHeaderFact.STATE } ?: return
+    val proof = model.headerFacts.firstOrNull { it.fact == BootloaderHeaderFact.PROOF } ?: return
+    val tier = model.headerFacts.firstOrNull { it.fact == BootloaderHeaderFact.TIER } ?: return
+    val trust = model.headerFacts.firstOrNull { it.fact == BootloaderHeaderFact.TRUST } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

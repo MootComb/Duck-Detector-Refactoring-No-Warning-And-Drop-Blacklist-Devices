@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.features.customrom.domain.CustomRomPackageVisib
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomStage
 import com.eltavine.duckdetector.features.customrom.domain.hasReducedCoverage
+import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFact
 import com.eltavine.duckdetector.features.customrom.presentation.model.CustomRomHeaderFactModel
 
 internal fun buildSubtitle(report: CustomRomReport): String {
@@ -82,7 +83,7 @@ internal fun buildHeaderFacts(report: CustomRomReport): List<CustomRomHeaderFact
         CustomRomStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
         CustomRomStage.READY -> listOf(
             CustomRomHeaderFactModel(
-                label = "ROMs",
+                fact = CustomRomHeaderFact.ROMS,
                 value = detectedRomValue(report),
                 status = when {
                     report.detectedRoms.isNotEmpty() -> DetectorStatus.warning()
@@ -91,7 +92,7 @@ internal fun buildHeaderFacts(report: CustomRomReport): List<CustomRomHeaderFact
                 },
             ),
             CustomRomHeaderFactModel(
-                label = "Build",
+                fact = CustomRomHeaderFact.BUILD,
                 value = when {
                     report.buildSignalCount + report.modificationSignalCount > 0 ->
                         signalValue(report.buildSignalCount + report.modificationSignalCount)
@@ -110,7 +111,7 @@ internal fun buildHeaderFacts(report: CustomRomReport): List<CustomRomHeaderFact
                 },
             ),
             CustomRomHeaderFactModel(
-                label = "Runtime",
+                fact = CustomRomHeaderFact.RUNTIME,
                 value = when {
                     report.runtimeSignalCount > 0 -> report.runtimeSignalCount.toString()
                     report.packageVisibility == CustomRomPackageVisibility.RESTRICTED -> "Scoped"
@@ -127,7 +128,7 @@ internal fun buildHeaderFacts(report: CustomRomReport): List<CustomRomHeaderFact
                 },
             ),
             CustomRomHeaderFactModel(
-                label = "Native",
+                fact = CustomRomHeaderFact.NATIVE,
                 value = when {
                     !report.nativeAvailable -> "N/A"
                     report.nativeSignalCount > 0 -> report.nativeSignalCount.toString()
@@ -149,10 +150,10 @@ internal fun placeholderFacts(
     status: DetectorStatus,
 ): List<CustomRomHeaderFactModel> {
     return listOf(
-        CustomRomHeaderFactModel("ROMs", value, status),
-        CustomRomHeaderFactModel("Build", value, status),
-        CustomRomHeaderFactModel("Runtime", value, status),
-        CustomRomHeaderFactModel("Native", value, status),
+        CustomRomHeaderFactModel(CustomRomHeaderFact.ROMS, value, status),
+        CustomRomHeaderFactModel(CustomRomHeaderFact.BUILD, value, status),
+        CustomRomHeaderFactModel(CustomRomHeaderFact.RUNTIME, value, status),
+        CustomRomHeaderFactModel(CustomRomHeaderFact.NATIVE, value, status),
     )
 }
 

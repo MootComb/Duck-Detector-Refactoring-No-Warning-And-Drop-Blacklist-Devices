@@ -46,6 +46,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixCardModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixDetailRowModel
+import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFact
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixHeaderFactModel
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.model.PlayIntegrityFixImpactItemModel
 
@@ -120,10 +121,10 @@ internal fun PlayIntegrityFixDetectorCard(
 private fun PlayIntegrityFixCollapsedOverview(
     model: PlayIntegrityFixCardModel,
 ) {
-    val direct = model.headerFacts.firstOrNull { it.label == "Direct" } ?: return
-    val review = model.headerFacts.firstOrNull { it.label == "Review" } ?: return
-    val props = model.headerFacts.firstOrNull { it.label == "Props" } ?: return
-    val native = model.headerFacts.firstOrNull { it.label == "Native" } ?: return
+    val direct = model.headerFacts.firstOrNull { it.fact == PlayIntegrityFixHeaderFact.DIRECT } ?: return
+    val review = model.headerFacts.firstOrNull { it.fact == PlayIntegrityFixHeaderFact.REVIEW } ?: return
+    val props = model.headerFacts.firstOrNull { it.fact == PlayIntegrityFixHeaderFact.PROPS } ?: return
+    val native = model.headerFacts.firstOrNull { it.fact == PlayIntegrityFixHeaderFact.NATIVE } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

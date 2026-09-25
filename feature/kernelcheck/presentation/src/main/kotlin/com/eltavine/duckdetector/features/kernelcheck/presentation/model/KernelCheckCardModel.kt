@@ -34,11 +34,21 @@ data class KernelCheckCardModel(
     val scanRows: List<KernelCheckDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class KernelCheckHeaderFact(val label: String) {
+    IDENTITY("Identity"),
+    BOOT("Boot"),
+    BEHAVIOR("Behavior"),
+    NATIVE("Native"),
+}
+
 data class KernelCheckHeaderFactModel(
-    val label: String,
+    val fact: KernelCheckHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class KernelCheckDetailRowModel(
     val label: String,

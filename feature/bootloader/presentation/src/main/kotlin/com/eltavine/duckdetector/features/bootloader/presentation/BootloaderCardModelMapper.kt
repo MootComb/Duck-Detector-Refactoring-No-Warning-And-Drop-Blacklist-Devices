@@ -31,6 +31,7 @@ import com.eltavine.duckdetector.features.bootloader.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardAssessment
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderDetailRowModel
+import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFact
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderImpactItemModel
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
@@ -140,12 +141,12 @@ class BootloaderCardModelMapper {
             BootloaderStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
             BootloaderStage.READY -> listOf(
                 BootloaderHeaderFactModel(
-                    label = "State",
+                    fact = BootloaderHeaderFact.STATE,
                     value = stateLabel(report.state),
                     status = report.authoritativeStateStatus(),
                 ),
                 BootloaderHeaderFactModel(
-                    label = "Proof",
+                    fact = BootloaderHeaderFact.PROOF,
                     value = proofLabel(report.evidenceMode),
                     status = when (report.evidenceMode) {
                         BootloaderEvidenceMode.ATTESTATION -> DetectorStatus.allClear()
@@ -154,7 +155,7 @@ class BootloaderCardModelMapper {
                     },
                 ),
                 BootloaderHeaderFactModel(
-                    label = "Tier",
+                    fact = BootloaderHeaderFact.TIER,
                     value = tierLabel(report.tier),
                     status = when (report.tier) {
                         TeeTier.STRONGBOX,
@@ -166,7 +167,7 @@ class BootloaderCardModelMapper {
                     },
                 ),
                 BootloaderHeaderFactModel(
-                    label = "Trust",
+                    fact = BootloaderHeaderFact.TRUST,
                     value = trustLabel(report.trustRoot),
                     status = trustStatus(report),
                 ),
@@ -352,10 +353,10 @@ class BootloaderCardModelMapper {
         status: DetectorStatus
     ): List<BootloaderHeaderFactModel> {
         return listOf(
-            BootloaderHeaderFactModel("State", value, status),
-            BootloaderHeaderFactModel("Proof", value, status),
-            BootloaderHeaderFactModel("Tier", value, status),
-            BootloaderHeaderFactModel("Trust", value, status),
+            BootloaderHeaderFactModel(BootloaderHeaderFact.STATE, value, status),
+            BootloaderHeaderFactModel(BootloaderHeaderFact.PROOF, value, status),
+            BootloaderHeaderFactModel(BootloaderHeaderFact.TIER, value, status),
+            BootloaderHeaderFactModel(BootloaderHeaderFact.TRUST, value, status),
         )
     }
 

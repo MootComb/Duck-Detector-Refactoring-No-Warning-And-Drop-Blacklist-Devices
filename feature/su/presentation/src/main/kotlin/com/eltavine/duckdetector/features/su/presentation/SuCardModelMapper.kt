@@ -25,6 +25,7 @@ import com.eltavine.duckdetector.features.su.domain.SuStage
 import com.eltavine.duckdetector.features.su.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFact
 import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuImpactItemModel
 
@@ -115,25 +116,25 @@ class SuCardModelMapper {
             )
 
             SuStage.FAILED -> listOf(
-                SuHeaderFactModel("Artifacts", "Error", DetectorStatus.info(InfoKind.ERROR)),
-                SuHeaderFactModel("Daemons", "Error", DetectorStatus.info(InfoKind.ERROR)),
-                SuHeaderFactModel("Context", "Error", DetectorStatus.info(InfoKind.ERROR)),
-                SuHeaderFactModel("Processes", "N/A", DetectorStatus.info(InfoKind.SUPPORT)),
+                SuHeaderFactModel(SuHeaderFact.ARTIFACTS, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.DAEMONS, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.CONTEXT, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.PROCESSES, "N/A", DetectorStatus.info(InfoKind.SUPPORT)),
             )
 
             SuStage.READY -> listOf(
                 SuHeaderFactModel(
-                    label = "Artifacts",
+                    fact = SuHeaderFact.ARTIFACTS,
                     value = if (report.suBinaries.isEmpty()) "None" else report.suBinaries.size.toString(),
                     status = if (report.suBinaries.isEmpty()) DetectorStatus.allClear() else DetectorStatus.danger(),
                 ),
                 SuHeaderFactModel(
-                    label = "Daemons",
+                    fact = SuHeaderFact.DAEMONS,
                     value = if (report.daemons.isEmpty()) "None" else daemonNames(report),
                     status = if (report.daemons.isEmpty()) DetectorStatus.allClear() else DetectorStatus.danger(),
                 ),
                 SuHeaderFactModel(
-                    label = "Context",
+                    fact = SuHeaderFact.CONTEXT,
                     value = when {
                         report.selfContextAbnormal -> "Abnormal"
                         report.selfContext.isNotBlank() -> "Normal"
@@ -146,7 +147,7 @@ class SuCardModelMapper {
                     },
                 ),
                 SuHeaderFactModel(
-                    label = "Processes",
+                    fact = SuHeaderFact.PROCESSES,
                     value = when {
                         !report.nativeAvailable -> "N/A"
                         report.suspiciousProcesses.isEmpty() -> "0"
@@ -474,10 +475,10 @@ class SuCardModelMapper {
         status: DetectorStatus,
     ): List<SuHeaderFactModel> {
         return listOf(
-            SuHeaderFactModel("Artifacts", value, status),
-            SuHeaderFactModel("Daemons", value, status),
-            SuHeaderFactModel("Context", value, status),
-            SuHeaderFactModel("Processes", value, status),
+            SuHeaderFactModel(SuHeaderFact.ARTIFACTS, value, status),
+            SuHeaderFactModel(SuHeaderFact.DAEMONS, value, status),
+            SuHeaderFactModel(SuHeaderFact.CONTEXT, value, status),
+            SuHeaderFactModel(SuHeaderFact.PROCESSES, value, status),
         )
     }
 

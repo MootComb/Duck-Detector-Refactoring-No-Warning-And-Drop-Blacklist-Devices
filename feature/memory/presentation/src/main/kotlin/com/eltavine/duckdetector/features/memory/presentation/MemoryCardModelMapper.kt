@@ -28,6 +28,7 @@ import com.eltavine.duckdetector.features.memory.domain.MemoryStage
 import com.eltavine.duckdetector.features.memory.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryDetailRowModel
+import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFact
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFactModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryImpactItemModel
 
@@ -118,7 +119,7 @@ class MemoryCardModelMapper {
             MemoryStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
             MemoryStage.READY -> listOf(
                 MemoryHeaderFactModel(
-                    label = "Critical",
+                    fact = MemoryHeaderFact.CRITICAL,
                     value = when {
                         report.dangerFindingCount > 0 -> report.dangerFindingCount.toString()
                         report.nativeAvailable -> "Clean"
@@ -131,7 +132,7 @@ class MemoryCardModelMapper {
                     },
                 ),
                 MemoryHeaderFactModel(
-                    label = "Review",
+                    fact = MemoryHeaderFact.REVIEW,
                     value = when {
                         report.reviewFindingCount > 0 -> report.reviewFindingCount.toString()
                         report.nativeAvailable -> "Clean"
@@ -144,7 +145,7 @@ class MemoryCardModelMapper {
                     },
                 ),
                 MemoryHeaderFactModel(
-                    label = "Hooks",
+                    fact = MemoryHeaderFact.HOOKS,
                     value = when {
                         report.hookFindingCount > 0 -> report.hookFindingCount.toString()
                         report.modifiedFunctionCount > 0 -> report.modifiedFunctionCount.toString()
@@ -159,7 +160,7 @@ class MemoryCardModelMapper {
                     },
                 ),
                 MemoryHeaderFactModel(
-                    label = "Runtime",
+                    fact = MemoryHeaderFact.RUNTIME,
                     value = when {
                         report.mappingFindingCount + report.loaderFindingCount > 0 ->
                             (report.mappingFindingCount + report.loaderFindingCount).toString()
@@ -418,10 +419,10 @@ class MemoryCardModelMapper {
         status: DetectorStatus,
     ): List<MemoryHeaderFactModel> {
         return listOf(
-            MemoryHeaderFactModel("Critical", value, status),
-            MemoryHeaderFactModel("Review", value, status),
-            MemoryHeaderFactModel("Hooks", value, status),
-            MemoryHeaderFactModel("Runtime", value, status),
+            MemoryHeaderFactModel(MemoryHeaderFact.CRITICAL, value, status),
+            MemoryHeaderFactModel(MemoryHeaderFact.REVIEW, value, status),
+            MemoryHeaderFactModel(MemoryHeaderFact.HOOKS, value, status),
+            MemoryHeaderFactModel(MemoryHeaderFact.RUNTIME, value, status),
         )
     }
 

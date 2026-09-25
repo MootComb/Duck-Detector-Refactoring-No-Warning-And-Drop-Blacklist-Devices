@@ -31,6 +31,7 @@ import com.eltavine.duckdetector.features.tee.domain.TeeSignal
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionId
+import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -214,7 +215,7 @@ class TeeCardModelMapperHeaderTest {
         )
 
         assertEquals(DetectorStatus.warning(), model.status)
-        assertEquals("Aligned + review", model.headerFacts.first { it.label == "Verdict" }.value)
+        assertEquals("Aligned + review", model.headerFacts.first { it.fact == TeeHeaderFact.VERDICT }.value)
         assertEquals("copy-me", model.factGroups.single().rows.single().hiddenCopyText)
     }
 
@@ -247,7 +248,7 @@ class TeeCardModelMapperHeaderTest {
         assertNull(model.rkpBadgeLabel)
         assertEquals(
             DetectorStatus.warning(),
-            model.headerFacts.single { it.label == "Trust" }.status
+            model.headerFacts.single { it.fact == TeeHeaderFact.TRUST }.status
         )
     }
 
@@ -272,6 +273,6 @@ class TeeCardModelMapperHeaderTest {
             isExpanded = false,
         )
 
-        assertEquals("StrongBox", model.headerFacts.single { it.label == "Tier" }.value)
+        assertEquals("StrongBox", model.headerFacts.single { it.fact == TeeHeaderFact.TIER }.value)
     }
 }

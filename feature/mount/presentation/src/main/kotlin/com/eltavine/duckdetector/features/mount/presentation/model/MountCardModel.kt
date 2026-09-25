@@ -36,11 +36,21 @@ data class MountCardModel(
     val scanRows: List<MountDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class MountHeaderFact(val label: String) {
+    CRITICAL("Critical"),
+    REVIEW("Review"),
+    COVERAGE("Coverage"),
+    NATIVE("Native"),
+}
+
 data class MountHeaderFactModel(
-    val label: String,
+    val fact: MountHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class MountDetailRowModel(
     val label: String,

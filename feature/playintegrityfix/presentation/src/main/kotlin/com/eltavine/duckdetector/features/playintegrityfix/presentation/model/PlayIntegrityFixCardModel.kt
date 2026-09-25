@@ -34,11 +34,21 @@ data class PlayIntegrityFixCardModel(
     val scanRows: List<PlayIntegrityFixDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class PlayIntegrityFixHeaderFact(val label: String) {
+    DIRECT("Direct"),
+    REVIEW("Review"),
+    PROPS("Props"),
+    NATIVE("Native"),
+}
+
 data class PlayIntegrityFixHeaderFactModel(
-    val label: String,
+    val fact: PlayIntegrityFixHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class PlayIntegrityFixDetailRowModel(
     val label: String,

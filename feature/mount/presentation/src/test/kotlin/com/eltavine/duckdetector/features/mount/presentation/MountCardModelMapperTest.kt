@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
 import com.eltavine.duckdetector.features.mount.domain.MountMethodResult
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
+import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -170,8 +171,8 @@ class MountCardModelMapperTest {
         assertEquals("KSU mount", row.value)
         assertEquals(DetectorStatus.danger(), row.status)
         assertEquals(DetectorStatus.danger(), model.status)
-        assertEquals("1", model.headerFacts.single { it.label == "Critical" }.value)
-        assertEquals("None", model.headerFacts.single { it.label == "Review" }.value)
+        assertEquals("1", model.headerFacts.single { it.fact == MountHeaderFact.CRITICAL }.value)
+        assertEquals("None", model.headerFacts.single { it.fact == MountHeaderFact.REVIEW }.value)
         assertEquals("1 critical mount signal(s)", model.verdict)
         assertTrue(row.detail.orEmpty().contains("KSU /data/adb/modules"))
         assertTrue(row.hiddenCopyText.orEmpty().contains("KSU /data/adb/modules"))
@@ -194,7 +195,7 @@ class MountCardModelMapperTest {
         )
 
         assertEquals(DetectorStatus.warning(), model.status)
-        assertEquals("1", model.headerFacts.single { it.label == "Review" }.value)
+        assertEquals("1", model.headerFacts.single { it.fact == MountHeaderFact.REVIEW }.value)
         assertEquals("1 mount signal(s) need review", model.verdict)
     }
 

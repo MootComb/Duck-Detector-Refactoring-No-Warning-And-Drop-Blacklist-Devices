@@ -46,6 +46,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryCardModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryDetailRowModel
+import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFact
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryHeaderFactModel
 import com.eltavine.duckdetector.features.memory.presentation.model.MemoryImpactItemModel
 
@@ -115,10 +116,10 @@ internal fun MemoryDetectorCard(
 private fun MemoryCollapsedOverview(
     model: MemoryCardModel,
 ) {
-    val critical = model.headerFacts.firstOrNull { it.label == "Critical" } ?: return
-    val review = model.headerFacts.firstOrNull { it.label == "Review" } ?: return
-    val hooks = model.headerFacts.firstOrNull { it.label == "Hooks" } ?: return
-    val runtime = model.headerFacts.firstOrNull { it.label == "Runtime" } ?: return
+    val critical = model.headerFacts.firstOrNull { it.fact == MemoryHeaderFact.CRITICAL } ?: return
+    val review = model.headerFacts.firstOrNull { it.fact == MemoryHeaderFact.REVIEW } ?: return
+    val hooks = model.headerFacts.firstOrNull { it.fact == MemoryHeaderFact.HOOKS } ?: return
+    val runtime = model.headerFacts.firstOrNull { it.fact == MemoryHeaderFact.RUNTIME } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

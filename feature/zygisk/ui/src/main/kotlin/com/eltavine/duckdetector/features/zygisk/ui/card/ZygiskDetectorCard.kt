@@ -48,6 +48,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetailRowModel
+import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFact
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
 
@@ -104,10 +105,10 @@ internal fun ZygiskDetectorCard(
 private fun ZygiskCollapsedOverview(
     model: ZygiskCardModel,
 ) {
-    val state = model.headerFacts.firstOrNull { it.label == "State" } ?: return
-    val confidence = model.headerFacts.firstOrNull { it.label == "Confidence" } ?: return
-    val fdTrap = model.headerFacts.firstOrNull { it.label == "FD trap" } ?: return
-    val native = model.headerFacts.firstOrNull { it.label == "Native" } ?: return
+    val state = model.headerFacts.firstOrNull { it.fact == ZygiskHeaderFact.STATE } ?: return
+    val confidence = model.headerFacts.firstOrNull { it.fact == ZygiskHeaderFact.CONFIDENCE } ?: return
+    val fdTrap = model.headerFacts.firstOrNull { it.fact == ZygiskHeaderFact.FD_TRAP } ?: return
+    val native = model.headerFacts.firstOrNull { it.fact == ZygiskHeaderFact.NATIVE } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

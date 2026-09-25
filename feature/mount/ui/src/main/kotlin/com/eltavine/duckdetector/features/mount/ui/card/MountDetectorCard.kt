@@ -55,6 +55,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.mount.ui.R
 import com.eltavine.duckdetector.features.mount.presentation.model.MountCardModel
 import com.eltavine.duckdetector.features.mount.presentation.model.MountDetailRowModel
+import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFact
 import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFactModel
 import com.eltavine.duckdetector.features.mount.presentation.model.MountImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
@@ -147,10 +148,10 @@ internal fun MountDetectorCard(
 private fun MountCollapsedOverview(
     model: MountCardModel,
 ) {
-    val critical = model.headerFacts.firstOrNull { it.label == "Critical" } ?: return
-    val review = model.headerFacts.firstOrNull { it.label == "Review" } ?: return
-    val coverage = model.headerFacts.firstOrNull { it.label == "Coverage" } ?: return
-    val native = model.headerFacts.firstOrNull { it.label == "Native" } ?: return
+    val critical = model.headerFacts.firstOrNull { it.fact == MountHeaderFact.CRITICAL } ?: return
+    val review = model.headerFacts.firstOrNull { it.fact == MountHeaderFact.REVIEW } ?: return
+    val coverage = model.headerFacts.firstOrNull { it.fact == MountHeaderFact.COVERAGE } ?: return
+    val native = model.headerFacts.firstOrNull { it.fact == MountHeaderFact.NATIVE } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

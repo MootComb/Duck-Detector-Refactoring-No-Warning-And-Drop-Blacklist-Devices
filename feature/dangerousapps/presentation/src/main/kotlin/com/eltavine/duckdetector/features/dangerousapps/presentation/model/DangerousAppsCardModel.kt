@@ -32,11 +32,21 @@ data class DangerousAppsCardModel(
     val targetApps: List<DangerousAppsTargetAppModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class DangerousAppsHeaderFact(val label: String) {
+    TARGETS("Targets"),
+    PM("PM"),
+    HITS("Hits"),
+    HIDDEN("Hidden"),
+}
+
 data class DangerousAppsHeaderFactModel(
-    val label: String,
+    val fact: DangerousAppsHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class DangerousAppsContextItemModel(
     val label: String,

@@ -37,11 +37,21 @@ data class SelinuxCardModel(
     val references: List<String>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class SelinuxHeaderFact(val label: String) {
+    MODE("Mode"),
+    POLICY("Policy"),
+    AUDIT("Audit"),
+    CONTEXT("Context"),
+}
+
 data class SelinuxHeaderFactModel(
-    val label: String,
+    val fact: SelinuxHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class SelinuxDetailRowModel(
     val label: String,

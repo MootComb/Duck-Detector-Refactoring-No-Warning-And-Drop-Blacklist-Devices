@@ -29,6 +29,7 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardAssessment
+import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -62,7 +63,7 @@ class BootloaderCardModelMapperTest {
         assertEquals(null, model.assessmentStatus)
         assertEquals(
             DetectorStatus.danger(),
-            model.headerFacts.single { it.label == "Trust" }.status,
+            model.headerFacts.single { it.fact == BootloaderHeaderFact.TRUST }.status,
         )
         assertEquals(
             DetectorStatus.danger(),
@@ -130,10 +131,10 @@ class BootloaderCardModelMapperTest {
             ),
         )
 
-        assertEquals("Verified", model.headerFacts.single { it.label == "State" }.value)
+        assertEquals("Verified", model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.value)
         assertEquals(
             DetectorStatus.allClear(),
-            model.headerFacts.single { it.label == "State" }.status,
+            model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.status,
         )
         assertEquals(BootloaderCardAssessment.CONSISTENCY_REVIEW, model.assessment)
         assertTrue(model.showConsistencyQuestionIcon)
@@ -178,10 +179,10 @@ class BootloaderCardModelMapperTest {
             ),
         )
 
-        assertEquals("Verified", model.headerFacts.single { it.label == "State" }.value)
+        assertEquals("Verified", model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.value)
         assertEquals(
             DetectorStatus.allClear(),
-            model.headerFacts.single { it.label == "State" }.status,
+            model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.status,
         )
         assertEquals(BootloaderCardAssessment.CONSISTENCY_CONFLICT, model.assessment)
         assertTrue(model.showConsistencyQuestionIcon)

@@ -47,6 +47,7 @@ import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedCardModel
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedDetailRowModel
+import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFact
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFactModel
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
@@ -131,10 +132,10 @@ internal fun LSPosedDetectorCard(
 private fun LSPosedCollapsedOverview(
     model: LSPosedCardModel,
 ) {
-    val critical = model.headerFacts.firstOrNull { it.label == "Critical" } ?: return
-    val review = model.headerFacts.firstOrNull { it.label == "Review" } ?: return
-    val bridge = model.headerFacts.firstOrNull { it.label == "Bridge" } ?: return
-    val packages = model.headerFacts.firstOrNull { it.label == "Packages" } ?: return
+    val critical = model.headerFacts.firstOrNull { it.fact == LSPosedHeaderFact.CRITICAL } ?: return
+    val review = model.headerFacts.firstOrNull { it.fact == LSPosedHeaderFact.REVIEW } ?: return
+    val bridge = model.headerFacts.firstOrNull { it.fact == LSPosedHeaderFact.BRIDGE } ?: return
+    val packages = model.headerFacts.firstOrNull { it.fact == LSPosedHeaderFact.PACKAGES } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

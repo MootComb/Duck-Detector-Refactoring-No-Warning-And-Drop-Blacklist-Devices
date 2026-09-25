@@ -40,91 +40,91 @@
 --------------------------------------------------------------------------------
   [✖ DANGER] key = value 0
   Verdict      : key = value 2
-  Quick Facts  : key = value 4: A long detail line that deliberately exceeds sixty characters in length 5
+  Quick Facts  : Trust: A long detail line that deliberately exceeds sixty characters in length 4
 
   [State]
     •    
-        Line one 8
-        Line two 8
+        Line one 7
+        Line two 7
           Line three
-    •   Padded value 9  
-        Unicode ✓ détail 11
-    • left | right 12
-        Unicode ✓ détail 14
+    •   Padded value 8  
+        Unicode ✓ détail 10
+    • left | right 11
+        Unicode ✓ détail 13
 
   [Attestation]
-    • A long detail line that deliberately exceeds sixty characters in length 15: Line one 16
-Line two 16
+    • A long detail line that deliberately exceeds sixty characters in length 14: Line one 15
+Line two 15
 
-  Line three (Unicode ✓ détail 17)
-    • Line one 18
-Line two 18
+  Line three (Unicode ✓ détail 16)
+    • Line one 17
+Line two 17
 
-  Line three  : Padded value 19
-        Line one 20
-        Line two 20
+  Line three  : Padded value 18
+        Line one 19
+        Line two 19
           Line three
 
   [Properties]
-    • A long detail line that deliberately exceeds sixty characters in length 21: Value 22
-        key = value 23
-    •   Padded value 24  : Value 25 (Value 26)
-    • Unicode ✓ détail 27: A long detail line that deliberately exceeds sixty characters in length 28
-        A long detail line that deliberately exceeds sixty characters in length 29
+    • A long detail line that deliberately exceeds sixty characters in length 20: Value 21
+        key = value 22
+    •   Padded value 23  : Value 24 (Value 25)
+    • Unicode ✓ détail 26: A long detail line that deliberately exceeds sixty characters in length 27
+        A long detail line that deliberately exceeds sixty characters in length 28
 
   [Consistency]
-    •   Padded value 30  : Line one 31
-Line two 31
+    •   Padded value 29  : Line one 30
+Line two 30
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 32
-    •    : key = value 34
-        A long detail line that deliberately exceeds sixty characters in length 35
+        A long detail line that deliberately exceeds sixty characters in length 31
+    •    : key = value 33
+        A long detail line that deliberately exceeds sixty characters in length 34
 
   [Methods]
-    • left | right 38: Unicode ✓ détail 39
-        A long detail line that deliberately exceeds sixty characters in length 40
-    • Value 41: Line one 42
-Line two 42
+    • left | right 37: Unicode ✓ détail 38
+        A long detail line that deliberately exceeds sixty characters in length 39
+    • Value 40: Line one 41
+Line two 41
 
   Line three
-        key = value 43
-    •   Padded value 44  : Padded value 45
-        left | right 46
+        key = value 42
+    •   Padded value 43  : Padded value 44
+        left | right 45
 
   [Scan]
-    •   Padded value 47  : Padded value 48
-        left | right 49
+    •   Padded value 46  : Padded value 47
+        left | right 48
 
   [Impact & Guidance]
-    • Padded value 36
-    • key = value 37
+    • Padded value 35
+    • key = value 36
 
 --------------------------------------------------------------------------------
   [✔ CLEAR]    
   Verdict      :   Padded value 2  
-  Quick Facts  : : key = value 5
+  Quick Facts  : Native: key = value 4
 
   [Build]
-    • Line one 6
-Line two 6
+    • Line one 5
+Line two 5
 
-  Line three  : Unicode ✓ détail 7
-        Line one 8
-        Line two 8
+  Line three  : Unicode ✓ détail 6
+        Line one 7
+        Line two 7
           Line three
-    •   Padded value 9  : Unicode ✓ détail 10
-        key = value 11
+    •   Padded value 8  : Unicode ✓ détail 9
+        key = value 10
 
   [Runtime]
-    • Line one 12
-Line two 12
+    • Line one 11
+Line two 11
 
-  Line three  : Value 13
-        A long detail line that deliberately exceeds sixty characters in length 14
+  Line three  : Value 12
+        A long detail line that deliberately exceeds sixty characters in length 13
 
   [Impact & Guidance]
-    • left | right 15
+    • left | right 14
 
 --------------------------------------------------------------------------------
   [ℹ INFO] A long detail line that deliberately exceeds sixty characters in length 0
@@ -158,40 +158,40 @@ Line two 13
 --------------------------------------------------------------------------------
   [ℹ INFO] left | right 0
   Verdict      : A long detail line that deliberately exceeds sixty characters in length 2
-  Quick Facts  : Value 4: Line one 5
-Line two 5
+  Quick Facts  : Native: Line one 4
+Line two 4
 
   Line three  
 
   [Identity]
     • 
-    • : Line one 10
-Line two 10
+    • : Line one 9
+Line two 9
 
   Line three
-        left | right 11
-    • Value 12: Line one 13
-Line two 13
+        left | right 10
+    • Value 11: Line one 12
+Line two 12
 
-  Line three (Value 14)
+  Line three (Value 13)
 
   [Anomalies]
-    • : Line one 16
-Line two 16
+    • : Line one 15
+Line two 15
 
   Line three
-        Line one 17
-        Line two 17
+        Line one 16
+        Line two 16
           Line three
-    •    : left | right 19
-        Line one 20
-        Line two 20
+    •    : left | right 18
+        Line one 19
+        Line two 19
           Line three
-    •   Padded value 21  : Padded value 22 (Unicode ✓ détail 23)
+    •   Padded value 20  : Padded value 21 (Unicode ✓ détail 22)
 
   [Behavior]
-    • Value 24: key = value 25 (Unicode ✓ détail 26)
-    • : left | right 28
+    • Value 23: key = value 24 (Unicode ✓ détail 25)
+    • : left | right 27
 
 --------------------------------------------------------------------------------
   [ℹ INFO] Line one 0
@@ -199,65 +199,62 @@ Line two 0
 
   Line three  
   Verdict      : key = value 2
-  Quick Facts  : key = value 4: Unicode ✓ détail 5  |  Line one 6
-Line two 6
-
-  Line three  : Unicode ✓ détail 7  |     : Unicode ✓ détail 9
+  Quick Facts  : Bridge: Unicode ✓ détail 4  |  Review: Unicode ✓ détail 5  |  Critical: Unicode ✓ détail 6
 
   [Runtime]
-    • Unicode ✓ détail 10: key = value 11
-        A long detail line that deliberately exceeds sixty characters in length 12
+    • Unicode ✓ détail 7: key = value 8
+        A long detail line that deliberately exceeds sixty characters in length 9
 
   [SELinux policy]
-    • Value 13: Padded value 14
-        A long detail line that deliberately exceeds sixty characters in length 15
+    • Value 10: Padded value 11
+        A long detail line that deliberately exceeds sixty characters in length 12
 
   [Methods]
-    • Value 16: Padded value 17
-        key = value 18
-    • Unicode ✓ détail 19: A long detail line that deliberately exceeds sixty characters in length 20
-        A long detail line that deliberately exceeds sixty characters in length 21
-    • Line one 22
-Line two 22
+    • Value 13: Padded value 14
+        key = value 15
+    • Unicode ✓ détail 16: A long detail line that deliberately exceeds sixty characters in length 17
+        A long detail line that deliberately exceeds sixty characters in length 18
+    • Line one 19
+Line two 19
 
   Line three  
-        Value 24
+        Value 21
 
   [Scan]
-    • Unicode ✓ détail 25: Padded value 26 (Padded value 27)
+    • Unicode ✓ détail 22: Padded value 23 (Padded value 24)
 
 --------------------------------------------------------------------------------
   [ℹ INFO] Value 0
   Verdict      : Unicode ✓ détail 2
-  Quick Facts  : A long detail line that deliberately exceeds sixty characters in length 4: A long detail line that deliberately exceeds sixty characters in length 5  |  key = value 6:   |  : Value 9
+  Quick Facts  : Hooks: A long detail line that deliberately exceeds sixty characters in length 4  |  Hooks:   |  Review: Value 6
 
   [Hooks]
-    • A long detail line that deliberately exceeds sixty characters in length 10: Line one 11
-Line two 11
+    • A long detail line that deliberately exceeds sixty characters in length 7: Line one 8
+Line two 8
 
   Line three
-        Line one 12
-        Line two 12
+        Line one 9
+        Line two 9
           Line three
-    • : left | right 14
-        A long detail line that deliberately exceeds sixty characters in length 15
+    • : left | right 11
+        A long detail line that deliberately exceeds sixty characters in length 12
 
   [Methods]
-    • Value 18
-        Value 20
-    •    : Line one 22
-Line two 22
+    • Value 15
+        Value 17
+    •    : Line one 19
+Line two 19
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 23
+        A long detail line that deliberately exceeds sixty characters in length 20
 
   [Scan]
-    • left | right 24
-        Value 26
-    • Value 27: Padded value 28 (Padded value 29)
+    • left | right 21
+        Value 23
+    • Value 24: Padded value 25 (Padded value 26)
 
   [Impact & Guidance]
-    • Padded value 17
+    • Padded value 14
 
 --------------------------------------------------------------------------------
   [ℹ INFO] A long detail line that deliberately exceeds sixty characters in length 0
@@ -373,181 +370,178 @@ Line two 27
 --------------------------------------------------------------------------------
   [ℹ INFO] Unicode ✓ détail 0
   Verdict      : left | right 2
-  Quick Facts  : Line one 4
-Line two 4
+  Quick Facts  : Audit: A long detail line that deliberately exceeds sixty characters in length 4  |  Policy: Line one 5
+Line two 5
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 5  |  left | right 6: Line one 7
-Line two 7
-
-  Line three    |  key = value 8: Line one 9
-Line two 9
+  Line three    |  Policy: Line one 6
+Line two 6
 
   Line three  
 
   [Policy]
-    • Unicode ✓ détail 16
+    • Unicode ✓ détail 13
+        left | right 15
+    • left | right 16: key = value 17
         left | right 18
-    • left | right 19: key = value 20
-        left | right 21
 
   [Audit]
-    •   Padded value 23  : Line one 24
-Line two 24
+    •   Padded value 20  : Line one 21
+Line two 21
 
-  Line three (Value 25)
+  Line three (Value 22)
 
   [Device]
-    • A long detail line that deliberately exceeds sixty characters in length 28: Padded value 29 (Value 30)
-    • left | right 31: Value 32
-    • : Padded value 35
-        Line one 36
-        Line two 36
+    • A long detail line that deliberately exceeds sixty characters in length 25: Padded value 26 (Value 27)
+    • left | right 28: Value 29
+    • : Padded value 32
+        Line one 33
+        Line two 33
           Line three
 
   [Methods]
-    • key = value 10: Value 11
+    • key = value 7: Value 8
+        left | right 9
+    • A long detail line that deliberately exceeds sixty characters in length 10: A long detail line that deliberately exceeds sixty characters in length 11
         left | right 12
-    • A long detail line that deliberately exceeds sixty characters in length 13: A long detail line that deliberately exceeds sixty characters in length 14
-        left | right 15
 
   [Policy Notes]
-    • left | right 22
+    • left | right 19
 
   [Audit Notes]
-    • key = value 27
+    • key = value 24
 
   [References]
-    •   Padded value 37  
-    • Value 38
+    •   Padded value 34  
+    • Value 35
     • 
 
 --------------------------------------------------------------------------------
   [✖ DANGER]   Padded value 0  
   Verdict      : 
-  Quick Facts  : left | right 4: Unicode ✓ détail 5
+  Quick Facts  : Context: Unicode ✓ détail 4
 
   [Artifacts]
-    • Line one 6
-Line two 6
+    • Line one 5
+Line two 5
 
-  Line three  : Unicode ✓ détail 7
+  Line three  : Unicode ✓ détail 6
 
   [Impact & Guidance]
 
 --------------------------------------------------------------------------------
   [✔ CLEAR]    
   Verdict      :    
-  Quick Facts  :    : left | right 5  |  :   Padded value 7    |     : A long detail line that deliberately exceeds sixty characters in length 9
+  Quick Facts  : Boot: left | right 4  |  Build:   Padded value 5    |  Build: A long detail line that deliberately exceeds sixty characters in length 6
 
   [Core]
     • 
 
   [Boot]
-    •    : key = value 14
-        Line one 15
-        Line two 15
+    •    : key = value 11
+        Line one 12
+        Line two 12
           Line three
 
   [Build]
-    •    : A long detail line that deliberately exceeds sixty characters in length 17 (Value 18)
-    • Line one 19
-Line two 19
+    •    : A long detail line that deliberately exceeds sixty characters in length 14 (Value 15)
+    • Line one 16
+Line two 16
 
-  Line three  : Line one 20
-Line two 20
+  Line three  : Line one 17
+Line two 17
 
   Line three
 
   [Source]
-    • Unicode ✓ détail 22: key = value 23
-        left | right 24
-    • left | right 25
+    • Unicode ✓ détail 19: key = value 20
+        left | right 21
+    • left | right 22
+        key = value 24
+    • key = value 25: left | right 26
         key = value 27
-    • key = value 28: left | right 29
-        key = value 30
 
   [Consistency]
-    • Unicode ✓ détail 31: Value 32
-        key = value 33
-    • : Padded value 35
-        Line one 36
-        Line two 36
+    • Unicode ✓ détail 28: Value 29
+        key = value 30
+    • : Padded value 32
+        Line one 33
+        Line two 33
           Line three
 
   [Info]
-    •    : A long detail line that deliberately exceeds sixty characters in length 38 (Padded value 39)
+    •    : A long detail line that deliberately exceeds sixty characters in length 35 (Padded value 36)
 
   [Methods]
-    • key = value 43
-        Unicode ✓ détail 45
-    • A long detail line that deliberately exceeds sixty characters in length 46
-        left | right 48
+    • key = value 40
+        Unicode ✓ détail 42
+    • A long detail line that deliberately exceeds sixty characters in length 43
+        left | right 45
 
   [Scan]
-    • Line one 49
-Line two 49
+    • Line one 46
+Line two 46
 
-  Line three  : left | right 50
-        key = value 51
-    •   Padded value 52  
-        left | right 54
+  Line three  : left | right 47
+        key = value 48
+    •   Padded value 49  
+        left | right 51
 
   [Impact & Guidance]
-    • Value 41
-    • Value 42
+    • Value 38
+    • Value 39
 
 --------------------------------------------------------------------------------
   [ℹ INFO] key = value 0
   Verdict      :    
-  Quick Facts  : key = value 5:   Padded value 6    |  Value 7: A long detail line that deliberately exceeds sixty characters in length 8  |  Value 9: A long detail line that deliberately exceeds sixty characters in length 10
+  Quick Facts  : Trust:   Padded value 5    |  Trust: A long detail line that deliberately exceeds sixty characters in length 6  |  Tier: A long detail line that deliberately exceeds sixty characters in length 7
 
   [Highlight Signals]
-    • A long detail line that deliberately exceeds sixty characters in length 11:   Padded value 12  
-    • left | right 13: A long detail line that deliberately exceeds sixty characters in length 14
+    • A long detail line that deliberately exceeds sixty characters in length 8:   Padded value 9  
+    • left | right 10: A long detail line that deliberately exceeds sixty characters in length 11
 
-  [key = value 15]
+  [key = value 12]
+    • Line one 13
+Line two 13
+
+  Line three  : 
     • Line one 16
 Line two 16
 
-  Line three  : 
-    • Line one 19
-Line two 19
-
   Line three  :
-        Line one 20
-        Line two 20
+        Line one 17
+        Line two 17
           Line three
 
   [Environment & Network]
-    • Network Status    : Line one 41
-Line two 41
+    • Network Status    : Line one 38
+Line two 38
 
   Line three  
     • Certificate Count : 
-    • Certificate 1       : Unicode ✓ détail 24
+    • Certificate 1       : Unicode ✓ détail 21
         Subject           :    
-        Issuer            : Value 26
-        Serial Number     : A long detail line that deliberately exceeds sixty characters in length 27
-        Validity          :  to Value 29
-        Signature          :   Padded value 30  
-        Public Key        : Line one 31
-Line two 31
+        Issuer            : Value 23
+        Serial Number     : A long detail line that deliberately exceeds sixty characters in length 24
+        Validity          :  to Value 26
+        Signature          :   Padded value 27  
+        Public Key        : Line one 28
+Line two 28
 
   Line three  
-    • Certificate 2       : key = value 32
-        Subject           : A long detail line that deliberately exceeds sixty characters in length 33
-        Issuer            : key = value 34
-        Serial Number     : left | right 35
-        Validity          : Line one 36
-Line two 36
+    • Certificate 2       : key = value 29
+        Subject           : A long detail line that deliberately exceeds sixty characters in length 30
+        Issuer            : key = value 31
+        Serial Number     : left | right 32
+        Validity          : Line one 33
+Line two 33
 
   Line three   to 
-        Signature          : key = value 38
-        Public Key        : Value 39
+        Signature          : key = value 35
+        Public Key        : Value 36
 
   [TEE Detailed Export]
-    Line one 42
-    Line two 42
+    Line one 39
+    Line two 39
     
       Line three
 
@@ -604,27 +598,27 @@ Line two 30
 --------------------------------------------------------------------------------
   [✔ CLEAR] Value 0
   Verdict      : key = value 2
-  Quick Facts  :    : Unicode ✓ détail 5  |  A long detail line that deliberately exceeds sixty characters in length 6: Unicode ✓ détail 7
+  Quick Facts  : Native: Unicode ✓ détail 4  |  Native: Unicode ✓ détail 5
 
   [State]
-    • left | right 8: Line one 9
-Line two 9
+    • left | right 6: Line one 7
+Line two 7
 
   Line three
     • 
 
   [Methods]
     •    
-        Padded value 19
+        Padded value 17
 
   [Impact & Guidance]
-    • left | right 14
-    • Unicode ✓ détail 16
+    • left | right 12
+    • Unicode ✓ détail 14
 
   [References]
-    • Unicode ✓ détail 20
-    • Line one 21
-Line two 21
+    • Unicode ✓ détail 18
+    • Line one 19
+Line two 19
 
   Line three  
 
@@ -702,111 +696,108 @@ Line two 0
 
   Line three  
   Verdict      :    
-  Quick Facts  : key = value 4: Unicode ✓ détail 5  |     : left | right 7  |  key = value 8:    
+  Quick Facts  : Tier: Unicode ✓ détail 4  |  Trust: left | right 5  |  Trust:    
 
   [State]
-    •    : Line one 11
-Line two 11
+    •    : Line one 8
+Line two 8
 
-  Line three (Value 12)
-    • Unicode ✓ détail 13: Value 14
-        A long detail line that deliberately exceeds sixty characters in length 15
+  Line three (Value 9)
+    • Unicode ✓ détail 10: Value 11
+        A long detail line that deliberately exceeds sixty characters in length 12
 
   [Attestation]
-    • Value 16: Value 17
+    • Value 13: Value 14
     • 
-        Value 21
+        Value 18
 
   [Properties]
-    •    : Padded value 23
-        A long detail line that deliberately exceeds sixty characters in length 24
+    •    : Padded value 20
+        A long detail line that deliberately exceeds sixty characters in length 21
     • 
-        Padded value 27
+        Padded value 24
 
   [Consistency]
     • 
-        Unicode ✓ détail 30
-    • Value 31: key = value 32
-        key = value 33
-    • left | right 34
+        Unicode ✓ détail 27
+    • Value 28: key = value 29
+        key = value 30
+    • left | right 31
 
   [Methods]
-    • Line one 39
-Line two 39
+    • Line one 36
+Line two 36
 
-  Line three  : left | right 40 (Padded value 41)
-    • Value 42: Unicode ✓ détail 43
-        Line one 44
-        Line two 44
+  Line three  : left | right 37 (Padded value 38)
+    • Value 39: Unicode ✓ détail 40
+        Line one 41
+        Line two 41
           Line three
 
   [Scan]
-    • A long detail line that deliberately exceeds sixty characters in length 45: Padded value 46 (Unicode ✓ détail 47)
-    • A long detail line that deliberately exceeds sixty characters in length 48: left | right 49 (Padded value 50)
+    • A long detail line that deliberately exceeds sixty characters in length 42: Padded value 43 (Unicode ✓ détail 44)
+    • A long detail line that deliberately exceeds sixty characters in length 45: left | right 46 (Padded value 47)
 
   [Impact & Guidance]
-    • Line one 37
-      Line two 37
+    • Line one 34
+      Line two 34
         Line three
-    • Line one 38
-      Line two 38
+    • Line one 35
+      Line two 35
         Line three
 
 --------------------------------------------------------------------------------
   [▲ WARNING] Unicode ✓ détail 0
   Verdict      : 
-  Quick Facts  : Value 4:   Padded value 5    |  Line one 6
-Line two 6
+  Quick Facts  : ROMs:   Padded value 4    |  ROMs: Line one 5
+Line two 5
 
-  Line three  : Line one 7
-Line two 7
-
-  Line three    |     :   Padded value 9  
+  Line three    |  Native:   Padded value 6  
 
   [Build]
-    •    : Padded value 11
-        Line one 12
-        Line two 12
+    •    : Padded value 8
+        Line one 9
+        Line two 9
           Line three
-    • left | right 13: Unicode ✓ détail 14
+    • left | right 10: Unicode ✓ détail 11
 
   [Runtime]
-    • : Padded value 17
-        Line one 18
-        Line two 18
+    • : Padded value 14
+        Line one 15
+        Line two 15
           Line three
-    • Unicode ✓ détail 19: Line one 20
-Line two 20
+    • Unicode ✓ détail 16: Line one 17
+Line two 17
 
   Line three
-        key = value 21
-    • Unicode ✓ détail 22: Value 23
+        key = value 18
+    • Unicode ✓ détail 19: Value 20
 
   [Framework]
-    • key = value 25: Padded value 26 (Value 27)
-    • left | right 28: Unicode ✓ détail 29 (Value 30)
-    • Value 31: Line one 32
-Line two 32
+    • key = value 22: Padded value 23 (Value 24)
+    • left | right 25: Unicode ✓ détail 26 (Value 27)
+    • Value 28: Line one 29
+Line two 29
 
-  Line three (Padded value 33)
+  Line three (Padded value 30)
 
   [Methods]
-    • Unicode ✓ détail 37: Unicode ✓ détail 38 (Padded value 39)
-    • Unicode ✓ détail 40: Padded value 41
+    • Unicode ✓ détail 34: Unicode ✓ détail 35 (Padded value 36)
+    • Unicode ✓ détail 37: Padded value 38
 
   [Scan]
     • 
-    •    : A long detail line that deliberately exceeds sixty characters in length 47
-        A long detail line that deliberately exceeds sixty characters in length 48
-    • Value 49: Line one 50
-Line two 50
+    •    : A long detail line that deliberately exceeds sixty characters in length 44
+        A long detail line that deliberately exceeds sixty characters in length 45
+    • Value 46: Line one 47
+Line two 47
 
   Line three
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 34
-    • Line one 36
-      Line two 36
+    • A long detail line that deliberately exceeds sixty characters in length 31
+    • Line one 33
+      Line two 33
         Line three
 
 --------------------------------------------------------------------------------
@@ -815,249 +806,249 @@ Line two 50
 Line two 2
 
   Line three  
-  Quick Facts  :    : left | right 5  |  A long detail line that deliberately exceeds sixty characters in length 6: A long detail line that deliberately exceeds sixty characters in length 7  |  Value 8: Value 9
+  Quick Facts  : PM: left | right 4  |  Targets: A long detail line that deliberately exceeds sixty characters in length 5  |  Hits: Value 6
 
   [HMA Alert:    ]
-    Summary:   Padded value 11  
+    Summary:   Padded value 8  
     Hidden Packages:
-      • A long detail line that deliberately exceeds sixty characters in length 12 () [methods: ,    , ]
-      • Line one 17
-Line two 17
+      • A long detail line that deliberately exceeds sixty characters in length 9 () [methods: ,    , ]
+      • Line one 14
+Line two 14
 
-  Line three   (A long detail line that deliberately exceeds sixty characters in length 18) [methods:    , A long detail line that deliberately exceeds sixty characters in length 20]
-      • Line one 21
-Line two 21
+  Line three   (A long detail line that deliberately exceeds sixty characters in length 15) [methods:    , A long detail line that deliberately exceeds sixty characters in length 17]
+      • Line one 18
+Line two 18
 
-  Line three   (A long detail line that deliberately exceeds sixty characters in length 22) [methods: Value 23, left | right 24]
+  Line three   (A long detail line that deliberately exceeds sixty characters in length 19) [methods: Value 20, left | right 21]
 
   [Detected Packages]
-    • A long detail line that deliberately exceeds sixty characters in length 25 () [methods: Value 27, key = value 28,   Padded value 29  ]
-    • Value 30 (left | right 31) [methods: key = value 32, Unicode ✓ détail 33]
+    • A long detail line that deliberately exceeds sixty characters in length 22 () [methods: Value 24, key = value 25,   Padded value 26  ]
+    • Value 27 (left | right 28) [methods: key = value 29, Unicode ✓ détail 30]
 
   [Context & Inventory]
-    • key = value 34: key = value 35
-    • Value 36: key = value 37
-    • A long detail line that deliberately exceeds sixty characters in length 38: Unicode ✓ détail 39
+    • key = value 31: key = value 32
+    • Value 33: key = value 34
+    • A long detail line that deliberately exceeds sixty characters in length 35: Unicode ✓ détail 36
 
   [Monitored Package Catalog (2 targets across 2 categories)]
-    • left | right 42 (1):
-        Unicode ✓ détail 40 (left | right 41)
-    •   Padded value 45   (1):
-          Padded value 43   (Line one 44
-Line two 44
+    • left | right 39 (1):
+        Unicode ✓ détail 37 (left | right 38)
+    •   Padded value 42   (1):
+          Padded value 40   (Line one 41
+Line two 41
 
   Line three  )
 
 --------------------------------------------------------------------------------
   [✔ CLEAR] 
   Verdict      : Value 2
-  Quick Facts  : left | right 4: Value 5  |  Value 6: Line one 7
-Line two 7
+  Quick Facts  : Boot: Value 4  |  Boot: Line one 5
+Line two 5
 
-  Line three    |  left | right 8: Unicode ✓ détail 9
+  Line three    |  Boot: Unicode ✓ détail 6
 
   [Identity]
-    • Value 10: key = value 11
+    • Value 7: key = value 8
+        A long detail line that deliberately exceeds sixty characters in length 9
+    • left | right 10: left | right 11
         A long detail line that deliberately exceeds sixty characters in length 12
-    • left | right 13: left | right 14
-        A long detail line that deliberately exceeds sixty characters in length 15
 
   [Anomalies]
-    • Unicode ✓ détail 16: left | right 17 (Unicode ✓ détail 18)
-    • Line one 19
-Line two 19
+    • Unicode ✓ détail 13: left | right 14 (Unicode ✓ détail 15)
+    • Line one 16
+Line two 16
 
-  Line three  : Value 20
-        A long detail line that deliberately exceeds sixty characters in length 21
-    • Unicode ✓ détail 22: Line one 23
-Line two 23
+  Line three  : Value 17
+        A long detail line that deliberately exceeds sixty characters in length 18
+    • Unicode ✓ détail 19: Line one 20
+Line two 20
 
   Line three
 
   [Behavior]
-    • Value 25: Value 26 (Value 27)
-    • left | right 28: Padded value 29
-        Line one 30
-        Line two 30
+    • Value 22: Value 23 (Value 24)
+    • left | right 25: Padded value 26
+        Line one 27
+        Line two 27
           Line three
-    • left | right 31: Unicode ✓ détail 32
-        key = value 33
+    • left | right 28: Unicode ✓ détail 29
+        key = value 30
 
   [Methods]
-    • Unicode ✓ détail 37
-        A long detail line that deliberately exceeds sixty characters in length 39
-    • Value 40
-        left | right 42
+    • Unicode ✓ détail 34
+        A long detail line that deliberately exceeds sixty characters in length 36
+    • Value 37
+        left | right 39
 
   [Scan]
-    • A long detail line that deliberately exceeds sixty characters in length 43: Line one 44
-Line two 44
+    • A long detail line that deliberately exceeds sixty characters in length 40: Line one 41
+Line two 41
 
   Line three
+        Line one 42
+        Line two 42
+          Line three
+    • Value 43: key = value 44
         Line one 45
         Line two 45
           Line three
-    • Value 46: key = value 47
-        Line one 48
-        Line two 48
-          Line three
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 34
-    • left | right 36
+    • A long detail line that deliberately exceeds sixty characters in length 31
+    • left | right 33
 
 --------------------------------------------------------------------------------
   [ℹ INFO] Unicode ✓ détail 0
   Verdict      : Unicode ✓ détail 2
-  Quick Facts  : key = value 4: left | right 5  |  key = value 6:      |  key = value 8:    
+  Quick Facts  : Bridge: left | right 4  |  Review:      |  Bridge:    
 
   [Runtime]
-    •    : A long detail line that deliberately exceeds sixty characters in length 11
-        left | right 12
-    • : Unicode ✓ détail 14
-        A long detail line that deliberately exceeds sixty characters in length 15
+    •    : A long detail line that deliberately exceeds sixty characters in length 8
+        left | right 9
+    • : Unicode ✓ détail 11
+        A long detail line that deliberately exceeds sixty characters in length 12
     • 
-        key = value 18
+        key = value 15
 
   [Binder]
-    • Line one 19
-Line two 19
+    • Line one 16
+Line two 16
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 20 (Value 21)
-    • Unicode ✓ détail 22: A long detail line that deliberately exceeds sixty characters in length 23
+  Line three  : A long detail line that deliberately exceeds sixty characters in length 17 (Value 18)
+    • Unicode ✓ détail 19: A long detail line that deliberately exceeds sixty characters in length 20
 
   [Package]
-    • Line one 25
-Line two 25
+    • Line one 22
+Line two 22
 
-  Line three  : Unicode ✓ détail 26 (Value 27)
-    • A long detail line that deliberately exceeds sixty characters in length 28: key = value 29
-        key = value 30
+  Line three  : Unicode ✓ détail 23 (Value 24)
+    • A long detail line that deliberately exceeds sixty characters in length 25: key = value 26
+        key = value 27
 
   [SELinux policy]
-    • Unicode ✓ détail 31: Padded value 32
-    • key = value 34
-        key = value 36
-    • : Unicode ✓ détail 38 (Unicode ✓ détail 39)
+    • Unicode ✓ détail 28: Padded value 29
+    • key = value 31
+        key = value 33
+    • : Unicode ✓ détail 35 (Unicode ✓ détail 36)
 
   [Native]
-    • Unicode ✓ détail 40: key = value 41
-        key = value 42
-    • left | right 43: Padded value 44
-        left | right 45
-    • Value 46
-        Line one 48
-        Line two 48
+    • Unicode ✓ détail 37: key = value 38
+        key = value 39
+    • left | right 40: Padded value 41
+        left | right 42
+    • Value 43
+        Line one 45
+        Line two 45
           Line three
 
   [Methods]
-    • Unicode ✓ détail 51: key = value 52
-        left | right 53
-    • : Unicode ✓ détail 55 (Unicode ✓ détail 56)
-    • A long detail line that deliberately exceeds sixty characters in length 57: Unicode ✓ détail 58
-        Line one 59
-        Line two 59
-          Line three
-
-  [Scan]
-    • key = value 60: left | right 61 (Unicode ✓ détail 62)
-    • A long detail line that deliberately exceeds sixty characters in length 63: Unicode ✓ détail 64
-        left | right 65
-
-  [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 49
-    • left | right 50
-
---------------------------------------------------------------------------------
-  [▲ WARNING] Value 0
-  Verdict      : left | right 2
-  Quick Facts  : : A long detail line that deliberately exceeds sixty characters in length 5  |     : key = value 7  |  Unicode ✓ détail 8: left | right 9
-
-  [Hooks]
-    • key = value 10: key = value 11 (Padded value 12)
-    • : left | right 14 (Unicode ✓ détail 15)
-
-  [Mapping]
-    • key = value 16
-        key = value 18
-    •    : Value 20
-        A long detail line that deliberately exceeds sixty characters in length 21
-
-  [Loader]
-    • Value 22: key = value 23
-    • : key = value 26 (Value 27)
-    • Unicode ✓ détail 28: A long detail line that deliberately exceeds sixty characters in length 29 (Unicode ✓ détail 30)
-
-  [Methods]
-    • left | right 33
-        key = value 35
-    • key = value 36: Padded value 37
-        left | right 38
-
-  [Scan]
-    • Line one 39
-Line two 39
-
-  Line three  : Unicode ✓ détail 40 (Padded value 41)
-    • : key = value 43 (Unicode ✓ détail 44)
-
-  [Impact & Guidance]
-    • left | right 31
-    • A long detail line that deliberately exceeds sixty characters in length 32
-
---------------------------------------------------------------------------------
-  [✔ CLEAR]    
-  Verdict      : Unicode ✓ détail 2
-  Quick Facts  : Value 4:   |  key = value 6: left | right 7  |  key = value 8: A long detail line that deliberately exceeds sixty characters in length 9
-
-  [Artifacts]
-    •   Padded value 18  : left | right 19
-        A long detail line that deliberately exceeds sixty characters in length 20
-    •    : left | right 23
-        key = value 24
-
-  [Runtime]
-    • Line one 26
-Line two 26
-
-  Line three  : Padded value 27 (Unicode ✓ détail 28)
-    • : A long detail line that deliberately exceeds sixty characters in length 31
-    • Unicode ✓ détail 34: key = value 35
-        key = value 36
-
-  [Filesystem]
-    • key = value 38: Line one 39
-Line two 39
-
-  Line three (Unicode ✓ détail 40)
-    • Unicode ✓ détail 42: left | right 43
-    •    : Value 47 (Value 48)
-
-  [Consistency]
-    •   Padded value 50  : Line one 51
-Line two 51
-
-  Line three (Unicode ✓ détail 52)
-    • left | right 54: A long detail line that deliberately exceeds sixty characters in length 55
+    • Unicode ✓ détail 48: key = value 49
+        left | right 50
+    • : Unicode ✓ détail 52 (Unicode ✓ détail 53)
+    • A long detail line that deliberately exceeds sixty characters in length 54: Unicode ✓ détail 55
         Line one 56
         Line two 56
           Line three
 
+  [Scan]
+    • key = value 57: left | right 58 (Unicode ✓ détail 59)
+    • A long detail line that deliberately exceeds sixty characters in length 60: Unicode ✓ détail 61
+        left | right 62
+
+  [Impact & Guidance]
+    • A long detail line that deliberately exceeds sixty characters in length 46
+    • left | right 47
+
+--------------------------------------------------------------------------------
+  [▲ WARNING] Value 0
+  Verdict      : left | right 2
+  Quick Facts  : Runtime: A long detail line that deliberately exceeds sixty characters in length 4  |  Review: key = value 5  |  Review: left | right 6
+
+  [Hooks]
+    • key = value 7: key = value 8 (Padded value 9)
+    • : left | right 11 (Unicode ✓ détail 12)
+
+  [Mapping]
+    • key = value 13
+        key = value 15
+    •    : Value 17
+        A long detail line that deliberately exceeds sixty characters in length 18
+
+  [Loader]
+    • Value 19: key = value 20
+    • : key = value 23 (Value 24)
+    • Unicode ✓ détail 25: A long detail line that deliberately exceeds sixty characters in length 26 (Unicode ✓ détail 27)
+
   [Methods]
-    •    : Value 61
-        A long detail line that deliberately exceeds sixty characters in length 62
-    • : Value 65
-        left | right 66
-    • left | right 68: left | right 69 (Value 70)
+    • left | right 30
+        key = value 32
+    • key = value 33: Padded value 34
+        left | right 35
 
   [Scan]
-    •   Padded value 72  : left | right 73
-        key = value 74
-    • Value 76
-        key = value 78
-    • key = value 80: A long detail line that deliberately exceeds sixty characters in length 81
-        Line one 82
-        Line two 82
+    • Line one 36
+Line two 36
+
+  Line three  : Unicode ✓ détail 37 (Padded value 38)
+    • : key = value 40 (Unicode ✓ détail 41)
+
+  [Impact & Guidance]
+    • left | right 28
+    • A long detail line that deliberately exceeds sixty characters in length 29
+
+--------------------------------------------------------------------------------
+  [✔ CLEAR]    
+  Verdict      : Unicode ✓ détail 2
+  Quick Facts  : Coverage:   |  Critical: left | right 5  |  Critical: A long detail line that deliberately exceeds sixty characters in length 6
+
+  [Artifacts]
+    •   Padded value 15  : left | right 16
+        A long detail line that deliberately exceeds sixty characters in length 17
+    •    : left | right 20
+        key = value 21
+
+  [Runtime]
+    • Line one 23
+Line two 23
+
+  Line three  : Padded value 24 (Unicode ✓ détail 25)
+    • : A long detail line that deliberately exceeds sixty characters in length 28
+    • Unicode ✓ détail 31: key = value 32
+        key = value 33
+
+  [Filesystem]
+    • key = value 35: Line one 36
+Line two 36
+
+  Line three (Unicode ✓ détail 37)
+    • Unicode ✓ détail 39: left | right 40
+    •    : Value 44 (Value 45)
+
+  [Consistency]
+    •   Padded value 47  : Line one 48
+Line two 48
+
+  Line three (Unicode ✓ détail 49)
+    • left | right 51: A long detail line that deliberately exceeds sixty characters in length 52
+        Line one 53
+        Line two 53
+          Line three
+
+  [Methods]
+    •    : Value 58
+        A long detail line that deliberately exceeds sixty characters in length 59
+    • : Value 62
+        left | right 63
+    • left | right 65: left | right 66 (Value 67)
+
+  [Scan]
+    •   Padded value 69  : left | right 70
+        key = value 71
+    • Value 73
+        key = value 75
+    • key = value 77: A long detail line that deliberately exceeds sixty characters in length 78
+        Line one 79
+        Line two 79
           Line three
 
   [Impact & Guidance]
@@ -1068,322 +1059,313 @@ Line two 51
 Line two 2
 
   Line three  
-  Quick Facts  : : left | right 5  |     :   |     :    
+  Quick Facts  : Runtime: left | right 4  |  Kernel:   |  Kernel:    
 
   [Native]
-    • Unicode ✓ détail 10: key = value 11
-        A long detail line that deliberately exceeds sixty characters in length 12
-    • A long detail line that deliberately exceeds sixty characters in length 14: A long detail line that deliberately exceeds sixty characters in length 15
-    •   Padded value 18  
-        left | right 20
+    • Unicode ✓ détail 7: key = value 8
+        A long detail line that deliberately exceeds sixty characters in length 9
+    • A long detail line that deliberately exceeds sixty characters in length 11: A long detail line that deliberately exceeds sixty characters in length 12
+    •   Padded value 15  
+        left | right 17
 
   [Runtime]
-    • Unicode ✓ détail 22: Unicode ✓ détail 23
-    •   Padded value 26  : key = value 27
-    • : key = value 31 (Padded value 32)
+    • Unicode ✓ détail 19: Unicode ✓ détail 20
+    •   Padded value 23  : key = value 24
+    • : key = value 28 (Padded value 29)
 
   [Kernel]
-    •   Padded value 34  
-        A long detail line that deliberately exceeds sixty characters in length 36
+    •   Padded value 31  
+        A long detail line that deliberately exceeds sixty characters in length 33
     • 
-        key = value 40
+        key = value 37
 
   [Properties]
-    • : A long detail line that deliberately exceeds sixty characters in length 43
-    • Unicode ✓ détail 46: A long detail line that deliberately exceeds sixty characters in length 47
+    • : A long detail line that deliberately exceeds sixty characters in length 40
+    • Unicode ✓ détail 43: A long detail line that deliberately exceeds sixty characters in length 44
 
   [Methods]
-    • Line one 53
-Line two 53
+    • Line one 50
+Line two 50
 
-  Line three  : Line one 54
-Line two 54
+  Line three  : Line one 51
+Line two 51
 
   Line three
-        key = value 55
-    •   Padded value 57  : Padded value 58
-        Line one 59
-        Line two 59
+        key = value 52
+    •   Padded value 54  : Padded value 55
+        Line one 56
+        Line two 56
           Line three
 
   [Scan]
-    •    : Unicode ✓ détail 62
-        key = value 63
-    • Value 65
-        Unicode ✓ détail 67
-    • : left | right 70 (Padded value 71)
+    •    : Unicode ✓ détail 59
+        key = value 60
+    • Value 62
+        Unicode ✓ détail 64
+    • : left | right 67 (Padded value 68)
 
   [Impact & Guidance]
-    • Value 50
-    • Padded value 51
-    • left | right 52
+    • Value 47
+    • Padded value 48
+    • left | right 49
 
 --------------------------------------------------------------------------------
   [✔ CLEAR]   Padded value 0  
   Verdict      :   Padded value 2  
-  Quick Facts  : Unicode ✓ détail 4:      |  left | right 6: left | right 7  |  key = value 8:    
+  Quick Facts  : Review:      |  Native: left | right 5  |  Native:    
 
   [Properties]
-    • key = value 10: A long detail line that deliberately exceeds sixty characters in length 11
-        A long detail line that deliberately exceeds sixty characters in length 12
-    • key = value 13: Padded value 14 (Padded value 15)
-    •   Padded value 16  : Line one 17
-Line two 17
+    • key = value 7: A long detail line that deliberately exceeds sixty characters in length 8
+        A long detail line that deliberately exceeds sixty characters in length 9
+    • key = value 10: Padded value 11 (Padded value 12)
+    •   Padded value 13  : Line one 14
+Line two 14
 
-  Line three (Unicode ✓ détail 18)
+  Line three (Unicode ✓ détail 15)
 
   [Consistency]
-    • left | right 19: Padded value 20
-    • Value 22: key = value 23 (Value 24)
-    • Unicode ✓ détail 25: left | right 26 (Value 27)
+    • left | right 16: Padded value 17
+    • Value 19: key = value 20 (Value 21)
+    • Unicode ✓ détail 22: left | right 23 (Value 24)
 
   [Native]
-    •    : Unicode ✓ détail 29 (Unicode ✓ détail 30)
-    •    : Line one 32
-Line two 32
+    •    : Unicode ✓ détail 26 (Unicode ✓ détail 27)
+    •    : Line one 29
+Line two 29
 
   Line three
-        key = value 33
+        key = value 30
 
   [Methods]
-    • key = value 37
-    •   Padded value 40  : Unicode ✓ détail 41
-        key = value 42
-    • key = value 43: key = value 44 (Value 45)
+    • key = value 34
+    •   Padded value 37  : Unicode ✓ détail 38
+        key = value 39
+    • key = value 40: key = value 41 (Value 42)
 
   [Scan]
-    • Value 46: Padded value 47
-    • Line one 49
-Line two 49
+    • Value 43: Padded value 44
+    • Line one 46
+Line two 46
 
-  Line three  : key = value 50
-    • Value 52
-        Line one 54
-        Line two 54
+  Line three  : key = value 47
+    • Value 49
+        Line one 51
+        Line two 51
           Line three
 
   [Impact & Guidance]
-    • Padded value 34
-    • left | right 35
-    • Line one 36
-      Line two 36
+    • Padded value 31
+    • left | right 32
+    • Line one 33
+      Line two 33
         Line three
 
 --------------------------------------------------------------------------------
   [✖ DANGER] Value 0
   Verdict      :   Padded value 2  
-  Quick Facts  : Line one 4
-Line two 4
-
-  Line three  :   |  left | right 6:   |  Line one 8
-Line two 8
-
-  Line three  :    
+  Quick Facts  : Context:   |  Audit:   |  Context:    
 
   [State]
-    • key = value 10
-        Padded value 12
-    • : Line one 14
-Line two 14
+    • key = value 7
+        Padded value 9
+    • : Line one 11
+Line two 11
 
-  Line three (Unicode ✓ détail 15)
-    • Value 16: key = value 17
+  Line three (Unicode ✓ détail 12)
+    • Value 13: key = value 14
 
   [Policy]
-    • Line one 30
-Line two 30
+    • Line one 27
+Line two 27
 
-  Line three  : Line one 31
-Line two 31
-
-  Line three
-        A long detail line that deliberately exceeds sixty characters in length 32
-    • A long detail line that deliberately exceeds sixty characters in length 33
-        Line one 35
-        Line two 35
-          Line three
-    • Value 36: left | right 37 (Padded value 38)
-
-  [Audit]
-    •    
-        Value 44
-    • left | right 45: A long detail line that deliberately exceeds sixty characters in length 46 (Value 47)
-
-  [Device]
-    • Value 50: A long detail line that deliberately exceeds sixty characters in length 51
-        left | right 52
-    • Value 53: Padded value 54
-        left | right 55
-    • : Padded value 57 (Value 58)
-
-  [Methods]
-    • left | right 21: A long detail line that deliberately exceeds sixty characters in length 22
-        Line one 23
-        Line two 23
-          Line three
-    • Unicode ✓ détail 24: Value 25
-    • : Line one 28
+  Line three  : Line one 28
 Line two 28
 
   Line three
         A long detail line that deliberately exceeds sixty characters in length 29
+    • A long detail line that deliberately exceeds sixty characters in length 30
+        Line one 32
+        Line two 32
+          Line three
+    • Value 33: left | right 34 (Padded value 35)
+
+  [Audit]
+    •    
+        Value 41
+    • left | right 42: A long detail line that deliberately exceeds sixty characters in length 43 (Value 44)
+
+  [Device]
+    • Value 47: A long detail line that deliberately exceeds sixty characters in length 48
+        left | right 49
+    • Value 50: Padded value 51
+        left | right 52
+    • : Padded value 54 (Value 55)
+
+  [Methods]
+    • left | right 18: A long detail line that deliberately exceeds sixty characters in length 19
+        Line one 20
+        Line two 20
+          Line three
+    • Unicode ✓ détail 21: Value 22
+    • : Line one 25
+Line two 25
+
+  Line three
+        A long detail line that deliberately exceeds sixty characters in length 26
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 19
-    • Padded value 20
+    • A long detail line that deliberately exceeds sixty characters in length 16
+    • Padded value 17
 
   [Policy Notes]
-    • left | right 39
-    • key = value 40
-    • Line one 41
-      Line two 41
+    • left | right 36
+    • key = value 37
+    • Line one 38
+      Line two 38
         Line three
 
   [Audit Notes]
-    • left | right 48
+    • left | right 45
 
   [References]
-    • Value 59
-    • key = value 60
-    • Unicode ✓ détail 61
+    • Value 56
+    • key = value 57
+    • Unicode ✓ détail 58
 
 --------------------------------------------------------------------------------
   [✖ DANGER] 
   Verdict      :   Padded value 2  
-  Quick Facts  : Line one 4
-Line two 4
-
-  Line three  : Value 5  |  key = value 6:      |    Padded value 8  : Value 9
+  Quick Facts  : Context: Value 4  |  Artifacts:      |  Context: Value 6
 
   [Artifacts]
-    • Line one 10
-Line two 10
+    • Line one 7
+Line two 7
 
-  Line three  : Unicode ✓ détail 11 (Padded value 12)
-    • Unicode ✓ détail 13
-        left | right 15
+  Line three  : Unicode ✓ détail 8 (Padded value 9)
+    • Unicode ✓ détail 10
+        left | right 12
     •    
 
   [Context]
-    • key = value 19: left | right 20 (Value 21)
-    • Line one 22
-Line two 22
+    • key = value 16: left | right 17 (Value 18)
+    • Line one 19
+Line two 19
 
-  Line three  : Padded value 23
-        Line one 24
-        Line two 24
+  Line three  : Padded value 20
+        Line one 21
+        Line two 21
           Line three
-    •   Padded value 25  : Line one 26
-Line two 26
+    •   Padded value 22  : Line one 23
+Line two 23
 
   Line three
-        key = value 27
+        key = value 24
 
   [Methods]
-    • left | right 31: A long detail line that deliberately exceeds sixty characters in length 32
-        A long detail line that deliberately exceeds sixty characters in length 33
-    • A long detail line that deliberately exceeds sixty characters in length 34: A long detail line that deliberately exceeds sixty characters in length 35
-        Line one 36
-        Line two 36
+    • left | right 28: A long detail line that deliberately exceeds sixty characters in length 29
+        A long detail line that deliberately exceeds sixty characters in length 30
+    • A long detail line that deliberately exceeds sixty characters in length 31: A long detail line that deliberately exceeds sixty characters in length 32
+        Line one 33
+        Line two 33
           Line three
-    • Value 37: Line one 38
-Line two 38
+    • Value 34: Line one 35
+Line two 35
 
   Line three
 
   [Scan]
-    • key = value 40: Padded value 41
-        key = value 42
-    •   Padded value 43  : key = value 44
-        Line one 45
-        Line two 45
+    • key = value 37: Padded value 38
+        key = value 39
+    •   Padded value 40  : key = value 41
+        Line one 42
+        Line two 42
           Line three
-    • left | right 46: Padded value 47 (Padded value 48)
+    • left | right 43: Padded value 44 (Padded value 45)
 
   [Impact & Guidance]
-    • left | right 28
-    • Unicode ✓ détail 29
-    • Value 30
+    • left | right 25
+    • Unicode ✓ détail 26
+    • Value 27
 
 --------------------------------------------------------------------------------
   [ℹ INFO]    
   Verdict      :   Padded value 2  
-  Quick Facts  : left | right 4: left | right 5  |  Unicode ✓ détail 6: Unicode ✓ détail 7
+  Quick Facts  : Build: left | right 4  |  Boot: Unicode ✓ détail 5
 
   [Core]
-    • Line one 8
-Line two 8
+    • Line one 6
+Line two 6
 
-  Line three  : Unicode ✓ détail 9
-        key = value 10
-    • key = value 11: Line one 12
-Line two 12
+  Line three  : Unicode ✓ détail 7
+        key = value 8
+    • key = value 9: Line one 10
+Line two 10
 
   Line three
-        key = value 13
-    • : Line one 15
-Line two 15
+        key = value 11
+    • : Line one 13
+Line two 13
 
-  Line three (Unicode ✓ détail 16)
+  Line three (Unicode ✓ détail 14)
 
   [Boot]
-    • left | right 17: A long detail line that deliberately exceeds sixty characters in length 18 (Unicode ✓ détail 19)
-    • Line one 20
-Line two 20
+    • left | right 15: A long detail line that deliberately exceeds sixty characters in length 16 (Unicode ✓ détail 17)
+    • Line one 18
+Line two 18
 
   Line three  
-        key = value 22
-    • : Line one 24
-Line two 24
+        key = value 20
+    • : Line one 22
+Line two 22
 
   Line three
 
   [Build]
     •    
-        key = value 28
-    • Line one 29
-Line two 29
+        key = value 26
+    • Line one 27
+Line two 27
 
-  Line three  : key = value 30
+  Line three  : key = value 28
 
   [Source]
-    •   Padded value 32  : A long detail line that deliberately exceeds sixty characters in length 33
-        key = value 34
-    • A long detail line that deliberately exceeds sixty characters in length 35: key = value 36
-        left | right 37
+    •   Padded value 30  : A long detail line that deliberately exceeds sixty characters in length 31
+        key = value 32
+    • A long detail line that deliberately exceeds sixty characters in length 33: key = value 34
+        left | right 35
 
   [Consistency]
-    • Line one 38
-Line two 38
+    • Line one 36
+Line two 36
 
-  Line three  : Value 39
-        key = value 40
-    • key = value 41: Unicode ✓ détail 42
-    •    : left | right 45 (Unicode ✓ détail 46)
+  Line three  : Value 37
+        key = value 38
+    • key = value 39: Unicode ✓ détail 40
+    •    : left | right 43 (Unicode ✓ détail 44)
 
   [Info]
-    •   Padded value 47  : Line one 48
-Line two 48
+    •   Padded value 45  : Line one 46
+Line two 46
 
   Line three
-        Line one 49
-        Line two 49
+        Line one 47
+        Line two 47
           Line three
-    • Unicode ✓ détail 50: key = value 51
-    • key = value 53: key = value 54 (Value 55)
+    • Unicode ✓ détail 48: key = value 49
+    • key = value 51: key = value 52 (Value 53)
 
   [Methods]
     • 
-    • Unicode ✓ détail 62
+    • Unicode ✓ détail 60
 
   [Scan]
-    • left | right 65: Unicode ✓ détail 66 (Padded value 67)
-    • Value 68: A long detail line that deliberately exceeds sixty characters in length 69
-        A long detail line that deliberately exceeds sixty characters in length 70
+    • left | right 63: Unicode ✓ détail 64 (Padded value 65)
+    • Value 66: A long detail line that deliberately exceeds sixty characters in length 67
+        A long detail line that deliberately exceeds sixty characters in length 68
 
   [Impact & Guidance]
+    • left | right 54
     • left | right 56
-    • left | right 58
 
 --------------------------------------------------------------------------------
   [✖ DANGER] Unicode ✓ détail 0
@@ -1391,67 +1373,67 @@ Line two 48
 Line two 2
 
   Line three  
-  Quick Facts  : left | right 5: Line one 6
-Line two 6
+  Quick Facts  : Trust: Line one 5
+Line two 5
 
-  Line three    |  left | right 7: left | right 8
+  Line three    |  Score: left | right 6
 
   [Highlight Signals]
-    • Line one 9
-Line two 9
+    • Line one 7
+Line two 7
 
   Line three  : 
-    •    : Unicode ✓ détail 12
+    •    : Unicode ✓ détail 10
 
-  [Unicode ✓ détail 13]
-    • Value 14: Padded value 15
-    • A long detail line that deliberately exceeds sixty characters in length 17: key = value 18
-    • key = value 20: 
+  [Unicode ✓ détail 11]
+    • Value 12: Padded value 13
+    • A long detail line that deliberately exceeds sixty characters in length 15: key = value 16
+    • key = value 18: 
 
-  [A long detail line that deliberately exceeds sixty characters in length 23]
-    • : key = value 25
+  [A long detail line that deliberately exceeds sixty characters in length 21]
+    • : key = value 23
     • :
-        Line one 28
-        Line two 28
+        Line one 26
+        Line two 26
           Line three
-    • A long detail line that deliberately exceeds sixty characters in length 30: A long detail line that deliberately exceeds sixty characters in length 31
+    • A long detail line that deliberately exceeds sixty characters in length 28: A long detail line that deliberately exceeds sixty characters in length 29
 
   [Environment & Network]
     • Network Status    :    
-    • Certificate Count :   Padded value 34  
-    • Certificate 1       : Value 35
-        Subject           : Unicode ✓ détail 36
-        Issuer            : key = value 37
+    • Certificate Count :   Padded value 32  
+    • Certificate 1       : Value 33
+        Subject           : Unicode ✓ détail 34
+        Issuer            : key = value 35
         Serial Number     :    
-        Validity          : key = value 39 to 
-        Signature          : left | right 41
-        Public Key        : Value 42
+        Validity          : key = value 37 to 
+        Signature          : left | right 39
+        Public Key        : Value 40
     • Certificate 2       : 
-        Subject           : A long detail line that deliberately exceeds sixty characters in length 44
-        Issuer            :   Padded value 45  
-        Serial Number     : Value 46
-        Validity          :     to Value 48
-        Signature          : Line one 49
-Line two 49
+        Subject           : A long detail line that deliberately exceeds sixty characters in length 42
+        Issuer            :   Padded value 43  
+        Serial Number     : Value 44
+        Validity          :     to Value 46
+        Signature          : Line one 47
+Line two 47
 
   Line three  
-        Public Key        : Line one 50
-Line two 50
+        Public Key        : Line one 48
+Line two 48
 
   Line three  
-    • Certificate 3       : Unicode ✓ détail 51
-        Subject           : A long detail line that deliberately exceeds sixty characters in length 52
-        Issuer            : A long detail line that deliberately exceeds sixty characters in length 53
-        Serial Number     : Line one 54
-Line two 54
+    • Certificate 3       : Unicode ✓ détail 49
+        Subject           : A long detail line that deliberately exceeds sixty characters in length 50
+        Issuer            : A long detail line that deliberately exceeds sixty characters in length 51
+        Serial Number     : Line one 52
+Line two 52
 
   Line three  
-        Validity          :   Padded value 55   to Value 56
-        Signature          : Unicode ✓ détail 57
+        Validity          :   Padded value 53   to Value 54
+        Signature          : Unicode ✓ détail 55
         Public Key        : 
 
   [TEE Detailed Export]
-    key = value 65
+    key = value 63
 
 --------------------------------------------------------------------------------
   [ℹ INFO] left | right 0
@@ -1532,51 +1514,51 @@ Line two 0
 
   Line three  
   Verdict      : Value 2
-  Quick Facts  :    : key = value 5  |     : Line one 7
-Line two 7
+  Quick Facts  : Native: key = value 4  |  FD trap: Line one 5
+Line two 5
 
   Line three  
 
   [State]
-    •   Padded value 8  
-        Line one 10
-        Line two 10
+    •   Padded value 6  
+        Line one 8
+        Line two 8
           Line three
-    • Line one 11
-Line two 11
+    • Line one 9
+Line two 9
 
   Line three  
 
   [Signals]
-    • A long detail line that deliberately exceeds sixty characters in length 26: left | right 27 (Value 28)
-    • key = value 29: left | right 30 (Unicode ✓ détail 31)
-    • Value 32: key = value 33
+    • A long detail line that deliberately exceeds sixty characters in length 24: left | right 25 (Value 26)
+    • key = value 27: left | right 28 (Unicode ✓ détail 29)
+    • Value 30: key = value 31
 
   [Methods]
-    • Line one 17
-Line two 17
+    • Line one 15
+Line two 15
 
   Line three  
-        Value 19
-    • Line one 20
-Line two 20
+        Value 17
+    • Line one 18
+Line two 18
 
-  Line three  : Line one 21
-Line two 21
+  Line three  : Line one 19
+Line two 19
 
-  Line three (Unicode ✓ détail 22)
-    • Unicode ✓ détail 23
-        Unicode ✓ détail 25
+  Line three (Unicode ✓ détail 20)
+    • Unicode ✓ détail 21
+        Unicode ✓ détail 23
 
   [Impact & Guidance]
-    • key = value 14
-    • Line one 16
-      Line two 16
+    • key = value 12
+    • Line one 14
+      Line two 14
         Line three
 
   [References]
-    •   Padded value 35  
-    • left | right 36
+    •   Padded value 33  
+    • left | right 34
 
 
 ================================================================================
@@ -1647,315 +1629,306 @@ Line two 8
 --------------------------------------------------------------------------------
   [ℹ INFO] Unicode ✓ détail 0
   Verdict      :    
-  Quick Facts  : : Value 5  |  left | right 6: Unicode ✓ détail 7  |    Padded value 8  : Value 9
+  Quick Facts  : State: Value 4  |  Trust: Unicode ✓ détail 5  |  Tier: Value 6
 
   [Attestation]
-    •   Padded value 10  : key = value 11
-    • A long detail line that deliberately exceeds sixty characters in length 13
+    •   Padded value 7  : key = value 8
+    • A long detail line that deliberately exceeds sixty characters in length 10
 
   [Properties]
-    • key = value 16: Line one 17
-Line two 17
+    • key = value 13: Line one 14
+Line two 14
 
   Line three
-        key = value 18
-    •   Padded value 19  : Line one 20
-Line two 20
+        key = value 15
+    •   Padded value 16  : Line one 17
+Line two 17
 
-  Line three (Unicode ✓ détail 21)
+  Line three (Unicode ✓ détail 18)
+    • Line one 19
+Line two 19
+
+  Line three  : Value 20
+        key = value 21
+
+  [Consistency]
     • Line one 22
 Line two 22
 
-  Line three  : Value 23
-        key = value 24
-
-  [Consistency]
-    • Line one 25
-Line two 25
-
-  Line three  : Unicode ✓ détail 26
-        A long detail line that deliberately exceeds sixty characters in length 27
-    • key = value 28: Value 29 (Padded value 30)
+  Line three  : Unicode ✓ détail 23
+        A long detail line that deliberately exceeds sixty characters in length 24
+    • key = value 25: Value 26 (Padded value 27)
 
   [Methods]
-    • Value 33: key = value 34
-        Line one 35
-        Line two 35
+    • Value 30: key = value 31
+        Line one 32
+        Line two 32
           Line three
-    • left | right 36
-        Value 38
+    • left | right 33
+        Value 35
 
   [Scan]
-    • Value 39: A long detail line that deliberately exceeds sixty characters in length 40
-        left | right 41
-    • Value 42: Value 43
+    • Value 36: A long detail line that deliberately exceeds sixty characters in length 37
+        left | right 38
+    • Value 39: Value 40
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 31
-    • Unicode ✓ détail 32
+    • A long detail line that deliberately exceeds sixty characters in length 28
+    • Unicode ✓ détail 29
 
 --------------------------------------------------------------------------------
   [ℹ INFO] A long detail line that deliberately exceeds sixty characters in length 0
   Verdict      : Value 2
-  Quick Facts  : Unicode ✓ détail 4:   Padded value 5  
+  Quick Facts  : Build:   Padded value 4  
 
   [Build]
-    • Value 6: Unicode ✓ détail 7
-    • Line one 9
-Line two 9
+    • Value 5: Unicode ✓ détail 6
+    • Line one 8
+Line two 8
 
-  Line three  : left | right 10 (Value 11)
-    • key = value 12: left | right 13 (Value 14)
+  Line three  : left | right 9 (Value 10)
+    • key = value 11: left | right 12 (Value 13)
 
   [Framework]
-    • key = value 15: Unicode ✓ détail 16 (Unicode ✓ détail 17)
-    • Unicode ✓ détail 18: Unicode ✓ détail 19
-        left | right 20
-    • Line one 21
-Line two 21
+    • key = value 14: Unicode ✓ détail 15 (Unicode ✓ détail 16)
+    • Unicode ✓ détail 17: Unicode ✓ détail 18
+        left | right 19
+    • Line one 20
+Line two 20
 
-  Line three  : Unicode ✓ détail 22
-        key = value 23
+  Line three  : Unicode ✓ détail 21
+        key = value 22
 
   [Methods]
-    • : left | right 26
-        left | right 27
+    • : left | right 25
+        left | right 26
 
   [Scan]
-    • Value 28: Unicode ✓ détail 29
-        left | right 30
-    • Unicode ✓ détail 31: key = value 32
-    • key = value 34: Padded value 35
+    • Value 27: Unicode ✓ détail 28
+        left | right 29
+    • Unicode ✓ détail 30: key = value 31
+    • key = value 33: Padded value 34
 
   [Impact & Guidance]
 
 --------------------------------------------------------------------------------
   [▲ WARNING]   Padded value 0  
   Verdict      : A long detail line that deliberately exceeds sixty characters in length 2
-  Quick Facts  : :   |    Padded value 6  : Line one 7
-Line two 7
+  Quick Facts  : PM:   |  Hidden: Line one 5
+Line two 5
 
-  Line three    |  Line one 8
-Line two 8
-
-  Line three  : key = value 9
+  Line three    |  Hidden: key = value 6
 
   [HMA Alert: ]
     Summary:    
     Hidden Packages:
-      •   Padded value 12   () [methods:    , key = value 15]
-      • left | right 16 (left | right 17) [methods: ]
+      •   Padded value 9   () [methods:    , key = value 12]
+      • left | right 13 (left | right 14) [methods: ]
 
   [Context & Inventory]
-    • Value 18: Unicode ✓ détail 19
-    • Unicode ✓ détail 20: left | right 21
-    • Unicode ✓ détail 22: left | right 23
+    • Value 15: Unicode ✓ détail 16
+    • Unicode ✓ détail 17: left | right 18
+    • Unicode ✓ détail 19: left | right 20
 
   [Monitored Package Catalog (3 targets across 3 categories)]
-    • Unicode ✓ détail 26 (1):
-        Value 24 (Unicode ✓ détail 25)
-    • key = value 29 (1):
-        Line one 27
-Line two 27
+    • Unicode ✓ détail 23 (1):
+        Value 21 (Unicode ✓ détail 22)
+    • key = value 26 (1):
+        Line one 24
+Line two 24
 
-  Line three   (Line one 28
-Line two 28
+  Line three   (Line one 25
+Line two 25
 
   Line three  )
     •     (1):
-        Line one 30
-Line two 30
+        Line one 27
+Line two 27
 
-  Line three   (left | right 31)
+  Line three   (left | right 28)
 
 --------------------------------------------------------------------------------
   [ℹ INFO] left | right 0
   Verdict      :    
-  Quick Facts  : Line one 4
-Line two 4
-
-  Line three  : Unicode ✓ détail 5
+  Quick Facts  : Behavior: Unicode ✓ détail 4
 
   [Anomalies]
-    •    : Unicode ✓ détail 7
+    •    : Unicode ✓ détail 6
 
   [Behavior]
-    • Line one 9
-Line two 9
+    • Line one 8
+Line two 8
 
-  Line three  : Padded value 10
-        left | right 11
+  Line three  : Padded value 9
+        left | right 10
 
   [Methods]
-    • : Line one 16
-Line two 16
+    • : Line one 15
+Line two 15
 
   Line three
-    • A long detail line that deliberately exceeds sixty characters in length 18: Unicode ✓ détail 19
-        key = value 20
+    • A long detail line that deliberately exceeds sixty characters in length 17: Unicode ✓ détail 18
+        key = value 19
 
   [Scan]
-    • Line one 21
-Line two 21
+    • Line one 20
+Line two 20
 
   Line three  
-        left | right 23
-    • : Padded value 25
-        A long detail line that deliberately exceeds sixty characters in length 26
+        left | right 22
+    • : Padded value 24
+        A long detail line that deliberately exceeds sixty characters in length 25
 
   [Impact & Guidance]
+    • key = value 11
     • key = value 12
-    • key = value 13
 
 --------------------------------------------------------------------------------
   [✖ DANGER]   Padded value 0  
   Verdict      : 
-  Quick Facts  : key = value 4: A long detail line that deliberately exceeds sixty characters in length 5  |  Line one 6
-Line two 6
-
-  Line three  : Unicode ✓ détail 7  |  : key = value 9
+  Quick Facts  : Bridge: A long detail line that deliberately exceeds sixty characters in length 4  |  Review: Unicode ✓ détail 5  |  Bridge: key = value 6
 
   [Runtime]
-    • Value 10: key = value 11
-        key = value 12
+    • Value 7: key = value 8
+        key = value 9
 
   [Package]
-    •    : left | right 14
-    •   Padded value 16  
-        Line one 18
-        Line two 18
+    •    : left | right 11
+    •   Padded value 13  
+        Line one 15
+        Line two 15
           Line three
-    •    : Value 20
-        A long detail line that deliberately exceeds sixty characters in length 21
+    •    : Value 17
+        A long detail line that deliberately exceeds sixty characters in length 18
 
   [SELinux policy]
-    • left | right 22: Padded value 23
-    • key = value 25
-        A long detail line that deliberately exceeds sixty characters in length 27
-    • left | right 28
-        left | right 30
+    • left | right 19: Padded value 20
+    • key = value 22
+        A long detail line that deliberately exceeds sixty characters in length 24
+    • left | right 25
+        left | right 27
 
   [Native]
-    • Value 31: left | right 32
-        left | right 33
-    • key = value 34
-    •    : Unicode ✓ détail 38
+    • Value 28: left | right 29
+        left | right 30
+    • key = value 31
+    •    : Unicode ✓ détail 35
 
   [Methods]
-    • Line one 41
-Line two 41
+    • Line one 38
+Line two 38
 
-  Line three  : key = value 42 (Value 43)
+  Line three  : key = value 39 (Value 40)
 
   [Scan]
-    • key = value 44
-    • : Line one 48
-Line two 48
+    • key = value 41
+    • : Line one 45
+Line two 45
 
   Line three
-        Line one 49
-        Line two 49
+        Line one 46
+        Line two 46
           Line three
 
   [Impact & Guidance]
-    • left | right 40
+    • left | right 37
 
 --------------------------------------------------------------------------------
   [▲ WARNING]    
   Verdict      :   Padded value 2  
-  Quick Facts  : Unicode ✓ détail 4: left | right 5  |     : Value 7  |  key = value 8:    
+  Quick Facts  : Critical: left | right 4  |  Runtime: Value 5  |  Review:    
 
   [Hooks]
-    • left | right 10: key = value 11
-    •    : Line one 14
-Line two 14
+    • left | right 7: key = value 8
+    •    : Line one 11
+Line two 11
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 15
+        A long detail line that deliberately exceeds sixty characters in length 12
 
   [Mapping]
-    • left | right 16: key = value 17
-        A long detail line that deliberately exceeds sixty characters in length 18
-    • key = value 19: A long detail line that deliberately exceeds sixty characters in length 20 (Padded value 21)
+    • left | right 13: key = value 14
+        A long detail line that deliberately exceeds sixty characters in length 15
+    • key = value 16: A long detail line that deliberately exceeds sixty characters in length 17 (Padded value 18)
 
   [Loader]
-    • key = value 22: Unicode ✓ détail 23
-        Line one 24
-        Line two 24
+    • key = value 19: Unicode ✓ détail 20
+        Line one 21
+        Line two 21
           Line three
-    • key = value 25
+    • key = value 22
 
   [Methods]
-    • key = value 30: left | right 31
-    • : Value 34
+    • key = value 27: left | right 28
+    • : Value 31
 
   [Scan]
-    •    : Line one 37
+    •    : Line one 34
+Line two 34
+
+  Line three
+    • Line one 36
+Line two 36
+
+  Line three  : Line one 37
 Line two 37
 
   Line three
-    • Line one 39
-Line two 39
-
-  Line three  : Line one 40
-Line two 40
-
-  Line three
-        Line one 41
-        Line two 41
+        Line one 38
+        Line two 38
           Line three
-    • left | right 42: Padded value 43 (Value 44)
+    • left | right 39: Padded value 40 (Value 41)
 
   [Impact & Guidance]
-    • Padded value 29
+    • Padded value 26
 
 --------------------------------------------------------------------------------
   [ℹ INFO] key = value 0
   Verdict      : left | right 2
-  Quick Facts  : Unicode ✓ détail 4: A long detail line that deliberately exceeds sixty characters in length 5
+  Quick Facts  : Native: A long detail line that deliberately exceeds sixty characters in length 4
 
   [Artifacts]
-    • left | right 6: Value 7 (Padded value 8)
+    • left | right 5: Value 6 (Padded value 7)
 
   [Runtime]
-    • Unicode ✓ détail 10: Line one 11
-Line two 11
+    • Unicode ✓ détail 9: Line one 10
+Line two 10
 
   Line three
-    • Unicode ✓ détail 14: Value 15
-        left | right 16
-    •   Padded value 18  : A long detail line that deliberately exceeds sixty characters in length 19 (Unicode ✓ détail 20)
+    • Unicode ✓ détail 13: Value 14
+        left | right 15
+    •   Padded value 17  : A long detail line that deliberately exceeds sixty characters in length 18 (Unicode ✓ détail 19)
 
   [Filesystem]
-    • A long detail line that deliberately exceeds sixty characters in length 22: left | right 23
-        A long detail line that deliberately exceeds sixty characters in length 24
+    • A long detail line that deliberately exceeds sixty characters in length 21: left | right 22
+        A long detail line that deliberately exceeds sixty characters in length 23
     • 
 
   [Consistency]
-    • : Padded value 31
+    • : Padded value 30
 
   [Methods]
-    •   Padded value 36  
-        Padded value 38
-    •   Padded value 40  : Line one 41
-Line two 41
+    •   Padded value 35  
+        Padded value 37
+    •   Padded value 39  : Line one 40
+Line two 40
 
   Line three
-        left | right 42
-    • Line one 44
-Line two 44
+        left | right 41
+    • Line one 43
+Line two 43
 
-  Line three  : Line one 45
-Line two 45
+  Line three  : Line one 44
+Line two 44
 
   Line three
 
   [Scan]
-    • A long detail line that deliberately exceeds sixty characters in length 48: Unicode ✓ détail 49
+    • A long detail line that deliberately exceeds sixty characters in length 47: Unicode ✓ détail 48
 
   [Impact & Guidance]
-    • left | right 34
-    • key = value 35
+    • left | right 33
+    • key = value 34
 
 --------------------------------------------------------------------------------
   [ℹ INFO] 
@@ -2045,49 +2018,49 @@ Line two 20
 --------------------------------------------------------------------------------
   [ℹ INFO] Unicode ✓ détail 0
   Verdict      : 
-  Quick Facts  : A long detail line that deliberately exceeds sixty characters in length 4: 
+  Quick Facts  : Mode: 
 
   [State]
-    • key = value 6: Padded value 7 (Padded value 8)
+    • key = value 5: Padded value 6 (Padded value 7)
 
   [Policy]
-    • Line one 15
+    • Line one 14
+Line two 14
+
+  Line three  : Line one 15
 Line two 15
 
-  Line three  : Line one 16
-Line two 16
-
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 17
-    • Line one 18
-Line two 18
+        A long detail line that deliberately exceeds sixty characters in length 16
+    • Line one 17
+Line two 17
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 19
-        Line one 20
-        Line two 20
+  Line three  : A long detail line that deliberately exceeds sixty characters in length 18
+        Line one 19
+        Line two 19
           Line three
 
   [Audit]
-    • Unicode ✓ détail 21: key = value 22 (Padded value 23)
-    •    : Padded value 25
-        A long detail line that deliberately exceeds sixty characters in length 26
-    • Line one 27
-Line two 27
+    • Unicode ✓ détail 20: key = value 21 (Padded value 22)
+    •    : Padded value 24
+        A long detail line that deliberately exceeds sixty characters in length 25
+    • Line one 26
+Line two 26
 
-  Line three  : Value 28 (Value 29)
+  Line three  : Value 27 (Value 28)
 
   [Methods]
-    •   Padded value 9  
-    • left | right 12: Line one 13
-Line two 13
+    •   Padded value 8  
+    • left | right 11: Line one 12
+Line two 12
 
-  Line three (Padded value 14)
+  Line three (Padded value 13)
 
   [Audit Notes]
-    • Padded value 30
-    • A long detail line that deliberately exceeds sixty characters in length 31
-    • Line one 32
-      Line two 32
+    • Padded value 29
+    • A long detail line that deliberately exceeds sixty characters in length 30
+    • Line one 31
+      Line two 31
         Line three
 
 --------------------------------------------------------------------------------
@@ -2121,50 +2094,50 @@ Line two 19
 --------------------------------------------------------------------------------
   [▲ WARNING]   Padded value 0  
   Verdict      :    
-  Quick Facts  :   Padded value 4  : key = value 5  |  Value 6: Line one 7
-Line two 7
+  Quick Facts  : Critical: key = value 4  |  Critical: Line one 5
+Line two 5
 
   Line three  
 
   [Boot]
-    • A long detail line that deliberately exceeds sixty characters in length 8
-        Value 10
-    • Line one 11
-Line two 11
+    • A long detail line that deliberately exceeds sixty characters in length 6
+        Value 8
+    • Line one 9
+Line two 9
 
-  Line three  : left | right 12
-        left | right 13
-    • : Value 15
-        key = value 16
+  Line three  : left | right 10
+        left | right 11
+    • : Value 13
+        key = value 14
 
   [Build]
-    • Unicode ✓ détail 17: A long detail line that deliberately exceeds sixty characters in length 18 (Unicode ✓ détail 19)
+    • Unicode ✓ détail 15: A long detail line that deliberately exceeds sixty characters in length 16 (Unicode ✓ détail 17)
 
   [Source]
-    •   Padded value 20  : Value 21
+    •   Padded value 18  : Value 19
 
   [Consistency]
-    • left | right 23: A long detail line that deliberately exceeds sixty characters in length 24
-        A long detail line that deliberately exceeds sixty characters in length 25
+    • left | right 21: A long detail line that deliberately exceeds sixty characters in length 22
+        A long detail line that deliberately exceeds sixty characters in length 23
 
   [Methods]
-    • Unicode ✓ détail 26: Padded value 27
-        key = value 28
-    • left | right 29: key = value 30
-        key = value 31
+    • Unicode ✓ détail 24: Padded value 25
+        key = value 26
+    • left | right 27: key = value 28
+        key = value 29
 
   [Scan]
-    • A long detail line that deliberately exceeds sixty characters in length 32: A long detail line that deliberately exceeds sixty characters in length 33
-        Line one 34
-        Line two 34
+    • A long detail line that deliberately exceeds sixty characters in length 30: A long detail line that deliberately exceeds sixty characters in length 31
+        Line one 32
+        Line two 32
           Line three
-    •    : A long detail line that deliberately exceeds sixty characters in length 36
-        key = value 37
-    • : Line one 39
-Line two 39
+    •    : A long detail line that deliberately exceeds sixty characters in length 34
+        key = value 35
+    • : Line one 37
+Line two 37
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 40
+        A long detail line that deliberately exceeds sixty characters in length 38
 
 --------------------------------------------------------------------------------
   [ℹ INFO] A long detail line that deliberately exceeds sixty characters in length 0
@@ -2229,30 +2202,30 @@ Line two 33
 --------------------------------------------------------------------------------
   [ℹ INFO] Unicode ✓ détail 0
   Verdict      : 
-  Quick Facts  : left | right 4: A long detail line that deliberately exceeds sixty characters in length 5  |  A long detail line that deliberately exceeds sixty characters in length 6: Value 7
+  Quick Facts  : State: A long detail line that deliberately exceeds sixty characters in length 4  |  Native: Value 5
 
   [Signals]
-    • left | right 17: Unicode ✓ détail 18
-        key = value 19
-    • Value 20
-        left | right 22
+    • left | right 15: Unicode ✓ détail 16
+        key = value 17
+    • Value 18
+        left | right 20
 
   [Methods]
-    • key = value 8
-        Line one 10
-        Line two 10
+    • key = value 6
+        Line one 8
+        Line two 8
           Line three
-    • Unicode ✓ détail 11
-    • : Line one 15
-Line two 15
+    • Unicode ✓ détail 9
+    • : Line one 13
+Line two 13
 
   Line three
-        Line one 16
-        Line two 16
+        Line one 14
+        Line two 14
           Line three
 
   [References]
-    • key = value 23
+    • key = value 21
 
 
 ================================================================================
@@ -2318,132 +2291,129 @@ Line two 2
 --------------------------------------------------------------------------------
   [✔ CLEAR] A long detail line that deliberately exceeds sixty characters in length 0
   Verdict      : Value 2
-  Quick Facts  : : Unicode ✓ détail 5  |  Line one 6
-Line two 6
-
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 7
+  Quick Facts  : State: Unicode ✓ détail 4  |  Trust: A long detail line that deliberately exceeds sixty characters in length 5
 
   [State]
-    • left | right 8: Line one 9
+    • left | right 6: Line one 7
+Line two 7
+
+  Line three (Value 8)
+    • Line one 9
 Line two 9
 
-  Line three (Value 10)
-    • Line one 11
-Line two 11
-
   Line three  
-        Value 13
-    • Value 14
-        Line one 16
-        Line two 16
+        Value 11
+    • Value 12
+        Line one 14
+        Line two 14
           Line three
 
   [Attestation]
-    • Unicode ✓ détail 17: Line one 18
-Line two 18
+    • Unicode ✓ détail 15: Line one 16
+Line two 16
 
-  Line three (Unicode ✓ détail 19)
-    • key = value 20: Value 21 (Padded value 22)
-    • Unicode ✓ détail 23
-        Padded value 25
+  Line three (Unicode ✓ détail 17)
+    • key = value 18: Value 19 (Padded value 20)
+    • Unicode ✓ détail 21
+        Padded value 23
 
   [Properties]
-    • Line one 26
-Line two 26
+    • Line one 24
+Line two 24
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 27
-        key = value 28
-    • A long detail line that deliberately exceeds sixty characters in length 29: Value 30
-        left | right 31
+  Line three  : A long detail line that deliberately exceeds sixty characters in length 25
+        key = value 26
+    • A long detail line that deliberately exceeds sixty characters in length 27: Value 28
+        left | right 29
 
   [Consistency]
-    •   Padded value 32  : A long detail line that deliberately exceeds sixty characters in length 33
-        Line one 34
-        Line two 34
+    •   Padded value 30  : A long detail line that deliberately exceeds sixty characters in length 31
+        Line one 32
+        Line two 32
           Line three
-    • Unicode ✓ détail 35: Value 36
-        A long detail line that deliberately exceeds sixty characters in length 37
-    • Value 38: Unicode ✓ détail 39
-        left | right 40
+    • Unicode ✓ détail 33: Value 34
+        A long detail line that deliberately exceeds sixty characters in length 35
+    • Value 36: Unicode ✓ détail 37
+        left | right 38
 
   [Methods]
-    • A long detail line that deliberately exceeds sixty characters in length 44
-        key = value 46
-    • Unicode ✓ détail 47: Unicode ✓ détail 48 (Value 49)
-    • Line one 50
-Line two 50
+    • A long detail line that deliberately exceeds sixty characters in length 42
+        key = value 44
+    • Unicode ✓ détail 45: Unicode ✓ détail 46 (Value 47)
+    • Line one 48
+Line two 48
 
-  Line three  : Line one 51
-Line two 51
+  Line three  : Line one 49
+Line two 49
 
-  Line three (Value 52)
+  Line three (Value 50)
 
   [Scan]
-    •    : Line one 54
-Line two 54
+    •    : Line one 52
+Line two 52
 
   Line three
-    • : A long detail line that deliberately exceeds sixty characters in length 57
-        left | right 58
+    • : A long detail line that deliberately exceeds sixty characters in length 55
+        left | right 56
 
   [Impact & Guidance]
-    • Unicode ✓ détail 41
-    • Line one 42
-      Line two 42
+    • Unicode ✓ détail 39
+    • Line one 40
+      Line two 40
         Line three
-    • Value 43
+    • Value 41
 
 --------------------------------------------------------------------------------
   [✖ DANGER] left | right 0
   Verdict      :    
-  Quick Facts  : key = value 4: A long detail line that deliberately exceeds sixty characters in length 5  |  :      |  left | right 8: Value 9
+  Quick Facts  : Runtime: A long detail line that deliberately exceeds sixty characters in length 4  |  Build:      |  Native: Value 6
 
   [Build]
-    • key = value 10: Line one 11
-Line two 11
+    • key = value 7: Line one 8
+Line two 8
 
   Line three
-    • : Value 14
+    • : Value 11
 
   [Runtime]
     •    
-        key = value 18
+        key = value 15
     • 
-    • A long detail line that deliberately exceeds sixty characters in length 22: Line one 23
-Line two 23
+    • A long detail line that deliberately exceeds sixty characters in length 19: Line one 20
+Line two 20
 
   Line three
 
   [Framework]
-    • key = value 25: A long detail line that deliberately exceeds sixty characters in length 26 (Value 27)
-    • key = value 28: left | right 29
-        Line one 30
-        Line two 30
+    • key = value 22: A long detail line that deliberately exceeds sixty characters in length 23 (Value 24)
+    • key = value 25: left | right 26
+        Line one 27
+        Line two 27
           Line three
-    • Value 31
-        Padded value 33
+    • Value 28
+        Padded value 30
 
   [Methods]
+    • A long detail line that deliberately exceeds sixty characters in length 34
+        left | right 36
     • A long detail line that deliberately exceeds sixty characters in length 37
         left | right 39
-    • A long detail line that deliberately exceeds sixty characters in length 40
-        left | right 42
 
   [Scan]
-    • key = value 43: Padded value 44
-        key = value 45
-    • Line one 46
-Line two 46
+    • key = value 40: Padded value 41
+        key = value 42
+    • Line one 43
+Line two 43
 
-  Line three  : left | right 47
-        Line one 48
-        Line two 48
+  Line three  : left | right 44
+        Line one 45
+        Line two 45
           Line three
 
   [Impact & Guidance]
-    • Value 34
-    • Value 35
-    • key = value 36
+    • Value 31
+    • Value 32
+    • key = value 33
 
 --------------------------------------------------------------------------------
   [✖ DANGER] Value 0
@@ -2451,44 +2421,44 @@ Line two 46
 Line two 2
 
   Line three  
-  Quick Facts  : key = value 4:   |  key = value 6: Value 7  |  : A long detail line that deliberately exceeds sixty characters in length 9
+  Quick Facts  : Hits:   |  Hits: Value 5  |  Hits: A long detail line that deliberately exceeds sixty characters in length 6
 
-  [HMA Alert: key = value 10]
-    Summary: left | right 11
+  [HMA Alert: key = value 7]
+    Summary: left | right 8
     Hidden Packages:
-      •     (Line one 13
-Line two 13
+      •     (Line one 10
+Line two 10
 
-  Line three  ) [methods:    , key = value 15]
-      • A long detail line that deliberately exceeds sixty characters in length 16 () [methods: Line one 18
-Line two 18
+  Line three  ) [methods:    , key = value 12]
+      • A long detail line that deliberately exceeds sixty characters in length 13 () [methods: Line one 15
+Line two 15
 
-  Line three  ,   Padded value 19  , Value 20]
+  Line three  ,   Padded value 16  , Value 17]
 
   [Detected Packages]
-    •  (A long detail line that deliberately exceeds sixty characters in length 22) [methods:   Padded value 23  , left | right 24,   Padded value 25  ]
-    •   Padded value 26   () [methods: Unicode ✓ détail 28, Line one 29
-Line two 29
+    •  (A long detail line that deliberately exceeds sixty characters in length 19) [methods:   Padded value 20  , left | right 21,   Padded value 22  ]
+    •   Padded value 23   () [methods: Unicode ✓ détail 25, Line one 26
+Line two 26
 
   Line three  ]
 
   [Context & Inventory]
-    • left | right 30: Unicode ✓ détail 31
-    • Unicode ✓ détail 32: Line one 33
-Line two 33
+    • left | right 27: Unicode ✓ détail 28
+    • Unicode ✓ détail 29: Line one 30
+Line two 30
 
   Line three  
 
   [Monitored Package Catalog (3 targets across 3 categories)]
     •     (1):
-        key = value 34 (Line one 35
-Line two 35
+        key = value 31 (Line one 32
+Line two 32
 
   Line three  )
-    • left | right 39 (1):
-        Unicode ✓ détail 37 (left | right 38)
-    •   Padded value 42   (1):
-        A long detail line that deliberately exceeds sixty characters in length 40 (A long detail line that deliberately exceeds sixty characters in length 41)
+    • left | right 36 (1):
+        Unicode ✓ détail 34 (left | right 35)
+    •   Padded value 39   (1):
+        A long detail line that deliberately exceeds sixty characters in length 37 (A long detail line that deliberately exceeds sixty characters in length 38)
 
 --------------------------------------------------------------------------------
   [✔ CLEAR]   Padded value 0  
@@ -2496,57 +2466,54 @@ Line two 35
 Line two 2
 
   Line three  
-  Quick Facts  : Line one 4
-Line two 4
-
-  Line three  : key = value 5  |  left | right 6: Unicode ✓ détail 7
+  Quick Facts  : Behavior: key = value 4  |  Identity: Unicode ✓ détail 5
 
   [Identity]
-    • Value 8
-        key = value 10
-    • Value 11: Line one 12
-Line two 12
+    • Value 6
+        key = value 8
+    • Value 9: Line one 10
+Line two 10
 
   Line three
-    • Line one 14
-Line two 14
+    • Line one 12
+Line two 12
 
   Line three  
 
   [Anomalies]
-    •   Padded value 17  : Line one 18
-Line two 18
+    •   Padded value 15  : Line one 16
+Line two 16
 
   Line three
-        Line one 19
-        Line two 19
+        Line one 17
+        Line two 17
           Line three
-    • Value 20
-        key = value 22
+    • Value 18
+        key = value 20
 
   [Behavior]
-    • Value 23: A long detail line that deliberately exceeds sixty characters in length 24
-        A long detail line that deliberately exceeds sixty characters in length 25
-    •   Padded value 26  : A long detail line that deliberately exceeds sixty characters in length 27
-        left | right 28
+    • Value 21: A long detail line that deliberately exceeds sixty characters in length 22
+        A long detail line that deliberately exceeds sixty characters in length 23
+    •   Padded value 24  : A long detail line that deliberately exceeds sixty characters in length 25
+        left | right 26
 
   [Methods]
-    • Value 31
-        Unicode ✓ détail 33
-    • A long detail line that deliberately exceeds sixty characters in length 34
-        Padded value 36
+    • Value 29
+        Unicode ✓ détail 31
+    • A long detail line that deliberately exceeds sixty characters in length 32
+        Padded value 34
 
   [Scan]
-    • A long detail line that deliberately exceeds sixty characters in length 37: Line one 38
-Line two 38
+    • A long detail line that deliberately exceeds sixty characters in length 35: Line one 36
+Line two 36
 
   Line three
-        Line one 39
-        Line two 39
+        Line one 37
+        Line two 37
           Line three
-    • Unicode ✓ détail 40
-        Unicode ✓ détail 42
-    • A long detail line that deliberately exceeds sixty characters in length 43: Unicode ✓ détail 44 (Unicode ✓ détail 45)
+    • Unicode ✓ détail 38
+        Unicode ✓ détail 40
+    • A long detail line that deliberately exceeds sixty characters in length 41: Unicode ✓ détail 42 (Unicode ✓ détail 43)
 
   [Impact & Guidance]
 
@@ -2556,128 +2523,128 @@ Line two 0
 
   Line three  
   Verdict      : Value 2
-  Quick Facts  :    :   |  Value 6: Unicode ✓ détail 7
+  Quick Facts  : Critical:   |  Packages: Unicode ✓ détail 5
 
   [Runtime]
-    • left | right 8: Unicode ✓ détail 9
-        A long detail line that deliberately exceeds sixty characters in length 10
-    • left | right 11: Value 12
-        A long detail line that deliberately exceeds sixty characters in length 13
-    • : Padded value 15
+    • left | right 6: Unicode ✓ détail 7
+        A long detail line that deliberately exceeds sixty characters in length 8
+    • left | right 9: Value 10
+        A long detail line that deliberately exceeds sixty characters in length 11
+    • : Padded value 13
 
   [Binder]
     • 
-        Unicode ✓ détail 19
-    • Value 20: Padded value 21
-        key = value 22
+        Unicode ✓ détail 17
+    • Value 18: Padded value 19
+        key = value 20
 
   [Package]
-    • : Unicode ✓ détail 24
-    • Value 26: Padded value 27
+    • : Unicode ✓ détail 22
+    • Value 24: Padded value 25
 
   [SELinux policy]
-    • Value 29: Unicode ✓ détail 30 (Value 31)
-    •    : A long detail line that deliberately exceeds sixty characters in length 33
-        Line one 34
-        Line two 34
+    • Value 27: Unicode ✓ détail 28 (Value 29)
+    •    : A long detail line that deliberately exceeds sixty characters in length 31
+        Line one 32
+        Line two 32
           Line three
 
   [Native]
-    • Line one 35
-Line two 35
+    • Line one 33
+Line two 33
 
-  Line three  : Value 36
-        Line one 37
-        Line two 37
+  Line three  : Value 34
+        Line one 35
+        Line two 35
           Line three
     •    
-        Padded value 40
-    •    : Unicode ✓ détail 42 (Unicode ✓ détail 43)
+        Padded value 38
+    •    : Unicode ✓ détail 40 (Unicode ✓ détail 41)
 
   [Methods]
-    •    : Line one 48
-Line two 48
+    •    : Line one 46
+Line two 46
 
   Line three
-    • A long detail line that deliberately exceeds sixty characters in length 50
-        left | right 52
+    • A long detail line that deliberately exceeds sixty characters in length 48
+        left | right 50
 
   [Scan]
-    • key = value 53: Unicode ✓ détail 54
-    •   Padded value 56  : Padded value 57
-    • key = value 59: Line one 60
-Line two 60
+    • key = value 51: Unicode ✓ détail 52
+    •   Padded value 54  : Padded value 55
+    • key = value 57: Line one 58
+Line two 58
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 61
+        A long detail line that deliberately exceeds sixty characters in length 59
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 44
-    • Unicode ✓ détail 46
+    • A long detail line that deliberately exceeds sixty characters in length 42
+    • Unicode ✓ détail 44
 
 --------------------------------------------------------------------------------
   [✖ DANGER] 
   Verdict      : 
-  Quick Facts  :    : left | right 5  |  Value 6: A long detail line that deliberately exceeds sixty characters in length 7
+  Quick Facts  : Review: left | right 4  |  Hooks: A long detail line that deliberately exceeds sixty characters in length 5
 
   [Hooks]
-    •   Padded value 8  : key = value 9
-        Line one 10
-        Line two 10
+    •   Padded value 6  : key = value 7
+        Line one 8
+        Line two 8
           Line three
-    • key = value 11
+    • key = value 9
 
   [Mapping]
-    • Unicode ✓ détail 14: Line one 15
-Line two 15
+    • Unicode ✓ détail 12: Line one 13
+Line two 13
 
   Line three
-        Line one 16
-        Line two 16
+        Line one 14
+        Line two 14
           Line three
-    • left | right 17
-        Padded value 19
-    • left | right 20: Padded value 21
-        Line one 22
-        Line two 22
+    • left | right 15
+        Padded value 17
+    • left | right 18: Padded value 19
+        Line one 20
+        Line two 20
           Line three
 
   [Loader]
-    • A long detail line that deliberately exceeds sixty characters in length 23
-    •   Padded value 26  : Line one 27
+    • A long detail line that deliberately exceeds sixty characters in length 21
+    •   Padded value 24  : Line one 25
+Line two 25
+
+  Line three
+        A long detail line that deliberately exceeds sixty characters in length 26
+    • Line one 27
 Line two 27
 
-  Line three
-        A long detail line that deliberately exceeds sixty characters in length 28
-    • Line one 29
-Line two 29
-
-  Line three  : Unicode ✓ détail 30 (Value 31)
+  Line three  : Unicode ✓ détail 28 (Value 29)
 
   [Methods]
-    • : Line one 35
-Line two 35
+    • : Line one 33
+Line two 33
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 36
-    • Value 37: Value 38
-        key = value 39
-    • A long detail line that deliberately exceeds sixty characters in length 40: key = value 41
-        A long detail line that deliberately exceeds sixty characters in length 42
+        A long detail line that deliberately exceeds sixty characters in length 34
+    • Value 35: Value 36
+        key = value 37
+    • A long detail line that deliberately exceeds sixty characters in length 38: key = value 39
+        A long detail line that deliberately exceeds sixty characters in length 40
 
   [Scan]
-    • Line one 43
-Line two 43
+    • Line one 41
+Line two 41
 
-  Line three  : left | right 44
-    • key = value 46: left | right 47
-        Line one 48
-        Line two 48
+  Line three  : left | right 42
+    • key = value 44: left | right 45
+        Line one 46
+        Line two 46
           Line three
-    • A long detail line that deliberately exceeds sixty characters in length 49: Padded value 50
+    • A long detail line that deliberately exceeds sixty characters in length 47: Padded value 48
 
   [Impact & Guidance]
-    • A long detail line that deliberately exceeds sixty characters in length 33
+    • A long detail line that deliberately exceeds sixty characters in length 31
 
 --------------------------------------------------------------------------------
   [✖ DANGER] Line one 0
@@ -2685,57 +2652,57 @@ Line two 0
 
   Line three  
   Verdict      :   Padded value 2  
-  Quick Facts  : : Value 5  |  Unicode ✓ détail 6: Value 7  |  key = value 8: Unicode ✓ détail 9
+  Quick Facts  : Critical: Value 4  |  Native: Value 5  |  Coverage: Unicode ✓ détail 6
 
   [Artifacts]
-    • Unicode ✓ détail 18: A long detail line that deliberately exceeds sixty characters in length 19 (Value 20)
-    • A long detail line that deliberately exceeds sixty characters in length 22: left | right 23
+    • Unicode ✓ détail 15: A long detail line that deliberately exceeds sixty characters in length 16 (Value 17)
+    • A long detail line that deliberately exceeds sixty characters in length 19: left | right 20
 
   [Runtime]
-    •   Padded value 26  : A long detail line that deliberately exceeds sixty characters in length 27
-    • left | right 30
-        Unicode ✓ détail 32
-    • Unicode ✓ détail 34: Value 35
-        left | right 36
+    •   Padded value 23  : A long detail line that deliberately exceeds sixty characters in length 24
+    • left | right 27
+        Unicode ✓ détail 29
+    • Unicode ✓ détail 31: Value 32
+        left | right 33
 
   [Filesystem]
-    • Line one 38
-Line two 38
+    • Line one 35
+Line two 35
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 39
-    •   Padded value 42  : key = value 43
+  Line three  : A long detail line that deliberately exceeds sixty characters in length 36
+    •   Padded value 39  : key = value 40
 
   [Consistency]
-    • Value 46: Line one 47
-Line two 47
+    • Value 43: Line one 44
+Line two 44
 
   Line three
-        left | right 48
-    • left | right 50: Unicode ✓ détail 51 (Value 52)
-    • Line one 54
-Line two 54
+        left | right 45
+    • left | right 47: Unicode ✓ détail 48 (Value 49)
+    • Line one 51
+Line two 51
 
-  Line three  : Value 55
-        key = value 56
+  Line three  : Value 52
+        key = value 53
 
   [Methods]
-    • A long detail line that deliberately exceeds sixty characters in length 61: Unicode ✓ détail 62 (Value 63)
-    •    : key = value 66
-        left | right 67
-    •   Padded value 69  
+    • A long detail line that deliberately exceeds sixty characters in length 58: Unicode ✓ détail 59 (Value 60)
+    •    : key = value 63
+        left | right 64
+    •   Padded value 66  
 
   [Scan]
-    • Unicode ✓ détail 73: Line one 74
-Line two 74
+    • Unicode ✓ détail 70: Line one 71
+Line two 71
 
-  Line three (Padded value 75)
-    •    : A long detail line that deliberately exceeds sixty characters in length 78
+  Line three (Padded value 72)
+    •    : A long detail line that deliberately exceeds sixty characters in length 75
 
   [Impact & Guidance]
-    • Unicode ✓ détail 58
-    • Padded value 59
-    • Line one 60
-      Line two 60
+    • Unicode ✓ détail 55
+    • Padded value 56
+    • Line one 57
+      Line two 57
         Line three
 
 --------------------------------------------------------------------------------
@@ -2744,123 +2711,120 @@ Line two 0
 
   Line three  
   Verdict      : key = value 2
-  Quick Facts  : Line one 4
-Line two 4
-
-  Line three  :      |    Padded value 6  :   Padded value 7    |  : Unicode ✓ détail 9
+  Quick Facts  : Flags:      |  Kernel:   Padded value 5    |  Flags: Unicode ✓ détail 6
 
   [Native]
-    • Line one 10
-Line two 10
+    • Line one 7
+Line two 7
 
-  Line three  : Value 11
-        Line one 12
-        Line two 12
+  Line three  : Value 8
+        Line one 9
+        Line two 9
           Line three
-    • Value 14: Padded value 15
-        key = value 16
+    • Value 11: Padded value 12
+        key = value 13
 
   [Runtime]
-    • key = value 18
-        A long detail line that deliberately exceeds sixty characters in length 20
-    •    : A long detail line that deliberately exceeds sixty characters in length 23 (Value 24)
+    • key = value 15
+        A long detail line that deliberately exceeds sixty characters in length 17
+    •    : A long detail line that deliberately exceeds sixty characters in length 20 (Value 21)
 
   [Kernel]
-    • Line one 26
-Line two 26
+    • Line one 23
+Line two 23
 
-  Line three  : Padded value 27
-        left | right 28
-    •   Padded value 30  : Line one 31
-Line two 31
+  Line three  : Padded value 24
+        left | right 25
+    •   Padded value 27  : Line one 28
+Line two 28
 
   Line three
-        A long detail line that deliberately exceeds sixty characters in length 32
+        A long detail line that deliberately exceeds sixty characters in length 29
 
   [Properties]
-    • Line one 34
-Line two 34
+    • Line one 31
+Line two 31
 
-  Line three  : Unicode ✓ détail 35
-    • A long detail line that deliberately exceeds sixty characters in length 38: Line one 39
-Line two 39
+  Line three  : Unicode ✓ détail 32
+    • A long detail line that deliberately exceeds sixty characters in length 35: Line one 36
+Line two 36
 
   Line three
-        key = value 40
+        key = value 37
 
   [Methods]
-    • Unicode ✓ détail 44
-        Unicode ✓ détail 46
-    •   Padded value 48  : key = value 49
+    • Unicode ✓ détail 41
+        Unicode ✓ détail 43
+    •   Padded value 45  : key = value 46
 
   [Scan]
-    • Value 52: left | right 53
-    • Value 56: Line one 57
-Line two 57
+    • Value 49: left | right 50
+    • Value 53: Line one 54
+Line two 54
 
   Line three
-        Line one 58
-        Line two 58
+        Line one 55
+        Line two 55
           Line three
-    •    : Line one 61
-Line two 61
+    •    : Line one 58
+Line two 58
 
-  Line three (Value 62)
+  Line three (Value 59)
 
   [Impact & Guidance]
 
 --------------------------------------------------------------------------------
   [▲ WARNING] 
   Verdict      : key = value 2
-  Quick Facts  : : A long detail line that deliberately exceeds sixty characters in length 5  |  Unicode ✓ détail 6:   |  Value 8: left | right 9
+  Quick Facts  : Native: A long detail line that deliberately exceeds sixty characters in length 4  |  Review:   |  Native: left | right 6
 
   [Properties]
-    •    : Unicode ✓ détail 11
-        key = value 12
-    • left | right 13
-        left | right 15
+    •    : Unicode ✓ détail 8
+        key = value 9
+    • left | right 10
+        left | right 12
 
   [Consistency]
-    • : A long detail line that deliberately exceeds sixty characters in length 17
-        key = value 18
-    •   Padded value 19  
+    • : A long detail line that deliberately exceeds sixty characters in length 14
+        key = value 15
+    •   Padded value 16  
 
   [Native]
-    •    : Padded value 23
-        Line one 24
-        Line two 24
+    •    : Padded value 20
+        Line one 21
+        Line two 21
           Line three
-    • A long detail line that deliberately exceeds sixty characters in length 25: Line one 26
-Line two 26
+    • A long detail line that deliberately exceeds sixty characters in length 22: Line one 23
+Line two 23
 
   Line three
-        key = value 27
+        key = value 24
 
   [Methods]
-    • Line one 30
-Line two 30
+    • Line one 27
+Line two 27
 
-  Line three  : A long detail line that deliberately exceeds sixty characters in length 31 (Unicode ✓ détail 32)
-    • Unicode ✓ détail 33: A long detail line that deliberately exceeds sixty characters in length 34 (Unicode ✓ détail 35)
-    • key = value 36: Unicode ✓ détail 37
-        key = value 38
+  Line three  : A long detail line that deliberately exceeds sixty characters in length 28 (Unicode ✓ détail 29)
+    • Unicode ✓ détail 30: A long detail line that deliberately exceeds sixty characters in length 31 (Unicode ✓ détail 32)
+    • key = value 33: Unicode ✓ détail 34
+        key = value 35
 
   [Scan]
-    • Line one 39
-Line two 39
+    • Line one 36
+Line two 36
 
-  Line three  : Padded value 40
-        left | right 41
-    • left | right 42: left | right 43 (Padded value 44)
-    • Line one 45
-Line two 45
+  Line three  : Padded value 37
+        left | right 38
+    • left | right 39: left | right 40 (Padded value 41)
+    • Line one 42
+Line two 42
 
-  Line three  : Value 46
-        A long detail line that deliberately exceeds sixty characters in length 47
+  Line three  : Value 43
+        A long detail line that deliberately exceeds sixty characters in length 44
 
   [Impact & Guidance]
-    • Line one 29
-      Line two 29
+    • Line one 26
+      Line two 26
         Line three
 
 --------------------------------------------------------------------------------
@@ -2869,127 +2833,127 @@ Line two 45
 Line two 2
 
   Line three  
-  Quick Facts  : key = value 4: Line one 5
-Line two 5
+  Quick Facts  : Policy: Line one 4
+Line two 4
 
-  Line three    |  A long detail line that deliberately exceeds sixty characters in length 6: Value 7  |  Value 8: 
+  Line three    |  Audit: Value 5  |  Context: 
 
   [State]
-    •   Padded value 10  : A long detail line that deliberately exceeds sixty characters in length 11
-    •    : key = value 14
-        Line one 15
-        Line two 15
+    •   Padded value 7  : A long detail line that deliberately exceeds sixty characters in length 8
+    •    : key = value 11
+        Line one 12
+        Line two 12
           Line three
-    • Line one 16
-Line two 16
+    • Line one 13
+Line two 13
 
-  Line three  : Line one 17
-Line two 17
+  Line three  : Line one 14
+Line two 14
 
   Line three
 
   [Policy]
-    • Line one 31
-Line two 31
+    • Line one 28
+Line two 28
 
-  Line three  : Value 32
-        A long detail line that deliberately exceeds sixty characters in length 33
-    • Value 34: A long detail line that deliberately exceeds sixty characters in length 35
-        key = value 36
+  Line three  : Value 29
+        A long detail line that deliberately exceeds sixty characters in length 30
+    • Value 31: A long detail line that deliberately exceeds sixty characters in length 32
+        key = value 33
 
   [Audit]
-    • left | right 39: A long detail line that deliberately exceeds sixty characters in length 40 (Value 41)
-    • Line one 42
-Line two 42
+    • left | right 36: A long detail line that deliberately exceeds sixty characters in length 37 (Value 38)
+    • Line one 39
+Line two 39
 
-  Line three  : Line one 43
-Line two 43
+  Line three  : Line one 40
+Line two 40
 
-  Line three (Value 44)
+  Line three (Value 41)
 
   [Device]
-    • Line one 48
-Line two 48
+    • Line one 45
+Line two 45
 
   Line three  
-        key = value 50
-    • Unicode ✓ détail 51
-        left | right 53
+        key = value 47
+    • Unicode ✓ détail 48
+        left | right 50
 
   [Methods]
-    • : Padded value 23
-        Line one 24
-        Line two 24
+    • : Padded value 20
+        Line one 21
+        Line two 21
           Line three
-    • Line one 25
-Line two 25
+    • Line one 22
+Line two 22
 
   Line three  
-        Value 27
-    • left | right 28: left | right 29 (Unicode ✓ détail 30)
+        Value 24
+    • left | right 25: left | right 26 (Unicode ✓ détail 27)
 
   [Impact & Guidance]
-    • Line one 19
-      Line two 19
+    • Line one 16
+      Line two 16
         Line three
-    • Line one 20
-      Line two 20
+    • Line one 17
+      Line two 17
         Line three
 
   [Policy Notes]
-    • A long detail line that deliberately exceeds sixty characters in length 38
+    • A long detail line that deliberately exceeds sixty characters in length 35
 
   [Audit Notes]
-    • key = value 45
-    • Value 46
-    • Value 47
+    • key = value 42
+    • Value 43
+    • Value 44
 
   [References]
-    • left | right 54
+    • left | right 51
     •    
-    • Value 56
+    • Value 53
 
 --------------------------------------------------------------------------------
   [ℹ INFO]   Padded value 0  
   Verdict      : key = value 2
-  Quick Facts  : key = value 4:      |     : key = value 7  |  Value 8: Unicode ✓ détail 9
+  Quick Facts  : Artifacts:      |  Artifacts: key = value 5  |  Processes: Unicode ✓ détail 6
 
   [Artifacts]
-    • Unicode ✓ détail 10: Value 11
-    • key = value 13
-    • left | right 16
-        Value 18
+    • Unicode ✓ détail 7: Value 8
+    • key = value 10
+    • left | right 13
+        Value 15
 
   [Context]
-    • Unicode ✓ détail 19
-    •   Padded value 22  
-        Value 24
+    • Unicode ✓ détail 16
+    •   Padded value 19  
+        Value 21
 
   [Methods]
-    •   Padded value 28  : Padded value 29 (Value 30)
-    • Unicode ✓ détail 31
-    •   Padded value 34  : Line one 35
-Line two 35
+    •   Padded value 25  : Padded value 26 (Value 27)
+    • Unicode ✓ détail 28
+    •   Padded value 31  : Line one 32
+Line two 32
 
   Line three
-        key = value 36
+        key = value 33
 
   [Scan]
-    •   Padded value 37  
-    • Line one 40
-Line two 40
+    •   Padded value 34  
+    • Line one 37
+Line two 37
 
   Line three  
-        left | right 42
+        left | right 39
 
   [Impact & Guidance]
-    • Line one 25
-      Line two 25
+    • Line one 22
+      Line two 22
         Line three
-    • Line one 26
-      Line two 26
+    • Line one 23
+      Line two 23
         Line three
-    • Value 27
+    • Value 24
 
 --------------------------------------------------------------------------------
   [ℹ INFO] Value 0
@@ -2997,142 +2961,142 @@ Line two 40
 Line two 2
 
   Line three  
-  Quick Facts  : Unicode ✓ détail 4:   |  key = value 6: Value 7
+  Quick Facts  : Review:   |  Critical: Value 5
 
   [Core]
-    • Value 8: left | right 9
-    • Line one 11
-Line two 11
+    • Value 6: left | right 7
+    • Line one 9
+Line two 9
 
-  Line three  : Unicode ✓ détail 12
-    • Value 14
-        Value 16
+  Line three  : Unicode ✓ détail 10
+    • Value 12
+        Value 14
 
   [Boot]
     •    
-        A long detail line that deliberately exceeds sixty characters in length 19
-    •   Padded value 20  
-        left | right 22
+        A long detail line that deliberately exceeds sixty characters in length 17
+    •   Padded value 18  
+        left | right 20
 
   [Build]
-    •   Padded value 23  : Unicode ✓ détail 24
-        A long detail line that deliberately exceeds sixty characters in length 25
-    • A long detail line that deliberately exceeds sixty characters in length 26
-        left | right 28
-    • Unicode ✓ détail 29: Unicode ✓ détail 30
-        left | right 31
+    •   Padded value 21  : Unicode ✓ détail 22
+        A long detail line that deliberately exceeds sixty characters in length 23
+    • A long detail line that deliberately exceeds sixty characters in length 24
+        left | right 26
+    • Unicode ✓ détail 27: Unicode ✓ détail 28
+        left | right 29
 
   [Source]
-    •    : Value 33 (Padded value 34)
-    • left | right 35: left | right 36 (Padded value 37)
+    •    : Value 31 (Padded value 32)
+    • left | right 33: left | right 34 (Padded value 35)
 
   [Consistency]
-    • Line one 38
-Line two 38
+    • Line one 36
+Line two 36
 
-  Line three  : Line one 39
-Line two 39
+  Line three  : Line one 37
+Line two 37
 
   Line three
-    • Value 41: left | right 42 (Padded value 43)
+    • Value 39: left | right 40 (Padded value 41)
 
   [Info]
-    • A long detail line that deliberately exceeds sixty characters in length 44: Unicode ✓ détail 45
-        key = value 46
-    • A long detail line that deliberately exceeds sixty characters in length 47
-    •   Padded value 50  : key = value 51
+    • A long detail line that deliberately exceeds sixty characters in length 42: Unicode ✓ détail 43
+        key = value 44
+    • A long detail line that deliberately exceeds sixty characters in length 45
+    •   Padded value 48  : key = value 49
 
   [Methods]
-    • Unicode ✓ détail 56: Line one 57
-Line two 57
+    • Unicode ✓ détail 54: Line one 55
+Line two 55
 
   Line three
-    •   Padded value 59  
-        left | right 61
+    •   Padded value 57  
+        left | right 59
 
   [Scan]
     • 
-        Value 64
-    • A long detail line that deliberately exceeds sixty characters in length 65: Padded value 66
-        key = value 67
+        Value 62
+    • A long detail line that deliberately exceeds sixty characters in length 63: Padded value 64
+        key = value 65
 
   [Impact & Guidance]
-    • key = value 53
-    • A long detail line that deliberately exceeds sixty characters in length 54
-    • Line one 55
-      Line two 55
+    • key = value 51
+    • A long detail line that deliberately exceeds sixty characters in length 52
+    • Line one 53
+      Line two 53
         Line three
 
 --------------------------------------------------------------------------------
   [✔ CLEAR] Value 0
   Verdict      :   Padded value 2  
-  Quick Facts  :   Padded value 5  : key = value 6  |  left | right 7: Line one 8
-Line two 8
+  Quick Facts  : Verdict: key = value 5  |  Verdict: Line one 6
+Line two 6
 
   Line three  
 
   [Highlight Signals]
-    • key = value 9: Line one 10
+    • key = value 7: Line one 8
+Line two 8
+
+  Line three  
+    • : Line one 10
 Line two 10
 
   Line three  
-    • : Line one 12
+
+  [Value 11]
+    • Line one 12
 Line two 12
 
-  Line three  
-
-  [Value 13]
-    • Line one 14
-Line two 14
-
   Line three  : 
-    • Line one 17
-Line two 17
+    • Line one 15
+Line two 15
 
-  Line three  : Padded value 18
-    • Unicode ✓ détail 20: left | right 21
+  Line three  : Padded value 16
+    • Unicode ✓ détail 18: left | right 19
 
-  [key = value 23]
-    •   Padded value 24  :
-        Line one 25
-        Line two 25
+  [key = value 21]
+    •   Padded value 22  :
+        Line one 23
+        Line two 23
           Line three
-    •   Padded value 27  : Padded value 28
+    •   Padded value 25  : Padded value 26
 
-  [Value 30]
-    • Line one 31
-Line two 31
+  [Value 28]
+    • Line one 29
+Line two 29
 
   Line three  :
-        Line one 32
-        Line two 32
+        Line one 30
+        Line two 30
           Line three
-    • Unicode ✓ détail 34: Unicode ✓ détail 35
-    • left | right 37: key = value 38
+    • Unicode ✓ détail 32: Unicode ✓ détail 33
+    • left | right 35: key = value 36
 
   [Environment & Network]
-    • Network Status    : left | right 65
-    • Certificate Count : A long detail line that deliberately exceeds sixty characters in length 41
-    • Certificate 1       :   Padded value 42  
-        Subject           : Unicode ✓ détail 43
-        Issuer            : Value 44
-        Serial Number     : left | right 45
-        Validity          : left | right 46 to left | right 47
-        Signature          : left | right 48
-        Public Key        :   Padded value 49  
-    • Certificate 2       : A long detail line that deliberately exceeds sixty characters in length 50
-        Subject           : key = value 51
-        Issuer            : Line one 52
-Line two 52
+    • Network Status    : left | right 63
+    • Certificate Count : A long detail line that deliberately exceeds sixty characters in length 39
+    • Certificate 1       :   Padded value 40  
+        Subject           : Unicode ✓ détail 41
+        Issuer            : Value 42
+        Serial Number     : left | right 43
+        Validity          : left | right 44 to left | right 45
+        Signature          : left | right 46
+        Public Key        :   Padded value 47  
+    • Certificate 2       : A long detail line that deliberately exceeds sixty characters in length 48
+        Subject           : key = value 49
+        Issuer            : Line one 50
+Line two 50
 
   Line three  
-        Serial Number     : A long detail line that deliberately exceeds sixty characters in length 53
-        Validity          :  to left | right 55
+        Serial Number     : A long detail line that deliberately exceeds sixty characters in length 51
+        Validity          :  to left | right 53
         Signature          : 
-        Public Key        : key = value 57
+        Public Key        : key = value 55
 
   [TEE Detailed Export]
-    key = value 66
+    key = value 64
 
 --------------------------------------------------------------------------------
   [ℹ INFO] Value 0
@@ -3212,33 +3176,33 @@ Line two 67
 Line two 2
 
   Line three  
-  Quick Facts  : key = value 4: A long detail line that deliberately exceeds sixty characters in length 5  |    Padded value 6  : A long detail line that deliberately exceeds sixty characters in length 7
+  Quick Facts  : Confidence: A long detail line that deliberately exceeds sixty characters in length 4  |  FD trap: A long detail line that deliberately exceeds sixty characters in length 5
 
   [State]
-    • Line one 8
-Line two 8
+    • Line one 6
+Line two 6
 
   Line three  
-        left | right 10
-    • A long detail line that deliberately exceeds sixty characters in length 11: Value 12
+        left | right 8
+    • A long detail line that deliberately exceeds sixty characters in length 9: Value 10
 
   [Signals]
     •    
-        A long detail line that deliberately exceeds sixty characters in length 28
-    • key = value 29
+        A long detail line that deliberately exceeds sixty characters in length 26
+    • key = value 27
 
   [Methods]
-    • Unicode ✓ détail 17: Unicode ✓ détail 18
-    •   Padded value 20  : Value 21 (Padded value 22)
-    •    : left | right 24
-        key = value 25
+    • Unicode ✓ détail 15: Unicode ✓ détail 16
+    •   Padded value 18  : Value 19 (Padded value 20)
+    •    : left | right 22
+        key = value 23
 
   [Impact & Guidance]
-    • Padded value 14
-    • Value 16
+    • Padded value 12
+    • Value 14
 
   [References]
-    • Unicode ✓ détail 32
+    • Unicode ✓ détail 30
     •    
 
 

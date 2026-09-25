@@ -55,6 +55,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.nativeroot.ui.R
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootCardModel
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootDetailRowModel
+import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFact
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFactModel
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootImpactItemModel
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
@@ -139,10 +140,10 @@ internal fun NativeRootDetectorCard(
 private fun NativeRootCollapsedOverview(
     model: NativeRootCardModel,
 ) {
-    val flags = model.headerFacts.firstOrNull { it.label == "Flags" } ?: return
-    val direct = model.headerFacts.firstOrNull { it.label == "Direct" } ?: return
-    val kernel = model.headerFacts.firstOrNull { it.label == "Kernel" } ?: return
-    val runtime = model.headerFacts.firstOrNull { it.label == "Runtime" } ?: return
+    val flags = model.headerFacts.firstOrNull { it.fact == NativeRootHeaderFact.FLAGS } ?: return
+    val direct = model.headerFacts.firstOrNull { it.fact == NativeRootHeaderFact.DIRECT } ?: return
+    val kernel = model.headerFacts.firstOrNull { it.fact == NativeRootHeaderFact.KERNEL } ?: return
+    val runtime = model.headerFacts.firstOrNull { it.fact == NativeRootHeaderFact.RUNTIME } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

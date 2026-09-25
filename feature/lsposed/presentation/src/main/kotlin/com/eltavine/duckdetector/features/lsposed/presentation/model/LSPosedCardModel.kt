@@ -36,11 +36,21 @@ data class LSPosedCardModel(
     val scanRows: List<LSPosedDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class LSPosedHeaderFact(val label: String) {
+    CRITICAL("Critical"),
+    REVIEW("Review"),
+    BRIDGE("Bridge"),
+    PACKAGES("Packages"),
+}
+
 data class LSPosedHeaderFactModel(
-    val label: String,
+    val fact: LSPosedHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class LSPosedDetailRowModel(
     val label: String,

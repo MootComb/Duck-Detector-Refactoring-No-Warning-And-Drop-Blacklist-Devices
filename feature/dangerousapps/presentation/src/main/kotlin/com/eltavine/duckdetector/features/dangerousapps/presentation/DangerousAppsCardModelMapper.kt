@@ -25,6 +25,7 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousPackageV
 import com.eltavine.duckdetector.features.dangerousapps.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsContextItemModel
+import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFact
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFactModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHiddenPackageItemModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHmaAlertModel
@@ -141,12 +142,12 @@ class DangerousAppsCardModelMapper {
     private fun buildHeaderFacts(report: DangerousAppsReport): List<DangerousAppsHeaderFactModel> {
         return listOf(
             DangerousAppsHeaderFactModel(
-                label = "Targets",
+                fact = DangerousAppsHeaderFact.TARGETS,
                 value = report.targets.size.toString(),
                 status = DetectorStatus.allClear(),
             ),
             DangerousAppsHeaderFactModel(
-                label = "PM",
+                fact = DangerousAppsHeaderFact.PM,
                 value = visibilityFactValue(report),
                 status = when (report.packageVisibility) {
                     DangerousPackageVisibility.FULL -> if (report.suspiciousLowPmInventory) {
@@ -160,12 +161,12 @@ class DangerousAppsCardModelMapper {
                 },
             ),
             DangerousAppsHeaderFactModel(
-                label = "Hits",
+                fact = DangerousAppsHeaderFact.HITS,
                 value = report.detectedCount.toString(),
                 status = if (report.detectedCount > 0) DetectorStatus.warning() else DetectorStatus.allClear(),
             ),
             DangerousAppsHeaderFactModel(
-                label = "Hidden",
+                fact = DangerousAppsHeaderFact.HIDDEN,
                 value = report.hiddenCount.toString(),
                 status = if (report.hiddenCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),

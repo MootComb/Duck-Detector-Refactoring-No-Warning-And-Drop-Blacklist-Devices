@@ -51,6 +51,7 @@ import com.eltavine.duckdetector.core.ui.model.ContextItemModel
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
+import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFact
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFactModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHiddenPackageItemModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHmaAlertModel
@@ -130,10 +131,10 @@ internal fun DangerousAppsDetectorCard(
 private fun DangerousAppsOverview(
     model: DangerousAppsCardModel,
 ) {
-    val targets = model.headerFacts.firstOrNull { it.label == "Targets" } ?: return
-    val packageManager = model.headerFacts.firstOrNull { it.label == "PM" } ?: return
-    val hits = model.headerFacts.firstOrNull { it.label == "Hits" } ?: return
-    val hidden = model.headerFacts.firstOrNull { it.label == "Hidden" } ?: return
+    val targets = model.headerFacts.firstOrNull { it.fact == DangerousAppsHeaderFact.TARGETS } ?: return
+    val packageManager = model.headerFacts.firstOrNull { it.fact == DangerousAppsHeaderFact.PM } ?: return
+    val hits = model.headerFacts.firstOrNull { it.fact == DangerousAppsHeaderFact.HITS } ?: return
+    val hidden = model.headerFacts.firstOrNull { it.fact == DangerousAppsHeaderFact.HIDDEN } ?: return
 
     Row(
         modifier = Modifier.fillMaxWidth(),

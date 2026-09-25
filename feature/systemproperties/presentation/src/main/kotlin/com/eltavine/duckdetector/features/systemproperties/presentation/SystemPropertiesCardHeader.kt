@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
 import com.eltavine.duckdetector.features.systemproperties.domain.hasReducedCoverage
+import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFact
 import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFactModel
 
 internal fun buildSubtitle(report: SystemPropertiesReport): String {
@@ -99,22 +100,22 @@ internal fun buildHeaderFacts(report: SystemPropertiesReport): List<SystemProper
             }
             listOf(
                 SystemPropertiesHeaderFactModel(
-                    label = "Critical",
+                    fact = SystemPropertiesHeaderFact.CRITICAL,
                     value = countLabel(report.dangerSignals.size),
                     status = if (report.dangerSignals.isEmpty()) DetectorStatus.allClear() else DetectorStatus.danger(),
                 ),
                 SystemPropertiesHeaderFactModel(
-                    label = "Review",
+                    fact = SystemPropertiesHeaderFact.REVIEW,
                     value = countLabel(report.warningSignals.size),
                     status = if (report.warningSignals.isEmpty()) DetectorStatus.allClear() else DetectorStatus.warning(),
                 ),
                 SystemPropertiesHeaderFactModel(
-                    label = "Boot",
+                    fact = SystemPropertiesHeaderFact.BOOT,
                     value = if (report.bootSignalCount > 0) report.bootSignalCount.toString() else "Clean",
                     status = categoryStatus(bootSignals),
                 ),
                 SystemPropertiesHeaderFactModel(
-                    label = "Build",
+                    fact = SystemPropertiesHeaderFact.BUILD,
                     value = if (report.buildProfileSignalCount > 0) report.buildProfileSignalCount.toString() else "Clean",
                     status = categoryStatus(buildSignals),
                 ),
@@ -128,10 +129,10 @@ private fun placeholderFacts(
     status: DetectorStatus,
 ): List<SystemPropertiesHeaderFactModel> {
     return listOf(
-        SystemPropertiesHeaderFactModel("Critical", value, status),
-        SystemPropertiesHeaderFactModel("Review", value, status),
-        SystemPropertiesHeaderFactModel("Boot", value, status),
-        SystemPropertiesHeaderFactModel("Build", value, status),
+        SystemPropertiesHeaderFactModel(SystemPropertiesHeaderFact.CRITICAL, value, status),
+        SystemPropertiesHeaderFactModel(SystemPropertiesHeaderFact.REVIEW, value, status),
+        SystemPropertiesHeaderFactModel(SystemPropertiesHeaderFact.BOOT, value, status),
+        SystemPropertiesHeaderFactModel(SystemPropertiesHeaderFact.BUILD, value, status),
     )
 }
 

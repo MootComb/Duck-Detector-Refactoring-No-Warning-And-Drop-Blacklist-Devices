@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
 import com.eltavine.duckdetector.features.nativeroot.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.nativeroot.domain.hasRuntimeReducedCoverage
+import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFact
 import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFactModel
 
 internal fun buildSubtitle(report: NativeRootReport): String {
@@ -116,7 +117,7 @@ internal fun buildHeaderFacts(report: NativeRootReport): List<NativeRootHeaderFa
         NativeRootStage.FAILED -> placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
         NativeRootStage.READY -> listOf(
             NativeRootHeaderFactModel(
-                label = "Flags",
+                fact = NativeRootHeaderFact.FLAGS,
                 value = familyValue(report),
                 status = when {
                     report.detectedFamilies.isEmpty() && report.hasReducedCoverage() -> DetectorStatus.info(
@@ -128,7 +129,7 @@ internal fun buildHeaderFacts(report: NativeRootReport): List<NativeRootHeaderFa
                 },
             ),
             NativeRootHeaderFactModel(
-                label = "Direct",
+                fact = NativeRootHeaderFact.DIRECT,
                 value = when {
                     report.directFindings.isNotEmpty() -> report.directFindings.size.toString()
                     report.ksuSupercallBlocked || !report.ksuSupercallAttempted -> "Limited"
@@ -145,7 +146,7 @@ internal fun buildHeaderFacts(report: NativeRootReport): List<NativeRootHeaderFa
                 },
             ),
             NativeRootHeaderFactModel(
-                label = "Kernel",
+                fact = NativeRootHeaderFact.KERNEL,
                 value = when {
                     report.kernelFindings.isNotEmpty() -> report.kernelFindings.size.toString()
                     report.nativeAvailable -> "Clean"
@@ -158,7 +159,7 @@ internal fun buildHeaderFacts(report: NativeRootReport): List<NativeRootHeaderFa
                 },
             ),
             NativeRootHeaderFactModel(
-                label = "Runtime",
+                fact = NativeRootHeaderFact.RUNTIME,
                 value = if (report.runtimeFindings.isEmpty()) {
                     when {
                         !report.nativeAvailable -> "N/A"
@@ -187,10 +188,10 @@ private fun placeholderFacts(
     status: DetectorStatus,
 ): List<NativeRootHeaderFactModel> {
     return listOf(
-        NativeRootHeaderFactModel("Flags", value, status),
-        NativeRootHeaderFactModel("Direct", value, status),
-        NativeRootHeaderFactModel("Kernel", value, status),
-        NativeRootHeaderFactModel("Runtime", value, status),
+        NativeRootHeaderFactModel(NativeRootHeaderFact.FLAGS, value, status),
+        NativeRootHeaderFactModel(NativeRootHeaderFact.DIRECT, value, status),
+        NativeRootHeaderFactModel(NativeRootHeaderFact.KERNEL, value, status),
+        NativeRootHeaderFactModel(NativeRootHeaderFact.RUNTIME, value, status),
     )
 }
 

@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodOutc
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootMethodResult
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
+import com.eltavine.duckdetector.features.nativeroot.presentation.model.NativeRootHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -135,7 +136,7 @@ class NativeRootCardModelMapperTest {
 
         assertEquals(DetectionSeverity.INFO, model.status.severity)
         assertTrue(model.summary.contains("blocked by app seccomp"))
-        assertEquals("Limited", model.headerFacts.single { it.label == "Direct" }.value)
+        assertEquals("Limited", model.headerFacts.single { it.fact == NativeRootHeaderFact.DIRECT }.value)
         assertTrue(
             model.nativeRows.any {
                 it.label == "KSU supercall" && it.value == "Blocked by seccomp"

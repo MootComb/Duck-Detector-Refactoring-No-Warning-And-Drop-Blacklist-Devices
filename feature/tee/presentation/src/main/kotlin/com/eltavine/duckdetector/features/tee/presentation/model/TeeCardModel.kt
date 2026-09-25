@@ -39,11 +39,21 @@ enum class TeeFactIcon {
     WARNING,
 }
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class TeeHeaderFact(val label: String) {
+    VERDICT("Verdict"),
+    TIER("Tier"),
+    TRUST("Trust"),
+    SCORE("Score"),
+}
+
 data class TeeHeaderFactModel(
-    val label: String,
+    val fact: TeeHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class TeeHighlightSignalModel(
     val label: String,

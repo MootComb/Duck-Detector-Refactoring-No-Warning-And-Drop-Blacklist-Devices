@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
+import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFact
 import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFactModel
 
 internal fun buildSubtitle(report: MountReport): String {
@@ -100,7 +101,7 @@ internal fun buildHeaderFacts(report: MountReport): List<MountHeaderFactModel> {
         MountStage.FAILED -> if (report.dangerSignalCount > 0 || report.warningSignalCount > 0) {
             listOf(
                 MountHeaderFactModel(
-                    label = "Critical",
+                    fact = MountHeaderFact.CRITICAL,
                     value = countLabel(report.dangerSignalCount),
                     status = if (report.dangerSignalCount == 0) {
                         DetectorStatus.allClear()
@@ -109,7 +110,7 @@ internal fun buildHeaderFacts(report: MountReport): List<MountHeaderFactModel> {
                     },
                 ),
                 MountHeaderFactModel(
-                    label = "Review",
+                    fact = MountHeaderFact.REVIEW,
                     value = countLabel(report.warningSignalCount),
                     status = if (report.warningSignalCount == 0) {
                         DetectorStatus.allClear()
@@ -117,25 +118,25 @@ internal fun buildHeaderFacts(report: MountReport): List<MountHeaderFactModel> {
                         DetectorStatus.warning()
                     },
                 ),
-                MountHeaderFactModel("Coverage", "Error", DetectorStatus.info(InfoKind.ERROR)),
-                MountHeaderFactModel("Native", "Error", DetectorStatus.info(InfoKind.ERROR)),
+                MountHeaderFactModel(MountHeaderFact.COVERAGE, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                MountHeaderFactModel(MountHeaderFact.NATIVE, "Error", DetectorStatus.info(InfoKind.ERROR)),
             )
         } else {
             placeholderFacts("Error", DetectorStatus.info(InfoKind.ERROR))
         }
         MountStage.READY -> listOf(
             MountHeaderFactModel(
-                label = "Critical",
+                fact = MountHeaderFact.CRITICAL,
                 value = countLabel(report.dangerSignalCount),
                 status = if (report.dangerSignalCount == 0) DetectorStatus.allClear() else DetectorStatus.danger(),
             ),
             MountHeaderFactModel(
-                label = "Review",
+                fact = MountHeaderFact.REVIEW,
                 value = countLabel(report.warningSignalCount),
                 status = if (report.warningSignalCount == 0) DetectorStatus.allClear() else DetectorStatus.warning(),
             ),
             MountHeaderFactModel(
-                label = "Coverage",
+                fact = MountHeaderFact.COVERAGE,
                 value = "${coveragePercent(report)}%",
                 status = when {
                     report.permissionDenied == 0 -> DetectorStatus.allClear()
@@ -144,7 +145,7 @@ internal fun buildHeaderFacts(report: MountReport): List<MountHeaderFactModel> {
                 },
             ),
             MountHeaderFactModel(
-                label = "Native",
+                fact = MountHeaderFact.NATIVE,
                 value = if (report.nativeAvailable) "Loaded" else "N/A",
                 status = if (report.nativeAvailable) DetectorStatus.allClear() else DetectorStatus.info(
                     InfoKind.SUPPORT
@@ -159,10 +160,10 @@ private fun placeholderFacts(
     status: DetectorStatus
 ): List<MountHeaderFactModel> {
     return listOf(
-        MountHeaderFactModel("Critical", value, status),
-        MountHeaderFactModel("Review", value, status),
-        MountHeaderFactModel("Coverage", value, status),
-        MountHeaderFactModel("Native", value, status),
+        MountHeaderFactModel(MountHeaderFact.CRITICAL, value, status),
+        MountHeaderFactModel(MountHeaderFact.REVIEW, value, status),
+        MountHeaderFactModel(MountHeaderFact.COVERAGE, value, status),
+        MountHeaderFactModel(MountHeaderFact.NATIVE, value, status),
     )
 }
 

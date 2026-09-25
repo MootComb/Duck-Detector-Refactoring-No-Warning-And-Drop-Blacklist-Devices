@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
 import com.eltavine.duckdetector.features.kernelcheck.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckCardModel
+import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckHeaderFact
 import com.eltavine.duckdetector.features.kernelcheck.presentation.model.KernelCheckHeaderFactModel
 
 class KernelCheckCardModelMapper {
@@ -122,7 +123,7 @@ class KernelCheckCardModelMapper {
 
             KernelCheckStage.READY -> listOf(
                 KernelCheckHeaderFactModel(
-                    label = "Identity",
+                    fact = KernelCheckHeaderFact.IDENTITY,
                     value = when {
                         report.identityFindingCount > 0 -> report.identityFindingCount.toString()
                         report.unameOutput.isBlank() && report.procVersion.isBlank() -> "N/A"
@@ -138,7 +139,7 @@ class KernelCheckCardModelMapper {
                     },
                 ),
                 KernelCheckHeaderFactModel(
-                    label = "Boot",
+                    fact = KernelCheckHeaderFact.BOOT,
                     value = when {
                         report.bootFindingCount > 0 -> report.bootFindingCount.toString()
                         report.nativeAvailable || report.procCmdline.isNotBlank() -> "Clean"
@@ -151,7 +152,7 @@ class KernelCheckCardModelMapper {
                     },
                 ),
                 KernelCheckHeaderFactModel(
-                    label = "Behavior",
+                    fact = KernelCheckHeaderFact.BEHAVIOR,
                     value = when {
                         report.hasReviewInfoIndicators -> report.reviewInfoFindingCount.toString()
                         report.hasInformationalCveState -> report.cvePatchState.label
@@ -171,7 +172,7 @@ class KernelCheckCardModelMapper {
                     },
                 ),
                 KernelCheckHeaderFactModel(
-                    label = "Native",
+                    fact = KernelCheckHeaderFact.NATIVE,
                     value = if (report.nativeAvailable) "Loaded" else "N/A",
                     status = if (report.nativeAvailable) DetectorStatus.allClear() else DetectorStatus.info(
                         InfoKind.SUPPORT
@@ -186,10 +187,10 @@ class KernelCheckCardModelMapper {
         status: DetectorStatus,
     ): List<KernelCheckHeaderFactModel> {
         return listOf(
-            KernelCheckHeaderFactModel("Identity", value, status),
-            KernelCheckHeaderFactModel("Boot", value, status),
-            KernelCheckHeaderFactModel("Behavior", value, status),
-            KernelCheckHeaderFactModel("Native", value, status),
+            KernelCheckHeaderFactModel(KernelCheckHeaderFact.IDENTITY, value, status),
+            KernelCheckHeaderFactModel(KernelCheckHeaderFact.BOOT, value, status),
+            KernelCheckHeaderFactModel(KernelCheckHeaderFact.BEHAVIOR, value, status),
+            KernelCheckHeaderFactModel(KernelCheckHeaderFact.NATIVE, value, status),
         )
     }
 }

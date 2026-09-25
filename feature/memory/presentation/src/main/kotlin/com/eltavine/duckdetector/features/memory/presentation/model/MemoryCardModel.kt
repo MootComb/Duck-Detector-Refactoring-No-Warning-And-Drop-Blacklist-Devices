@@ -34,11 +34,21 @@ data class MemoryCardModel(
     val scanRows: List<MemoryDetailRowModel>,
 ) : DetectorHeadline
 
+/** The facts in the card's header, in the order the export lists them. */
+enum class MemoryHeaderFact(val label: String) {
+    CRITICAL("Critical"),
+    REVIEW("Review"),
+    HOOKS("Hooks"),
+    RUNTIME("Runtime"),
+}
+
 data class MemoryHeaderFactModel(
-    val label: String,
+    val fact: MemoryHeaderFact,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = fact.label
+}
 
 data class MemoryDetailRowModel(
     val label: String,
