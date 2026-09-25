@@ -44,10 +44,10 @@ import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoHeaderFactModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoRowModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoSectionModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoRowModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoSectionModel
 
 @Composable
 fun DeviceInfoCard(

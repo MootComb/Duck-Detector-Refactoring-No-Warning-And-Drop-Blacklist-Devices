@@ -89,6 +89,10 @@
         ":feature:dangerousapps:domain",
         ":feature:dangerousapps:presentation",
         ":feature:dangerousapps:ui",
+        ":feature:deviceinfo:data",
+        ":feature:deviceinfo:domain",
+        ":feature:deviceinfo:presentation",
+        ":feature:deviceinfo:ui",
         ":feature:kernelcheck:data",
         ":feature:kernelcheck:domain",
         ":feature:kernelcheck:presentation",
@@ -329,6 +333,34 @@
         ":core:ui",
         ":feature:dangerousapps:domain",
         ":feature:dangerousapps:presentation"
+      ]
+    },
+    ":feature:deviceinfo:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":feature:deviceinfo:domain"
+      ]
+    },
+    ":feature:deviceinfo:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:deviceinfo:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report",
+        ":feature:deviceinfo:domain"
+      ]
+    },
+    ":feature:deviceinfo:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:report",
+        ":core:ui",
+        ":feature:deviceinfo:domain",
+        ":feature:deviceinfo:presentation"
       ]
     },
     ":feature:kernelcheck:data": {

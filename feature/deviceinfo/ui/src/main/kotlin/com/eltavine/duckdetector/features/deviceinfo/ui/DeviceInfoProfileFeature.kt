@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.deviceinfo.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,15 +26,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.eltavine.duckdetector.core.detector.DeviceProfileFeature
 import com.eltavine.duckdetector.core.detector.DeviceProfileSession
 import com.eltavine.duckdetector.core.report.DeviceReport
-import com.eltavine.duckdetector.features.deviceinfo.presentation.DeviceInfoViewModel
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoScanner
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
 import com.eltavine.duckdetector.features.deviceinfo.ui.card.DeviceInfoCard
 
-object DeviceInfoProfileFeature : DeviceProfileFeature {
+class DeviceInfoProfileFeature(
+    private val createScanner: (Context) -> DeviceInfoScanner,
+) : DeviceProfileFeature {
     @Composable
     override fun rememberSession(): DeviceProfileSession {
         val context = LocalContext.current
-        val viewModel: DeviceInfoViewModel = viewModel(factory = remember(context) { DeviceInfoViewModel.factory(context) })
+        val viewModel: DeviceInfoViewModel = viewModel(
+            factory = remember(context) { DeviceInfoViewModel.factory { createScanner(context.applicationContext) } },
+        )
         return remember(viewModel) { DeviceInfoProfileSession(viewModel) }
     }
 }

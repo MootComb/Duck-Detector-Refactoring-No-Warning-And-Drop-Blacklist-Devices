@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.deviceinfo.presentation
 
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 
 enum class DeviceInfoUiStage {
     LOADING,

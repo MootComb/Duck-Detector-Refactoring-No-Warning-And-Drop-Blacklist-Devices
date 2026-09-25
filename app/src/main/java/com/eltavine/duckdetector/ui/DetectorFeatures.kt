@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRep
 import com.eltavine.duckdetector.features.customrom.ui.CustomRomDetectorFeature
 import com.eltavine.duckdetector.features.dangerousapps.data.repository.DangerousAppsRepository
 import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsDetectorFeature
+import com.eltavine.duckdetector.features.deviceinfo.data.repository.DeviceInfoRepository
 import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
 import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
 import com.eltavine.duckdetector.features.kernelcheck.ui.KernelCheckDetectorFeature
@@ -72,5 +73,5 @@ internal object DetectorFeatures {
     val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature { SystemPropertiesRepository() }
     val virtualization: DetectorFeature = VirtualizationDetectorFeature { context -> VirtualizationRepository(context) }
     val zygisk: DetectorFeature = ZygiskDetectorFeature { context -> ZygiskRepository(context) }
-    val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature
+    val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature { context -> DeviceInfoRepository(context) }
 }

@@ -22,6 +22,7 @@ import android.os.Build
 import android.view.Display
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoEntry
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoScanner
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSection
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoStage
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +32,11 @@ import java.util.TimeZone
 
 class DeviceInfoRepository(
     context: Context,
-) {
+) : DeviceInfoScanner {
 
     private val appContext = context.applicationContext
 
-    suspend fun scan(): DeviceInfoReport = withContext(Dispatchers.IO) {
+    override suspend fun scan(): DeviceInfoReport = withContext(Dispatchers.IO) {
         runCatching {
             buildReport()
         }.getOrElse { throwable ->

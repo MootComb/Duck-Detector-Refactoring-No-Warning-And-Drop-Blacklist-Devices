@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.deviceinfo.ui.model
+package com.eltavine.duckdetector.features.deviceinfo.presentation.model
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 

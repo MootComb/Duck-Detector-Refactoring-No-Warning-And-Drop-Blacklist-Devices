@@ -20,7 +20,7 @@ import com.eltavine.duckdetector.core.report.DeviceReport
 import com.eltavine.duckdetector.core.report.ReportBlock
 import com.eltavine.duckdetector.core.report.ReportDeviceIdentity
 import com.eltavine.duckdetector.core.report.ReportFact
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 
 fun DeviceInfoCardModel.toDeviceReport(): DeviceReport = DeviceReport(
     identity = ReportDeviceIdentity(

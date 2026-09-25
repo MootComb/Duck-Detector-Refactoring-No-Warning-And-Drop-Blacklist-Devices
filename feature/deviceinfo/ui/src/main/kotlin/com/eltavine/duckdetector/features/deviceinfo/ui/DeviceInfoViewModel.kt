@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.deviceinfo.presentation
+package com.eltavine.duckdetector.features.deviceinfo.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.eltavine.duckdetector.features.deviceinfo.data.repository.DeviceInfoRepository
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoScanner
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoStage
+import com.eltavine.duckdetector.features.deviceinfo.presentation.DeviceInfoCardModelMapper
+import com.eltavine.duckdetector.features.deviceinfo.presentation.DeviceInfoUiStage
+import com.eltavine.duckdetector.features.deviceinfo.presentation.DeviceInfoUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +32,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DeviceInfoViewModel(
-    private val repository: DeviceInfoRepository,
+    private val repository: DeviceInfoScanner,
     private val mapper: DeviceInfoCardModelMapper = DeviceInfoCardModelMapper(),
 ) : ViewModel() {
 
@@ -74,12 +76,11 @@ class DeviceInfoViewModel(
     }
 
     companion object {
-        fun factory(context: Context): ViewModelProvider.Factory {
-            val appContext = context.applicationContext
+        fun factory(createScanner: () -> DeviceInfoScanner): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return DeviceInfoViewModel(DeviceInfoRepository(appContext)) as T
+                    return DeviceInfoViewModel(createScanner()) as T
                 }
             }
         }

@@ -20,10 +20,10 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoStage
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoHeaderFactModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoRowModel
-import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoSectionModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoRowModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoSectionModel
 
 class DeviceInfoCardModelMapper {
 
