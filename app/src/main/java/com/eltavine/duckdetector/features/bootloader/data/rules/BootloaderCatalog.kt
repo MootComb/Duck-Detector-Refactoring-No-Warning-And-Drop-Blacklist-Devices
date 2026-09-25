@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.bootloader.data.rules
 
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 
 data class BootloaderPropertySpec(
     val property: String,

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.utils
+plugins {
+    id("duckdetector.jvm.library")
+}
 
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
+kotlin {
+    explicitApi()
+}
 
-data class MultiSourcePropertyRead(
-    val property: String,
-    val category: SystemPropertyCategory,
-    val preferredValue: String,
-    val preferredSource: SystemPropertySource,
-    val sourceValues: Map<SystemPropertySource, String>,
-)
+dependencies {
+    api(project(":core:native"))
+}

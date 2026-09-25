@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.utils
+package com.eltavine.duckdetector.capability.systemproperties.data
 
-import com.eltavine.duckdetector.features.systemproperties.data.native.SystemPropertiesNativeBridge
-import com.eltavine.duckdetector.features.systemproperties.data.native.SystemPropertiesNativeSnapshot
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import java.util.concurrent.TimeUnit
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
 
-class SystemPropertyReadUtils(
+public class SystemPropertyReadUtils(
     private val nativeBridge: SystemPropertiesNativeBridge = SystemPropertiesNativeBridge(),
 ) {
     private var getpropSnapshot: Map<String, String>? = null
 
-    fun collectNativeSnapshot(
+    public fun collectNativeSnapshot(
         propertyNames: Collection<String>,
     ): SystemPropertiesNativeSnapshot {
         return nativeBridge.collectSnapshot(propertyNames)
     }
 
-    fun readProperty(
+    public fun readProperty(
         property: String,
         category: SystemPropertyCategory,
         cache: MutableMap<String, MultiSourcePropertyRead>,

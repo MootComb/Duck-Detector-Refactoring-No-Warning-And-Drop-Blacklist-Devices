@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.systemproperties.data.rules
 
 import android.os.Build
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 
 data class SystemPropertyRule(
     val property: String,

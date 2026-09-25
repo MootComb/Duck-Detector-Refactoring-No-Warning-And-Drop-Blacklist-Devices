@@ -16,10 +16,10 @@
 
 package com.eltavine.duckdetector.features.systemproperties.data.repository
 
-import com.eltavine.duckdetector.features.systemproperties.data.native.PropAreaFinding
-import com.eltavine.duckdetector.features.systemproperties.data.native.SystemPropertiesNativeSnapshot
+import com.eltavine.duckdetector.capability.systemproperties.domain.PropAreaFinding
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodOutcome
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySeverity
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

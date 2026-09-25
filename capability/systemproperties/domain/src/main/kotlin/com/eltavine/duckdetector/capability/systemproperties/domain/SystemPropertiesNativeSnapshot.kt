@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.native
+package com.eltavine.duckdetector.capability.systemproperties.domain
 
 import com.eltavine.duckdetector.core.native.NativeCollectionStatus
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
 
-data class PropAreaFinding(
+public data class PropAreaFinding(
     val context: String,
     val holeCount: Int,
     val detail: String,
 )
 
-data class SystemPropertiesNativeSnapshot(
+public data class SystemPropertiesNativeSnapshot(
     val available: Boolean = false,
     val libcProperties: Map<String, String> = emptyMap(),
     val cmdlineBootParams: Map<String, String> = emptyMap(),
@@ -50,13 +49,13 @@ data class SystemPropertiesNativeSnapshot(
     val bootParamHitCount: Int
         get() = (cmdlineBootParams.keys + bootconfigBootParams.keys).toSet().size
 
-    fun libcValue(
+    public fun libcValue(
         property: String,
     ): String {
         return sanitizeLibcValue(libcProperties[property])
     }
 
-    fun findBootValueForProperty(
+    public fun findBootValueForProperty(
         property: String,
     ): Pair<SystemPropertySource, String>? {
         val bootKey = propertyToBootKey(property) ?: return null

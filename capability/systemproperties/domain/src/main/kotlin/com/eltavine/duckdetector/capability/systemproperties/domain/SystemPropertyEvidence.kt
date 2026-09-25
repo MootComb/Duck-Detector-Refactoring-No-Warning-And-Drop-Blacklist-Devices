@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.domain
+package com.eltavine.duckdetector.capability.systemproperties.domain
 
-enum class SystemPropertySeverity {
+public enum class SystemPropertySeverity {
     SAFE,
     WARNING,
     DANGER,
     NEUTRAL,
 }
 
-enum class SystemPropertyCategory {
+public enum class SystemPropertyCategory {
     SECURITY_CORE,
     VERIFIED_BOOT,
     PARTITION_VERITY,
@@ -36,7 +36,7 @@ enum class SystemPropertyCategory {
     PROPERTY_CONSISTENCY,
 }
 
-enum class SystemPropertySource {
+public enum class SystemPropertySource {
     REFLECTION,
     GETPROP,
     JVM,
@@ -46,7 +46,7 @@ enum class SystemPropertySource {
     BOOTCONFIG,
 }
 
-data class SystemPropertySignal(
+public data class SystemPropertySignal(
     val property: String,
     val description: String,
     val value: String,

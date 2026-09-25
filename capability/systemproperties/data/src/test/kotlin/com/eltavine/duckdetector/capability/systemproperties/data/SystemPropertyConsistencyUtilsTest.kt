@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.utils
+package com.eltavine.duckdetector.capability.systemproperties.data
 
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

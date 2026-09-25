@@ -50,7 +50,7 @@ limitations under the License.
         errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/systemproperties/data/utils/SystemPropertyReadUtils.kt"
+            file="../capability/systemproperties/data/src/main/kotlin/com/eltavine/duckdetector/capability/systemproperties/data/SystemPropertyReadUtils.kt"
             line="67" column="25" />
     </issue>
 

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.utils
+package com.eltavine.duckdetector.capability.systemproperties.data
 
 import android.os.Build
-import com.eltavine.duckdetector.features.systemproperties.data.native.SystemPropertiesNativeSnapshot
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySeverity
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySignal
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 
-class SystemPropertyConsistencyUtils {
+public class SystemPropertyConsistencyUtils {
 
-    fun buildSourceMismatchSignals(
+    public fun buildSourceMismatchSignals(
         reads: Collection<MultiSourcePropertyRead>,
     ): List<SystemPropertySignal> {
         return reads.mapNotNull { read ->
@@ -68,7 +69,7 @@ class SystemPropertyConsistencyUtils {
         }
     }
 
-    fun buildConsistencySignals(
+    public fun buildConsistencySignals(
         readsByProperty: Map<String, MultiSourcePropertyRead>,
         nativeSnapshot: SystemPropertiesNativeSnapshot,
     ): List<SystemPropertySignal> {

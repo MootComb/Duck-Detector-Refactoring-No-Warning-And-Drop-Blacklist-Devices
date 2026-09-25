@@ -66,6 +66,7 @@
         ":capability:earlypreload:data",
         ":capability:packageinventory:data",
         ":capability:packageinventory:domain",
+        ":capability:systemproperties:data",
         ":core:detector",
         ":core:evidence",
         ":core:native",
@@ -118,6 +119,19 @@
     ":capability:packageinventory:domain": {
       "kind": "jvm",
       "allowed_project_dependencies": []
+    },
+    ":capability:systemproperties:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:systemproperties:domain",
+        ":core:native"
+      ]
+    },
+    ":capability:systemproperties:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":core:native"
+      ]
     },
     ":core:detector": {
       "kind": "android-library",

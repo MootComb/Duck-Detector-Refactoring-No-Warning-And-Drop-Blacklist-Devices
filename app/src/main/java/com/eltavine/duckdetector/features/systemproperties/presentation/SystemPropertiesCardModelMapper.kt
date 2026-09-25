@@ -22,10 +22,10 @@ import com.eltavine.duckdetector.features.systemproperties.domain.SystemProperti
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodResult
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertyCategory
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySeverity
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySignal
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesCardModel
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesDetailRowModel
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesHeaderFactModel

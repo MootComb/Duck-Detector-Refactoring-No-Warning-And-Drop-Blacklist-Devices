@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.systemproperties.data.native
+package com.eltavine.duckdetector.capability.systemproperties.data
 
+import com.eltavine.duckdetector.capability.systemproperties.domain.PropAreaFinding
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertiesNativeSnapshot
 import com.eltavine.duckdetector.core.native.NativePayloadCodec
 import com.eltavine.duckdetector.core.native.NativePayloadContract
 import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-class SystemPropertiesNativeBridge(
+public class SystemPropertiesNativeBridge(
     private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
 ) {
 
-    fun collectSnapshot(
+    public fun collectSnapshot(
         propertyNames: Collection<String>,
     ): SystemPropertiesNativeSnapshot {
         if (propertyNames.isEmpty()) {

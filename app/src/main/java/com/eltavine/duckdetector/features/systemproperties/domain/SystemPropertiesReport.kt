@@ -16,6 +16,10 @@
 
 package com.eltavine.duckdetector.features.systemproperties.domain
 
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
+import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
+
 enum class SystemPropertiesStage {
     LOADING,
     READY,
