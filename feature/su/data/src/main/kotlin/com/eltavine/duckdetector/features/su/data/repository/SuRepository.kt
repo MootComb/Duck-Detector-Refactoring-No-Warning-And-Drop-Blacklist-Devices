@@ -17,6 +17,8 @@
 package com.eltavine.duckdetector.features.su.data.repository
 
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.platform.PathState
+import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.su.data.native.SuNativeBridge
 import com.eltavine.duckdetector.features.su.domain.SuDaemonFinding
 import com.eltavine.duckdetector.features.su.domain.SuMethodOutcome
@@ -30,6 +32,7 @@ import kotlinx.coroutines.withContext
 
 class SuRepository(
     private val nativeBridge: SuNativeBridge = SuNativeBridge(),
+    private val pathState: (String) -> PathState = PathStat::of,
 ) : DetectorScanner<SuReport> {
 
     override suspend fun scan(): SuReport = withContext(Dispatchers.IO) {
@@ -39,21 +42,21 @@ class SuRepository(
             }
     }
 
-    private fun scanInternal(): SuReport {
+    internal fun scanInternal(): SuReport {
         val foundSuBinaries = linkedSetOf<String>()
         val foundDaemons = linkedMapOf<String, String>()
 
-        SU_PATHS.forEach { path ->
-            if (File(path).exists()) {
-                foundSuBinaries += path
-            }
+        // Root solutions keep their files under /data/adb, which they create 0700 root and which is
+        // labelled adb_data_file (system/sepolicy file_contexts); no app may search it, so a denied
+        // stat there is not an absent file.
+        val suStates = SU_PATHS.associateWith(pathState)
+        suStates.filterValues { it == PathState.PRESENT }.keys.forEach { foundSuBinaries += it }
+        val daemonStates = DAEMON_PATHS.mapValues { (path, _) -> pathState(path) }
+        daemonStates.filterValues { it == PathState.PRESENT }.keys.forEach { path ->
+            foundDaemons[path] = DAEMON_PATHS.getValue(path)
         }
-
-        DAEMON_PATHS.forEach { (path, name) ->
-            if (File(path).exists()) {
-                foundDaemons[path] = name
-            }
-        }
+        val unobservableSuPaths = suStates.values.count { it == PathState.NOT_OBSERVABLE }
+        val unobservableDaemonPaths = daemonStates.values.count { it == PathState.NOT_OBSERVABLE }
 
         val pathEnv = System.getenv("PATH")
         pathEnv?.split(File.pathSeparator)
@@ -77,6 +80,8 @@ class SuRepository(
         val methods = buildMethods(
             foundSuBinaries = foundSuBinaries.toList(),
             foundDaemons = foundDaemons,
+            unobservableSuPaths = unobservableSuPaths,
+            unobservableDaemonPaths = unobservableDaemonPaths,
             selfContext = selfContext,
             selfContextAbnormal = selfContextAbnormal,
             suspiciousProcesses = nativeSnapshot.suspiciousProcesses,
@@ -95,8 +100,9 @@ class SuRepository(
             selfContextAbnormal = selfContextAbnormal,
             suspiciousProcesses = nativeSnapshot.suspiciousProcesses,
             nativeAvailable = nativeSnapshot.available,
-            checkedSuPathCount = SU_PATHS.size,
-            checkedDaemonPathCount = DAEMON_PATHS.size,
+            checkedSuPathCount = SU_PATHS.size - unobservableSuPaths,
+            checkedDaemonPathCount = DAEMON_PATHS.size - unobservableDaemonPaths,
+            unobservablePathCount = unobservableSuPaths + unobservableDaemonPaths,
             checkedProcessCount = nativeSnapshot.checkedProcesses,
             deniedProcessCount = nativeSnapshot.deniedProcesses,
             methods = methods,
@@ -106,6 +112,8 @@ class SuRepository(
     private fun buildMethods(
         foundSuBinaries: List<String>,
         foundDaemons: Map<String, String>,
+        unobservableSuPaths: Int,
+        unobservableDaemonPaths: Int,
         selfContext: String,
         selfContextAbnormal: Boolean,
         suspiciousProcesses: List<String>,
@@ -131,16 +139,33 @@ class SuRepository(
         return listOf(
             SuMethodResult(
                 label = "daemonScan",
-                summary = foundDaemons.values.toSet().takeIf { it.isNotEmpty() }?.joinToString("/")
-                    ?: "Clean",
-                outcome = if (foundDaemons.isNotEmpty()) SuMethodOutcome.DETECTED else SuMethodOutcome.CLEAN,
-                detail = foundDaemons.keys.takeIf { it.isNotEmpty() }?.joinToString(),
+                summary = when {
+                    foundDaemons.isNotEmpty() -> foundDaemons.values.toSet().joinToString("/")
+                    unobservableDaemonPaths > 0 -> "Partial"
+                    else -> "Clean"
+                },
+                outcome = when {
+                    foundDaemons.isNotEmpty() -> SuMethodOutcome.DETECTED
+                    unobservableDaemonPaths > 0 -> SuMethodOutcome.SUPPORT
+                    else -> SuMethodOutcome.CLEAN
+                },
+                detail = foundDaemons.keys.takeIf { it.isNotEmpty() }?.joinToString()
+                    ?: unobservedDetail(unobservableDaemonPaths, DAEMON_PATHS.size),
             ),
             SuMethodResult(
                 label = "fileScan",
-                summary = if (foundSuBinaries.isNotEmpty()) "SU found" else "Clean",
-                outcome = if (foundSuBinaries.isNotEmpty()) SuMethodOutcome.DETECTED else SuMethodOutcome.CLEAN,
-                detail = foundSuBinaries.takeIf { it.isNotEmpty() }?.joinToString(),
+                summary = when {
+                    foundSuBinaries.isNotEmpty() -> "SU found"
+                    unobservableSuPaths > 0 -> "Partial"
+                    else -> "Clean"
+                },
+                outcome = when {
+                    foundSuBinaries.isNotEmpty() -> SuMethodOutcome.DETECTED
+                    unobservableSuPaths > 0 -> SuMethodOutcome.SUPPORT
+                    else -> SuMethodOutcome.CLEAN
+                },
+                detail = foundSuBinaries.takeIf { it.isNotEmpty() }?.joinToString()
+                    ?: unobservedDetail(unobservableSuPaths, SU_PATHS.size),
             ),
             SuMethodResult(
                 label = "nativeSyscall",
@@ -165,6 +190,9 @@ class SuRepository(
             ),
         )
     }
+
+    private fun unobservedDetail(unobservable: Int, total: Int): String? =
+        if (unobservable > 0) "$unobservable of $total paths could not be checked from this app." else null
 
     private fun checkSuExecutable(): String? {
         var process: Process? = null

@@ -50,6 +50,8 @@ data class SuReport(
     val nativeAvailable: Boolean,
     val checkedSuPathCount: Int,
     val checkedDaemonPathCount: Int,
+    /** Scanned paths this process could not stat, so their absence is not established. */
+    val unobservablePathCount: Int = 0,
     val checkedProcessCount: Int,
     val deniedProcessCount: Int,
     val methods: List<SuMethodResult>,

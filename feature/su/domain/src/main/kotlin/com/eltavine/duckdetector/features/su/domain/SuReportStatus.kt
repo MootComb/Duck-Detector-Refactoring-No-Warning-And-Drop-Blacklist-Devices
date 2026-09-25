@@ -25,7 +25,7 @@ fun SuReport.toDetectorStatus(): DetectorStatus {
         SuStage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
         SuStage.READY -> when {
             hasRootIndicators -> DetectorStatus.danger()
-            !nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
+            !nativeAvailable || unobservablePathCount > 0 -> DetectorStatus.info(InfoKind.SUPPORT)
             else -> DetectorStatus.allClear()
         }
     }
