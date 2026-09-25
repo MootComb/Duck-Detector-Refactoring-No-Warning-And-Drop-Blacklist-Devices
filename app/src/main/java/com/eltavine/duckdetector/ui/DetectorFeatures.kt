@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.ui
 
+import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DeviceProfileFeature
 import com.eltavine.duckdetector.features.bootloader.ui.BootloaderDetectorFeature
@@ -35,28 +36,42 @@ import com.eltavine.duckdetector.features.systemproperties.ui.SystemPropertiesDe
 import com.eltavine.duckdetector.features.tee.ui.TeeDetectorFeature
 import com.eltavine.duckdetector.features.virtualization.ui.VirtualizationDetectorFeature
 import com.eltavine.duckdetector.features.zygisk.ui.ZygiskDetectorFeature
+import com.eltavine.duckdetector.sdk.DetectorCatalog
 
 /**
- * Every detector the application composes, each bound to the platform adapters it scans through.
+ * The dashboard card of every detector, and the device profile shown under them.
  *
- * This is the one place that names every detector; central code works on the sessions these
- * features create.
+ * Which detectors exist and the order their scans start come from [DetectorCatalog]. This file
+ * only names each detector's card; everything central works on the sessions the cards create.
  */
 internal object DetectorFeatures {
-    val bootloader: DetectorFeature = BootloaderDetectorFeature
-    val tee: DetectorFeature = TeeDetectorFeature
-    val customRom: DetectorFeature = CustomRomDetectorFeature
-    val dangerousApps: DetectorFeature = DangerousAppsDetectorFeature
-    val kernelCheck: DetectorFeature = KernelCheckDetectorFeature
-    val lsposed: DetectorFeature = LSPosedDetectorFeature
-    val memory: DetectorFeature = MemoryDetectorFeature
-    val mount: DetectorFeature = MountDetectorFeature
-    val nativeRoot: DetectorFeature = NativeRootDetectorFeature
-    val playIntegrityFix: DetectorFeature = PlayIntegrityFixDetectorFeature
-    val selinux: DetectorFeature = SelinuxDetectorFeature
-    val su: DetectorFeature = SuDetectorFeature
-    val systemProperties: DetectorFeature = SystemPropertiesDetectorFeature
-    val virtualization: DetectorFeature = VirtualizationDetectorFeature
-    val zygisk: DetectorFeature = ZygiskDetectorFeature
+    private val cards: Map<DetectorId, DetectorFeature> = listOf(
+        BootloaderDetectorFeature,
+        CustomRomDetectorFeature,
+        DangerousAppsDetectorFeature,
+        KernelCheckDetectorFeature,
+        LSPosedDetectorFeature,
+        MemoryDetectorFeature,
+        MountDetectorFeature,
+        NativeRootDetectorFeature,
+        PlayIntegrityFixDetectorFeature,
+        SelinuxDetectorFeature,
+        SuDetectorFeature,
+        SystemPropertiesDetectorFeature,
+        TeeDetectorFeature,
+        VirtualizationDetectorFeature,
+        ZygiskDetectorFeature,
+    ).associateBy { it.id }
+
+    /** Every detector's card, in the catalog's scan-start order. */
+    val all: List<DetectorFeature> = DetectorCatalog.all.map { detector ->
+        checkNotNull(cards[detector.id]) { "${detector.id} is in DetectorCatalog but has no card here" }
+    }
+
     val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature { context -> DeviceInfoRepository(context) }
+
+    init {
+        val uncatalogued = cards.keys - DetectorCatalog.all.map { it.id }.toSet()
+        check(uncatalogued.isEmpty()) { "cards for detectors missing from DetectorCatalog: $uncatalogued" }
+    }
 }

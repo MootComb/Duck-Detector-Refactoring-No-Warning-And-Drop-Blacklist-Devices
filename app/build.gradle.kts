@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import com.eltavine.duckdetector.buildlogic.detectorModules
+
 plugins {
     id("duckdetector.android.application")
     id("duckdetector.android.apk-artifacts")
@@ -28,41 +30,24 @@ android {
 }
 
 dependencies {
-    implementation(project(":capability:attestation:data"))
-    implementation(project(":capability:attestation:domain"))
-    implementation(project(":capability:selinuxpolicy:data"))
-    implementation(project(":capability:helperprocess:data"))
-    implementation(project(":capability:systemproperties:data"))
     implementation(project(":capability:earlypreload:data"))
     implementation(project(":capability:packageinventory:data"))
+    implementation(project(":capability:selinuxpolicy:data"))
     implementation(project(":core:evidence"))
-    implementation(project(":core:native"))
     implementation(project(":core:report"))
     implementation(project(":core:scan"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:su:ui"))
-    implementation(project(":feature:memory:ui"))
-    implementation(project(":feature:kernelcheck:ui"))
-    implementation(project(":feature:playintegrityfix:ui"))
-    implementation(project(":feature:zygisk:ui"))
-    implementation(project(":feature:customrom:ui"))
-    implementation(project(":feature:dangerousapps:ui"))
-    implementation(project(":feature:systemproperties:ui"))
-    implementation(project(":feature:virtualization:ui"))
-    implementation(project(":feature:mount:ui"))
-    implementation(project(":feature:selinux:ui"))
-    implementation(project(":feature:lsposed:ui"))
-    implementation(project(":feature:nativeroot:data"))
-    implementation(project(":feature:nativeroot:ui"))
-    implementation(project(":feature:bootloader:ui"))
-    implementation(project(":feature:tee:data"))
-    implementation(project(":feature:tee:ui"))
+    implementation(project(":feature:dashboard:ui"))
     implementation(project(":feature:deviceinfo:data"))
     implementation(project(":feature:deviceinfo:ui"))
+    implementation(project(":feature:nativeroot:data"))
+    implementation(project(":feature:settings:ui"))
+    implementation(project(":feature:tee:data"))
     implementation(project(":feature:update:data"))
     implementation(project(":feature:update:ui"))
-    implementation(project(":feature:settings:ui"))
-    implementation(project(":feature:dashboard:ui"))
+    implementation(project(":sdk:runtime"))
+    // Every detector's dashboard card, discovered like the SDK discovers the detectors.
+    detectorModules("ui").forEach { implementation(project(it)) }
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

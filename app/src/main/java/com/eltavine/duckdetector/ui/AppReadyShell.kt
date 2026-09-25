@@ -30,6 +30,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +57,7 @@ import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUi
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
+import com.eltavine.duckdetector.features.tee.detector.TeeDetector
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
 import com.eltavine.duckdetector.features.update.ui.UpdateViewModel
@@ -87,27 +89,13 @@ internal fun AppReadyShell(
     val notifier = remember(appContext) { ScanProgressNotifier(appContext) }
     val updateFactory = remember(context) { updateViewModelFactory(context) }
     val updateViewModel: UpdateViewModel = viewModel(factory = updateFactory)
-    // Every detector view model starts scanning when it is created, so this order is the order in
-    // which detector scans begin; it is kept exactly as it was when the shell created them itself.
-    val bootloader = DetectorFeatures.bootloader.rememberSession()
-    val tee = DetectorFeatures.tee.rememberSession()
-    val customRom = DetectorFeatures.customRom.rememberSession()
-    val dangerousApps = DetectorFeatures.dangerousApps.rememberSession()
+    // Every detector session starts scanning when it is created, so the catalog order is the order
+    // in which detector scans begin.
+    val detectorSessions = DetectorFeatures.all.map { feature -> key(feature.id) { feature.rememberSession() } }
     val deviceProfile = DetectorFeatures.deviceProfile.rememberSession()
-    val kernelCheck = DetectorFeatures.kernelCheck.rememberSession()
-    val lsposed = DetectorFeatures.lsposed.rememberSession()
-    val memory = DetectorFeatures.memory.rememberSession()
-    val mount = DetectorFeatures.mount.rememberSession()
-    val nativeRoot = DetectorFeatures.nativeRoot.rememberSession()
-    val playIntegrityFix = DetectorFeatures.playIntegrityFix.rememberSession()
-    val selinux = DetectorFeatures.selinux.rememberSession()
-    val su = DetectorFeatures.su.rememberSession()
-    val systemProperties = DetectorFeatures.systemProperties.rememberSession()
-    val virtualization = DetectorFeatures.virtualization.rememberSession()
-    val zygisk = DetectorFeatures.zygisk.rememberSession()
-    val detectors = remember(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk) {
-        listOf(bootloader, customRom, dangerousApps, kernelCheck, lsposed, memory, mount, nativeRoot, playIntegrityFix, selinux, su, systemProperties, tee, virtualization, zygisk)
-    }
+    // The scan coordinator, the dashboard and the export list detectors by id.
+    val detectors = remember(detectorSessions) { detectorSessions.sortedBy { it.id.value } }
+    val tee = detectorSessions.first { it.id == TeeDetector.id }
     val updateUiState by updateViewModel.uiState.collectAsState()
 
     LaunchedEffect(updateViewModel) {

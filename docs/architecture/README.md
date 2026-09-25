@@ -68,7 +68,7 @@ The CI `contracts` job runs the Python checkers and their self-tests; the `verif
 
 ## Composition invariants
 
-`DetectorFeatures` in `:app` is the only place that names every detector. Each entry binds a feature's `DetectorFeature` to its platform adapters, for example `TeeDetectorFeature { context -> TeeRepository(context) }`. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md)).
+`DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` names each detector's dashboard card and orders the cards by the catalog; a unit test fails when a detector has no card or a card has no detector. The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md), [ADR 0008](../adr/0008-headless-detectors-and-sdk.md)).
 
 Scan lifecycle is owned explicitly ([ADR 0003](../adr/0003-scan-lifecycle-ownership.md)):
 
