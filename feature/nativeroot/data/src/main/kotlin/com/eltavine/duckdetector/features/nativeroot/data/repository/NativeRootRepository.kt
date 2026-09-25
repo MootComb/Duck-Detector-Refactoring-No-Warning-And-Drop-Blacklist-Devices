@@ -101,6 +101,7 @@ class NativeRootRepository(
             susfsProbeHit = snapshot.susfsProbeHit,
             pathHitCount = snapshot.pathHitCount + shellTmpResult.hitCount,
             pathCheckCount = snapshot.pathCheckCount + shellTmpResult.checkedCount,
+            pathDeniedCount = snapshot.pathDeniedCount,
             processHitCount = snapshot.processHitCount + rootProcessResult.hitCount,
             processCheckedCount = snapshot.processCheckedCount + rootProcessResult.checkedCount,
             processDeniedCount = snapshot.processDeniedCount + rootProcessResult.deniedCount,

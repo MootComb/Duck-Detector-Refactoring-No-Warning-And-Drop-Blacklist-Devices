@@ -105,7 +105,11 @@ internal fun buildScanRows(report: NativeRootReport): List<NativeRootDetailRowMo
         NativeRootStage.READY -> listOf(
             NativeRootDetailRowModel(
                 "Paths checked",
-                report.pathCheckCount.toString(),
+                if (report.pathDeniedCount > 0) {
+                    "${report.pathCheckCount} · ${report.pathDeniedCount} not observable"
+                } else {
+                    report.pathCheckCount.toString()
+                },
                 DetectorStatus.info(InfoKind.SUPPORT)
             ),
             NativeRootDetailRowModel(

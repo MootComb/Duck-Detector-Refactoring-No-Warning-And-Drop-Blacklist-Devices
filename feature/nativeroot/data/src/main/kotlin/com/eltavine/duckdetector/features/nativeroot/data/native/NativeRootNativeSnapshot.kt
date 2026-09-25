@@ -66,6 +66,7 @@ data class NativeRootNativeSnapshot(
     val selfKsuFdwrapperFdCount: Int = 0,
     val pathHitCount: Int = 0,
     val pathCheckCount: Int = 0,
+    val pathDeniedCount: Int = 0,
     val processHitCount: Int = 0,
     val processCheckedCount: Int = 0,
     val processDeniedCount: Int = 0,

@@ -133,6 +133,7 @@ class NativeRootNativeBridge(
 
             "PATH_HITS" -> copy(pathHitCount = value.toIntOrNull() ?: pathHitCount)
             "PATH_CHECKS" -> copy(pathCheckCount = value.toIntOrNull() ?: pathCheckCount)
+            "PATH_DENIED" -> copy(pathDeniedCount = value.toIntOrNull() ?: pathDeniedCount)
             "PROCESS_HITS" -> copy(processHitCount = value.toIntOrNull() ?: processHitCount)
             "PROCESS_CHECKED" -> copy(
                 processCheckedCount = value.toIntOrNull() ?: processCheckedCount

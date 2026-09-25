@@ -16,7 +16,10 @@
 
 #include "nativeroot/probes/path_probe.h"
 
+#include <cerrno>
 #include <string>
+
+#include <unistd.h>
 
 #include "nativeroot/common/io_utils.h"
 
@@ -150,6 +153,18 @@ namespace duckdetector::nativeroot {
             return evidence;
         }
 
+        // A missing path is only established when its parent is searchable, or is itself missing.
+        // access(X_OK) goes through inode_permission(), so DAC and SELinux search checks both apply.
+        // /data/adb, for example, is created 0700 root by root solutions and labelled
+        // adb_data_file (system/sepolicy file_contexts), which no app domain may search.
+        bool parent_observable(const char *path) {
+            const std::string parent = parent_path_of(path);
+            if (parent.empty() || access(parent.c_str(), X_OK) == 0) {
+                return true;
+            }
+            return errno == ENOENT || errno == ENOTDIR;
+        }
+
         std::string evidence_summary(const PathEvidence &evidence) {
             std::string summary;
             if (evidence.stat_visible) {
@@ -171,13 +186,18 @@ namespace duckdetector::nativeroot {
 
     ProbeResult run_path_probe() {
         ProbeResult result;
-        result.checked_count = static_cast<int>(sizeof(kPathRules) / sizeof(kPathRules[0]));
 
         for (const PathRule &rule: kPathRules) {
             const PathEvidence evidence = collect_path_evidence(rule.path);
             if (evidence.confirmation_count() < 2) {
+                if (parent_observable(rule.path)) {
+                    result.checked_count += 1;
+                } else {
+                    result.denied_count += 1;
+                }
                 continue;
             }
+            result.checked_count += 1;
             result.flags.kernel_su = result.flags.kernel_su || rule.kernel_su;
             result.flags.apatch = result.flags.apatch || rule.apatch;
             result.flags.magisk = result.flags.magisk || rule.magisk;

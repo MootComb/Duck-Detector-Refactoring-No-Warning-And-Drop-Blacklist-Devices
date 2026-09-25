@@ -92,6 +92,7 @@ namespace duckdetector::nativeroot {
         int self_ksu_fdwrapper_count = 0;
         int path_hit_count = 0;
         int path_check_count = 0;
+        int path_denied_count = 0;
         int process_hit_count = 0;
         int process_checked_count = 0;
         int process_denied_count = 0;

@@ -116,6 +116,7 @@ namespace duckdetector::nativeroot {
         );
         snapshot.path_hit_count = path_probe.hit_count;
         snapshot.path_check_count = path_probe.checked_count;
+        snapshot.path_denied_count = path_probe.denied_count;
         snapshot.process_hit_count = process_probe.hit_count;
         snapshot.process_checked_count = process_probe.checked_count;
         snapshot.process_denied_count = process_probe.denied_count;

@@ -68,6 +68,7 @@ class NativeRootNativeBridgeTest {
                 SELF_KSU_FDWRAPPER_FDS=2
                 PATH_HITS=2
                 PATH_CHECKS=12
+                PATH_DENIED=11
                 PROCESS_HITS=1
                 PROCESS_CHECKED=9
                 PROCESS_DENIED=40
@@ -89,6 +90,7 @@ class NativeRootNativeBridgeTest {
         assertEquals(12000L, snapshot.kernelSuVersion)
         assertTrue(snapshot.kernelPatchSideChannel)
         assertTrue(snapshot.kernelPatchSideChannelAvailable)
+        assertEquals(11, snapshot.pathDeniedCount)
         assertTrue(snapshot.kernelPatchSuperkey)
         assertTrue(snapshot.kernelPatchSuperkeyAvailable)
         assertEquals(4, snapshot.kernelPatchSuperkeyCheckedCount)

@@ -96,6 +96,7 @@ namespace duckdetector::nativeroot {
         output << "SELF_KSU_FDWRAPPER_FDS=" << snapshot.self_ksu_fdwrapper_count << '\n';
         output << "PATH_HITS=" << snapshot.path_hit_count << '\n';
         output << "PATH_CHECKS=" << snapshot.path_check_count << '\n';
+        output << "PATH_DENIED=" << snapshot.path_denied_count << '\n';
         output << "PROCESS_HITS=" << snapshot.process_hit_count << '\n';
         output << "PROCESS_CHECKED=" << snapshot.process_checked_count << '\n';
         output << "PROCESS_DENIED=" << snapshot.process_denied_count << '\n';

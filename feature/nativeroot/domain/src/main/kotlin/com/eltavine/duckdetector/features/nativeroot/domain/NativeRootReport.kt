@@ -80,6 +80,8 @@ data class NativeRootReport(
     val susfsProbeHit: Boolean,
     val pathHitCount: Int,
     val pathCheckCount: Int,
+    /** Rules whose parent directory this process may not search, so their absence is unknown. */
+    val pathDeniedCount: Int = 0,
     val processHitCount: Int,
     val processCheckedCount: Int,
     val processDeniedCount: Int,

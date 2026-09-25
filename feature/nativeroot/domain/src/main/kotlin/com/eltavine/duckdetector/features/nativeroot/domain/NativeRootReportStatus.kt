@@ -41,6 +41,7 @@ fun NativeRootReport.hasReducedCoverage(): Boolean {
 
 fun NativeRootReport.hasRuntimeReducedCoverage(): Boolean {
     return !cgroupAvailable ||
+            pathDeniedCount > 0 ||
             !isolatedMountProbeAvailable ||
             !ksuThroneHuntAvailable ||
             !ksuThroneHuntStimulusApplied ||
