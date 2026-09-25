@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "selinux/context_validity_probe.h"
+#include "selinuxpolicy/context_validity_probe.h"
 #include <atomic>
 #include <cerrno>
 #include <cstddef>

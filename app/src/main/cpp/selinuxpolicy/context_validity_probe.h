@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef DUCKDETECTOR_SELINUX_CONTEXT_VALIDITY_PROBE_H
-#define DUCKDETECTOR_SELINUX_CONTEXT_VALIDITY_PROBE_H
+#ifndef DUCKDETECTOR_SELINUXPOLICY_CONTEXT_VALIDITY_PROBE_H
+#define DUCKDETECTOR_SELINUXPOLICY_CONTEXT_VALIDITY_PROBE_H
 
 #include <jni.h>
 #include <optional>
@@ -86,4 +86,4 @@ namespace duckdetector::selinux {
 
 }  // namespace duckdetector::selinux
 
-#endif  // DUCKDETECTOR_SELINUX_CONTEXT_VALIDITY_PROBE_H
+#endif  // DUCKDETECTOR_SELINUXPOLICY_CONTEXT_VALIDITY_PROBE_H

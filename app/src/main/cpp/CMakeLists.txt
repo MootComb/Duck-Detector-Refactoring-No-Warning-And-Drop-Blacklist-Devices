@@ -37,13 +37,16 @@ set(SU_SOURCES
     su/native_bridge.cpp
 )
 
+set(SELINUX_POLICY_SOURCES
+    selinuxpolicy/context_validity_checks.cpp
+    selinuxpolicy/context_validity_probe.cpp
+    selinuxpolicy/context_validity_symbols.cpp
+    selinuxpolicy/context_validity_native_bridge.cpp
+    selinuxpolicy/dirty_policy_probe.cpp
+)
+
 set(SELINUX_SOURCES
     selinux/audit_probe.cpp
-    selinux/context_validity_checks.cpp
-    selinux/context_validity_probe.cpp
-    selinux/context_validity_symbols.cpp
-    selinux/context_validity_native_bridge.cpp
-    selinux/dirty_policy_probe.cpp
     selinux/native_bridge.cpp
 )
 
@@ -189,6 +192,7 @@ add_library(duckdetector SHARED
     ${TEE_DER_SOURCES}
     ${PACKAGE_INVENTORY_SOURCES}
     ${SU_SOURCES}
+    ${SELINUX_POLICY_SOURCES}
     ${SELINUX_SOURCES}
     ${CUSTOM_ROM_SOURCES}
     ${KERNEL_CHECK_SOURCES}

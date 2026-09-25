@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "selinux/context_validity_probe.h"
-#include "selinux/context_validity_internal.h"
+#include "selinuxpolicy/context_validity_probe.h"
+#include "selinuxpolicy/context_validity_internal.h"
 #include <atomic>
 #include <cerrno>
 #include <cstddef>

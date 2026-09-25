@@ -22,7 +22,7 @@
 #include <string>
 
 #include "common/payload_codec.h"
-#include "selinux/context_validity_probe.h"
+#include "selinuxpolicy/context_validity_probe.h"
 
 namespace {
 
