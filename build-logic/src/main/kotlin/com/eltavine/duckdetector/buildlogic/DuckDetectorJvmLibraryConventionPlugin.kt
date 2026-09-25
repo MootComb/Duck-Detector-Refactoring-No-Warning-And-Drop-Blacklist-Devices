@@ -31,6 +31,7 @@ class DuckDetectorJvmLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("org.jetbrains.kotlin.jvm")
+            pluginManager.apply("com.android.lint")
             pluginManager.apply("duckdetector.module-boundaries")
 
             extensions.configure<JavaPluginExtension> {

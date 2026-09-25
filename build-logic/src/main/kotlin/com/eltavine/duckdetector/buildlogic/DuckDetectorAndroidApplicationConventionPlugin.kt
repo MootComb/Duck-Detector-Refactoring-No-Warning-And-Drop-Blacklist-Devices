@@ -77,6 +77,9 @@ class DuckDetectorAndroidApplicationConventionPlugin : Plugin<Project> {
         extensions.configure<ApplicationExtension> {
             configureAndroidCommon(this)
             ndkVersion = requiredGradleProperty("duckdetector.android.ndk")
+            // The composition root is the single lint entry point, so it must analyse every module it
+            // depends on; otherwise code moved out of :app silently leaves lint coverage.
+            lint.checkDependencies = true
 
             defaultConfig {
                 targetSdk = requiredIntGradleProperty("duckdetector.android.targetSdk")

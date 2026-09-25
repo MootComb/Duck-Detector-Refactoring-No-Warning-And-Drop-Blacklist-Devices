@@ -79,6 +79,12 @@ class DuckDetectorModuleBoundariesPlugin : Plugin<Project> {
         }
         val projectDependencies = sortedMapOf<String, MutableSet<String>>()
         val externalDependencies = sortedMapOf<String, MutableSet<String>>()
+        // External artifacts only matter where they reach the module's own code; tool classpaths such
+        // as androidLintTool legitimately carry Android artifacts into pure JVM modules.
+        val codeConfigurations = CODE_CLASSPATHS
+            .mapNotNull { configurations.findByName(it) }
+            .flatMap { it.hierarchy }
+            .mapTo(mutableSetOf()) { it.name }
         configurations.forEach { configuration ->
             configuration.dependencies.forEach { dependency ->
                 when (dependency) {
@@ -88,12 +94,22 @@ class DuckDetectorModuleBoundariesPlugin : Plugin<Project> {
                         projectDependencies.getOrPut(configuration.name, ::sortedSetOf) += dependency.path
                     }
 
-                    is ExternalModuleDependency ->
+                    is ExternalModuleDependency -> if (configuration.name in codeConfigurations) {
                         externalDependencies.getOrPut(configuration.name, ::sortedSetOf) +=
                             "${dependency.group}:${dependency.name}"
+                    }
                 }
             }
         }
         return ProjectFacts(path, kind, projectDependencies, externalDependencies)
+    }
+
+    private companion object {
+        val CODE_CLASSPATHS = listOf(
+            "compileClasspath",
+            "runtimeClasspath",
+            "testCompileClasspath",
+            "testRuntimeClasspath",
+        )
     }
 }
