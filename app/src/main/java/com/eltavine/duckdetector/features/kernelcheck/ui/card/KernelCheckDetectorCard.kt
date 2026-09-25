@@ -48,7 +48,7 @@ import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckCardMo
 import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckDetailRowModel
 import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckHeaderFactModel
 import com.eltavine.duckdetector.features.kernelcheck.ui.model.KernelCheckImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun KernelCheckDetectorCard(

@@ -47,7 +47,7 @@ import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoCardMode
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoRowModel
 import com.eltavine.duckdetector.features.deviceinfo.ui.model.DeviceInfoSectionModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun DeviceInfoCard(

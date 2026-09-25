@@ -64,7 +64,8 @@
       "kind": "android-application",
       "allowed_project_dependencies": [
         ":core:evidence",
-        ":core:native"
+        ":core:native",
+        ":core:ui"
       ]
     },
     ":core:evidence": {
@@ -74,6 +75,12 @@
     ":core:native": {
       "kind": "jvm",
       "allowed_project_dependencies": []
+    },
+    ":core:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     }
   }
 }

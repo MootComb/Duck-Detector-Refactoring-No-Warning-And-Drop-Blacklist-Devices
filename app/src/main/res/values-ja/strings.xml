@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">Duck Detector ロゴ</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">Telegram</string>
     <string name="user_agreement">利用規約</string>
     <string name="disclaimer">および免責事項</string>
     <string name="please_read_carefully">続行前に必ずお読みください</string>
@@ -102,17 +100,6 @@ limitations under the License.
     <string name="licenses_dialog_licenses">ライセンス: %1$s</string>
     <string name="licenses_dialog_open">開く</string>
     <string name="licenses_dialog_no_license_text">利用可能なライセンステキストはありません。</string>
-    <string name="alpha_title">ALPHA ビルド</string>
-    <string name="alpha_banner">ALPHA</string>
-    <string name="alpha_message">このビルドは alpha テスト版です。C++ とアセンブリを含む大規模なリファクタリングが入っているため、不安定なクラッシュが発生する可能性があります。</string>
-    <string name="alpha_warning_runtime">このブランチでは、予期しない起動失敗や実行時クラッシュがまだ発生する可能性があります。</string>
-    <string name="alpha_warning_report">問題が起きた場合は報告してください。再現手順が明確だと特に助かります。</string>
-    <string name="alpha_warning_download">クラッシュログの取得方法が分からない場合は、下のリンクから AppErrorsTracking をダウンロードしてください。</string>
-    <string name="alpha_helper">クラッシュログ補助: AppErrorsTracking は GitHub Actions と Telegram CI で入手できます。</string>
-    <string name="alpha_dismiss_ready">この警告は今閉じられます。</string>
-    <string name="alpha_dismiss_waiting">%1$d 秒後に閉じられます。</string>
-    <string name="alpha_continue">理解しました。続行</string>
-    <string name="alpha_continue_waiting">理解しました (%1$d 秒)</string>
     <string name="screen_capture_title">スクリーンショットを検出</string>
     <string name="screen_capture_message">スクリーンショットに詳細情報が含まれていない場合、この問題は対応されません。</string>
     <string name="dialog_continue">続行</string>

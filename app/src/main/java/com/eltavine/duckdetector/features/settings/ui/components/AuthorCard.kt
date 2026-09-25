@@ -70,7 +70,7 @@ import androidx.compose.ui.platform.LocalDensity
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import compose.icons.SimpleIcons
 import compose.icons.simpleicons.Assemblyscript
 import compose.icons.simpleicons.Cplusplus

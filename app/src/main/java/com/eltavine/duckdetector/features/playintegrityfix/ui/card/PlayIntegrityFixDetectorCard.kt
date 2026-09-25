@@ -47,7 +47,7 @@ import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrit
 import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrityFixDetailRowModel
 import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrityFixHeaderFactModel
 import com.eltavine.duckdetector.features.playintegrityfix.ui.model.PlayIntegrityFixImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun PlayIntegrityFixDetectorCard(

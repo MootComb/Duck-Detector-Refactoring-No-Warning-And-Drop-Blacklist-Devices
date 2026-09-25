@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">أفهم، متابعة</string>
+    <string name="alpha_continue_waiting">أفهم (%1$d ثانية)</string>
+    <string name="alpha_dismiss_ready">يمكنك تجاهل هذا التحذير الآن.</string>
+    <string name="alpha_dismiss_waiting">يمكن التجاهل بعد %1$d ثانية.</string>
+    <string name="alpha_helper">مساعد سجلات الأعطال: يتوفر AppErrorsTracking عبر GitHub Actions و Telegram CI.</string>
+    <string name="alpha_message">هذا الإصدار هو إصدار اختبار ألفا. ونظرًا إلى أنه يتضمن إعادة هيكلة كبيرة تمس C++ و assembly، فقد تحدث أعطال غير مستقرة.</string>
+    <string name="alpha_title">إصدار ALPHA</string>
+    <string name="alpha_warning_download">إذا كنت لا تعرف كيفية التقاط سجلات الأعطال، فقم بتنزيل AppErrorsTracking من أحد الروابط أدناه.</string>
+    <string name="alpha_warning_report">إذا واجهت مشكلة، فيرجى الإبلاغ عنها. وتكون خطوات إعادة الإنتاج الواضحة مفيدة بشكل خاص.</string>
+    <string name="alpha_warning_runtime">قد تستمر حالات فشل التشغيل غير المتوقعة أو الأعطال أثناء التشغيل في هذا الفرع.</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">تليجرام</string>
+</resources>

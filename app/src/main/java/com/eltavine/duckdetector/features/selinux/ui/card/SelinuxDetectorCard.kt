@@ -48,7 +48,7 @@ import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxCardModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxDetailRowModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxHeaderFactModel
 import com.eltavine.duckdetector.features.selinux.ui.model.SelinuxImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun SelinuxDetectorCard(

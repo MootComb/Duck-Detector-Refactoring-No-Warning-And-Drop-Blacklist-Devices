@@ -47,11 +47,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.core.ui.R as CoreUiR
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.formatBuildTimeUtc
 import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 private const val ABOUT_WEBSITE = "eltavine.com"
 private const val ABOUT_EMAIL = "me@eltavine.com"
@@ -153,9 +154,9 @@ fun AboutCard(
                     onClick = { openExternalUri(context, "https://$ABOUT_WEBSITE") },
                 )
                 AboutInfoRow(
-                    label = stringResource(R.string.social_github),
+                    label = stringResource(CoreUiR.string.social_github),
                     value = ABOUT_GITHUB_REPOSITORY,
-                    iconPainter = painterResource(R.drawable.ic_github),
+                    iconPainter = painterResource(CoreUiR.drawable.ic_github),
                     onClick = { openExternalUri(context, ABOUT_GITHUB_URL) },
                 )
                 AboutInfoRow(

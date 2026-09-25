@@ -49,7 +49,7 @@ import com.eltavine.duckdetector.features.virtualization.ui.model.Virtualization
 import com.eltavine.duckdetector.features.virtualization.ui.model.VirtualizationDetailRowModel
 import com.eltavine.duckdetector.features.virtualization.ui.model.VirtualizationHeaderFactModel
 import com.eltavine.duckdetector.features.virtualization.ui.model.VirtualizationImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun VirtualizationDetectorCard(

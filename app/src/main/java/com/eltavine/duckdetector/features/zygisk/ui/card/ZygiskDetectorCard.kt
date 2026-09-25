@@ -49,7 +49,7 @@ import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskDetailRowModel
 import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskHeaderFactModel
 import com.eltavine.duckdetector.features.zygisk.ui.model.ZygiskImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun ZygiskDetectorCard(

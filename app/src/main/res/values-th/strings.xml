@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">โลโก้ Duck Detector</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">Telegram</string>
     <string name="user_agreement">ข้อตกลงผู้ใช้</string>
     <string name="disclaimer">และข้อจำกัดความรับผิดชอบ</string>
     <string name="please_read_carefully">โปรดอ่านอย่างละเอียดก่อนดำเนินการต่อ</string>
@@ -102,17 +100,6 @@ limitations under the License.
     <string name="licenses_dialog_licenses">ใบอนุญาต: %1$s</string>
     <string name="licenses_dialog_open">เปิด</string>
     <string name="licenses_dialog_no_license_text">ไม่มีข้อความใบอนุญาต</string>
-    <string name="alpha_title">บิลด์ ALPHA</string>
-    <string name="alpha_banner">ALPHA</string>
-    <string name="alpha_message">นี่คือบิลด์ทดสอบ alpha เนื่องจากมีการรีแฟกเตอร์ครั้งใหญ่ที่แตะ C++ และ assembly จึงอาจเกิดการแครชที่ไม่เสถียรได้</string>
-    <string name="alpha_warning_runtime">สาขานี้ยังอาจเกิดความล้มเหลวขณะเริ่มต้นหรือแครชระหว่างทำงานได้</string>
-    <string name="alpha_warning_report">หากคุณพบปัญหา โปรดรายงาน ยิ่งมีขั้นตอนการทำซ้ำที่ชัดเจนก็ยิ่งช่วยได้มาก</string>
-    <string name="alpha_warning_download">หากคุณยังไม่รู้วิธีเก็บ crash log ให้ดาวน์โหลด AppErrorsTracking จากลิงก์ด้านล่าง</string>
-    <string name="alpha_helper">ตัวช่วย crash log: AppErrorsTracking ใช้ได้ผ่าน GitHub Actions และ Telegram CI</string>
-    <string name="alpha_dismiss_ready">คุณปิดคำเตือนนี้ได้แล้ว</string>
-    <string name="alpha_dismiss_waiting">ปิดได้ในอีก %1$d วินาที</string>
-    <string name="alpha_continue">รับทราบแล้ว ดำเนินการต่อ</string>
-    <string name="alpha_continue_waiting">รับทราบแล้ว (%1$d วินาที)</string>
     <string name="screen_capture_title">ตรวจพบการจับภาพหน้าจอ</string>
     <string name="screen_capture_message">หากภาพหน้าจอไม่มีข้อมูลรายละเอียด ปัญหานี้จะไม่ได้รับการดำเนินการ</string>
     <string name="dialog_continue">ดำเนินการต่อ</string>

@@ -44,4 +44,5 @@ rootProject.name = "Duck Detector"
 include(":app")
 include(":core:evidence")
 include(":core:native")
+include(":core:ui")
  

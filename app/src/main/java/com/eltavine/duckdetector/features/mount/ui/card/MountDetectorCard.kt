@@ -57,7 +57,7 @@ import com.eltavine.duckdetector.features.mount.ui.model.MountCardModel
 import com.eltavine.duckdetector.features.mount.ui.model.MountDetailRowModel
 import com.eltavine.duckdetector.features.mount.ui.model.MountHeaderFactModel
 import com.eltavine.duckdetector.features.mount.ui.model.MountImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun MountDetectorCard(

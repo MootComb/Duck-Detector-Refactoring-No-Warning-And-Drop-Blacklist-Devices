@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">شعار Duck Detector</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">تليجرام</string>
     <string name="user_agreement">اتفاقية المستخدم</string>
     <string name="disclaimer">وإخلاء المسؤولية</string>
     <string name="please_read_carefully">يرجى القراءة بعناية قبل المتابعة</string>
@@ -109,17 +107,6 @@ limitations under the License.
     <string name="licenses_dialog_licenses">التراخيص: %1$s</string>
     <string name="licenses_dialog_open">فتح</string>
     <string name="licenses_dialog_no_license_text">لا يتوفر نص ترخيص.</string>
-    <string name="alpha_title">إصدار ALPHA</string>
-    <string name="alpha_banner">ALPHA</string>
-    <string name="alpha_message">هذا الإصدار هو إصدار اختبار ألفا. ونظرًا إلى أنه يتضمن إعادة هيكلة كبيرة تمس C++ و assembly، فقد تحدث أعطال غير مستقرة.</string>
-    <string name="alpha_warning_runtime">قد تستمر حالات فشل التشغيل غير المتوقعة أو الأعطال أثناء التشغيل في هذا الفرع.</string>
-    <string name="alpha_warning_report">إذا واجهت مشكلة، فيرجى الإبلاغ عنها. وتكون خطوات إعادة الإنتاج الواضحة مفيدة بشكل خاص.</string>
-    <string name="alpha_warning_download">إذا كنت لا تعرف كيفية التقاط سجلات الأعطال، فقم بتنزيل AppErrorsTracking من أحد الروابط أدناه.</string>
-    <string name="alpha_helper">مساعد سجلات الأعطال: يتوفر AppErrorsTracking عبر GitHub Actions و Telegram CI.</string>
-    <string name="alpha_dismiss_ready">يمكنك تجاهل هذا التحذير الآن.</string>
-    <string name="alpha_dismiss_waiting">يمكن التجاهل بعد %1$d ثانية.</string>
-    <string name="alpha_continue">أفهم، متابعة</string>
-    <string name="alpha_continue_waiting">أفهم (%1$d ثانية)</string>
     <string name="screen_capture_title">تم اكتشاف لقطة شاشة</string>
     <string name="screen_capture_message">إذا كانت لقطة الشاشة لا تحتوي على معلومات مفصلة، فلن تتم معالجة هذه المشكلة.</string>
     <string name="dialog_continue">متابعة</string>

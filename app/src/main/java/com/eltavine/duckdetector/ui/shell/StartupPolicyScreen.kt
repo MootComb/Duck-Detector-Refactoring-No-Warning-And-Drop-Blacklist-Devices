@@ -60,7 +60,7 @@ import com.eltavine.duckdetector.core.notifications.preferences.ScanNotification
 import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 data class StartupPackageVisibilityState(
     val visibility: InstalledPackageVisibility,

@@ -52,7 +52,7 @@ import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardMode
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderDetailRowModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun BootloaderDetectorCard(

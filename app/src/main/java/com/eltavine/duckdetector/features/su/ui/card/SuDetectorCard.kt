@@ -47,7 +47,7 @@ import com.eltavine.duckdetector.features.su.ui.model.SuCardModel
 import com.eltavine.duckdetector.features.su.ui.model.SuDetailRowModel
 import com.eltavine.duckdetector.features.su.ui.model.SuHeaderFactModel
 import com.eltavine.duckdetector.features.su.ui.model.SuImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun SuDetectorCard(

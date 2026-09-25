@@ -86,7 +86,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
-import com.eltavine.duckdetector.ui.theme.MotionTokens
+import com.eltavine.duckdetector.core.ui.theme.MotionTokens
 import kotlinx.coroutines.delay
 
 private val NumberedHeadingRegex = Regex("""^\d+\.\s.*""")

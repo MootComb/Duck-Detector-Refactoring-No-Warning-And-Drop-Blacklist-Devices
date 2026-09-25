@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">АЛЬФА</string>
+    <string name="alpha_continue">Я розумію, продовжити</string>
+    <string name="alpha_continue_waiting">Я розумію (%1$ds)</string>
+    <string name="alpha_dismiss_ready">Тепер ви можете закрити це попередження.</string>
+    <string name="alpha_dismiss_waiting">Закриття буде доступне через %1$ds.</string>
+    <string name="alpha_helper">Помічник з логів збоїв: AppErrorsTracking доступний на GitHub Actions та Telegram CI.</string>
+    <string name="alpha_message">Ця збірка є альфа-версією для тестування. Через масштабний рефакторинг C++ та асемблера можуть виникати нестабільні збої.</string>
+    <string name="alpha_title">АЛЬФА-ЗБІРКА</string>
+    <string name="alpha_warning_download">Якщо ви не знаєте, як отримати журнали збоїв (logs), завантажте AppErrorsTracking за одним із посилань нижче.</string>
+    <string name="alpha_warning_report">Якщо ви зіткнулися з проблемою, будь ласка, повідомте про неї. Особливо корисними будуть чіткі кроки для відтворення помилки.</string>
+    <string name="alpha_warning_runtime">У цій гілці все ще можуть траплятися неочікувані помилки під час запуску або збої під час роботи.</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+</resources>

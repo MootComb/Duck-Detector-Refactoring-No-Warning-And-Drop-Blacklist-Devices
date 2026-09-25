@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">Biểu trưng Duck Detector</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">Telegram</string>
     <string name="user_agreement">Thỏa thuận người dùng</string>
     <string name="disclaimer">và tuyên bố miễn trừ</string>
     <string name="please_read_carefully">Vui lòng đọc kỹ trước khi tiếp tục</string>
@@ -102,17 +100,6 @@ limitations under the License.
     <string name="licenses_dialog_licenses">Giấy phép: %1$s</string>
     <string name="licenses_dialog_open">Mở</string>
     <string name="licenses_dialog_no_license_text">Không có văn bản giấy phép.</string>
-    <string name="alpha_title">Bản build ALPHA</string>
-    <string name="alpha_banner">ALPHA</string>
-    <string name="alpha_message">Đây là bản build thử nghiệm alpha. Vì có đợt refactor lớn liên quan đến C++ và assembly, có thể xảy ra crash không ổn định.</string>
-    <string name="alpha_warning_runtime">Nhánh này vẫn có thể gặp lỗi khởi động ngoài ý muốn hoặc crash khi chạy.</string>
-    <string name="alpha_warning_report">Nếu gặp sự cố, vui lòng báo cáo. Các bước tái hiện rõ ràng sẽ đặc biệt hữu ích.</string>
-    <string name="alpha_warning_download">Nếu bạn chưa biết cách lấy crash log, hãy tải AppErrorsTracking từ một trong các liên kết bên dưới.</string>
-    <string name="alpha_helper">Trợ giúp crash log: AppErrorsTracking có sẵn trên GitHub Actions và Telegram CI.</string>
-    <string name="alpha_dismiss_ready">Bạn có thể đóng cảnh báo này ngay bây giờ.</string>
-    <string name="alpha_dismiss_waiting">Có thể đóng sau %1$d giây.</string>
-    <string name="alpha_continue">Tôi hiểu, tiếp tục</string>
-    <string name="alpha_continue_waiting">Tôi hiểu (%1$d giây)</string>
     <string name="screen_capture_title">Đã phát hiện chụp màn hình</string>
     <string name="screen_capture_message">Nếu ảnh chụp màn hình không chứa thông tin chi tiết, vấn đề này sẽ không được xử lý.</string>
     <string name="dialog_continue">Tiếp tục</string>

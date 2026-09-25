@@ -47,7 +47,7 @@ import com.eltavine.duckdetector.features.memory.ui.model.MemoryCardModel
 import com.eltavine.duckdetector.features.memory.ui.model.MemoryDetailRowModel
 import com.eltavine.duckdetector.features.memory.ui.model.MemoryHeaderFactModel
 import com.eltavine.duckdetector.features.memory.ui.model.MemoryImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun MemoryDetectorCard(

@@ -57,7 +57,7 @@ import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootCardMode
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootDetailRowModel
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootHeaderFactModel
 import com.eltavine.duckdetector.features.nativeroot.ui.model.NativeRootImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun NativeRootDetectorCard(

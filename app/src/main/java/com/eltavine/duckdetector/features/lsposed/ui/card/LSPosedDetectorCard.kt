@@ -49,7 +49,7 @@ import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedCardModel
 import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedDetailRowModel
 import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedHeaderFactModel
 import com.eltavine.duckdetector.features.lsposed.ui.model.LSPosedImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun LSPosedDetectorCard(

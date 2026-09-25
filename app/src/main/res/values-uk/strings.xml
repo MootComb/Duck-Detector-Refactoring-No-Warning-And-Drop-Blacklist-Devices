@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">Логотип Duck Detector</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">Telegram</string>
     <string name="user_agreement">Угода користувача</string>
     <string name="disclaimer">&amp; Відмова від відповідальності</string>
     <string name="please_read_carefully">Уважно прочитайте, перш ніж продовжити</string>
@@ -112,17 +110,6 @@ limitations under the License.
     <string name="licenses_dialog_open">Відкрити</string>
     <string name="licenses_dialog_no_license_text">Текст ліцензії відсутній.</string>
 
-    <string name="alpha_title">АЛЬФА-ЗБІРКА</string>
-    <string name="alpha_banner">АЛЬФА</string>
-    <string name="alpha_message">Ця збірка є альфа-версією для тестування. Через масштабний рефакторинг C++ та асемблера можуть виникати нестабільні збої.</string>
-    <string name="alpha_warning_runtime">У цій гілці все ще можуть траплятися неочікувані помилки під час запуску або збої під час роботи.</string>
-    <string name="alpha_warning_report">Якщо ви зіткнулися з проблемою, будь ласка, повідомте про неї. Особливо корисними будуть чіткі кроки для відтворення помилки.</string>
-    <string name="alpha_warning_download">Якщо ви не знаєте, як отримати журнали збоїв (logs), завантажте AppErrorsTracking за одним із посилань нижче.</string>
-    <string name="alpha_helper">Помічник з логів збоїв: AppErrorsTracking доступний на GitHub Actions та Telegram CI.</string>
-    <string name="alpha_dismiss_ready">Тепер ви можете закрити це попередження.</string>
-    <string name="alpha_dismiss_waiting">Закриття буде доступне через %1$ds.</string>
-    <string name="alpha_continue">Я розумію, продовжити</string>
-    <string name="alpha_continue_waiting">Я розумію (%1$ds)</string>
 
     <string name="screen_capture_title">Виявлено знімок екрана</string>
     <string name="screen_capture_message">Якщо знімок екрана не містить детальної інформації, це питання не буде розглянуто.</string>

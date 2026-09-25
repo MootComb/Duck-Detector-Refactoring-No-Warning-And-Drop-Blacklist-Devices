@@ -16,8 +16,6 @@ limitations under the License.
 
 <resources>
     <string name="duck_logo_description">Duck Detector 標誌</string>
-    <string name="social_github">GitHub</string>
-    <string name="social_telegram">Telegram</string>
     <string name="user_agreement">使用者協議</string>
     <string name="disclaimer">及免責聲明</string>
     <string name="please_read_carefully">請在繼續前仔細閱讀</string>
@@ -104,17 +102,6 @@ limitations under the License.
     <string name="licenses_dialog_licenses">授權：%1$s</string>
     <string name="licenses_dialog_open">開啟</string>
     <string name="licenses_dialog_no_license_text">沒有可用的授權文本。</string>
-    <string name="alpha_title">ALPHA 建置</string>
-    <string name="alpha_banner">ALPHA</string>
-    <string name="alpha_message">這是 Alpha 測試建置。由於其中包含涉及 C++ 與組合語言的大規模重構，可能發生不穩定崩潰。</string>
-    <string name="alpha_warning_runtime">此分支仍可能出現意外啟動失敗或執行時崩潰。</string>
-    <string name="alpha_warning_report">如果遇到問題，請盡快回報。清楚的重現步驟會特別有幫助。</string>
-    <string name="alpha_warning_download">如果您不知道如何擷取崩潰日誌，請從下方連結下載 AppErrorsTracking。</string>
-    <string name="alpha_helper">崩潰日誌輔助：AppErrorsTracking 可透過 GitHub Actions 與 Telegram CI 取得。</string>
-    <string name="alpha_dismiss_ready">您現在可以關閉此警告了。</string>
-    <string name="alpha_dismiss_waiting">%1$d 秒後可關閉。</string>
-    <string name="alpha_continue">我已了解，繼續</string>
-    <string name="alpha_continue_waiting">我已了解（%1$d 秒）</string>
     <string name="screen_capture_title">偵測到截圖</string>
     <string name="screen_capture_message">如果截圖中不包含詳細資訊，此問題將不會被處理。</string>
     <string name="dialog_continue">繼續</string>

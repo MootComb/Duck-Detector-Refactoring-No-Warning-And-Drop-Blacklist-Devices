@@ -89,7 +89,7 @@ import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
 import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.virtualization.ui.card.VirtualizationDetectorCard
 import com.eltavine.duckdetector.features.zygisk.ui.card.ZygiskDetectorCard
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -363,7 +363,7 @@ private fun BrandHeader() {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SocialGlyph(
-                iconRes = R.drawable.ic_telegram,
+                iconRes = com.eltavine.duckdetector.core.ui.R.drawable.ic_telegram,
                 onClick = {
                     openExternalUri(context, "https://t.me/duck_detector")
                 },

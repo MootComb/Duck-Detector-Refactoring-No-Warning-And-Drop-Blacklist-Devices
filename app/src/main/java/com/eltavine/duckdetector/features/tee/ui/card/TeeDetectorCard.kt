@@ -78,7 +78,7 @@ import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeHighlightSignalModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

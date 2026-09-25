@@ -54,7 +54,7 @@ import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHe
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHiddenPackageItemModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsHmaAlertModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.model.DangerousAppsPackageItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

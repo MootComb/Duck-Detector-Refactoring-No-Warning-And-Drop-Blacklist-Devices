@@ -25,11 +25,14 @@ import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import com.eltavine.duckdetector.core.startup.preload.EarlyMountPreloadStore
 import com.eltavine.duckdetector.core.startup.preload.EarlyVirtualizationPreloadStore
+import com.eltavine.duckdetector.core.ui.AppBuildInfo
+import com.eltavine.duckdetector.core.ui.LocalAppBuildInfo
 import com.eltavine.duckdetector.ui.DuckDetectorApp
-import com.eltavine.duckdetector.ui.theme.DuckDetectorTheme
+import com.eltavine.duckdetector.core.ui.theme.DuckDetectorTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -55,8 +58,10 @@ class MainActivity : ComponentActivity() {
         )
         setContentView(root)
         composeView.setContent {
-            DuckDetectorTheme {
-                DuckDetectorApp()
+            CompositionLocalProvider(LocalAppBuildInfo provides appBuildInfo) {
+                DuckDetectorTheme {
+                    DuckDetectorApp()
+                }
             }
         }
     }
@@ -75,6 +80,14 @@ class MainActivity : ComponentActivity() {
         procMountSampler = null
         super.onDestroy()
     }
+
+    private val appBuildInfo = AppBuildInfo(
+        versionName = BuildConfig.VERSION_NAME,
+        versionCode = BuildConfig.VERSION_CODE,
+        buildHash = BuildConfig.BUILD_HASH,
+        buildTimeUtc = BuildConfig.BUILD_TIME_UTC,
+        isAlphaVersion = BuildConfig.isAlphaVersion,
+    )
 
     private fun createProcMountSampler(): WebView? {
         // Attach this before starting Compose, matching PrivIsolated's WebView-before-bind order.

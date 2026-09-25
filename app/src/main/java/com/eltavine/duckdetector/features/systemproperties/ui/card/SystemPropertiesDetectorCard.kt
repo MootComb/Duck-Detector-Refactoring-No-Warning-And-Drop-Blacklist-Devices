@@ -50,7 +50,7 @@ import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemProper
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesDetailRowModel
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesHeaderFactModel
 import com.eltavine.duckdetector.features.systemproperties.ui.model.SystemPropertiesImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun SystemPropertiesDetectorCard(

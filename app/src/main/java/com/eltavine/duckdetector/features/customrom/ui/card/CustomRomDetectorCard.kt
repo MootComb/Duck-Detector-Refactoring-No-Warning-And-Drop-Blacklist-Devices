@@ -47,7 +47,7 @@ import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomCardModel
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomDetailRowModel
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomHeaderFactModel
 import com.eltavine.duckdetector.features.customrom.ui.model.CustomRomImpactItemModel
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun CustomRomDetectorCard(
