@@ -33,6 +33,7 @@ import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxImpa
 
 internal fun buildStateRows(report: SelinuxReport): List<SelinuxDetailRowModel> {
     val detectionPath = when {
+        report.mode == SelinuxMode.UNKNOWN -> "Not resolved"
         report.paradoxDetected -> "Paradox logic"
         report.methods.any {
             it.status.equals(

@@ -16,7 +16,9 @@
 
 package com.eltavine.duckdetector.features.selinux.data.repository
 
-import android.os.Build
+import android.system.ErrnoException
+import android.system.Os
+import android.system.OsConstants
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import java.io.File
@@ -24,11 +26,8 @@ import java.util.concurrent.TimeUnit
 
 internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
     return try {
-        val mount = File(SELINUX_MOUNT_PATH)
-        val policy = File(SELINUX_POLICY_PATH)
-        val enforce = File(SELINUX_STATUS_PATH)
-        when {
-            !mount.exists() -> SelinuxCheckResult(
+        when (nodeState(SELINUX_MOUNT_PATH)) {
+            NodeState.ABSENT -> SelinuxCheckResult(
                 method = METHOD_FILESYSTEM,
                 status = FILESYSTEM_NOT_MOUNTED,
                 isSecure = false,
@@ -36,21 +35,15 @@ internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
                 details = "/sys/fs/selinux does not exist",
             )
 
-            policy.exists() && enforce.exists() -> SelinuxCheckResult(
+            NodeState.NOT_OBSERVABLE -> SelinuxCheckResult(
                 method = METHOD_FILESYSTEM,
-                status = FILESYSTEM_ACTIVE,
-                isSecure = true,
+                status = FILESYSTEM_NOT_OBSERVABLE,
+                isSecure = null,
                 permissionDenied = false,
-                details = "SELinux filesystem mounted with policy nodes",
+                details = "/sys/fs/selinux could not be examined from this process",
             )
 
-            else -> SelinuxCheckResult(
-                method = METHOD_FILESYSTEM,
-                status = FILESYSTEM_MOUNTED,
-                isSecure = true,
-                permissionDenied = false,
-                details = "SELinux filesystem present",
-            )
+            NodeState.PRESENT -> selinuxNodesResult()
         }
     } catch (throwable: Throwable) {
         SelinuxCheckResult(
@@ -61,6 +54,39 @@ internal fun checkSelinuxFilesystem(): SelinuxCheckResult {
             details = throwable.message ?: "Filesystem check failed",
         )
     }
+}
+
+private fun selinuxNodesResult(): SelinuxCheckResult {
+    val policy = File(SELINUX_POLICY_PATH)
+    val enforce = File(SELINUX_STATUS_PATH)
+    return when {
+        policy.exists() && enforce.exists() -> SelinuxCheckResult(
+            method = METHOD_FILESYSTEM,
+            status = FILESYSTEM_ACTIVE,
+            isSecure = true,
+            permissionDenied = false,
+            details = "SELinux filesystem mounted with policy nodes",
+        )
+
+        else -> SelinuxCheckResult(
+            method = METHOD_FILESYSTEM,
+            status = FILESYSTEM_MOUNTED,
+            isSecure = true,
+            permissionDenied = false,
+            details = "SELinux filesystem present",
+        )
+    }
+}
+
+private enum class NodeState { PRESENT, ABSENT, NOT_OBSERVABLE }
+
+// Only ENOENT shows a node is missing. AOSP lets every domain search selinuxfs and getattr its
+// files (system/sepolicy private/domain.te), so any other error means this process may not look.
+private fun nodeState(path: String): NodeState = try {
+    Os.stat(path)
+    NodeState.PRESENT
+} catch (error: ErrnoException) {
+    if (error.errno == OsConstants.ENOENT) NodeState.ABSENT else NodeState.NOT_OBSERVABLE
 }
 
 internal fun checkViaSysfs(): SelinuxCheckResult {
@@ -245,60 +271,13 @@ internal fun checkViaProcAttr(): SelinuxCheckResult {
     return try {
         val procAttrFile = File(PROC_ATTR_PATH)
         if (procAttrFile.exists() && procAttrFile.canRead()) {
-            val context = procAttrFile.readText().trim().replace("\u0000", "")
-            if (context.isBlank()) {
-                SelinuxCheckResult(
-                    method = METHOD_PROC_ATTR,
-                    status = "Empty",
-                    isSecure = null,
-                    permissionDenied = false,
-                    details = "Context file empty",
-                )
-            } else {
-                val type = context.split(":").getOrNull(2) ?: "unknown"
-                when {
-                    type == "untrusted_app" || type.contains(
-                        "app",
-                        ignoreCase = true
-                    ) -> SelinuxCheckResult(
-                        method = METHOD_PROC_ATTR,
-                        status = SELINUX_ENFORCING,
-                        isSecure = true,
-                        permissionDenied = false,
-                        details = "Context: $context (confined to $type)",
-                    )
-
-                    type == "kernel" || type == "init" -> SelinuxCheckResult(
-                        method = METHOD_PROC_ATTR,
-                        status = "System context",
-                        isSecure = true,
-                        permissionDenied = false,
-                        details = "Context: $context",
-                    )
-
-                    context.contains(":") -> SelinuxCheckResult(
-                        method = METHOD_PROC_ATTR,
-                        status = SELINUX_ENFORCING,
-                        isSecure = true,
-                        permissionDenied = false,
-                        details = "Context: $context",
-                    )
-
-                    else -> SelinuxCheckResult(
-                        method = METHOD_PROC_ATTR,
-                        status = "Unknown context",
-                        isSecure = null,
-                        permissionDenied = false,
-                        details = "Raw: $context",
-                    )
-                }
-            }
+            classifyProcAttrContext(procAttrFile.readText())
         } else {
             SelinuxCheckResult(
                 method = METHOD_PROC_ATTR,
                 status = "Not readable",
                 isSecure = null,
-                permissionDenied = !procAttrFile.exists(),
+                permissionDenied = procAttrFile.exists(),
                 details = if (procAttrFile.exists()) "Access denied" else "File not found",
             )
         }
@@ -317,6 +296,50 @@ internal fun checkViaProcAttr(): SelinuxCheckResult {
             isSecure = null,
             permissionDenied = false,
             details = throwable.message ?: "proc attr check failed",
+        )
+    }
+}
+
+/**
+ * The domain this process runs in. The kernel reports a task's context whether or not the policy
+ * is enforced (selinux_getprocattr in security/selinux/hooks.c), so a labelled context shows that
+ * SELinux is enabled, never whether it enforces.
+ */
+internal fun classifyProcAttrContext(raw: String): SelinuxCheckResult {
+    val context = raw.trim().replace("\u0000", "")
+    val type = context.split(":").getOrNull(2)
+    return when {
+        context.isBlank() -> SelinuxCheckResult(
+            method = METHOD_PROC_ATTR,
+            status = "Empty",
+            isSecure = null,
+            permissionDenied = false,
+            details = "Context file empty",
+        )
+
+        type == null -> SelinuxCheckResult(
+            method = METHOD_PROC_ATTR,
+            status = "Unknown context",
+            isSecure = null,
+            permissionDenied = false,
+            details = "Raw: $context",
+        )
+
+        // Zygote moves every app process into its seapp_contexts domain before app code runs.
+        type == "kernel" || type == "init" -> SelinuxCheckResult(
+            method = METHOD_PROC_ATTR,
+            status = "Unexpected context",
+            isSecure = false,
+            permissionDenied = false,
+            details = "Context: $context. An app process never keeps the $type domain.",
+        )
+
+        else -> SelinuxCheckResult(
+            method = METHOD_PROC_ATTR,
+            status = PROC_ATTR_LABELED,
+            isSecure = null,
+            permissionDenied = false,
+            details = "Context: $context. A labelled context shows SELinux is enabled, not whether it enforces.",
         )
     }
 }
@@ -353,20 +376,15 @@ internal fun determineStatusWithParadoxLogic(
         )
     }
 
-    val hasPermissionDenied = results.any { it.permissionDenied }
-    if (hasPermissionDenied && filesystemActive) {
+    // Only a denied read of the enforce node proves enforcing mode: every UID may read it (S_IRUGO
+    // in security/selinux/selinuxfs.c), and in permissive mode avc_denied() grants instead of
+    // returning -EACCES (security/selinux/avc.c).
+    val enforceReadDenied = results.any { it.permissionDenied && it.method in ENFORCE_NODE_METHODS }
+    if (enforceReadDenied && filesystemActive) {
         return StatusResolution(
             SelinuxMode.ENFORCING,
             "Enforcing (paradox)",
             paradoxDetected = true
-        )
-    }
-
-    if (filesystemActive && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        return StatusResolution(
-            SelinuxMode.ENFORCING,
-            "Enforcing (default)",
-            paradoxDetected = false
         )
     }
 
@@ -393,7 +411,10 @@ internal const val METHOD_FILESYSTEM = "filesystem"
 private const val METHOD_SYSFS = "sysfs"
 private const val METHOD_GETENFORCE = "getenforce"
 private const val METHOD_PROC_ATTR = "proc/self/attr"
+private val ENFORCE_NODE_METHODS = setOf(METHOD_SYSFS, METHOD_GETENFORCE)
+internal const val PROC_ATTR_LABELED = "Labeled"
 internal const val FILESYSTEM_NOT_MOUNTED = "Not mounted"
+internal const val FILESYSTEM_NOT_OBSERVABLE = "Not observable"
 internal const val FILESYSTEM_ACTIVE = "Active"
 internal const val FILESYSTEM_MOUNTED = "Mounted"
 private const val SELINUX_STATUS_PATH = "/sys/fs/selinux/enforce"
