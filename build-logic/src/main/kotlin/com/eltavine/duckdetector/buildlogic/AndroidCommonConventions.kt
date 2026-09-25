@@ -67,9 +67,17 @@ internal fun Project.configureAndroidCommon(extension: CommonExtension) {
     extensions.configure<KotlinAndroidProjectExtension> {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
+            moduleName.set(kotlinModuleName())
         }
     }
 }
+
+/**
+ * A Kotlin module name that is unique in the build. The default is the directory name, which the
+ * layers of every feature share, so their `META-INF/<name>.kotlin_module` files would collide in
+ * the fused SDK AAR and hide the top-level functions of all but one module from its consumers.
+ */
+internal fun Project.kotlinModuleName(): String = "duckdetector" + path.replace(':', '-')
 
 /**
  * One task name that runs the unit tests every module is expected to keep green: debug unit tests

@@ -41,6 +41,7 @@ class DuckDetectorJvmLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<KotlinJvmProjectExtension> {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_17)
+                    moduleName.set(kotlinModuleName())
                 }
             }
             tasks.withType<Test>().configureEach {
