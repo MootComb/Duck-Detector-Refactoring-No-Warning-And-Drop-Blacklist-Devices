@@ -23,7 +23,12 @@ import com.eltavine.duckdetector.features.tee.data.verification.keystore.timingS
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 import java.util.Locale
 
+/** Keeps a deep check that never reached a result apart from one that passed or failed. */
+internal fun notRunValue(probeError: String?): String =
+    probeError?.let { "Did not complete • $it" } ?: "Skipped"
+
 internal fun keyPairValue(artifacts: TeeScanArtifacts): String {
+    if (!artifacts.pairConsistency.executed) return notRunValue(artifacts.pairConsistency.probeError)
     val base = if (artifacts.pairConsistency.keyMatchesCertificate) {
         "Signature matched certificate"
     } else {
@@ -34,6 +39,7 @@ internal fun keyPairValue(artifacts: TeeScanArtifacts): String {
 
 internal fun lifecycleValue(artifacts: TeeScanArtifacts): String {
     return when {
+        !artifacts.lifecycle.executed -> notRunValue(artifacts.lifecycle.probeError)
         artifacts.lifecycle.deleteRemovedAlias && artifacts.lifecycle.regeneratedFreshMaterial -> "Delete ok • fresh material"
         else -> "Delete/regenerate contradiction"
     }
@@ -43,7 +49,7 @@ internal fun aesGcmValue(artifacts: TeeScanArtifacts): String {
     val result = artifacts.aesGcm
     val authorizationFailures = aesGcmAuthorizationFailures(result)
     return when {
-        !result.executed -> result.probeError?.let { "Did not complete • $it" } ?: "Skipped"
+        !result.executed -> notRunValue(result.probeError)
         !result.roundTripSucceeded -> buildString {
             append("Round-trip failed")
             result.keyInfoLevel?.let {
@@ -348,7 +354,9 @@ internal fun importKeyRetainedAttestationNarrativeValue(artifacts: TeeScanArtifa
 }
 
 internal fun oversizedChallengeValue(artifacts: TeeScanArtifacts): String {
-    return if (artifacts.oversizedChallenge.acceptedOversizedChallenge) {
+    return if (!artifacts.oversizedChallenge.executed) {
+        notRunValue(probeError = null)
+    } else if (artifacts.oversizedChallenge.acceptedOversizedChallenge) {
         "Accepted ${artifacts.oversizedChallenge.acceptedSizesLabel()}"
     } else {
         "Rejected ${artifacts.oversizedChallenge.attemptedSizesLabel()}"

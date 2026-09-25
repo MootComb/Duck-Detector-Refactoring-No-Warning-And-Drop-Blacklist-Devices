@@ -71,6 +71,7 @@ class OversizedChallengeProbe {
 }
 
 data class OversizedChallengeResult(
+    val executed: Boolean = true,
     val acceptedOversizedChallenge: Boolean,
     val acceptedSizes: List<Int> = emptyList(),
     val attemptedSizes: List<Int> = OversizedChallengeProbe.CHALLENGE_SIZES,

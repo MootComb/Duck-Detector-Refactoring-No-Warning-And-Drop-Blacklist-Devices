@@ -44,10 +44,8 @@ class UpdateSubcomponentProbe {
             val key = keyStore.getKey(alias, null)
             val chain = keyStore.getCertificateChain(alias)
             if (key == null || chain.isNullOrEmpty()) {
-                return UpdateSubcomponentResult(
-                    updateSucceeded = false,
-                    keyNotFoundStyleFailure = false,
-                    detail = "Generated key but could not read key material back for update probe.",
+                return UpdateSubcomponentResult.notCompleted(
+                    "Generated key but could not read key material back for update probe.",
                 )
             }
             try {
@@ -69,11 +67,7 @@ class UpdateSubcomponentProbe {
                 )
             }
         }.getOrElse { throwable ->
-            UpdateSubcomponentResult(
-                updateSucceeded = false,
-                keyNotFoundStyleFailure = false,
-                detail = throwable.message ?: "Update subcomponent probe failed.",
-            )
+            UpdateSubcomponentResult.notCompleted(throwable.message ?: "Update subcomponent probe did not complete.")
         }.also {
             runCatching { keyStore.deleteEntry(alias) }
         }
@@ -90,7 +84,20 @@ class UpdateSubcomponentProbe {
 }
 
 data class UpdateSubcomponentResult(
+    val executed: Boolean = true,
     val updateSucceeded: Boolean,
     val keyNotFoundStyleFailure: Boolean,
+    val probeError: String? = null,
     val detail: String,
-)
+) {
+    companion object {
+        /** setKeyEntry was never attempted, so there is no update-path behaviour to judge. */
+        fun notCompleted(reason: String) = UpdateSubcomponentResult(
+            executed = false,
+            updateSucceeded = false,
+            keyNotFoundStyleFailure = false,
+            probeError = reason,
+            detail = reason,
+        )
+    }
+}

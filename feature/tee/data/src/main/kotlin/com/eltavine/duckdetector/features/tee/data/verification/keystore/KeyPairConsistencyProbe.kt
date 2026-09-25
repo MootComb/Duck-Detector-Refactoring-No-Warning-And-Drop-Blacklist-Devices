@@ -49,7 +49,7 @@ class KeyPairConsistencyProbe {
             val payload = "duck_pair_probe".encodeToByteArray()
             val signature = AndroidKeyStoreTools.signData(privateKey, payload)
             val verified = verifySignature(certificate, payload, signature)
-            val timings = sampleSigningMicros(privateKey)
+            val timings = runCatching { sampleSigningMicros(privateKey) }.getOrDefault(TimingStats())
             KeyPairConsistencyResult(
                 keyMatchesCertificate = verified,
                 medianSignMicros = timings.medianMicros,
@@ -61,25 +61,29 @@ class KeyPairConsistencyProbe {
                 },
             )
         }.getOrElse { throwable ->
+            val reason = throwable.message ?: "Key pair consistency probe did not complete."
             KeyPairConsistencyResult(
+                executed = false,
                 keyMatchesCertificate = false,
-                detail = throwable.message ?: "Key pair consistency probe failed.",
+                probeError = reason,
+                detail = reason,
             )
         }.also {
             AndroidKeyStoreTools.safeDelete(keyStore, alias)
         }
     }
 
+    /** Local JCA work on what keystore returned, so a key or signature it cannot parse does not verify. */
     private fun verifySignature(
         certificate: X509Certificate,
         payload: ByteArray,
         signatureBytes: ByteArray,
-    ): Boolean {
+    ): Boolean = runCatching {
         val verifier = Signature.getInstance("SHA256withECDSA")
         verifier.initVerify(certificate.publicKey)
         verifier.update(payload)
-        return verifier.verify(signatureBytes)
-    }
+        verifier.verify(signatureBytes)
+    }.getOrDefault(false)
 
     private fun sampleSigningMicros(privateKey: java.security.PrivateKey): TimingStats {
         val samples = buildList {
@@ -108,8 +112,16 @@ class KeyPairConsistencyProbe {
     }
 }
 
+/**
+ * Keystore2 prunes a caller's own sibling operations when KeyMint runs out of operation slots
+ * (system/security keystore2/src/operation.rs), and this probe signs while other keystore probes,
+ * including the one that saturates operation slots, run in parallel. So a keystore exception means
+ * the probe did not complete; only a signature that fails local verification is a mismatch.
+ */
 data class KeyPairConsistencyResult(
+    val executed: Boolean = true,
     val keyMatchesCertificate: Boolean,
+    val probeError: String? = null,
     val medianSignMicros: Int? = null,
     val jitterRatio: Double? = null,
     val detail: String,

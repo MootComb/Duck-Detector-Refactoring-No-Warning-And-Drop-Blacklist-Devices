@@ -64,11 +64,14 @@ class KeyLifecycleProbe {
                 },
             )
         }.getOrElse { throwable ->
+            val reason = throwable.message ?: "Key lifecycle probe did not complete."
             KeyLifecycleResult(
+                executed = false,
                 created = false,
                 deleteRemovedAlias = false,
                 regeneratedFreshMaterial = false,
-                detail = throwable.message ?: "Key lifecycle probe failed.",
+                probeError = reason,
+                detail = reason,
             )
         }.also {
             AndroidKeyStoreTools.safeDelete(keyStore, alias)
@@ -76,9 +79,12 @@ class KeyLifecycleProbe {
     }
 }
 
+/** A keystore exception means the probe did not complete; only an observed alias or serial contradicts. */
 data class KeyLifecycleResult(
+    val executed: Boolean = true,
     val created: Boolean,
     val deleteRemovedAlias: Boolean,
     val regeneratedFreshMaterial: Boolean,
+    val probeError: String? = null,
     val detail: String,
 )

@@ -166,7 +166,9 @@ internal fun grantSelfDomainFullChainSplitValue(artifacts: TeeScanArtifacts): St
 }
 
 internal fun pureCertificateValue(artifacts: TeeScanArtifacts): String {
-    return if (artifacts.pureCertificate.pureCertificateReturnsNullKey) {
+    return if (!artifacts.pureCertificate.executed) {
+        notRunValue(artifacts.pureCertificate.probeError)
+    } else if (artifacts.pureCertificate.pureCertificateReturnsNullKey) {
         "Null key as expected"
     } else {
         "Returned a key object"
@@ -224,6 +226,7 @@ internal fun operationErrorPathValue(artifacts: TeeScanArtifacts): String {
 
 internal fun updateSubcomponentValue(artifacts: TeeScanArtifacts): String {
     val base = when {
+        !artifacts.updateSubcomponent.executed -> notRunValue(artifacts.updateSubcomponent.probeError)
         artifacts.updateSubcomponent.keyNotFoundStyleFailure -> "Key-not-found style failure"
         artifacts.updateSubcomponent.updateSucceeded -> "No anomaly"
         else -> "Unexpected failure"
@@ -263,6 +266,7 @@ internal fun grantUpdateSubcomponentFailed(artifacts: TeeScanArtifacts): Boolean
 internal fun updateSubcomponentLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
     artifacts.updateSubcomponent.keyNotFoundStyleFailure || grantUpdateSubcomponentFailed(artifacts) ->
         TeeSignalLevel.FAIL
+    !artifacts.updateSubcomponent.executed || !artifacts.updateSubcomponent.updateSucceeded -> TeeSignalLevel.INFO
     else -> TeeSignalLevel.PASS
 }
 
@@ -319,7 +323,9 @@ internal fun pruningValue(artifacts: TeeScanArtifacts): String {
 }
 
 internal fun dualAlgorithmValue(artifacts: TeeScanArtifacts): String {
-    return if (artifacts.dualAlgorithm.mismatchDetected) {
+    return if (!artifacts.dualAlgorithm.executed) {
+        notRunValue(artifacts.dualAlgorithm.probeError)
+    } else if (artifacts.dualAlgorithm.mismatchDetected) {
         "RSA/EC chain difference observed"
     } else {
         "RSA/EC chains aligned"

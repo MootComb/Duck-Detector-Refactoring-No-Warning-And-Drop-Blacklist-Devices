@@ -63,7 +63,8 @@ internal data class DeferredChecks(
             timingSideChannel: com.eltavine.duckdetector.features.tee.data.verification.keystore.TimingSideChannelResult,
         ) = DeferredChecks(
             pairConsistency = com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyPairConsistencyResult(
-                keyMatchesCertificate = true,
+                executed = false,
+                keyMatchesCertificate = false,
                 detail = "Deep checks were skipped because hardware-backed attestation was not established.",
             ),
             aesGcm = com.eltavine.duckdetector.features.tee.data.verification.keystore.AesGcmRoundTripResult(
@@ -71,9 +72,10 @@ internal data class DeferredChecks(
                 detail = "AES-GCM round-trip probe skipped.",
             ),
             lifecycle = com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyLifecycleResult(
+                executed = false,
                 created = false,
-                deleteRemovedAlias = true,
-                regeneratedFreshMaterial = true,
+                deleteRemovedAlias = false,
+                regeneratedFreshMaterial = false,
                 detail = "Lifecycle probe skipped.",
             ),
             keyMintCapability = com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyMintCapabilityResult(
@@ -86,6 +88,7 @@ internal data class DeferredChecks(
             timingSideChannel = timingSideChannel,
 
             oversizedChallenge = com.eltavine.duckdetector.features.tee.data.verification.keystore.OversizedChallengeResult(
+                executed = false,
                 acceptedOversizedChallenge = false,
                 acceptedSizes = emptyList(),
                 attemptedSizes = com.eltavine.duckdetector.features.tee.data.verification.keystore.OversizedChallengeProbe.CHALLENGE_SIZES,
@@ -143,7 +146,8 @@ internal data class DeferredChecks(
                 detail = "KeyMetadata shape probe skipped.",
             ),
             pureCertificate = com.eltavine.duckdetector.features.tee.data.verification.keystore.PureCertificateResult(
-                pureCertificateReturnsNullKey = true,
+                executed = false,
+                pureCertificateReturnsNullKey = false,
                 detail = "Pure certificate probe skipped.",
             ),
             pureCertificateSecurityLevel = com.eltavine.duckdetector.features.tee.data.verification.keystore.PureCertificateSecurityLevelResult(
@@ -171,7 +175,8 @@ internal data class DeferredChecks(
                 detail = "Binder chain consistency probe skipped.",
             ),
             updateSubcomponent = com.eltavine.duckdetector.features.tee.data.verification.keystore.UpdateSubcomponentResult(
-                updateSucceeded = true,
+                executed = false,
+                updateSucceeded = false,
                 keyNotFoundStyleFailure = false,
                 detail = "Update subcomponent probe skipped.",
             ),
@@ -186,6 +191,7 @@ internal data class DeferredChecks(
                 detail = "Pruning probe skipped.",
             ),
             dualAlgorithm = com.eltavine.duckdetector.features.tee.data.verification.certificate.DualAlgorithmChainResult(
+                executed = false,
                 mismatchDetected = false,
                 detail = "Dual algorithm comparison skipped.",
             ),

@@ -28,9 +28,12 @@ class DualAlgorithmChainProbe(
         ecChain: List<X509Certificate>,
     ): DualAlgorithmChainResult {
         if (rsaChain.isEmpty() || ecChain.isEmpty()) {
+            val reason = "Dual-algorithm comparison could not collect both RSA and EC attestation chains."
             return DualAlgorithmChainResult(
+                executed = false,
                 mismatchDetected = false,
-                detail = "Dual-algorithm comparison could not collect both RSA and EC attestation chains.",
+                probeError = reason,
+                detail = reason,
             )
         }
         val rsaTrust = trustAnalyzer.inspect(rsaChain)
@@ -59,7 +62,9 @@ class DualAlgorithmChainProbe(
 }
 
 data class DualAlgorithmChainResult(
+    val executed: Boolean = true,
     val mismatchDetected: Boolean,
+    val probeError: String? = null,
     val detail: String,
     val trustRootMismatch: Boolean = false,
     val issuerMismatch: Boolean = false,

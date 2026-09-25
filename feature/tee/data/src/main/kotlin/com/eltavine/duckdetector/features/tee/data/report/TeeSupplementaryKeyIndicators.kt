@@ -20,7 +20,7 @@ import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 
 internal fun MutableList<TeeEvidenceItem>.addKeyMaterialAndBinderIndicators(artifacts: TeeScanArtifacts) {
-    if (!artifacts.pairConsistency.keyMatchesCertificate) {
+    if (artifacts.pairConsistency.executed && !artifacts.pairConsistency.keyMatchesCertificate) {
         add(
             fact(
                 "Key pair",
@@ -67,7 +67,9 @@ internal fun MutableList<TeeEvidenceItem>.addKeyMaterialAndBinderIndicators(arti
             )
         )
     }
-    if (!artifacts.lifecycle.deleteRemovedAlias || !artifacts.lifecycle.regeneratedFreshMaterial) {
+    if (artifacts.lifecycle.executed &&
+        (!artifacts.lifecycle.deleteRemovedAlias || !artifacts.lifecycle.regeneratedFreshMaterial)
+    ) {
         add(
             fact(
                 "Lifecycle",
@@ -76,7 +78,7 @@ internal fun MutableList<TeeEvidenceItem>.addKeyMaterialAndBinderIndicators(arti
             )
         )
     }
-    if (!artifacts.pureCertificate.pureCertificateReturnsNullKey) {
+    if (artifacts.pureCertificate.executed && !artifacts.pureCertificate.pureCertificateReturnsNullKey) {
         add(
             fact(
                 "Pure certificate",

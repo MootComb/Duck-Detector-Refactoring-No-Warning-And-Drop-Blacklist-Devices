@@ -142,7 +142,7 @@ internal fun buildSections(
                     fact(
                         "Key pair",
                         keyPairValue(artifacts),
-                        if (artifacts.pairConsistency.keyMatchesCertificate) TeeSignalLevel.PASS else TeeSignalLevel.FAIL
+                        keyPairLevel(artifacts),
                     )
                 )
                 add(
@@ -315,7 +315,7 @@ internal fun buildSections(
                     fact(
                         "Pure cert",
                         pureCertificateValue(artifacts),
-                        if (artifacts.pureCertificate.pureCertificateReturnsNullKey) TeeSignalLevel.PASS else TeeSignalLevel.FAIL
+                        pureCertificateLevel(artifacts),
                     )
                 )
                 add(

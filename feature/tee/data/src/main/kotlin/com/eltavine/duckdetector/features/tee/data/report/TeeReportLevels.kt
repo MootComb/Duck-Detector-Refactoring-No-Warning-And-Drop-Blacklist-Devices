@@ -319,7 +319,20 @@ private fun patchLevel(patchState: TeePatchState): TeeSignalLevel = when (patchS
     TeePatchGrade.UNKNOWN -> TeeSignalLevel.INFO
 }
 
+internal fun keyPairLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
+    !artifacts.pairConsistency.executed -> TeeSignalLevel.INFO
+    artifacts.pairConsistency.keyMatchesCertificate -> TeeSignalLevel.PASS
+    else -> TeeSignalLevel.FAIL
+}
+
+internal fun pureCertificateLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
+    !artifacts.pureCertificate.executed -> TeeSignalLevel.INFO
+    artifacts.pureCertificate.pureCertificateReturnsNullKey -> TeeSignalLevel.PASS
+    else -> TeeSignalLevel.FAIL
+}
+
 internal fun lifecycleLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
+    !artifacts.lifecycle.executed -> TeeSignalLevel.INFO
     artifacts.lifecycle.deleteRemovedAlias && artifacts.lifecycle.regeneratedFreshMaterial -> TeeSignalLevel.PASS
     else -> TeeSignalLevel.FAIL
 }
@@ -331,6 +344,7 @@ internal fun keyboxLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
 }
 
 internal fun oversizedChallengeLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
+    !artifacts.oversizedChallenge.executed -> TeeSignalLevel.INFO
     artifacts.oversizedChallenge.acceptedOversizedChallenge -> TeeSignalLevel.WARN
     else -> TeeSignalLevel.PASS
 }

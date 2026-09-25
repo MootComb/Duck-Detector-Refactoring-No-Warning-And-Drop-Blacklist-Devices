@@ -42,9 +42,8 @@ class PureCertificateProbe {
             )
             generator.generateKeyPair()
             val certificate = keyStore.getCertificate(tempAlias)
-                ?: return PureCertificateResult(
-                    pureCertificateReturnsNullKey = false,
-                    detail = "Failed to create temporary certificate for pure certificate probe.",
+                ?: return PureCertificateResult.notCompleted(
+                    "Failed to create temporary certificate for pure certificate probe.",
                 )
             keyStore.deleteEntry(tempAlias)
             keyStore.setCertificateEntry(certAlias, certificate)
@@ -58,10 +57,7 @@ class PureCertificateProbe {
                 },
             )
         }.getOrElse { throwable ->
-            PureCertificateResult(
-                pureCertificateReturnsNullKey = false,
-                detail = throwable.message ?: "Pure certificate probe failed.",
-            )
+            PureCertificateResult.notCompleted(throwable.message ?: "Pure certificate probe did not complete.")
         }.also {
             runCatching { keyStore.deleteEntry(tempAlias) }
             runCatching { keyStore.deleteEntry(certAlias) }
@@ -70,6 +66,18 @@ class PureCertificateProbe {
 }
 
 data class PureCertificateResult(
+    val executed: Boolean = true,
     val pureCertificateReturnsNullKey: Boolean,
+    val probeError: String? = null,
     val detail: String,
-)
+) {
+    companion object {
+        /** The certificate-only entry was never read back, so getKey() said nothing either way. */
+        fun notCompleted(reason: String) = PureCertificateResult(
+            executed = false,
+            pureCertificateReturnsNullKey = false,
+            probeError = reason,
+            detail = reason,
+        )
+    }
+}
