@@ -59,7 +59,8 @@ PATTERNS = {
         (r"\bkotlin\.reflect\.|\.(?:memberProperties|declaredMemberProperties|memberFunctions)\b",
          "kotlin.reflect"),
         (r"\bHiddenApiBypass\b", "HiddenApiBypass"),
-        (r"\.(?:parameterTypes|genericParameterTypes|declaringClass)\b", "reflective metadata"),
+        (r"\.(?:parameterTypes|genericParameterTypes|genericInterfaces|genericSuperclass|actualTypeArguments|"
+         r"declaringClass)\b", "reflective metadata"),
     ],
     "class_identity": [
         (CLASS_RECEIVER + r"\s*\??\.\s*(?:simpleName|name|canonicalName|typeName)\b", "runtime class name"),

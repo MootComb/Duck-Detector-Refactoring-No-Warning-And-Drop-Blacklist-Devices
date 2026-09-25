@@ -112,6 +112,10 @@ class ReflectionBoundaryCheckerTest(unittest.TestCase):
         ]))
         self.assert_accepted()
 
+    def test_generic_type_metadata_is_operations(self) -> None:
+        self.write(SOURCE, "fun model(detector: Any) = detector.javaClass.genericInterfaces.first()\n")
+        self.assert_rejected(f"{SOURCE}:1: reflective metadata is operations reflection")
+
     def test_other_java_lang_reflect_types_are_operations(self) -> None:
         self.write(SOURCE, "import java.lang.reflect.Proxy\n")
         self.assert_rejected("java.lang.reflect is operations reflection")

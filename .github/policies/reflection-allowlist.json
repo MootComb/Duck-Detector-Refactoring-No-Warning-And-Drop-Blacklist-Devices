@@ -5,6 +5,8 @@
     "core",
     "capability",
     "feature",
+    "sdk",
+    "samples",
     "build-logic"
   ],
   "allowed": [
