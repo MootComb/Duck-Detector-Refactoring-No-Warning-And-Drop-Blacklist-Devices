@@ -211,13 +211,14 @@ internal fun keyMetadataShapeValue(artifacts: TeeScanArtifacts): String {
 
 internal fun operationErrorPathValue(artifacts: TeeScanArtifacts): String {
     val result = artifacts.operationErrorPath
+    if (!result.executed && result.probeError != null) return notRunValue(result.probeError)
     val status = when {
         !result.executed -> "Skipped"
-        !result.createOperationSucceeded -> "createOperation failed"
-        !result.updateAadServiceSpecific -> "updateAad mismatch"
-        !result.oversizedUpdateRejected -> "Oversized update accepted"
-        !result.abortInvalidatedHandle -> "Abort left operation alive"
+        result.oversizedUpdateRejected == false -> "Oversized update accepted"
+        result.abortInvalidatedHandle == false -> "Abort left operation alive"
+        result.updateAadUnexpectedlyAccepted -> "updateAad accepted on a signing operation"
         result.fallbackCompatParamsUsed -> "Compatibility params required"
+        result.subChecksIncomplete -> "Partially evaluated"
         else -> "Native-style errors"
     }
     val detail = result.detail.takeIf { it.isNotBlank() } ?: return status

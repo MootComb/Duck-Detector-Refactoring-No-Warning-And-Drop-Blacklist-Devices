@@ -98,17 +98,21 @@ internal fun MutableList<TeeEvidenceItem>.addKeyMaterialAndBinderIndicators(arti
             )
         )
     }
-    if (artifacts.operationErrorPath.executed &&
-        (!artifacts.operationErrorPath.createOperationSucceeded ||
-            !artifacts.operationErrorPath.updateAadServiceSpecific ||
-            !artifacts.operationErrorPath.oversizedUpdateRejected ||
-            !artifacts.operationErrorPath.abortInvalidatedHandle)
-    ) {
+    val operationErrorPath = artifacts.operationErrorPath
+    if (operationErrorPath.executed && operationErrorPath.keystore2SemanticsDiverged) {
         add(
             fact(
                 "Operation path",
-                "Keystore2 operation error handling diverged from native-style semantics.",
+                "Keystore2 operation error handling diverged from checks keystore2 itself enforces.",
                 TeeSignalLevel.FAIL
+            )
+        )
+    } else if (operationErrorPath.executed && operationErrorPath.updateAadUnexpectedlyAccepted) {
+        add(
+            fact(
+                "Operation path",
+                "updateAad was accepted on a signing operation. AOSP's reference KeyMint rejects it, but the HAL does not require an error, so this can be vendor behaviour.",
+                TeeSignalLevel.WARN
             )
         )
     }

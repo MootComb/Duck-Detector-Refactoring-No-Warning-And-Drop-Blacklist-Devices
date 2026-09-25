@@ -183,12 +183,9 @@ internal fun operationErrorPathLevel(artifacts: TeeScanArtifacts): TeeSignalLeve
     val result = artifacts.operationErrorPath
     return when {
         !result.executed -> TeeSignalLevel.INFO
-        !result.createOperationSucceeded ||
-            !result.updateAadServiceSpecific ||
-            !result.oversizedUpdateRejected ||
-            !result.abortInvalidatedHandle -> TeeSignalLevel.FAIL
-        result.fallbackCompatParamsUsed -> TeeSignalLevel.WARN
-
+        result.keystore2SemanticsDiverged -> TeeSignalLevel.FAIL
+        result.updateAadUnexpectedlyAccepted || result.fallbackCompatParamsUsed -> TeeSignalLevel.WARN
+        result.subChecksIncomplete -> TeeSignalLevel.INFO
         else -> TeeSignalLevel.PASS
     }
 }

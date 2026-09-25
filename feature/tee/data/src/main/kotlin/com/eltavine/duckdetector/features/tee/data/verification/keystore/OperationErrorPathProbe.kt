@@ -18,7 +18,6 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
-import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 
 class OperationErrorPathProbe(
     private val binderClient: Keystore2PrivateBinderClient = Keystore2PrivateBinderClient(),
@@ -41,14 +40,10 @@ class OperationErrorPathProbe(
                 useStrongBox = false,
             )
             val service = binderClient.getKeystoreService()
-                ?: return OperationErrorPathResult(
-                    executed = false,
-                    detail = "Keystore2 service interface was unavailable.",
-                )
+                ?: return OperationErrorPathResult.notCompleted("Keystore2 service interface was unavailable.")
             val response = binderClient.getKeyEntryResponse(service, binderClient.createKeyDescriptor(alias))
-                ?: return OperationErrorPathResult(
-                    executed = true,
-                    detail = "Keystore2 getKeyEntry() returned null for the probe alias.",
+                ?: return OperationErrorPathResult.notCompleted(
+                    "Keystore2 getKeyEntry() returned null for the probe alias.",
                 )
             val returnedDescriptor = binderClient.getReturnedDescriptor(response)
             val descriptor = when {
@@ -56,9 +51,8 @@ class OperationErrorPathProbe(
                 binderClient.getDescriptorDomain(returnedDescriptor) == binderClient.getDomainKeyId() -> returnedDescriptor
                 else -> {
                     val namespace = binderClient.getDescriptorNamespace(returnedDescriptor)
-                        ?: return OperationErrorPathResult(
-                            executed = true,
-                            detail = "Keystore2 returned a non-KEY_ID descriptor without namespace information.",
+                        ?: return OperationErrorPathResult.notCompleted(
+                            "Keystore2 returned a non-KEY_ID descriptor without namespace information.",
                         )
                     binderClient.createKeyIdDescriptor(namespace, alias)
                 }
@@ -68,10 +62,7 @@ class OperationErrorPathProbe(
                     service,
                     Keystore2PrivateBinderClient.SECURITY_LEVEL_TRUSTED_ENVIRONMENT,
                 )
-                ?: return OperationErrorPathResult(
-                    executed = true,
-                    detail = "IKeystoreSecurityLevel binder was unavailable.",
-                )
+                ?: return OperationErrorPathResult.notCompleted("IKeystoreSecurityLevel binder was unavailable.")
 
             val minimalParams = binderClient.createSigningOperationParameters()
             val minimalOperation = createOperation(securityLevel, descriptor, minimalParams)
@@ -81,87 +72,87 @@ class OperationErrorPathProbe(
                 val compatParams = binderClient.createSigningOperationParametersWithAlgorithm()
                 val compatOperation = createOperation(securityLevel, descriptor, compatParams)
                 if (!compatOperation.succeeded) {
-                    return OperationErrorPathResult(
-                        executed = true,
-                        detail = compatOperation.detail ?: "createOperation failed for both minimal and compatibility params.",
+                    return OperationErrorPathResult.notCompleted(
+                        compatOperation.detail ?: "createOperation failed for both minimal and compatibility params.",
                     )
                 }
                 compatParams
             }
 
-            val updateAadServiceSpecific = probeUpdateAad(securityLevel, descriptor, activeParams)
+            val updateAadRejected = probeUpdateAad(securityLevel, descriptor, activeParams)
             val oversizedUpdateRejected = probeOversizedUpdate(securityLevel, descriptor, activeParams)
             val abortInvalidatedHandle = probeAbortInvalidatesHandle(securityLevel, descriptor, activeParams)
 
             OperationErrorPathResult(
                 executed = true,
                 createOperationSucceeded = true,
-                updateAadServiceSpecific = updateAadServiceSpecific,
+                updateAadRejected = updateAadRejected,
+                updateAadAcceptanceExpected = updateAadAcceptanceExpected(KeyMintVendorIdentity.current()),
                 oversizedUpdateRejected = oversizedUpdateRejected,
                 abortInvalidatedHandle = abortInvalidatedHandle,
                 fallbackCompatParamsUsed = !minimalOperation.succeeded,
-                detail = "updateAadServiceSpecific=$updateAadServiceSpecific, oversizedUpdateRejected=$oversizedUpdateRejected, abortInvalidatedHandle=$abortInvalidatedHandle, compatFallback=${!minimalOperation.succeeded}",
+                detail = "updateAadRejected=$updateAadRejected, oversizedUpdateRejected=$oversizedUpdateRejected, abortInvalidatedHandle=$abortInvalidatedHandle, compatFallback=${!minimalOperation.succeeded}",
             )
         }.getOrElse { throwable ->
-            OperationErrorPathResult(
-                executed = true,
-                detail = throwable.message ?: "Operation error-path probe failed.",
-            )
+            OperationErrorPathResult.notCompleted(throwable.message ?: "Operation error-path probe did not complete.")
         }.also {
             AndroidKeyStoreTools.safeDelete(keyStore, alias)
         }
     }
 
+    /** True when rejected, false when accepted, null when the call failed outside keystore2's error path. */
     private fun probeUpdateAad(
         securityLevel: Any,
         descriptor: Any,
         parameters: List<Any>,
-    ): Boolean {
+    ): Boolean? {
         val created = createOperation(securityLevel, descriptor, parameters)
-        val operation = created.operation ?: return false
+        val operation = created.operation ?: return null
         return try {
             binderClient.updateAadOperation(operation, "aad".encodeToByteArray())
-            isUpdateAadSuccessExpected()
+            false
         } catch (throwable: Throwable) {
-            binderClient.isServiceSpecificException(throwable)
+            if (binderClient.isServiceSpecificException(throwable)) true else null
         } finally {
             runCatching { binderClient.abortOperation(operation) }
         }
     }
 
+    /** keystore2 rejects more than 0x8000 bytes itself (MAX_RECEIVE_DATA), before any vendor code runs. */
     private fun probeOversizedUpdate(
         securityLevel: Any,
         descriptor: Any,
         parameters: List<Any>,
-    ): Boolean {
+    ): Boolean? {
         val created = createOperation(securityLevel, descriptor, parameters)
-        val operation = created.operation ?: return false
+        val operation = created.operation ?: return null
         return try {
             binderClient.updateOperation(operation, ByteArray(LARGE_INPUT_SIZE))
             false
         } catch (throwable: Throwable) {
-            binderClient.isServiceSpecificException(throwable)
+            if (binderClient.isServiceSpecificException(throwable)) true else null
         } finally {
             runCatching { binderClient.abortOperation(operation) }
         }
     }
 
+    /** keystore2 answers every call on a finalized operation with INVALID_OPERATION_HANDLE (check_active). */
     private fun probeAbortInvalidatesHandle(
         securityLevel: Any,
         descriptor: Any,
         parameters: List<Any>,
-    ): Boolean {
+    ): Boolean? {
         val created = createOperation(securityLevel, descriptor, parameters)
-        val operation = created.operation ?: return false
+        val operation = created.operation ?: return null
         return try {
             binderClient.abortOperation(operation)
             binderClient.updateOperation(operation, "after_abort".encodeToByteArray())
             false
         } catch (throwable: Throwable) {
+            if (!binderClient.isServiceSpecificException(throwable)) return null
             val expectedInvalidHandle =
                 binderClient.getKeyMintErrorCodeValue("INVALID_OPERATION_HANDLE") ?: INVALID_OPERATION_HANDLE_FALLBACK
-            binderClient.isServiceSpecificException(throwable) &&
-                binderClient.extractServiceSpecificErrorCode(throwable) == expectedInvalidHandle
+            binderClient.extractServiceSpecificErrorCode(throwable) == expectedInvalidHandle
         }
     }
 
@@ -193,39 +184,37 @@ class OperationErrorPathProbe(
     companion object {
         private const val LARGE_INPUT_SIZE = 0x8001
         private const val INVALID_OPERATION_HANDLE_FALLBACK = -28
-
-        private val UPDATE_AAD_ALLOWS_SUCCESS = setOf("samsung")
-        private val XIAOMI_BRANDS = setOf("xiaomi", "redmi", "poco")
-
-        private fun isUpdateAadSuccessExpected(): Boolean {
-            val manufacturer = Build.MANUFACTURER.lowercase()
-            val brand = Build.BRAND.lowercase()
-
-            if (manufacturer in UPDATE_AAD_ALLOWS_SUCCESS || brand in UPDATE_AAD_ALLOWS_SUCCESS) return true
-
-            if (manufacturer != "xiaomi" && brand !in XIAOMI_BRANDS) return false
-
-            return isMediaTekDevice()
-        }
-
-        private fun isMediaTekDevice(): Boolean {
-            val roHardware = readSystemProperty("ro.hardware")
-            if (!roHardware.isNullOrBlank() && roHardware.startsWith("mt")) return true
-            return Build.HARDWARE.startsWith("mt", ignoreCase = true)
-        }
-
-        private fun readSystemProperty(key: String): String? {
-            return HiddenSystemProperties.read(key, "").getOrNull()?.takeIf { it.isNotBlank() }
-        }
     }
 }
 
+/** Each sub-check is null when its operation could not be created or failed outside keystore2's errors. */
 data class OperationErrorPathResult(
     val executed: Boolean,
     val createOperationSucceeded: Boolean = false,
-    val updateAadServiceSpecific: Boolean = false,
-    val oversizedUpdateRejected: Boolean = false,
-    val abortInvalidatedHandle: Boolean = false,
+    val updateAadRejected: Boolean? = null,
+    val updateAadAcceptanceExpected: Boolean = false,
+    val oversizedUpdateRejected: Boolean? = null,
+    val abortInvalidatedHandle: Boolean? = null,
     val fallbackCompatParamsUsed: Boolean = false,
+    val probeError: String? = null,
     val detail: String,
-)
+) {
+    /** Both checks are enforced by keystore2 itself, so they hold whatever KeyMint the device ships. */
+    val keystore2SemanticsDiverged: Boolean
+        get() = oversizedUpdateRejected == false || abortInvalidatedHandle == false
+
+    /** The KeyMint HAL permits accepting updateAad here, so this is a difference, not a violation. */
+    val updateAadUnexpectedlyAccepted: Boolean
+        get() = updateAadRejected == false && !updateAadAcceptanceExpected
+
+    val subChecksIncomplete: Boolean
+        get() = updateAadRejected == null || oversizedUpdateRejected == null || abortInvalidatedHandle == null
+
+    companion object {
+        fun notCompleted(reason: String) = OperationErrorPathResult(
+            executed = false,
+            probeError = reason,
+            detail = reason,
+        )
+    }
+}
