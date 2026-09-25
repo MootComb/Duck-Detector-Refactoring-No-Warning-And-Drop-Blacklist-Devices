@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation(project(":core:evidence"))
     implementation(project(":core:native"))
+    implementation(project(":core:scan"))
     implementation(project(":core:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)

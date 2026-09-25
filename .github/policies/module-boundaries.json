@@ -65,6 +65,7 @@
       "allowed_project_dependencies": [
         ":core:evidence",
         ":core:native",
+        ":core:scan",
         ":core:ui"
       ]
     },
@@ -73,6 +74,10 @@
       "allowed_project_dependencies": []
     },
     ":core:native": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":core:scan": {
       "kind": "jvm",
       "allowed_project_dependencies": []
     },
