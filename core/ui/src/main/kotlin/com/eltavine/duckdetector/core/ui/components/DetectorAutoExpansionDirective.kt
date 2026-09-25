@@ -18,15 +18,20 @@ package com.eltavine.duckdetector.core.ui.components
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
+import com.eltavine.duckdetector.core.evidence.DetectorId
 
 public data class DetectorAutoExpansionDirective(
-    val titles: Set<String> = emptySet(),
-    val onConsumed: (String) -> Unit = {},
+    val detectorIds: Set<DetectorId> = emptySet(),
+    val onConsumed: (DetectorId) -> Unit = {},
 ) {
-    public fun shouldExpand(title: String): Boolean {
-        return title in titles
+    public fun shouldExpand(detectorId: DetectorId?): Boolean {
+        return detectorId != null && detectorId in detectorIds
     }
 }
+
+/** Identity of the detector whose card is being composed; the dashboard provides it around each card. */
+public val LocalDetectorIdentity: ProvidableCompositionLocal<DetectorId?> =
+    compositionLocalOf { null }
 
 public val LocalDetectorAutoExpansionDirective: ProvidableCompositionLocal<DetectorAutoExpansionDirective> =
     compositionLocalOf { DetectorAutoExpansionDirective() }

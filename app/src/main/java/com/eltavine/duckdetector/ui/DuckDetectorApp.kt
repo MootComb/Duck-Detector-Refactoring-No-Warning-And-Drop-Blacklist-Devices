@@ -50,6 +50,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
+import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.notifications.ScanNotificationPermissions
 import com.eltavine.duckdetector.core.notifications.ScanProgressNotificationSnapshot
 import com.eltavine.duckdetector.core.notifications.ScanProgressNotifier
@@ -101,7 +102,7 @@ import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeEffect
-import com.eltavine.duckdetector.ui.shell.attentionDetectorTitles
+import com.eltavine.duckdetector.ui.shell.attentionDetectorIds
 import com.eltavine.duckdetector.ui.shell.FloatingAppTabSwitcher
 import com.eltavine.duckdetector.ui.shell.StartupGateState
 import com.eltavine.duckdetector.ui.shell.StartupPackageVisibilityState
@@ -490,17 +491,17 @@ private fun AppReadyShell(
         }
     }
     var dismissedDetectorResultNoticeKey by rememberSaveable { mutableStateOf<String?>(null) }
-    val detectorTitlesNeedingAttention = remember(detectorSummaries) {
-        attentionDetectorTitles(detectorSummaries)
+    val detectorsNeedingAttention = remember(detectorSummaries) {
+        attentionDetectorIds(detectorSummaries)
     }
-    var pendingAttentionExpansionTitles by rememberSaveable { mutableStateOf(emptyList<String>()) }
+    var pendingAttentionExpansionIds by rememberSaveable { mutableStateOf(emptyList<String>()) }
 
-    LaunchedEffect(detectorResultNoticeKey, detectorTitlesNeedingAttention) {
+    LaunchedEffect(detectorResultNoticeKey, detectorsNeedingAttention) {
         if (detectorResultNoticeKey == null) {
             dismissedDetectorResultNoticeKey = null
-            pendingAttentionExpansionTitles = emptyList()
+            pendingAttentionExpansionIds = emptyList()
         } else {
-            pendingAttentionExpansionTitles = detectorTitlesNeedingAttention.toList()
+            pendingAttentionExpansionIds = detectorsNeedingAttention.map { it.value }
         }
     }
 
@@ -530,10 +531,10 @@ private fun AppReadyShell(
             AppDestination.MAIN -> {
                 CompositionLocalProvider(
                     LocalDetectorAutoExpansionDirective provides DetectorAutoExpansionDirective(
-                        titles = pendingAttentionExpansionTitles.toSet(),
-                        onConsumed = { title ->
-                            pendingAttentionExpansionTitles =
-                                pendingAttentionExpansionTitles.filterNot { it == title }
+                        detectorIds = pendingAttentionExpansionIds.mapTo(linkedSetOf(), ::DetectorId),
+                        onConsumed = { detectorId ->
+                            pendingAttentionExpansionIds =
+                                pendingAttentionExpansionIds.filterNot { it == detectorId.value }
                         },
                     ),
                 ) {

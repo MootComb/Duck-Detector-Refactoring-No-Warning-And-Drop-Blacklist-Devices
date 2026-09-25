@@ -38,6 +38,7 @@ import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
+import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import kotlinx.coroutines.delay
 
@@ -56,9 +57,9 @@ internal fun shouldShowDetectorResultNotice(
     }
 }
 
-internal fun attentionDetectorTitles(
+internal fun attentionDetectorIds(
     contributions: List<DetectorSummary>,
-): Set<String> {
+): Set<DetectorId> {
     return contributions
         .filter { contribution ->
             contribution.ready && when (contribution.status.severity) {
@@ -69,7 +70,7 @@ internal fun attentionDetectorTitles(
                 DetectionSeverity.ALL_CLEAR -> false
             }
         }
-        .mapTo(linkedSetOf()) { contribution -> contribution.title }
+        .mapTo(linkedSetOf()) { contribution -> contribution.id }
 }
 
 @Composable

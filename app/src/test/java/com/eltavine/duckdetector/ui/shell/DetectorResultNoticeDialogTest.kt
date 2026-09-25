@@ -69,8 +69,8 @@ class DetectorResultNoticeDialogTest {
     }
 
     @Test
-    fun `returns titles for ready danger and warning detectors only`() {
-        val titles = attentionDetectorTitles(
+    fun `returns ids of ready danger and warning detectors only`() {
+        val ids = attentionDetectorIds(
             listOf(
                 DetectorSummary(
                     id = DetectorId("bootloader"),
@@ -107,6 +107,6 @@ class DetectorResultNoticeDialogTest {
             ),
         )
 
-        assertEquals(linkedSetOf("Bootloader", "TEE"), titles)
+        assertEquals(linkedSetOf(DetectorId("bootloader"), DetectorId("tee")), ids)
     }
 }

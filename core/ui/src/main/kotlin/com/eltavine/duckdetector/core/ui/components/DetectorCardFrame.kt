@@ -81,9 +81,10 @@ public fun DetectorCardFrame(
         if (isExpanded) R.string.card_collapse else R.string.card_expand,
     )
     val autoExpansionDirective = LocalDetectorAutoExpansionDirective.current
+    val detectorId = LocalDetectorIdentity.current
 
-    LaunchedEffect(autoExpansionDirective.titles, title) {
-        if (!autoExpansionDirective.shouldExpand(title)) {
+    LaunchedEffect(autoExpansionDirective.detectorIds, detectorId) {
+        if (detectorId == null || !autoExpansionDirective.shouldExpand(detectorId)) {
             return@LaunchedEffect
         }
         if (expanded == null) {
@@ -91,7 +92,7 @@ public fun DetectorCardFrame(
         } else if (!isExpanded) {
             onExpandedChange?.invoke(true)
         }
-        autoExpansionDirective.onConsumed(title)
+        autoExpansionDirective.onConsumed(detectorId)
     }
 
     Card(
