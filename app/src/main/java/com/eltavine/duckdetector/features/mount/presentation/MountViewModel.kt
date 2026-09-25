@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.mount.data.repository.MountRepository
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountStage
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class MountViewModel(
     private val repository: MountRepository,
@@ -43,35 +43,40 @@ class MountViewModel(
     )
     val uiState: StateFlow<MountUiState> = _uiState.asStateFlow()
 
+    private val scans = ScanSessionRunner(viewModelScope)
+
     init {
         rescan()
     }
 
     fun rescan() {
-        viewModelScope.launch {
-            val loading = MountReport.loading()
-            _uiState.update {
-                it.copy(
-                    stage = MountUiStage.LOADING,
-                    report = loading,
-                    cardModel = mapper.map(loading),
-                )
-            }
-
-            val report = repository.scan()
-            val cardModel = mapper.map(report)
-            _uiState.update {
-                it.copy(
-                    stage = if (report.stage == MountStage.FAILED) {
-                        MountUiStage.FAILED
-                    } else {
-                        MountUiStage.READY
-                    },
-                    report = report,
-                    cardModel = cardModel,
-                )
-            }
-        }
+        scans.launch(
+            begin = {
+                val loading = MountReport.loading()
+                _uiState.update {
+                    it.copy(
+                        stage = MountUiStage.LOADING,
+                        report = loading,
+                        cardModel = mapper.map(loading),
+                    )
+                }
+            },
+            collect = { repository.scan() },
+            publish = { report ->
+                val cardModel = mapper.map(report)
+                _uiState.update {
+                    it.copy(
+                        stage = if (report.stage == MountStage.FAILED) {
+                            MountUiStage.FAILED
+                        } else {
+                            MountUiStage.READY
+                        },
+                        report = report,
+                        cardModel = cardModel,
+                    )
+                }
+            },
+        )
     }
 
     companion object {
