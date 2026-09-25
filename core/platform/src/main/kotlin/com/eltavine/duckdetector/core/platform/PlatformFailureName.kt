@@ -18,12 +18,14 @@ package com.eltavine.duckdetector.core.platform
 
 import android.content.pm.PackageManager
 import android.os.BadParcelableException
+import android.os.Build
 import android.os.DeadObjectException
 import android.os.DeadSystemException
 import android.os.OperationCanceledException
 import android.os.ParcelFormatException
 import android.os.RemoteException
 import android.os.TransactionTooLargeException
+import android.security.keystore.BackendBusyException
 import android.security.keystore.KeyExpiredException
 import android.security.keystore.KeyNotYetValidException
 import android.security.keystore.KeyPermanentlyInvalidatedException
@@ -44,11 +46,22 @@ import com.eltavine.duckdetector.core.evidence.FailureName
  *
  * Hidden platform failures such as `android.os.ServiceSpecificException` are not visible to the
  * compiler, so [HiddenPlatformFailure] recognises them first; an exact identity is more specific
- * than any type check.
+ * than any type check. Keystore failures added after the minimum SDK are checked only on releases
+ * that have them.
  */
 public object PlatformFailureName {
 
-    public fun of(failure: Throwable): String = HiddenPlatformFailure.nameOf(failure) ?: when (failure) {
+    public fun of(failure: Throwable): String =
+        HiddenPlatformFailure.nameOf(failure) ?: newerKeystoreFailureName(failure) ?: publicFailureName(failure)
+
+    private fun newerKeystoreFailureName(failure: Throwable): String? = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            failure is android.security.KeyStoreException -> "KeyStoreException"
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && failure is BackendBusyException -> "BackendBusyException"
+        else -> null
+    }
+
+    private fun publicFailureName(failure: Throwable): String = when (failure) {
         is DeadSystemException -> "DeadSystemException"
         is DeadObjectException -> "DeadObjectException"
         is TransactionTooLargeException -> "TransactionTooLargeException"
