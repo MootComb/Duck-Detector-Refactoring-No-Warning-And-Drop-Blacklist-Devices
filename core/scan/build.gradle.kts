@@ -23,5 +23,6 @@ kotlin {
 }
 
 dependencies {
+    api(project(":core:evidence"))
     api(libs.kotlinx.coroutines.core)
 }

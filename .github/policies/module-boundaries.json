@@ -79,7 +79,9 @@
     },
     ":core:scan": {
       "kind": "jvm",
-      "allowed_project_dependencies": []
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
     },
     ":core:ui": {
       "kind": "android-library",
