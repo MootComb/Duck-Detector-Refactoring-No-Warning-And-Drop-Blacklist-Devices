@@ -22,7 +22,7 @@ The Mount detector asks whether this app's mount view shows systemless root moun
 - Observable signal: mount ID gaps, peer group gaps, minor device gaps, statx mount IDs and mount-root attributes that disagree with mountinfo, and namespace identity versus init.
 - Producing subsystem: the kernel's mount ID allocator, statx and namespace links.
 - Mechanism: unmounting hidden entries leaves gaps and contradictions between independently exposed views.
-- References: kernel/common Documentation/filesystems/proc.rst (mountinfo mount IDs and propagation); statx STATX_MNT_ID and STATX_ATTR_MOUNT_ROOT from upstream Linux (kernel.org man pages).
+- References: kernel/common Documentation/filesystems/proc.rst (mountinfo mount IDs and propagation); kernel/common include/uapi/linux/stat.h (STATX_MNT_ID and STATX_ATTR_MOUNT_ROOT).
 - Applicability: statx needs a kernel that fills the mount ID fields; /proc/1/ns/mnt is readable only where SELinux allows it.
 - Visibility limits: an app shares init's namespace only when zygote isolation failed, so a different namespace is expected.
 - Result states: anomaly, mount root, review, clean, unsupported, unavailable.

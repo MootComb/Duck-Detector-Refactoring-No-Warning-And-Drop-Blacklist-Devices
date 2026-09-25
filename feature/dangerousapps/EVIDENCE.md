@@ -11,7 +11,7 @@ The Dangerous Apps detector asks whether root managers, hooking frameworks and s
 - Observable signal: installed packages from PackageManager, and targets PackageManager omits although other methods find them.
 - Producing subsystem: PackageManager and its package visibility filtering.
 - Mechanism: an installed target appears in PackageManager unless visibility filtering or a hiding module removes it.
-- References: frameworks/base core/java/android/content/pm/PackageManager.java; developer.android.com package visibility guidance; capability/packageinventory/EVIDENCE.md.
+- References: frameworks/base core/java/android/content/pm/PackageManager.java; capability/packageinventory/EVIDENCE.md.
 - Applicability: full visibility needs QUERY_ALL_PACKAGES from the host.
 - Visibility limits: restricted visibility is reported; hidden-from-PackageManager findings are only computed under full visibility.
 - Result states: detected, hidden from PackageManager, restricted, clean.

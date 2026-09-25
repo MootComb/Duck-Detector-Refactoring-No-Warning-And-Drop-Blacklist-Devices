@@ -11,7 +11,7 @@ The Memory detector asks whether this process's own code and mappings show signs
 - Observable signal: where dlsym resolves sensitive libc and linker symbols, and the first bytes at those entry points.
 - Producing subsystem: the dynamic linker and the mapped libc and linker images in this process.
 - Mechanism: a PLT or GOT hook resolves the symbol outside its module; an inline hook replaces the prologue with a branch or a load-and-branch trampoline.
-- References: kernel/common Documentation/filesystems/proc.rst for /proc/self/maps; bionic linker for symbol resolution. Discovery only for the prologue byte patterns, which are the probe's instruction heuristics.
+- References: kernel/common Documentation/filesystems/proc.rst for /proc/self/maps; bionic linker/linker_namespaces.h for the loader's namespaces. Discovery only for the prologue byte patterns, which are the probe's instruction heuristics.
 - Applicability: resolution checks on every ABI; entry byte checks only on arm64 and x86_64.
 - Visibility limits: dlopen(nullptr) can fail; other ABIs report the entry check as unsupported.
 - Result states: mismatch, hook-like, jump entry, clean, unavailable, unsupported ABI.

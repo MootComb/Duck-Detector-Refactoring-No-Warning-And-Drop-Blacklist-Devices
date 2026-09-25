@@ -55,7 +55,7 @@ The Kernel Check detector asks whether the running kernel looks like a custom or
 - Observable signal: MIDR_EL1 values read through the kernel against the CPU the device reports.
 - Producing subsystem: the kernel's exposure of MIDR_EL1 to user space.
 - Mechanism: a pinned MIDR comparison exposes CPU identity rewriting.
-- References: Arm Architecture Reference Manual (MIDR_EL1); kernel/common Documentation for the arm64 CPU feature registers exposure.
+- References: kernel/common Documentation/arch/arm64/cpu-feature-registers.rst (MIDR_EL1 is exposed to user space); the Arm Architecture Reference Manual defines the register but was not consulted here.
 - Applicability: arm64 only; other ABIs report it as unavailable.
 - Visibility limits: kernels without the register exposure cannot be compared.
 - Result states: consistent, mismatch, unavailable.

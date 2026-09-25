@@ -11,7 +11,7 @@ The Native Root detector asks whether kernel-level root solutions (KernelSU and 
 - Observable signal: whether syscall 45 reads its first argument before the truncate body rejects a negative length (superkey residency), and the timing gap between a long and an empty key (pre-84169d5d builds).
 - Producing subsystem: the arm64 kernel syscall table, which KernelPatch patches.
 - Mechanism: a stock kernel rejects the negative length in do_sys_truncate before deriving a user pointer, so an untouched page stays non-resident; KernelPatch's handler reads arg0 first and faults it in.
-- References: kernel/common Documentation/filesystems/proc.rst for the process views used here; the truncate path and mincore semantics are from upstream Linux (kernel.org). Discovery only for KernelPatch's handler order, which follows the probe authors' reading of KernelPatch.
+- References: kernel/common fs/open.c (do_sys_truncate rejects a negative length before any path lookup). Discovery only for KernelPatch's handler order, which follows the probe authors' reading of KernelPatch.
 - Applicability: arm64 processes only; the negative superkey result is trusted only on kernels up to 6.6, where KernelPatch's read faults the page.
 - Visibility limits: seccomp can block syscall 45 in the child; other ABIs use another syscall numbering and report the probes as not run.
 - Result states: detected, clean (arm64, measured), unavailable (other ABI, blocked, unmeasured, unusable run).

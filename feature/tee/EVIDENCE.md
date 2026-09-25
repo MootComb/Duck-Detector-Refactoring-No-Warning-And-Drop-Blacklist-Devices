@@ -11,7 +11,7 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 - Observable signal: the attestation certificate chain of a freshly generated key, its trust root, revocation status, and the RootOfTrust fields in the attestation extension.
 - Producing subsystem: KeyMint in the TEE or StrongBox, reached through keystore2, which also appends the RKP or factory certificates.
 - Mechanism: the attestation extension carries a KeyDescription whose RootOfTrust holds deviceLocked, verifiedBootState and verifiedBootHash; the chain must verify up to a Google or known root and not appear in Google's revocation list.
-- References: hardware/interfaces security/keymint/aidl KeyCreationResult.aidl (KeyDescription and RootOfTrust schema); Android key attestation documentation on source.android.com.
+- References: hardware/interfaces security/keymint/aidl KeyCreationResult.aidl (KeyDescription and RootOfTrust schema).
 - Applicability: KeyMint devices on Android 12 and later, and Keymaster 4 devices behind keystore2's compatibility layer; StrongBox only where advertised.
 - Visibility limits: the chain is whatever keystore2 returns to this app, so a process that intercepts keystore2 can substitute it; revocation is checked online only with the user's consent and otherwise against the bundled list.
 - Result states: consistent, suspicious, tampered, broken (no hardware-backed trust), inconclusive.

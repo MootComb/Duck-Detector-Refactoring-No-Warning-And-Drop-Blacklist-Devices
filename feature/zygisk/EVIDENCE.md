@@ -11,7 +11,7 @@ The Zygisk detector asks whether code injected through zygote (Zygisk, Zygisk Ne
 - Observable signal: whether dlopen, dlsym and dlclose resolve into the loader image, whether their entries branch straight out of it, and whether restricted-path libraries are loaded.
 - Producing subsystem: the dynamic linker and this process's linker namespaces.
 - Mechanism: injection frameworks hook the loader's entry points or load libraries from paths the app's namespace should not reach.
-- References: bionic linker for namespace isolation; kernel/common Documentation/filesystems/proc.rst for /proc/self/maps. Discovery only for the restricted path list.
+- References: bionic linker/linker_namespaces.h (is_accessible and isolated namespaces); kernel/common Documentation/filesystems/proc.rst for /proc/self/maps. Discovery only for the restricted path list.
 - Applicability: the owning-image check on every ABI; the branch decoding on arm64 only.
 - Visibility limits: an unreadable /proc/self/maps leaves the snapshot unavailable.
 - Result states: bypassed, clean, unavailable.
