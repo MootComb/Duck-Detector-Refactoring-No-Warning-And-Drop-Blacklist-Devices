@@ -38,7 +38,8 @@ class SystemPropertiesCardModelMapperTest {
     fun `prop area method and scan rows are rendered`() {
         val report = SystemPropertiesReport(
             stage = SystemPropertiesStage.READY,
-            signals = listOf(
+            propertySignals = emptyList(),
+            propAreaSignals = listOf(
                 SystemPropertySignal(
                     property = "prop_area hole: u:object_r:shell_prop:s0",
                     description = "Raw property area layout residue",
@@ -90,7 +91,8 @@ class SystemPropertiesCardModelMapperTest {
     fun `unavailable prop area keeps ready report at support`() {
         val report = SystemPropertiesReport(
             stage = SystemPropertiesStage.READY,
-            signals = emptyList(),
+            propertySignals = emptyList(),
+            propAreaSignals = emptyList(),
             infoSignals = emptyList(),
             checkedRuleCount = 12,
             observedRuleCount = 1,

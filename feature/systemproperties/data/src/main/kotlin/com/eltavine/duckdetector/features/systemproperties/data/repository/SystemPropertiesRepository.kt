@@ -94,14 +94,14 @@ class SystemPropertiesRepository(
         )
         val propAreaSignals = buildPropAreaSignals(nativeSnapshot)
 
-        val allSignals =
+        val propertySignals =
             ruleSignals +
                     buildSignals +
                     sourceSignals +
-                    consistencySignals +
-                    propAreaSignals
+                    consistencySignals
         if (
-            allSignals.isEmpty() &&
+            propertySignals.isEmpty() &&
+            propAreaSignals.isEmpty() &&
             infoSignals.isEmpty() &&
             !nativeSnapshot.propAreaAvailable
         ) {
@@ -124,7 +124,8 @@ class SystemPropertiesRepository(
 
         return SystemPropertiesReport(
             stage = SystemPropertiesStage.READY,
-            signals = allSignals,
+            propertySignals = propertySignals,
+            propAreaSignals = propAreaSignals,
             infoSignals = infoSignals,
             checkedRuleCount = SystemPropertiesCatalog.rules.size,
             observedRuleCount = observedRuleCount,

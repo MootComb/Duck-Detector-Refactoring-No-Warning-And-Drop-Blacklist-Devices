@@ -43,7 +43,7 @@ internal fun buildImpactItems(report: SystemPropertiesReport): List<SystemProper
         )
 
         SystemPropertiesStage.READY -> buildList {
-            val crossCheckSignals = report.signals.filter(::isCrossCheckSignal)
+            val crossCheckSignals = report.crossCheckSignals
             if (crossCheckSignals.isNotEmpty()) {
                 add(
                     SystemPropertiesImpactItemModel(
@@ -60,7 +60,7 @@ internal fun buildImpactItems(report: SystemPropertiesReport): List<SystemProper
                 add(
                     SystemPropertiesImpactItemModel(
                         text = "Raw /dev/__properties__ hole residue means the property storage layout no longer matches a normal append-only allocation pattern.",
-                        status = if (report.dangerSignals.any(::isPropAreaHoleSignal)) {
+                        status = if (report.hasDangerPropAreaHole) {
                             DetectorStatus.danger()
                         } else {
                             DetectorStatus.warning()
@@ -105,15 +105,8 @@ internal fun buildImpactItems(report: SystemPropertiesReport): List<SystemProper
     }
 }
 
-internal fun isPropAreaHoleSignal(
-    signal: SystemPropertySignal,
-): Boolean {
-    return signal.property.startsWith("prop_area hole:")
-}
+internal val SystemPropertiesReport.crossCheckSignals: List<SystemPropertySignal>
+    get() = propertySignals.filter { it.category == SystemPropertyCategory.PROPERTY_CONSISTENCY }
 
-internal fun isCrossCheckSignal(
-    signal: SystemPropertySignal,
-): Boolean {
-    return signal.category == SystemPropertyCategory.PROPERTY_CONSISTENCY &&
-            !isPropAreaHoleSignal(signal)
-}
+internal val SystemPropertiesReport.hasDangerPropAreaHole: Boolean
+    get() = propAreaSignals.any { it.severity == SystemPropertySeverity.DANGER }

@@ -42,7 +42,10 @@ data class SystemPropertiesMethodResult(
 
 data class SystemPropertiesReport(
     val stage: SystemPropertiesStage,
-    val signals: List<SystemPropertySignal>,
+    /** Signals about individual properties, their sources and how those sources agree. */
+    val propertySignals: List<SystemPropertySignal>,
+    /** One signal per property context whose raw property area has holes. */
+    val propAreaSignals: List<SystemPropertySignal>,
     val infoSignals: List<SystemPropertySignal>,
     val checkedRuleCount: Int,
     val observedRuleCount: Int,
@@ -59,6 +62,9 @@ data class SystemPropertiesReport(
     val methods: List<SystemPropertiesMethodResult>,
     val errorMessage: String? = null,
 ) {
+    val signals: List<SystemPropertySignal>
+        get() = propertySignals + propAreaSignals
+
     val dangerSignals: List<SystemPropertySignal>
         get() = signals.filter { it.severity == SystemPropertySeverity.DANGER }
 
@@ -105,7 +111,8 @@ data class SystemPropertiesReport(
         fun loading(): SystemPropertiesReport {
             return SystemPropertiesReport(
                 stage = SystemPropertiesStage.LOADING,
-                signals = emptyList(),
+                propertySignals = emptyList(),
+                propAreaSignals = emptyList(),
                 infoSignals = emptyList(),
                 checkedRuleCount = 0,
                 observedRuleCount = 0,
@@ -126,7 +133,8 @@ data class SystemPropertiesReport(
         fun failed(message: String): SystemPropertiesReport {
             return SystemPropertiesReport(
                 stage = SystemPropertiesStage.FAILED,
-                signals = emptyList(),
+                propertySignals = emptyList(),
+                propAreaSignals = emptyList(),
                 infoSignals = emptyList(),
                 checkedRuleCount = 0,
                 observedRuleCount = 0,

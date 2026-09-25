@@ -67,7 +67,7 @@ internal fun buildScanRows(report: SystemPropertiesReport): List<SystemPropertie
         )
 
         SystemPropertiesStage.READY -> run {
-            val crossCheckSignals = report.signals.filter(::isCrossCheckSignal)
+            val crossCheckSignals = report.crossCheckSignals
             listOf(
                 SystemPropertiesDetailRowModel(
                     label = "Rules checked",
@@ -125,7 +125,7 @@ internal fun buildScanRows(report: SystemPropertiesReport): List<SystemPropertie
                     label = "Prop area holes",
                     value = report.propAreaHoleCount.toString(),
                     status = when {
-                        report.dangerSignals.any(::isPropAreaHoleSignal) -> DetectorStatus.danger()
+                        report.hasDangerPropAreaHole -> DetectorStatus.danger()
                         report.propAreaHoleCount > 0 -> DetectorStatus.warning()
                         report.propAreaAvailable -> DetectorStatus.allClear()
                         else -> DetectorStatus.info(InfoKind.SUPPORT)
