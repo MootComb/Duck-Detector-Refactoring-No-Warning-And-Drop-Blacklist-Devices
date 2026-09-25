@@ -115,4 +115,21 @@ public data class SelinuxContextValiditySnapshot(
      * the same information in the wording the report shows.
      */
     val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
-)
+) {
+    /**
+     * Whether the native dirty-policy access oracle passed its own checks: it ran in the expected
+     * app_zygote carrier, answered the same way on repeated queries, allowed the control edge that
+     * stock policy allows and denied the one it denies. Only then does an allowed edge describe the
+     * live policy rather than a broken query path.
+     */
+    public val dirtyPolicyTrusted: Boolean
+        get() = dirtyPolicyAvailable && dirtyPolicyProbeAttempted && dirtyPolicyCarrierMatchesExpected &&
+            dirtyPolicyStable && dirtyPolicyControlsPassed &&
+            dirtyPolicyAccessControlAllowed == true && dirtyPolicyNegativeControlRejected == true
+
+    /** [dirtyPolicyTrusted] for the oracle that queries through android.os.SELinux. */
+    public val javaDirtyPolicyTrusted: Boolean
+        get() = javaDirtyPolicyAvailable && javaDirtyPolicyProbeAttempted && javaDirtyPolicyCarrierMatchesExpected &&
+            javaDirtyPolicyStable && javaDirtyPolicyControlsPassed &&
+            javaDirtyPolicyAccessControlAllowed == true && javaDirtyPolicyNegativeControlRejected == true
+}

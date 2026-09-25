@@ -228,6 +228,7 @@ private fun dirtyPolicyTrack(
     return when (source) {
         DirtyPolicyTrackSource.NATIVE -> DirtyPolicyTrack(
             label = "native app_zygote",
+            trusted = snapshot.dirtyPolicyTrusted,
             available = snapshot.dirtyPolicyAvailable,
             probeAttempted = snapshot.dirtyPolicyProbeAttempted,
             carrierContext = snapshot.dirtyPolicyCarrierContext,
@@ -258,6 +259,7 @@ private fun dirtyPolicyTrack(
         )
         DirtyPolicyTrackSource.JAVA -> DirtyPolicyTrack(
             label = "java app_zygote",
+            trusted = snapshot.javaDirtyPolicyTrusted,
             available = snapshot.javaDirtyPolicyAvailable,
             probeAttempted = snapshot.javaDirtyPolicyProbeAttempted,
             carrierContext = snapshot.javaDirtyPolicyCarrierContext,
@@ -296,6 +298,7 @@ private enum class DirtyPolicyTrackSource {
 
 private data class DirtyPolicyTrack(
     val label: String,
+    val trusted: Boolean,
     val available: Boolean,
     val probeAttempted: Boolean,
     val carrierContext: String?,
@@ -326,13 +329,6 @@ private data class DirtyPolicyTrack(
 ) {
     val reportable: Boolean
         get() = available && probeAttempted && carrierMatchesExpected
-
-    val trusted: Boolean
-        get() = reportable &&
-            stable &&
-            controlsPassed &&
-            accessControlAllowed == true &&
-            negativeControlRejected == true
 
     fun describe(verdict: Boolean?): String {
         val status = when (verdict) {
