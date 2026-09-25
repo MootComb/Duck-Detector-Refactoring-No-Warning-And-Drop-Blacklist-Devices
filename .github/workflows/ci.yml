@@ -79,6 +79,9 @@ jobs:
         with:
           cache-read-only: "true"
 
+      # Every module registers a unitTest lifecycle task, so the unqualified name runs the tests of
+      # all core, capability, feature and app modules; :build-logic:test runs the module boundary
+      # validator's self-tests. Configuring the build already fails on a boundary violation.
       # assembleDebug covers externalNativeBuildDebug, so the CMake configuration and all four ABIs
       # are compiled here. The contributors asset is deliberately left unrefreshed: pull requests
       # have no reason to reach github.com during the build.
@@ -88,12 +91,14 @@ jobs:
           set -euo pipefail
 
           ./gradlew --stacktrace \
-            :app:testDebugUnitTest \
+            :build-logic:test \
+            unitTest \
             :app:assembleDebug
 
       # Gating. lintDebug reports zero errors, so any new one fails the pull request. Translation
       # completeness is reported as a warning instead (see the lint block in the convention plugin),
       # because a locale that has not caught up with a new string must not block unrelated work.
+      # :app enables checkDependencies, so this single run analyses every module it depends on.
       - name: Run Android lint
         shell: bash
         run: |
@@ -107,7 +112,7 @@ jobs:
         with:
           name: verify-reports
           path: |
-            app/build/reports/tests/
+            **/build/reports/tests/
             app/build/reports/lint-results-debug.html
             app/build/reports/lint-results-debug.txt
           if-no-files-found: ignore

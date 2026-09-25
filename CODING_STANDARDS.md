@@ -122,12 +122,19 @@
 - 修改 reducer / mapper 时，必须补展示或判定回归测试。
 - 修复 bug 时，优先先补回归测试，再改实现。
 
-### 6.2 TEE / Native 相关改动
+### 6.2 必跑验证
 
-以下改动至少应执行对应验证：
+每次改动至少执行以下验证，与 CI 一致：
 
-- TEE probe / reducer 改动：相关 unit tests + `:app:assembleDebug`
-- Native / JNI 改动：`externalNativeBuildDebug` + `:app:assembleDebug`
+- `./gradlew unitTest :app:assembleDebug :app:lintDebug`：运行所有模块的单测，构建四个 ABI 的 native 库，并执行覆盖全部依赖模块的 lint
+- `python3 .github/scripts/check-source-file-length.py`：任何源文件都不得达到 600 行
+
+按改动类型追加：
+
+- TEE probe / reducer 改动：相关 unit tests
+- Native / JNI 改动：`python3 .github/scripts/check-jni-contracts.py` + `python3 .github/scripts/check-native-boundaries.py`
+- 模块边界或 build-logic 改动：`./gradlew :build-logic:test`
+- 检查脚本改动：运行对应的 `.github/scripts/test-*.py` 自测
 - 文案或卡片映射改动：对应 mapper / reducer tests
 
 ### 6.3 真机验证
