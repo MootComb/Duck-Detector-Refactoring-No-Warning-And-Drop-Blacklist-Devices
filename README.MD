@@ -59,11 +59,11 @@ Current feature areas:
 
 `Play Integrity Fix` refers to local indicators associated with integrity-spoofing modifications; DuckDetector does not return an official Google Play Integrity API verdict. The TEE area evaluates Android KeyStore and attestation evidence, including certificate chains, security levels, revocation data, and selected KeyMint, StrongBox, and Soter behavior where supported.
 
-Supporting packages provide the dashboard, device information, settings, update checks, notifications, license information, and common UI infrastructure.
+Supporting modules provide the dashboard, device information, settings, update checks, notifications, license information, and common UI infrastructure.
 
 # How it works
 
-- **Feature-oriented structure:** detector areas keep collection, domain models, report mapping, and UI code close to the feature that owns them.
+- **Feature modules:** each detector owns its collection, judgement rules, report projection, and UI in its own Gradle modules, while collection code that several detectors share lives in capability modules.
 - **Early native capture:** a transparent `NativeActivity` runs before `MainActivity` and records early mount and virtualization evidence.
 - **Native probes:** the shared native library performs checks that require direct system calls, `/proc` inspection, timing measurements, linker/runtime visibility, or architecture-specific assembly.
 - **Process separation:** selected Zygisk, virtualization, SELinux, and TEE checks run in dedicated or isolated services so evidence can be compared across process boundaries.
@@ -83,27 +83,30 @@ Supporting packages provide the dashboard, device information, settings, update 
 
 ```text
 Duck-Detector-Refactoring/
-├─ app/
-│  ├─ src/main/java/com/eltavine/duckdetector/
-│  │  ├─ core/            # Shared platform and UI infrastructure
-│  │  ├─ features/        # Detector and supporting feature packages
-│  │  └─ ui/              # App shell, navigation, and theme
-│  └─ src/main/cpp/       # C++, JNI, and architecture-specific assembly
-├─ build-logic/           # Convention plugins and generated-asset tasks
+├─ app/                   # Composition root: activities, detector catalog, notifications
+│  └─ src/main/cpp/       # Native units, one directory per owning module, with per-ABI assembly
+├─ core/                  # Contracts: evidence, native payloads, reports, scan lifecycle, detector, UI
+├─ capability/            # Evidence collection shared by several detectors
+├─ feature/               # One detector or supporting feature per directory, split into layers
+├─ build-logic/           # Convention plugins, module boundary validation, generated-asset tasks
+├─ docs/                  # Architecture overview, ADRs, and follow-ups
+├─ .github/policies/      # Module and native boundary policies
 ├─ gradle/                # Version catalog and Gradle wrapper files
 ├─ scripts/               # Repository maintenance scripts
 ├─ build.gradle.kts
 └─ settings.gradle.kts
 ```
 
-Feature packages generally use these boundaries where they apply:
+Each detector is a set of Gradle modules under `feature/<name>/`:
 
+- `domain`: result models, report models, status definitions, and judgement rules (pure JVM)
 - `data`: probes, parsers, repositories, JNI bridges, and Android service access
-- `domain`: reports, result models, and status definitions
-- `presentation`: view models, report-to-UI mapping, and UI state
-- `ui`: Compose cards, screens, and feature-specific display models
+- `presentation`: card models, report projection, and summary mapping (pure JVM)
+- `ui`: Compose cards, the view model, and the detector's integration with the dashboard
 
-Native sources are compiled into the `libduckdetector.so` shared library. Kotlin code accesses native results through feature-specific JNI bridges.
+Dependencies point from `:app` to features, from features to capabilities, and from capabilities to core; features never depend on each other. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
+
+Native sources are organized into units, each compiled as its own object library and linked into `libduckdetector.so`. Kotlin code reaches native results through JNI bridges in the module that owns each unit.
 
 # Build
 
@@ -129,7 +132,7 @@ gradlew.bat :app:assembleDebug
 For the standard local validation path:
 
 ```bash
-./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:assembleDebug
+./gradlew unitTest :app:assembleDebug :app:lintDebug
 ```
 
 Before contributing, read [`CODING_STANDARDS.md`](./CODING_STANDARDS.md).
