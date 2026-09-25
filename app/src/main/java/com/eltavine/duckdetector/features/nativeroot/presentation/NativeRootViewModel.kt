@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.nativeroot.data.repository.NativeRootRepository
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class NativeRootViewModel(
     private val repository: NativeRootRepository,
@@ -43,34 +43,39 @@ class NativeRootViewModel(
     )
     val uiState: StateFlow<NativeRootUiState> = _uiState.asStateFlow()
 
+    private val scans = ScanSessionRunner(viewModelScope)
+
     init {
         rescan()
     }
 
     fun rescan() {
-        viewModelScope.launch {
-            val loading = NativeRootReport.loading()
-            _uiState.update {
-                it.copy(
-                    stage = NativeRootUiStage.LOADING,
-                    report = loading,
-                    cardModel = mapper.map(loading),
-                )
-            }
-
-            val report = repository.scan()
-            _uiState.update {
-                it.copy(
-                    stage = if (report.stage == NativeRootStage.FAILED) {
-                        NativeRootUiStage.FAILED
-                    } else {
-                        NativeRootUiStage.READY
-                    },
-                    report = report,
-                    cardModel = mapper.map(report),
-                )
-            }
-        }
+        scans.launch(
+            begin = {
+                val loading = NativeRootReport.loading()
+                _uiState.update {
+                    it.copy(
+                        stage = NativeRootUiStage.LOADING,
+                        report = loading,
+                        cardModel = mapper.map(loading),
+                    )
+                }
+            },
+            collect = { repository.scan() },
+            publish = { report ->
+                _uiState.update {
+                    it.copy(
+                        stage = if (report.stage == NativeRootStage.FAILED) {
+                            NativeRootUiStage.FAILED
+                        } else {
+                            NativeRootUiStage.READY
+                        },
+                        report = report,
+                        cardModel = mapper.map(report),
+                    )
+                }
+            },
+        )
     }
 
     companion object {
