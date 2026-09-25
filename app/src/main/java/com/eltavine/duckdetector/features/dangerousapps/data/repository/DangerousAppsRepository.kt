@@ -24,15 +24,15 @@ import android.os.Parcel
 import android.provider.Settings
 import android.text.TextUtils
 import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
+import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.CreatePackageContextZipProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.OpenApkFdPackageProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneDebugfsContextProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneLoopbackProbe
-import com.eltavine.duckdetector.features.dangerousapps.data.rules.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFinding
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppTarget
+import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousDetectionMethod

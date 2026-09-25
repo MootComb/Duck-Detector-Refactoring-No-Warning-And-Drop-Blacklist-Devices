@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.dangerousapps.data.rules
-
-import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppCategory
-import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppTarget
+package com.eltavine.duckdetector.features.dangerousapps.domain
 
 object DangerousAppsCatalog {
 

@@ -17,8 +17,8 @@
 package com.eltavine.duckdetector.features.dangerousapps.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
-import com.eltavine.duckdetector.features.dangerousapps.data.rules.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFinding
+import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousDetectionMethod

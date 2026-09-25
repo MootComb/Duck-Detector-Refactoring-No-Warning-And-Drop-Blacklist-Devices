@@ -59,8 +59,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/MT2&quot; to &quot;bin.mt.termex&quot;,"
         errorLine2="         ~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="171" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="190" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -68,8 +68,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/NP&quot; to &quot;com.wn.app.np&quot;,"
         errorLine2="         ~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="172" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="191" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -77,8 +77,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/xinhao&quot; to &quot;com.termux&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="173" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="192" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -86,8 +86,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/Download/advanced/&quot; to &quot;com.byyoung.setting&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="174" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="193" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -95,32 +95,32 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/.OShin&quot; to &quot;com.suqi8.oshin&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="175" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="194" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/MT2&quot;," errorLine2="         ~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="179" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="200" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/NP&quot;," errorLine2="         ~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="180" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="201" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/xinhao&quot;," errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="181" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="202" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -128,15 +128,15 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/Download/advanced/&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="182" column="10" />
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="203" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/.OShin&quot;," errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
+            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
             line="183" column="10" />
     </issue>
 

@@ -23,7 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.dangerousapps.data.repository.DangerousAppsRepository
-import com.eltavine.duckdetector.features.dangerousapps.data.rules.DangerousAppsCatalog
+import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import kotlinx.coroutines.flow.MutableStateFlow
