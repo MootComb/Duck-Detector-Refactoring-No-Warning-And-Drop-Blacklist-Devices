@@ -133,6 +133,10 @@
         ":feature:tee:domain",
         ":feature:tee:presentation",
         ":feature:tee:ui",
+        ":feature:update:data",
+        ":feature:update:domain",
+        ":feature:update:presentation",
+        ":feature:update:ui",
         ":feature:virtualization:data",
         ":feature:virtualization:domain",
         ":feature:virtualization:presentation",
@@ -700,6 +704,30 @@
         ":core:ui",
         ":feature:tee:domain",
         ":feature:tee:presentation"
+      ]
+    },
+    ":feature:update:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":feature:update:domain"
+      ]
+    },
+    ":feature:update:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
+    },
+    ":feature:update:presentation": {
+      "kind": "jvm",
+      "allowed_project_dependencies": [
+        ":feature:update:domain"
+      ]
+    },
+    ":feature:update:ui": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":core:ui",
+        ":feature:update:domain",
+        ":feature:update:presentation"
       ]
     },
     ":feature:virtualization:data": {

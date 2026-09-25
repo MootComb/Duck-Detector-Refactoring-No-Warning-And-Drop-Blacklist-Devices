@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.update.presentation
+package com.eltavine.duckdetector.features.update.ui
 
-import com.eltavine.duckdetector.features.update.data.NightlyUpdateChecker
-import com.eltavine.duckdetector.features.update.data.TEST_BASE_SHA
-import com.eltavine.duckdetector.features.update.data.UpdateManifestParser
-import com.eltavine.duckdetector.features.update.data.validUpdateManifestJson
 import com.eltavine.duckdetector.features.update.domain.AvailableNightlyUpdate
+import com.eltavine.duckdetector.features.update.domain.NightlyUpdateApk
+import com.eltavine.duckdetector.features.update.domain.NightlyUpdateChecker
+import com.eltavine.duckdetector.features.update.domain.NightlyUpdateCommit
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateManifest
 import com.eltavine.duckdetector.features.update.domain.UpdateChangelogEntry
 import com.eltavine.duckdetector.features.update.domain.UpdateCheckResult
+import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
+import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -42,7 +43,27 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class UpdateViewModelTest {
     private val dispatcher: TestDispatcher = StandardTestDispatcher()
-    private val manifest = UpdateManifestParser().parse(validUpdateManifestJson())
+    private val manifest = NightlyUpdateManifest(
+        schemaVersion = 1,
+        channel = "nightly",
+        branch = "master",
+        versionName = "2026.08.08-${TEST_HEAD_SHA.take(12)}",
+        versionCode = 500,
+        commit = NightlyUpdateCommit(
+            sha = TEST_HEAD_SHA,
+            subject = "feat(update): publish Nightly metadata",
+            body = "Publish metadata after the APK is available.",
+            authorName = "Duck Contributor",
+            authoredAt = "2026-08-08T12:20:00Z",
+        ),
+        builtAtUtc = "2026-08-08T12:30:00Z",
+        apk = NightlyUpdateApk(
+            name = "Duck.Detector-test.apk",
+            downloadUrl = "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/nightly/Duck.Detector-test.apk",
+            sizeBytes = 12_345_678L,
+            sha256 = "c".repeat(64),
+        ),
+    )
 
     @Before
     fun setUp() {
@@ -208,3 +229,6 @@ class UpdateViewModelTest {
         private const val NEWER_HEAD_SHA = "cccccccccccccccccccccccccccccccccccccccc"
     }
 }
+
+private const val TEST_HEAD_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+private const val TEST_BASE_SHA = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"

@@ -64,19 +64,6 @@ limitations under the License.
     <string name="update_status_current">คุณใช้ Nightly รุ่นล่าสุดแล้ว</string>
     <string name="update_status_available">มี Nightly รุ่นใหม่; แตะเพื่อดูรายละเอียด</string>
     <string name="update_status_failed">ตรวจสอบ GitHub ไม่สำเร็จ; แตะเพื่อลองใหม่</string>
-    <string name="update_dialog_title">มีอัปเดต Nightly</string>
-    <string name="update_version_change">%1$s → %2$s</string>
-    <string name="update_branch_hash_label">สาขาและ commit</string>
-    <string name="update_author_label">ผู้เขียน commit ล่าสุด</string>
-    <string name="update_time_label">อัปเดตเมื่อ</string>
-    <string name="update_changelog_title">การเปลี่ยนแปลงตั้งแต่รุ่นปัจจุบัน</string>
-    <plurals name="update_remaining_commits">
-        <item quantity="one">ยังไม่แสดง commit อีก 1 รายการ</item>
-        <item quantity="other">ยังไม่แสดง commit อีก %1$d รายการ</item>
-    </plurals>
-    <string name="update_later">ภายหลัง</string>
-    <string name="update_view_changes">ดูการเปลี่ยนแปลงทั้งหมดบน GitHub</string>
-    <string name="update_download">เปิดหน้าดาวน์โหลด</string>
     <string name="update_open_failed">ไม่มีเบราว์เซอร์สำหรับเปิด GitHub</string>
     <string name="author_summary_eltavine">มีส่วนร่วมด้าน UI, C++, ASM และ Kotlin</string>
     <string name="author_summary_baka">TEE และ Zygisk</string>

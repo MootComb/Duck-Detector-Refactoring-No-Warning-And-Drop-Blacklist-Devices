@@ -64,19 +64,6 @@ limitations under the License.
     <string name="update_status_current">You have the latest Nightly build</string>
     <string name="update_status_available">A newer Nightly build is available; tap for details</string>
     <string name="update_status_failed">Could not check GitHub; tap to retry</string>
-    <string name="update_dialog_title">Nightly update available</string>
-    <string name="update_version_change">%1$s → %2$s</string>
-    <string name="update_branch_hash_label">Branch and commit</string>
-    <string name="update_author_label">Latest commit author</string>
-    <string name="update_time_label">Updated</string>
-    <string name="update_changelog_title">Changes since your build</string>
-    <plurals name="update_remaining_commits">
-        <item quantity="one">1 additional commit is not shown</item>
-        <item quantity="other">%1$d additional commits are not shown</item>
-    </plurals>
-    <string name="update_later">Later</string>
-    <string name="update_view_changes">View all changes on GitHub</string>
-    <string name="update_download">Open download</string>
     <string name="update_open_failed">No browser is available to open GitHub</string>
     <string name="author_summary_eltavine">Contributed UI, C++, ASM and Kotlin.</string>
     <string name="author_summary_baka">TEE &amp; Zygisk</string>

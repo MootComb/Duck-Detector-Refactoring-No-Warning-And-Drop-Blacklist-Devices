@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.update.presentation
+package com.eltavine.duckdetector.features.update.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.eltavine.duckdetector.BuildConfig
-import com.eltavine.duckdetector.features.update.data.UpdateCacheStore
-import com.eltavine.duckdetector.features.update.data.NightlyUpdateChecker
-import com.eltavine.duckdetector.features.update.data.UpdateRepository
+import com.eltavine.duckdetector.features.update.domain.NightlyUpdateChecker
 import com.eltavine.duckdetector.features.update.domain.UpdateCheckResult
+import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
+import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
+import com.eltavine.duckdetector.features.update.presentation.UpdateUiState
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -150,17 +149,18 @@ class UpdateViewModel internal constructor(
     }
 
     companion object {
-        fun factory(context: Context): ViewModelProvider.Factory {
-            val appContext = context.applicationContext
+        fun factory(
+            createChecker: () -> NightlyUpdateChecker,
+            currentVersionCode: Int,
+            currentCommitSha: String,
+        ): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return UpdateViewModel(
-                        repository = UpdateRepository(
-                            cache = UpdateCacheStore.getInstance(appContext),
-                        ),
-                        currentVersionCode = BuildConfig.VERSION_CODE,
-                        currentCommitSha = BuildConfig.BUILD_HASH,
+                        repository = createChecker(),
+                        currentVersionCode = currentVersionCode,
+                        currentCommitSha = currentCommitSha,
                     ) as T
                 }
             }

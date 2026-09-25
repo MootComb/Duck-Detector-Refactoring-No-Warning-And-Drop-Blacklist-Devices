@@ -64,19 +64,6 @@ limitations under the License.
     <string name="update_status_current">У вас найновіша збірка Nightly</string>
     <string name="update_status_available">Доступна новіша збірка Nightly; торкніться для подробиць</string>
     <string name="update_status_failed">Не вдалося перевірити GitHub; торкніться, щоб повторити</string>
-    <string name="update_dialog_title">Доступне оновлення Nightly</string>
-    <string name="update_version_change">%1$s → %2$s</string>
-    <string name="update_branch_hash_label">Гілка та коміт</string>
-    <string name="update_author_label">Автор останнього коміту</string>
-    <string name="update_time_label">Оновлено</string>
-    <string name="update_changelog_title">Зміни після вашої збірки</string>
-    <plurals name="update_remaining_commits">
-        <item quantity="one">Ще 1 коміт не показано</item>
-        <item quantity="other">Ще %1$d комітів не показано</item>
-    </plurals>
-    <string name="update_later">Пізніше</string>
-    <string name="update_view_changes">Переглянути всі зміни на GitHub</string>
-    <string name="update_download">Відкрити завантаження</string>
     <string name="update_open_failed">Немає браузера для відкриття GitHub</string>
 
     <string name="author_summary_eltavine">Зробив внесок в UI, C++, ASM та Kotlin.</string>

@@ -73,6 +73,8 @@ dependencies {
     implementation(project(":feature:tee:ui"))
     implementation(project(":feature:deviceinfo:data"))
     implementation(project(":feature:deviceinfo:ui"))
+    implementation(project(":feature:update:data"))
+    implementation(project(":feature:update:ui"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.app.runtime)
     implementation(libs.bundles.app.compose)

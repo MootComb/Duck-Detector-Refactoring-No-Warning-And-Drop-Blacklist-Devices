@@ -64,19 +64,6 @@ limitations under the License.
     <string name="update_status_current">目前已是最新 Nightly 建置</string>
     <string name="update_status_available">有新的 Nightly 建置；輕觸查看詳情</string>
     <string name="update_status_failed">無法檢查 GitHub；輕觸重試</string>
-    <string name="update_dialog_title">發現 Nightly 更新</string>
-    <string name="update_version_change">%1$s → %2$s</string>
-    <string name="update_branch_hash_label">分支與提交</string>
-    <string name="update_author_label">最新提交作者</string>
-    <string name="update_time_label">更新時間</string>
-    <string name="update_changelog_title">自目前建置以來的變更</string>
-    <plurals name="update_remaining_commits">
-        <item quantity="one">另有 1 個提交未顯示</item>
-        <item quantity="other">另有 %1$d 個提交未顯示</item>
-    </plurals>
-    <string name="update_later">稍後</string>
-    <string name="update_view_changes">在 GitHub 查看所有變更</string>
-    <string name="update_download">前往下載</string>
     <string name="update_open_failed">沒有可用來開啟 GitHub 的瀏覽器</string>
     <string name="author_summary_eltavine">負責 UI、C++、ASM 與 Kotlin。</string>
     <string name="author_summary_baka">TEE 與 Zygisk</string>

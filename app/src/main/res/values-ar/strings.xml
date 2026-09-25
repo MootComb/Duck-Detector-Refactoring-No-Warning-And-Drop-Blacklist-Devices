@@ -64,19 +64,6 @@ limitations under the License.
     <string name="update_status_current">لديك أحدث إصدار Nightly</string>
     <string name="update_status_available">يتوفر إصدار Nightly أحدث؛ اضغط للتفاصيل</string>
     <string name="update_status_failed">تعذر التحقق من GitHub؛ اضغط لإعادة المحاولة</string>
-    <string name="update_dialog_title">يتوفر تحديث Nightly</string>
-    <string name="update_version_change">%1$s ← %2$s</string>
-    <string name="update_branch_hash_label">الفرع والالتزام</string>
-    <string name="update_author_label">مؤلف أحدث التزام</string>
-    <string name="update_time_label">وقت التحديث</string>
-    <string name="update_changelog_title">التغييرات منذ إصدارك</string>
-    <plurals name="update_remaining_commits">
-        <item quantity="one">لم يتم عرض التزام إضافي واحد</item>
-        <item quantity="other">لم يتم عرض %1$d من الالتزامات الإضافية</item>
-    </plurals>
-    <string name="update_later">لاحقًا</string>
-    <string name="update_view_changes">عرض كل التغييرات على GitHub</string>
-    <string name="update_download">فتح التنزيل</string>
     <string name="update_open_failed">لا يتوفر متصفح لفتح GitHub</string>
     <string name="author_summary_eltavine">ساهم في واجهة المستخدم و C++ و ASM و Kotlin.</string>
     <string name="author_summary_baka">TEE و Zygisk</string>

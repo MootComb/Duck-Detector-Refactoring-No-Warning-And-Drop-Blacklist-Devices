@@ -80,7 +80,7 @@ import com.eltavine.duckdetector.features.settings.ui.model.SettingsUiState
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
-import com.eltavine.duckdetector.features.update.presentation.UpdateViewModel
+import com.eltavine.duckdetector.features.update.ui.UpdateViewModel
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
@@ -389,7 +389,7 @@ private fun AppReadyShell(
     val scope = rememberCoroutineScope()
     var isResolvingUpdateDownload by remember { mutableStateOf(false) }
     val notifier = remember(appContext) { ScanProgressNotifier(appContext) }
-    val updateFactory = remember(context) { UpdateViewModel.factory(context) }
+    val updateFactory = remember(context) { updateViewModelFactory(context) }
     val updateViewModel: UpdateViewModel = viewModel(factory = updateFactory)
     // Every detector view model starts scanning when it is created, so this order is the order in
     // which detector scans begin; it is kept exactly as it was when the shell created them itself.

@@ -53,10 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.update.domain.AvailableNightlyUpdate
+import com.eltavine.duckdetector.features.update.ui.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

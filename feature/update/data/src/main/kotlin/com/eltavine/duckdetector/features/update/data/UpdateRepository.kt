@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.update.data
 
 import com.eltavine.duckdetector.features.update.domain.AvailableNightlyUpdate
+import com.eltavine.duckdetector.features.update.domain.NightlyUpdateChecker
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateManifest
 import com.eltavine.duckdetector.features.update.domain.UpdateChangelogEntry
 import com.eltavine.duckdetector.features.update.domain.UpdateCheckResult
@@ -25,13 +26,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-fun interface NightlyUpdateChecker {
-    suspend fun check(
-        currentVersionCode: Int,
-        currentCommitSha: String,
-    ): UpdateCheckResult
-}
 
 class UpdateRepository internal constructor(
     private val httpClient: UpdateHttpClient = HttpUrlConnectionUpdateClient(),
