@@ -7,7 +7,6 @@
     "app/src/main/cpp/selinux/context_validity_probe.cpp": 1114,
     "app/src/main/cpp/tee/trickystore/trickystore_probe.cpp": 1113,
     "app/src/main/cpp/virtualization/honeypot_traps.cpp": 921,
-    "feature/dashboard/ui/src/main/kotlin/com/eltavine/duckdetector/features/dashboard/ui/DashboardScreen.kt": 873,
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/report/TeeReportReducer.kt": 3251,
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/KeyMintCapabilityProbe.kt": 1629,
     "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PostProcessingProbe.kt": 617,
