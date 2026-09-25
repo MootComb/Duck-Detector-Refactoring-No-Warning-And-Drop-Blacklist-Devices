@@ -21,23 +21,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.NetworkCheck
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,13 +47,13 @@ import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicense
 import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicensesScreen
 import com.eltavine.duckdetector.features.settings.ui.components.AboutCard
 import com.eltavine.duckdetector.features.settings.ui.components.AuthorCard
+import com.eltavine.duckdetector.features.settings.ui.components.ConsentSettingCard
 import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
-    onCrlNetworkingChange: (Boolean) -> Unit,
+    consentToggles: List<ConsentToggle>,
     onCheckForUpdates: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -103,68 +96,8 @@ fun SettingsScreen(
                     )
                 }
 
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = ShapeTokens.CornerExtraLarge,
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 18.dp, vertical = 18.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        ) {
-                            Surface(
-                                shape = ShapeTokens.CornerLarge,
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(44.dp)
-                                        .padding(10.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.NetworkCheck,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
-                            }
-
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                WrapSafeText(
-                                    text = stringResource(R.string.settings_crl_title),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                WrapSafeText(
-                                    text = stringResource(R.string.settings_crl_summary),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-
-                            Switch(
-                                checked = uiState.isCrlNetworkingEnabled,
-                                onCheckedChange = onCrlNetworkingChange,
-                            )
-                        }
-
-                        WrapSafeText(
-                            text = stringResource(R.string.settings_crl_footer),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                consentToggles.forEach { toggle ->
+                    ConsentSettingCard(toggle = toggle)
                 }
 
                 AboutCard(

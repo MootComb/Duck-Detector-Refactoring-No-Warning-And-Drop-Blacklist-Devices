@@ -17,7 +17,6 @@
 package com.eltavine.duckdetector.ui.shell
 
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
 
@@ -32,8 +31,9 @@ enum class StartupGateState {
     READY,
 }
 
+/** Detector consents never block the first scan; the gate only waits for their decisions to load. */
 fun resolveStartupGateState(
-    teePrefs: TeeNetworkPrefs?,
+    consentDecisionsLoaded: Boolean,
     notificationPrefs: ScanNotificationPrefs?,
     notificationPermissionState: ScanNotificationPermissionState,
     packageVisibilityLoaded: Boolean,
@@ -41,7 +41,7 @@ fun resolveStartupGateState(
     packageVisibilityReviewAcknowledged: Boolean,
 ): StartupGateState {
     return when {
-        teePrefs == null || notificationPrefs == null || !packageVisibilityLoaded ->
+        !consentDecisionsLoaded || notificationPrefs == null || !packageVisibilityLoaded ->
             StartupGateState.LOADING
 
         !notificationPrefs.notificationsPrompted &&

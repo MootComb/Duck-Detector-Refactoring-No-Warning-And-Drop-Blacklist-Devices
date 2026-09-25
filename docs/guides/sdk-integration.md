@@ -112,4 +112,9 @@ The SDK declares no permissions, so the host decides what its process may observ
 
 The SDK's only visibility declaration is TEE's `<queries>` entry for `com.tencent.soter.soterserver`, which the manifest merger adds to the host. The SOTER environment check needs it to tell a missing service from one that package visibility filtering hides.
 
-The online revocation refresh also needs the user's consent, which the SDK does not ask for. Without it, TEE checks revocation against the bundled snapshot and says so in its report.
+The online revocation refresh also needs the user's consent, which the SDK never asks for itself. Every detector lists the choices it needs in `consents`; today only TEE declares one, `TeeRevocationNetworkConsent`. Read the current answer from `decisions(context)`, record the user's with `decide(context, granted)`, and scan again. Until the user allows it, TEE checks revocation against the bundled snapshot and says so in its report.
+
+```kotlin
+val consents = DuckDetector.detectors.flatMap { it.consents }   // what the host should ask the user
+TeeRevocationNetworkConsent.decide(context, granted = true)      // then scan again
+```

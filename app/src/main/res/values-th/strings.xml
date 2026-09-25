@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">ไม่รองรับ</string>
     <string name="startup_status_waiting">รออยู่</string>
     <string name="startup_status_regular">ปกติ</string>
-    <string name="startup_status_local">ภายในเครื่อง</string>
     <string name="startup_status_optional">ไม่บังคับ</string>
     <string name="startup_status_acknowledged">รับทราบแล้ว</string>
     <string name="startup_status_review_later">ตรวจภายหลัง</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">ใช้การแจ้งเตือนปกติ</string>
     <string name="startup_live_update_regular_headline">เลือกการแจ้งเตือนปกติแล้ว</string>
     <string name="startup_live_update_regular_detail">การแจ้งเตือนต่อเนื่องแบบ promoted จะยังคงถูกปิด และความคืบหน้าการสแกนจะใช้เส้นทางการแจ้งเตือนปกติแทน</string>
-    <string name="startup_crl_title">รีเฟรช CRL ออนไลน์</string>
-    <string name="startup_crl_prompt_headline">เลือกว่าจะอนุญาตให้การตรวจสอบการเพิกถอน TEE ดึงอัปเดตออนไลน์หรือไม่</string>
-    <string name="startup_crl_prompt_detail">Duck Detector ตรวจสอบ snapshot การเพิกถอนในตัวเสมอ การอนุญาตเครือข่ายจะทำให้ดึง Google attestation revocation feed ล่าสุดระหว่างการยืนยัน TEE ได้</string>
-    <string name="startup_crl_allow_network">อนุญาตรีเฟรช</string>
-    <string name="startup_crl_local_only">ใช้ในตัวเท่านั้น</string>
-    <string name="startup_crl_ready_headline">อนุญาตการรีเฟรช CRL ออนไลน์แล้ว</string>
-    <string name="startup_crl_ready_detail">การยืนยัน TEE ตรวจสอบ snapshot ในตัว และอาจรีเฟรช Google attestation revocation feed ได้เมื่อสภาพเครือข่ายเอื้ออำนวย</string>
-    <string name="startup_crl_local_headline">การตรวจสอบการเพิกถอน TEE ใช้ snapshot ในตัว</string>
-    <string name="startup_crl_local_detail">Duck Detector จะไม่ทำการรีเฟรช CRL ออนไลน์จนกว่าคุณจะเปิดใช้อีกครั้งใน Settings การตรวจสอบการเพิกถอนในตัวยังคงทำงานอยู่</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">รายการแพ็กเกจดูเหมือนถูกจำกัดหรือถูกกรอง</string>
     <string name="startup_package_restricted_detail">PackageManager เปิดเผยแพ็กเกจที่ติดตั้งเพียง %1$d รายการ Dangerous Apps และโพรบที่เกี่ยวข้องอาจรายงานเครื่องมือที่ติดตั้งต่ำกว่าความจริงภายใต้การมองเห็นที่ถูกจำกัด รายการแบบมีขอบเขต หรือการกรองสไตล์ HMA</string>

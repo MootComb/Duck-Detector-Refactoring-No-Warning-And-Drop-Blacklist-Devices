@@ -55,9 +55,6 @@ limitations under the License.
     <string name="licenses_screen_back">Quay lại</string>
     <string name="licenses_screen_subtitle">Các thành phần bên thứ ba được đóng gói trong bản build này.</string>
     <string name="licenses_screen_title">Giấy phép mã nguồn mở</string>
-    <string name="settings_crl_footer">Thay đổi có hiệu lực ngay với hành vi làm mới trực tuyến. Kiểm tra thu hồi TEE tích hợp vẫn luôn bật.</string>
-    <string name="settings_crl_summary">Kiểm tra thu hồi TEE luôn dùng ảnh chụp tích hợp; tùy chọn này chỉ cho phép tải Google attestation revocation feed mới nhất.</string>
-    <string name="settings_crl_title">Cho phép làm mới CRL trực tuyến</string>
     <string name="settings_subtitle">Điều khiển xác minh trực tuyến và trạng thái cập nhật GitHub Nightly.</string>
     <string name="settings_title">Cài đặt</string>
     <string name="update_settings_label">Kiểm tra cập nhật</string>

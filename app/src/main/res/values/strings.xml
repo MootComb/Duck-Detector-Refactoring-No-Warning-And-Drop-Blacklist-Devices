@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">Unsupported</string>
     <string name="startup_status_waiting">Waiting</string>
     <string name="startup_status_regular">Regular</string>
-    <string name="startup_status_local">Local</string>
     <string name="startup_status_optional">Optional</string>
     <string name="startup_status_acknowledged">Acknowledged</string>
     <string name="startup_status_review_later">Review later</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">Use regular</string>
     <string name="startup_live_update_regular_headline">Regular notifications were selected.</string>
     <string name="startup_live_update_regular_detail">Promoted ongoing notifications stay disabled. Scan progress will use the regular notification path instead.</string>
-    <string name="startup_crl_title">CRL online refresh</string>
-    <string name="startup_crl_prompt_headline">Choose whether TEE revocation checks may fetch online updates.</string>
-    <string name="startup_crl_prompt_detail">Duck Detector always checks the built-in revocation snapshot. Allowing network lets it fetch Google\'s latest attestation revocation feed during TEE validation.</string>
-    <string name="startup_crl_allow_network">Allow refresh</string>
-    <string name="startup_crl_local_only">Built-in only</string>
-    <string name="startup_crl_ready_headline">Online CRL refresh is allowed.</string>
-    <string name="startup_crl_ready_detail">TEE validation checks the built-in snapshot and may refresh Google\'s attestation revocation feed whenever network conditions permit.</string>
-    <string name="startup_crl_local_headline">TEE revocation checks use the built-in snapshot.</string>
-    <string name="startup_crl_local_detail">Duck Detector will not perform online CRL refresh until you re-enable it in Settings. Built-in revocation checks remain active.</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">Package inventory looks scoped or filtered.</string>
     <string name="startup_package_restricted_detail">PackageManager exposed only %1$d installed packages. Dangerous Apps and related probes can under-report installed tools under restricted visibility, scoped inventory, or HMA-style filtering.</string>

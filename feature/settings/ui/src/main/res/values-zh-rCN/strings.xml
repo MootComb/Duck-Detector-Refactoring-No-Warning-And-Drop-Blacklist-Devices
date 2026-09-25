@@ -58,9 +58,6 @@ limitations under the License.
     <string name="licenses_screen_back">返回</string>
     <string name="licenses_screen_subtitle">此构建内置的第三方组件。</string>
     <string name="licenses_screen_title">开源许可证</string>
-    <string name="settings_crl_footer">更改会立即应用到在线刷新行为。内置 TEE 吊销检查始终保持启用。</string>
-    <string name="settings_crl_summary">TEE 吊销检查始终使用内置快照；此开关只允许获取 Google 最新 attestation revocation feed。</string>
-    <string name="settings_crl_title">允许在线刷新 CRL</string>
     <string name="settings_subtitle">在线验证控制与 GitHub Nightly 更新状态。</string>
     <string name="settings_title">设置</string>
     <string name="update_settings_label">检查更新</string>

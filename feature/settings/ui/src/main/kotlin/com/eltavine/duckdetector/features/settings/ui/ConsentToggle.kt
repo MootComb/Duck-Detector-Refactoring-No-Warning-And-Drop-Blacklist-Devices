@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.settings.presentation.model
+package com.eltavine.duckdetector.features.settings.ui
 
-data class SettingsUiState(
-    val versionName: String,
-    val versionCode: Int,
-    val buildTimeUtc: String,
-    val buildHash: String,
-    val updateStatus: SettingsUpdateStatus,
+import androidx.compose.runtime.Immutable
+import com.eltavine.duckdetector.core.ui.detector.ConsentSetting
+
+/** A detector's consent as a switch in settings. */
+@Immutable
+class ConsentToggle(
+    val setting: ConsentSetting,
+    val checked: Boolean,
+    val onCheckedChange: (Boolean) -> Unit,
 )
-
-enum class SettingsUpdateStatus {
-    IDLE,
-    CHECKING,
-    CURRENT,
-    AVAILABLE,
-    FAILED,
-}

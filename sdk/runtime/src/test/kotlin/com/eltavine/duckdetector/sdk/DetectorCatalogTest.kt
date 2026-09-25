@@ -31,6 +31,12 @@ class DetectorCatalogTest {
     }
 
     @Test
+    fun `every consent id appears once across the catalog`() {
+        val consentIds = DetectorCatalog.all.flatMap { detector -> detector.consents.map { it.id } }
+        assertEquals(consentIds.distinct(), consentIds)
+    }
+
+    @Test
     fun `bootloader and TEE start first and every other detector follows by id`() {
         assertEquals(listOf("bootloader", "tee"), ids.take(2))
         assertEquals(ids.drop(2).sorted(), ids.drop(2))

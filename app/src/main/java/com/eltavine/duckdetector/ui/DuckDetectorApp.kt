@@ -47,16 +47,17 @@ import com.eltavine.duckdetector.packagevisibility.preferences.PackageVisibility
 import com.eltavine.duckdetector.startup.legal.AgreementAcceptancePrefs
 import com.eltavine.duckdetector.startup.legal.AgreementAcceptanceStore
 import com.eltavine.duckdetector.startup.legal.AgreementScreen
+import com.eltavine.duckdetector.core.detector.ConsentDecision
+import com.eltavine.duckdetector.core.detector.ConsentId
 import com.eltavine.duckdetector.core.ui.components.AlphaBuildBanner
 import com.eltavine.duckdetector.core.ui.components.AlphaBuildWarningOverlay
 import com.eltavine.duckdetector.core.ui.components.ScreenshotWatermarkOverlay
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeEffect
 import com.eltavine.duckdetector.ui.shell.StartupPackageVisibilityState
 import com.eltavine.duckdetector.ui.shell.StartupPolicyScreen
+import com.eltavine.duckdetector.ui.shell.combineConsentDecisions
 import com.eltavine.duckdetector.ui.shell.resolveStartupGateState
 import com.eltavine.duckdetector.ui.shell.shouldCreateDetectorViewModels
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +80,6 @@ fun DuckDetectorApp() {
     val context = LocalContext.current
     val appContext = context.applicationContext
     val agreementStore = remember(appContext) { AgreementAcceptanceStore.getInstance(appContext) }
-    val consentStore = remember(appContext) { TeeNetworkConsentStore.getInstance(appContext) }
     val notificationConsentStore = remember(appContext) {
         ScanNotificationConsentStore.getInstance(appContext)
     }
@@ -95,17 +95,19 @@ fun DuckDetectorApp() {
         }
     }
     val agreementAccepted = agreementPrefs?.accepted == true
-    val teePrefs by produceState<TeeNetworkPrefs?>(
+    val consentDecisions by produceState<Map<ConsentId, ConsentDecision>?>(
         initialValue = null,
-        key1 = consentStore,
+        key1 = appContext,
         key2 = agreementAccepted,
     ) {
         if (!agreementAccepted) {
             value = null
             return@produceState
         }
-        consentStore.prefs.collect { currentPrefs ->
-            value = currentPrefs
+        combineConsentDecisions(
+            DetectorFeatures.consentCards.associate { it.consent.id to it.consent.decisions(appContext) },
+        ).collect { decisions ->
+            value = decisions
         }
     }
     val notificationPrefs by produceState<ScanNotificationPrefs?>(
@@ -158,14 +160,14 @@ fun DuckDetectorApp() {
         mutableStateOf(ScanNotificationPermissions.read(appContext))
     }
     val gateState = remember(
-        teePrefs,
+        consentDecisions,
         notificationPrefs,
         notificationPermissionState,
         packageVisibilityState,
         packageVisibilityReviewPrefs,
     ) {
         resolveStartupGateState(
-            teePrefs = teePrefs,
+            consentDecisionsLoaded = consentDecisions != null,
             notificationPrefs = notificationPrefs,
             notificationPermissionState = notificationPermissionState,
             packageVisibilityLoaded = packageVisibilityState != null &&
@@ -241,8 +243,7 @@ fun DuckDetectorApp() {
                     AppReadyShell(
                         destination = destination,
                         onSelectDestination = { selected -> destination = selected },
-                        networkPrefs = requireNotNull(teePrefs),
-                        consentStore = consentStore,
+                        consentDecisions = requireNotNull(consentDecisions),
                         notificationPermissionState = notificationPermissionState,
                         canShowUpdateDialog = (!requiresAlphaAcknowledgement || alphaAcknowledged) &&
                                 screenCaptureNoticeEventId == 0L,
@@ -254,7 +255,8 @@ fun DuckDetectorApp() {
                         gateState = gateState,
                         notificationPrefs = notificationPrefs,
                         notificationPermissionState = notificationPermissionState,
-                        teePrefs = teePrefs,
+                        consentCards = DetectorFeatures.consentCards,
+                        consentDecisions = consentDecisions,
                         packageVisibilityState = packageVisibilityState,
                         packageVisibilityReviewAcknowledged =
                             packageVisibilityReviewPrefs?.restrictedInventoryAcknowledged == true,
@@ -290,14 +292,9 @@ fun DuckDetectorApp() {
                                 notificationConsentStore.markLiveUpdatesPrompted()
                             }
                         },
-                        onAllowCrlNetwork = {
+                        onDecideConsent = { consentCard, granted ->
                             scope.launch {
-                                consentStore.setConsent(true)
-                            }
-                        },
-                        onUseLocalCrlOnly = {
-                            scope.launch {
-                                consentStore.setConsent(false)
+                                consentCard.consent.decide(appContext, granted)
                             }
                         },
                         onAcknowledgePackageVisibility = {

@@ -57,9 +57,6 @@ limitations under the License.
     <string name="licenses_screen_back">返回</string>
     <string name="licenses_screen_subtitle">此建置內含的第三方元件。</string>
     <string name="licenses_screen_title">開源授權</string>
-    <string name="settings_crl_footer">變更會立即套用到線上重新整理行為。內建 TEE 吊銷檢查始終保持啟用。</string>
-    <string name="settings_crl_summary">TEE 吊銷檢查始終使用內建快照；此開關只允許取得 Google 最新 attestation revocation feed。</string>
-    <string name="settings_crl_title">允許線上重新整理 CRL</string>
     <string name="settings_subtitle">線上驗證控制與 GitHub Nightly 更新狀態。</string>
     <string name="settings_title">設定</string>
     <string name="update_settings_label">檢查更新</string>

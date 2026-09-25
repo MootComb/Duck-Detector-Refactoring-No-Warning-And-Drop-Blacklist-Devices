@@ -18,7 +18,6 @@ package com.eltavine.duckdetector.ui.shell
 
 import android.os.Build
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Update
@@ -27,7 +26,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
+import com.eltavine.duckdetector.core.detector.ConsentDecision
+import com.eltavine.duckdetector.core.ui.detector.ConsentPrompt
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
 
@@ -146,43 +146,44 @@ internal fun liveUpdatePolicyCard(
     }
 }
 
+/** A detector consent's card. Consents are optional, so no decision is ever required to continue. */
 @Composable
-internal fun crlPolicyCard(
-    teePrefs: TeeNetworkPrefs,
-    onAllowCrlNetwork: () -> Unit,
-    onUseLocalCrlOnly: () -> Unit,
+internal fun consentPolicyCard(
+    prompt: ConsentPrompt,
+    decision: ConsentDecision,
+    onDecide: (granted: Boolean) -> Unit,
 ): StartupPolicyCardUi {
-    return if (!teePrefs.consentAsked) {
-        StartupPolicyCardUi(
-            icon = Icons.Rounded.CloudSync,
-            title = stringResource(R.string.startup_crl_title),
+    return when (decision) {
+        ConsentDecision.UNDECIDED -> StartupPolicyCardUi(
+            icon = prompt.icon,
+            title = stringResource(prompt.title),
             statusLabel = stringResource(R.string.startup_status_optional),
-            headline = stringResource(R.string.startup_crl_prompt_headline),
-            detail = stringResource(R.string.startup_crl_prompt_detail),
+            headline = stringResource(prompt.headline),
+            detail = stringResource(prompt.detail),
             tone = StartupPolicyTone.SUPPORT,
             requiresAction = false,
-            primaryActionLabel = stringResource(R.string.startup_crl_allow_network),
-            secondaryActionLabel = stringResource(R.string.startup_crl_local_only),
-            onPrimaryAction = onAllowCrlNetwork,
-            onSecondaryAction = onUseLocalCrlOnly,
+            primaryActionLabel = stringResource(prompt.allowLabel),
+            secondaryActionLabel = stringResource(prompt.declineLabel),
+            onPrimaryAction = { onDecide(true) },
+            onSecondaryAction = { onDecide(false) },
         )
-    } else if (teePrefs.consentGranted) {
-        StartupPolicyCardUi(
-            icon = Icons.Rounded.CloudSync,
-            title = stringResource(R.string.startup_crl_title),
+
+        ConsentDecision.GRANTED -> StartupPolicyCardUi(
+            icon = prompt.icon,
+            title = stringResource(prompt.title),
             statusLabel = stringResource(R.string.startup_status_ready),
-            headline = stringResource(R.string.startup_crl_ready_headline),
-            detail = stringResource(R.string.startup_crl_ready_detail),
+            headline = stringResource(prompt.grantedHeadline),
+            detail = stringResource(prompt.grantedDetail),
             tone = StartupPolicyTone.READY,
             requiresAction = false,
         )
-    } else {
-        StartupPolicyCardUi(
-            icon = Icons.Rounded.CloudSync,
-            title = stringResource(R.string.startup_crl_title),
-            statusLabel = stringResource(R.string.startup_status_local),
-            headline = stringResource(R.string.startup_crl_local_headline),
-            detail = stringResource(R.string.startup_crl_local_detail),
+
+        ConsentDecision.DECLINED -> StartupPolicyCardUi(
+            icon = prompt.icon,
+            title = stringResource(prompt.title),
+            statusLabel = stringResource(prompt.declinedStatus),
+            headline = stringResource(prompt.declinedHeadline),
+            detail = stringResource(prompt.declinedDetail),
             tone = StartupPolicyTone.ACKNOWLEDGED,
             requiresAction = false,
         )

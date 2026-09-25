@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.eltavine.duckdetector.BuildConfig
 import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.core.detector.ConsentDecision
+import com.eltavine.duckdetector.core.detector.ConsentId
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirective
 import com.eltavine.duckdetector.core.ui.components.LocalDetectorAutoExpansionDirective
@@ -54,10 +56,8 @@ import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDash
 import com.eltavine.duckdetector.features.dashboard.presentation.model.dashboardCardOrder
 import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
 import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
+import com.eltavine.duckdetector.features.settings.ui.ConsentToggle
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
-import com.eltavine.duckdetector.features.tee.detector.TeeDetector
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
 import com.eltavine.duckdetector.features.update.ui.UpdateViewModel
@@ -76,8 +76,7 @@ import kotlinx.coroutines.launch
 internal fun AppReadyShell(
     destination: AppDestination,
     onSelectDestination: (AppDestination) -> Unit,
-    networkPrefs: TeeNetworkPrefs,
-    consentStore: TeeNetworkConsentStore,
+    consentDecisions: Map<ConsentId, ConsentDecision>,
     notificationPermissionState: com.eltavine.duckdetector.notifications.ScanNotificationPermissionState,
     canShowUpdateDialog: Boolean,
 ) {
@@ -95,7 +94,6 @@ internal fun AppReadyShell(
     val deviceProfile = DetectorFeatures.deviceProfile.rememberSession()
     // The scan coordinator, the dashboard and the export list detectors by id.
     val detectors = remember(detectorSessions) { detectorSessions.sortedBy { it.id.value } }
-    val tee = detectorSessions.first { it.id == TeeDetector.id }
     val updateUiState by updateViewModel.uiState.collectAsState()
 
     LaunchedEffect(updateViewModel) {
@@ -127,14 +125,25 @@ internal fun AppReadyShell(
             isLoading = isDashboardLoading,
         )
     }
-    val settingsState = remember(networkPrefs.consentGranted, updateUiState.status) {
+    val settingsState = remember(updateUiState.status) {
         SettingsUiState(
-            isCrlNetworkingEnabled = networkPrefs.consentGranted,
             versionName = BuildConfig.VERSION_NAME,
             versionCode = BuildConfig.VERSION_CODE,
             buildTimeUtc = BuildConfig.BUILD_TIME_UTC,
             buildHash = BuildConfig.BUILD_HASH,
             updateStatus = updateUiState.status.toSettingsUpdateStatus(),
+        )
+    }
+    val consentToggles = DetectorFeatures.consentCards.map { consentCard ->
+        ConsentToggle(
+            setting = consentCard.card.setting,
+            checked = consentDecisions.getValue(consentCard.consent.id) == ConsentDecision.GRANTED,
+            onCheckedChange = { enabled ->
+                scope.launch {
+                    consentCard.consent.decide(appContext, enabled)
+                    detectorSessions.first { it.id == consentCard.detectorId }.rescan()
+                }
+            },
         )
     }
     val detectorResultNoticeKey = remember(isDashboardLoading, dashboardState.overview) {
@@ -203,12 +212,7 @@ internal fun AppReadyShell(
             AppDestination.SETTINGS -> {
                 SettingsScreen(
                     uiState = settingsState,
-                    onCrlNetworkingChange = { enabled ->
-                        scope.launch {
-                            consentStore.setConsent(enabled)
-                            tee.rescan()
-                        }
-                    },
+                    consentToggles = consentToggles,
                     onCheckForUpdates = updateViewModel::onSettingsUpdateAction,
                     modifier = Modifier.fillMaxSize(),
                 )

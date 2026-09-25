@@ -27,41 +27,6 @@
   ],
   "exceptions": [
     {
-      "path": "app/build.gradle.kts",
-      "detectors": ["tee"],
-      "reason": "The startup policy reads and writes the TEE network consent before the first scan (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/AppReadyShell.kt",
-      "detectors": ["tee"],
-      "reason": "Changing the TEE network consent in settings rescans TEE (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/DuckDetectorApp.kt",
-      "detectors": ["tee"],
-      "reason": "Loads the TEE network consent for the startup policy (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/AppShellState.kt",
-      "detectors": ["tee"],
-      "reason": "The startup policy state carries the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyCards.kt",
-      "detectors": ["tee"],
-      "reason": "The startup policy card asks for the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/main/java/com/eltavine/duckdetector/ui/shell/StartupPolicyScreen.kt",
-      "detectors": ["tee"],
-      "reason": "The startup policy screen asks for the TEE network consent (follow-ups: startup policy wires the TEE network consent)."
-    },
-    {
-      "path": "app/src/test/java/com/eltavine/duckdetector/ui/shell/AppShellStateTest.kt",
-      "detectors": ["tee"],
-      "reason": "Tests the startup policy state, which carries the TEE network consent."
-    },
-    {
       "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
       "detectors": ["su"],
       "reason": "Shows a consumer using one detector's typed object through the SDK."

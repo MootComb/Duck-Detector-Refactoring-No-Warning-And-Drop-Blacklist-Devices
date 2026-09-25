@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.core.ui.detector.DeviceProfileFeature
 import com.eltavine.duckdetector.features.deviceinfo.data.repository.DeviceInfoRepository
 import com.eltavine.duckdetector.features.deviceinfo.ui.DeviceInfoProfileFeature
 import com.eltavine.duckdetector.sdk.DetectorCatalog
+import com.eltavine.duckdetector.ui.shell.DetectorConsentCard
 
 /**
  * The dashboard card of every detector, and the device profile shown under them.
@@ -38,10 +39,20 @@ internal object DetectorFeatures {
         checkNotNull(cards[detector.id]) { "${detector.id} is in DetectorCatalog but has no card here" }
     }
 
+    /** Every detector's consent cards, in catalog order. */
+    val consentCards: List<DetectorConsentCard> = all.flatMap { feature ->
+        feature.consentCards.map { card -> DetectorConsentCard(feature.id, card) }
+    }
+
     val deviceProfile: DeviceProfileFeature = DeviceInfoProfileFeature { context -> DeviceInfoRepository(context) }
 
     init {
         val uncatalogued = cards.keys - DetectorCatalog.all.map { it.id }.toSet()
         check(uncatalogued.isEmpty()) { "cards for detectors missing from DetectorCatalog: $uncatalogued" }
+        DetectorCatalog.all.zip(all).forEach { (detector, feature) ->
+            check(feature.consentCards.map { it.consent } == detector.consents) {
+                "${detector.id}'s consent cards do not match the consents it declares"
+            }
+        }
     }
 }

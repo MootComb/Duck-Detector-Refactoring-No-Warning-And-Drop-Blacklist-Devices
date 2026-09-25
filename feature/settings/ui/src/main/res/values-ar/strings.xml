@@ -60,9 +60,6 @@ limitations under the License.
     <string name="licenses_screen_back">رجوع</string>
     <string name="licenses_screen_subtitle">مكونات الجهات الخارجية المضمَّنة في هذا البناء.</string>
     <string name="licenses_screen_title">تراخيص المصادر المفتوحة</string>
-    <string name="settings_crl_footer">تُطبَّق التغييرات فورًا على سلوك التحديث عبر الإنترنت. تبقى فحوصات إبطال TEE المدمجة مفعلة.</string>
-    <string name="settings_crl_summary">تستخدم فحوصات إبطال TEE دائمًا لقطة مدمجة؛ يسمح هذا الخيار فقط بجلب أحدث Google attestation revocation feed.</string>
-    <string name="settings_crl_title">السماح بتحديث CRL عبر الإنترنت</string>
     <string name="settings_subtitle">عناصر تحكم التحقق عبر الإنترنت وحالة تحديث GitHub Nightly.</string>
     <string name="settings_title">الإعدادات</string>
     <string name="update_settings_label">التحقق من التحديثات</string>

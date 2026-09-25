@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">지원 안 됨</string>
     <string name="startup_status_waiting">대기 중</string>
     <string name="startup_status_regular">일반</string>
-    <string name="startup_status_local">로컬</string>
     <string name="startup_status_optional">선택 사항</string>
     <string name="startup_status_acknowledged">확인됨</string>
     <string name="startup_status_review_later">나중에 검토</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">일반 알림 사용</string>
     <string name="startup_live_update_regular_headline">일반 알림을 선택했습니다.</string>
     <string name="startup_live_update_regular_detail">promoted ongoing notification은 계속 비활성화되며, 스캔 진행 상황은 일반 알림 경로를 사용합니다.</string>
-    <string name="startup_crl_title">CRL 온라인 새로고침</string>
-    <string name="startup_crl_prompt_headline">TEE 폐기 확인이 온라인 업데이트를 가져올지 선택하세요.</string>
-    <string name="startup_crl_prompt_detail">Duck Detector는 항상 내장 폐기 스냅샷을 확인합니다. 네트워크를 허용하면 TEE 검증 중 Google 최신 attestation revocation feed를 가져올 수 있습니다.</string>
-    <string name="startup_crl_allow_network">새로고침 허용</string>
-    <string name="startup_crl_local_only">내장만</string>
-    <string name="startup_crl_ready_headline">온라인 CRL 새로고침이 허용되었습니다.</string>
-    <string name="startup_crl_ready_detail">TEE 검증은 내장 스냅샷을 확인하고 네트워크 상태가 허용될 때마다 Google attestation revocation feed를 새로고침할 수 있습니다.</string>
-    <string name="startup_crl_local_headline">TEE 폐기 확인은 내장 스냅샷을 사용합니다.</string>
-    <string name="startup_crl_local_detail">설정에서 다시 활성화할 때까지 Duck Detector는 온라인 CRL 새로고침을 수행하지 않습니다. 내장 폐기 확인은 계속 활성화됩니다.</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">패키지 목록이 범위 제한되었거나 필터링된 것처럼 보입니다.</string>
     <string name="startup_package_restricted_detail">PackageManager가 설치된 패키지 %1$d개만 노출했습니다. 가시성 제한, 범위화된 목록, HMA 스타일 필터링 환경에서는 Dangerous Apps와 관련 프로브가 설치된 도구를 적게 보고할 수 있습니다.</string>

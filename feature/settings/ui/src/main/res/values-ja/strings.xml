@@ -55,9 +55,6 @@ limitations under the License.
     <string name="licenses_screen_back">戻る</string>
     <string name="licenses_screen_subtitle">このビルドに同梱されているサードパーティーコンポーネントです。</string>
     <string name="licenses_screen_title">オープンソースライセンス</string>
-    <string name="settings_crl_footer">変更はオンライン更新の動作に即時反映されます。内蔵 TEE 失効確認は有効なままです。</string>
-    <string name="settings_crl_summary">TEE の失効確認は常に内蔵スナップショットを使用します。この設定は Google の最新 attestation revocation feed の取得だけを許可します。</string>
-    <string name="settings_crl_title">オンライン CRL 更新を許可</string>
     <string name="settings_subtitle">オンライン検証の制御と GitHub Nightly 更新状況です。</string>
     <string name="settings_title">設定</string>
     <string name="update_settings_label">更新を確認</string>

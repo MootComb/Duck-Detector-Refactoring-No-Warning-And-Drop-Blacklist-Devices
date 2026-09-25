@@ -63,7 +63,6 @@ limitations under the License.
     <string name="startup_status_unsupported">Не підтримується</string>
     <string name="startup_status_waiting">Очікування</string>
     <string name="startup_status_regular">Звичайний</string>
-    <string name="startup_status_local">Локальний</string>
     <string name="startup_status_optional">Необов’язково</string>
     <string name="startup_status_acknowledged">Підтверджено</string>
     <string name="startup_status_review_later">Переглянути пізніше</string>
@@ -93,15 +92,6 @@ limitations under the License.
     <string name="startup_live_update_regular_headline">Вибрано звичайні сповіщення.</string>
     <string name="startup_live_update_regular_detail">Пріоритетні постійні сповіщення залишаються вимкненими. Замість цього прогрес сканування використовуватиме звичайний шлях сповіщень.</string>
 
-    <string name="startup_crl_title">Онлайн-оновлення CRL</string>
-    <string name="startup_crl_prompt_headline">Виберіть, чи можуть перевірки відкликання TEE отримувати онлайн-оновлення.</string>
-    <string name="startup_crl_prompt_detail">Duck Detector завжди перевіряє вбудований знімок відкликання. Дозвіл на мережу дає змогу отримувати найновіший канал відкликання атестації Google під час валідації TEE.</string>
-    <string name="startup_crl_allow_network">Дозволити оновлення</string>
-    <string name="startup_crl_local_only">Лише вбудований</string>
-    <string name="startup_crl_ready_headline">Онлайн-оновлення CRL дозволено.</string>
-    <string name="startup_crl_ready_detail">Валідація TEE перевіряє вбудований знімок і може оновлювати канал відкликання атестації Google, коли дозволяють умови мережі.</string>
-    <string name="startup_crl_local_headline">Перевірки відкликання TEE використовують вбудований знімок.</string>
-    <string name="startup_crl_local_detail">Duck Detector не виконуватиме онлайн-оновлення CRL, доки ви не ввімкнете його знову в Налаштуваннях. Вбудовані перевірки відкликання залишаються активними.</string>
 
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">Інвентар пакетів виглядає обмеженим або відфільтрованим.</string>

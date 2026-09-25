@@ -18,15 +18,11 @@ Release variants build the native libraries with CMake's `RelWithDebInfo` config
 
 ## Lint translation completeness is module-scoped
 
-Lint's `MissingTranslation` check compares a string only against the locales present in the module that declares it. `mount_diagnostic_clipboard_label`, `native_root_diagnostic_clipboard_label` and `tee_diagnostic_clipboard_label` moved from `:app` into feature modules. Those modules have fewer locale folders, so their missing translations are no longer reported, although the strings themselves are unchanged. Add the missing translations, or add a repository-wide translation completeness check that does not depend on module layout.
+Lint's `MissingTranslation` check compares a string only against the locales present in the module that declares it. `mount_diagnostic_clipboard_label` and `native_root_diagnostic_clipboard_label` moved from `:app` into feature modules. Those modules have fewer locale folders, so their missing translations are no longer reported, although the strings themselves are unchanged. `feature/tee/ui` has every locale since it took over TEE's consent strings, so lint reports `tee_diagnostic_clipboard_label`'s missing translations again. Add the missing translations, or add a repository-wide translation completeness check that does not depend on module layout.
 
 ## Shared per-scan platform snapshots
 
 Each detector still collects its own platform evidence during its scan, even when several detectors read the same source, such as the package inventory or system properties. A scan session that captures such evidence once and hands the same snapshot to every consumer would make cross-detector correlation exact, but it changes probe timing and ordering, so it needs its own design and on-device validation.
-
-## Startup policy wires the TEE network consent
-
-The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. When the consent changes, the shell finds the TEE session by `TeeDetector.id` and rescans it. This is composition-root wiring rather than a detection rule, but these files are the only places where the app names a detector, each recorded as a touch point exception. If another feature needs startup consent, replace this with a typed consent contract in `:core`.
 
 ## Public API dumps come from javap
 

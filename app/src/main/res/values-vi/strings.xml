@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">Không hỗ trợ</string>
     <string name="startup_status_waiting">Đang chờ</string>
     <string name="startup_status_regular">Thường</string>
-    <string name="startup_status_local">Cục bộ</string>
     <string name="startup_status_optional">Tùy chọn</string>
     <string name="startup_status_acknowledged">Đã xác nhận</string>
     <string name="startup_status_review_later">Xem lại sau</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">Dùng thông báo thường</string>
     <string name="startup_live_update_regular_headline">Đã chọn thông báo thường.</string>
     <string name="startup_live_update_regular_detail">Thông báo đang diễn ra được quảng bá sẽ tiếp tục tắt. Tiến trình quét sẽ dùng đường thông báo thường.</string>
-    <string name="startup_crl_title">Làm mới CRL trực tuyến</string>
-    <string name="startup_crl_prompt_headline">Chọn xem kiểm tra thu hồi TEE có được tải cập nhật trực tuyến hay không.</string>
-    <string name="startup_crl_prompt_detail">Duck Detector luôn kiểm tra ảnh chụp thu hồi tích hợp. Cho phép mạng sẽ tải Google attestation revocation feed mới nhất trong quá trình xác minh TEE.</string>
-    <string name="startup_crl_allow_network">Cho phép làm mới</string>
-    <string name="startup_crl_local_only">Chỉ tích hợp</string>
-    <string name="startup_crl_ready_headline">Đã cho phép làm mới CRL trực tuyến.</string>
-    <string name="startup_crl_ready_detail">Quá trình xác minh TEE kiểm tra ảnh chụp tích hợp và có thể làm mới Google attestation revocation feed khi điều kiện mạng cho phép.</string>
-    <string name="startup_crl_local_headline">Kiểm tra thu hồi TEE dùng ảnh chụp tích hợp.</string>
-    <string name="startup_crl_local_detail">Duck Detector sẽ không thực hiện làm mới CRL trực tuyến cho đến khi bạn bật lại trong Cài đặt. Kiểm tra thu hồi tích hợp vẫn luôn hoạt động.</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">Danh mục gói có vẻ bị giới hạn hoặc bị lọc.</string>
     <string name="startup_package_restricted_detail">PackageManager chỉ hiển thị %1$d gói đã cài đặt. Dangerous Apps và các đầu dò liên quan có thể báo thiếu các công cụ đã cài trong điều kiện hiển thị bị hạn chế, danh mục bị giới hạn hoặc lọc kiểu HMA.</string>

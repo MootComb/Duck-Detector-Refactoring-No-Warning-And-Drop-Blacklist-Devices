@@ -45,9 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.core.detector.ConsentDecision
+import com.eltavine.duckdetector.core.detector.ConsentId
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
 
@@ -58,26 +59,26 @@ data class StartupPackageVisibilityState(
 )
 
 @Composable
-fun StartupPolicyScreen(
+internal fun StartupPolicyScreen(
     gateState: StartupGateState,
     notificationPrefs: ScanNotificationPrefs?,
     notificationPermissionState: ScanNotificationPermissionState,
-    teePrefs: TeeNetworkPrefs?,
+    consentCards: List<DetectorConsentCard>,
+    consentDecisions: Map<ConsentId, ConsentDecision>?,
     packageVisibilityState: StartupPackageVisibilityState?,
     packageVisibilityReviewAcknowledged: Boolean,
     onAllowNotifications: () -> Unit,
     onSkipNotifications: () -> Unit,
     onOpenLiveUpdateSettings: () -> Unit,
     onUseRegularNotifications: () -> Unit,
-    onAllowCrlNetwork: () -> Unit,
-    onUseLocalCrlOnly: () -> Unit,
+    onDecideConsent: (DetectorConsentCard, granted: Boolean) -> Unit,
     onAcknowledgePackageVisibility: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cards = if (
         gateState == StartupGateState.LOADING ||
         notificationPrefs == null ||
-        teePrefs == null ||
+        consentDecisions == null ||
         packageVisibilityState == null
     ) {
         emptyList()
@@ -95,11 +96,13 @@ fun StartupPolicyScreen(
                 onOpenLiveUpdateSettings = onOpenLiveUpdateSettings,
                 onUseRegularNotifications = onUseRegularNotifications,
             ),
-            crlPolicyCard(
-                teePrefs = teePrefs,
-                onAllowCrlNetwork = onAllowCrlNetwork,
-                onUseLocalCrlOnly = onUseLocalCrlOnly,
-            ),
+        ) + consentCards.map { consentCard ->
+            consentPolicyCard(
+                prompt = consentCard.card.prompt,
+                decision = consentDecisions.getValue(consentCard.consent.id),
+                onDecide = { granted -> onDecideConsent(consentCard, granted) },
+            )
+        } + listOf(
             packageManagerPolicyCard(
                 packageVisibilityState = packageVisibilityState,
                 packageVisibilityReviewAcknowledged = packageVisibilityReviewAcknowledged,

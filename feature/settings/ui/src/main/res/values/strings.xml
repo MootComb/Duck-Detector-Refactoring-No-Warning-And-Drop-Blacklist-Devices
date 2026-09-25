@@ -70,9 +70,6 @@ limitations under the License.
     <string name="licenses_screen_back">Back</string>
     <string name="licenses_screen_subtitle">Third-party components bundled in this build.</string>
     <string name="licenses_screen_title">Open-source licenses</string>
-    <string name="settings_crl_footer">Changes apply immediately to online refresh behavior. Built-in TEE revocation checks remain enabled.</string>
-    <string name="settings_crl_summary">TEE revocation checks always use the built-in snapshot; this only permits fetching Google\'s latest attestation revocation feed.</string>
-    <string name="settings_crl_title">Allow online CRL refresh</string>
     <string name="settings_subtitle">Runtime controls and GitHub Nightly update status.</string>
     <string name="settings_title">Settings</string>
     <string name="update_settings_label">Check for updates</string>

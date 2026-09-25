@@ -47,8 +47,6 @@ dependencies {
     implementation(project(":feature:deviceinfo:ui"))
     implementation(project(":feature:settings:presentation"))
     implementation(project(":feature:settings:ui"))
-    implementation(project(":feature:tee:data"))
-    implementation(project(":feature:tee:detector"))
     implementation(project(":feature:update:data"))
     implementation(project(":feature:update:domain"))
     implementation(project(":feature:update:presentation"))

@@ -79,6 +79,8 @@ The CI `contracts` job runs the Python checkers and their self-tests. The `verif
 
 `DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` orders the dashboard cards by the catalog. The cards come from `detectorCards`, which `GenerateDetectorCardsTask` writes from the `detectorFeature` every `feature/<name>/ui` module exports, so listing the cards names no detector. A unit test fails when a detector has no card or a card has no detector ([ADR 0011](../adr/0011-generated-dashboard-cards.md)). The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md), [ADR 0008](../adr/0008-headless-detectors-and-sdk.md)).
 
+Consents follow the same path ([ADR 0013](../adr/0013-detector-consents.md)). A detector lists the user decisions it needs in `Detector.consents`, and its ui module describes each one in `DetectorFeature.consentCards`. The startup policy screen shows one card per consent, and settings shows one switch per consent. A change calls `decide` and rescans the session of the detector that owns the consent, so neither screen names a detector.
+
 Scan lifecycle is owned explicitly ([ADR 0003](../adr/0003-scan-lifecycle-ownership.md)):
 
 ```text

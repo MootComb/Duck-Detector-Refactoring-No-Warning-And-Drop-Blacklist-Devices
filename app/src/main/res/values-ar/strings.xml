@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">غير مدعوم</string>
     <string name="startup_status_waiting">قيد الانتظار</string>
     <string name="startup_status_regular">عادي</string>
-    <string name="startup_status_local">محلي</string>
     <string name="startup_status_optional">اختياري</string>
     <string name="startup_status_acknowledged">تم الإقرار</string>
     <string name="startup_status_review_later">راجع لاحقًا</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">استخدام الإشعار العادي</string>
     <string name="startup_live_update_regular_headline">تم اختيار الإشعارات العادية.</string>
     <string name="startup_live_update_regular_detail">تبقى ميزة الإشعار المباشر معطلة. وسيستخدم تقدم الفحص مسار الإشعارات العادي بدلًا من ذلك.</string>
-    <string name="startup_crl_title">تحديث CRL عبر الإنترنت</string>
-    <string name="startup_crl_prompt_headline">اختر ما إذا كان يمكن لفحوصات إبطال TEE جلب تحديثات عبر الإنترنت.</string>
-    <string name="startup_crl_prompt_detail">يفحص Duck Detector دائمًا لقطة الإبطال المدمجة. يتيح السماح بالشبكة جلب أحدث Google attestation revocation feed أثناء التحقق من TEE.</string>
-    <string name="startup_crl_allow_network">السماح بالتحديث</string>
-    <string name="startup_crl_local_only">المدمج فقط</string>
-    <string name="startup_crl_ready_headline">تم السماح بتحديث CRL عبر الإنترنت.</string>
-    <string name="startup_crl_ready_detail">يفحص التحقق من TEE اللقطة المدمجة وقد يحدث Google attestation revocation feed عندما تسمح ظروف الشبكة.</string>
-    <string name="startup_crl_local_headline">تستخدم فحوصات إبطال TEE اللقطة المدمجة.</string>
-    <string name="startup_crl_local_detail">لن ينفذ Duck Detector تحديث CRL عبر الإنترنت حتى تعيد تمكينه من الإعدادات. تبقى فحوصات الإبطال المدمجة مفعلة.</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">يبدو أن فهرس الحزم مقيّد أو تمت تصفيته.</string>
     <string name="startup_package_restricted_detail">كشف PackageManager عن %1$d حزمة مثبتة فقط. وقد تقلل التطبيقات الخطرة والمجسات ذات الصلة من الإبلاغ عن الأدوات المثبتة في ظل الرؤية المقيّدة أو الفهرسة المحددة النطاق أو التصفية بأسلوب HMA.</string>

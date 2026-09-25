@@ -55,9 +55,6 @@ limitations under the License.
     <string name="licenses_screen_back">กลับ</string>
     <string name="licenses_screen_subtitle">คอมโพเนนต์ภายนอกที่รวมมาในบิลด์นี้</string>
     <string name="licenses_screen_title">ใบอนุญาตโอเพนซอร์ส</string>
-    <string name="settings_crl_footer">การเปลี่ยนแปลงมีผลกับการรีเฟรชออนไลน์ทันที การตรวจสอบการเพิกถอน TEE ในตัวยังคงเปิดใช้อยู่</string>
-    <string name="settings_crl_summary">การตรวจสอบการเพิกถอน TEE ใช้ snapshot ในตัวเสมอ ตัวเลือกนี้อนุญาตเฉพาะการดึง Google attestation revocation feed ล่าสุด</string>
-    <string name="settings_crl_title">อนุญาตรีเฟรช CRL ออนไลน์</string>
     <string name="settings_subtitle">การควบคุมการยืนยันออนไลน์และสถานะอัปเดต GitHub Nightly</string>
     <string name="settings_title">การตั้งค่า</string>
     <string name="update_settings_label">ตรวจสอบอัปเดต</string>

@@ -58,7 +58,6 @@ limitations under the License.
     <string name="startup_status_unsupported">不支持</string>
     <string name="startup_status_waiting">等待中</string>
     <string name="startup_status_regular">常规</string>
-    <string name="startup_status_local">本地</string>
     <string name="startup_status_optional">可选</string>
     <string name="startup_status_acknowledged">已确认</string>
     <string name="startup_status_review_later">稍后检查</string>
@@ -85,15 +84,6 @@ limitations under the License.
     <string name="startup_live_update_use_regular">使用常规通知</string>
     <string name="startup_live_update_regular_headline">已选择常规通知。</string>
     <string name="startup_live_update_regular_detail">提升型持续通知将保持禁用，扫描进度会改用常规通知路径。</string>
-    <string name="startup_crl_title">CRL 在线刷新</string>
-    <string name="startup_crl_prompt_headline">请选择是否允许 TEE 吊销检查获取在线更新。</string>
-    <string name="startup_crl_prompt_detail">Duck Detector 始终会检查内置吊销快照。允许联网后，可以在 TEE 验证期间获取 Google 最新 attestation revocation feed。</string>
-    <string name="startup_crl_allow_network">允许刷新</string>
-    <string name="startup_crl_local_only">仅内置库</string>
-    <string name="startup_crl_ready_headline">已允许在线 CRL 刷新。</string>
-    <string name="startup_crl_ready_detail">TEE 验证会检查内置快照，并可在网络条件允许时刷新 Google 的 attestation revocation feed。</string>
-    <string name="startup_crl_local_headline">TEE 吊销检查使用内置快照。</string>
-    <string name="startup_crl_local_detail">在您重新于设置中启用之前，Duck Detector 不会执行在线 CRL 刷新。内置吊销检查始终保持启用。</string>
     <string name="startup_package_manager_title">PackageManager</string>
     <string name="startup_package_restricted_headline">软件包清单看起来被限制或过滤了。</string>
     <string name="startup_package_restricted_detail">PackageManager 仅暴露了 %1$d 个已安装软件包。在可见性受限、范围化清单或类似 HMA 的过滤下，Dangerous Apps 和相关探针可能低报已安装工具。</string>
