@@ -28,6 +28,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":capability:attestation:data"))
+    implementation(project(":capability:attestation:domain"))
     implementation(project(":capability:selinuxpolicy:data"))
     implementation(project(":capability:helperprocess:data"))
     implementation(project(":capability:systemproperties:data"))

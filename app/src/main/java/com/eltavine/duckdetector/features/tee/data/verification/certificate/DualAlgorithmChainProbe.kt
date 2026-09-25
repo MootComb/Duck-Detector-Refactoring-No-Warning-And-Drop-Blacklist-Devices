@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.certificate
 
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustAnalyzer
 import java.security.cert.X509Certificate
 
 class DualAlgorithmChainProbe(

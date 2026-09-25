@@ -16,6 +16,10 @@
 
 package com.eltavine.duckdetector.features.tee.domain
 
+import com.eltavine.duckdetector.capability.attestation.domain.TeeCertificateItem
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
+
 data class TeeReport(
     val stage: TeeScanStage,
     val verdict: TeeVerdict,

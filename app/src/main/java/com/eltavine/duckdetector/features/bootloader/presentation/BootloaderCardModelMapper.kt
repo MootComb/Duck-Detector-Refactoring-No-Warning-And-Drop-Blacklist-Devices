@@ -31,8 +31,8 @@ import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardAsse
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderDetailRowModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderImpactItemModel
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 
 class BootloaderCardModelMapper {
 

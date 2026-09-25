@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.attestation
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.domain.TeeCertificateItem
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeCertificateItem
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -37,9 +37,9 @@ import org.bouncycastle.asn1.ASN1Sequence
 import org.bouncycastle.asn1.ASN1Set
 import org.bouncycastle.asn1.ASN1TaggedObject
 
-class AttestationExtensionParser {
+public class AttestationExtensionParser {
 
-    fun parse(
+    public fun parse(
         chain: List<X509Certificate>,
         expectedChallenge: ByteArray,
     ): AttestationSnapshot {
@@ -453,7 +453,7 @@ class AttestationExtensionParser {
         return joinToString(separator = "") { byte -> "%02x".format(byte) }
     }
 
-    companion object {
+    public companion object {
         private const val KEY_ATTESTATION_OID = "1.3.6.1.4.1.11129.2.1.17"
     }
 }

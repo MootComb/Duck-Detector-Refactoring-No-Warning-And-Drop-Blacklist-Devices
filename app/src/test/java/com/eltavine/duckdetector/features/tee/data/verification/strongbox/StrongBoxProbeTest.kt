@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.strongbox
 
 import android.security.keystore.StrongBoxUnavailableException
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.security.InvalidAlgorithmParameterException
 import java.security.ProviderException
 import org.junit.Assert.assertEquals

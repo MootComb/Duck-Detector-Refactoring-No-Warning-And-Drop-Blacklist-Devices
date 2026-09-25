@@ -16,14 +16,6 @@
 
 package com.eltavine.duckdetector.features.tee.domain
 
-enum class TeeTrustRoot {
-    UNKNOWN,
-    FACTORY,
-    GOOGLE,
-    GOOGLE_RKP,
-    AOSP,
-}
-
 enum class TeePatchGrade {
     UNKNOWN,
     MATCHED,

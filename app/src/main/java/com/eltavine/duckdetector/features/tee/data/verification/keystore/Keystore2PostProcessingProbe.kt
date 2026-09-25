@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationExtensionParser
-import com.eltavine.duckdetector.features.tee.data.attestation.RootOfTrustSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationExtensionParser
+import com.eltavine.duckdetector.capability.attestation.data.RootOfTrustSnapshot
 import com.eltavine.duckdetector.features.tee.data.native.TeeRegisterTimerNativeBridge
 import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory

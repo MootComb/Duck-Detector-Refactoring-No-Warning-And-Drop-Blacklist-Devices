@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.attestation
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 
-class AndroidAttestationCollector(
+public class AndroidAttestationCollector(
     private val parser: AttestationExtensionParser = AttestationExtensionParser(),
 ) {
 
-    fun collect(useStrongBox: Boolean = false): AttestationSnapshot {
+    public fun collect(useStrongBox: Boolean = false): AttestationSnapshot {
         val keyStore = AndroidKeyStoreTools.loadKeyStore()
         val alias = "duckdetector_attest_${System.nanoTime()}"
         val challenge = ByteArray(32).also { SecureRandom().nextBytes(it) }
@@ -66,7 +65,7 @@ class AndroidAttestationCollector(
         }
     }
 
-    fun collectComparisonChains(useStrongBox: Boolean = false): Pair<List<X509Certificate>, List<X509Certificate>> {
+    public fun collectComparisonChains(useStrongBox: Boolean = false): Pair<List<X509Certificate>, List<X509Certificate>> {
         val keyStore = AndroidKeyStoreTools.loadKeyStore()
         val base = "duckdetector_compare_${System.nanoTime()}"
         val challenge = ByteArray(24).also { SecureRandom().nextBytes(it) }

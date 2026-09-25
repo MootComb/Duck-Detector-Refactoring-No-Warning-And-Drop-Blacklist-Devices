@@ -16,11 +16,11 @@
 
 package com.eltavine.duckdetector.features.tee.data.report
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 import com.eltavine.duckdetector.features.tee.data.native.NativeTeeSnapshot
-import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyResult
+import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyResult
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.ChainStructureResult
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustResult
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustResult
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.DualAlgorithmChainResult
 import com.eltavine.duckdetector.features.tee.data.verification.crl.CrlStatusResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.IdAttestationResult

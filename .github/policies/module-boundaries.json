@@ -63,6 +63,8 @@
     ":app": {
       "kind": "android-application",
       "allowed_project_dependencies": [
+        ":capability:attestation:data",
+        ":capability:attestation:domain",
         ":capability:earlypreload:data",
         ":capability:helperprocess:data",
         ":capability:packageinventory:data",
@@ -128,6 +130,16 @@
         ":feature:zygisk:presentation",
         ":feature:zygisk:ui"
       ]
+    },
+    ":capability:attestation:data": {
+      "kind": "android-library",
+      "allowed_project_dependencies": [
+        ":capability:attestation:domain"
+      ]
+    },
+    ":capability:attestation:domain": {
+      "kind": "jvm",
+      "allowed_project_dependencies": []
     },
     ":capability:earlypreload:data": {
       "kind": "android-library",

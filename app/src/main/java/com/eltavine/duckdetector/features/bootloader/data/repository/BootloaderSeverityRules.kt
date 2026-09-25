@@ -16,9 +16,9 @@
 
 package com.eltavine.duckdetector.features.bootloader.data.repository
 
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustResult
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingSeverity
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustResult
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
 
 internal object BootloaderSeverityRules {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.keystore
+package com.eltavine.duckdetector.capability.attestation.data
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
@@ -30,11 +30,11 @@ import java.util.Calendar
 import javax.crypto.KeyGenerator
 import javax.security.auth.x500.X500Principal
 
-object AndroidKeyStoreTools {
+public object AndroidKeyStoreTools {
 
-    fun loadKeyStore(): KeyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+    public fun loadKeyStore(): KeyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
 
-    fun safeDelete(keyStore: KeyStore, alias: String) {
+    public fun safeDelete(keyStore: KeyStore, alias: String) {
         runCatching {
             if (keyStore.containsAlias(alias)) {
                 keyStore.deleteEntry(alias)
@@ -42,11 +42,11 @@ object AndroidKeyStoreTools {
         }
     }
 
-    fun cleanup(keyStore: KeyStore, aliases: Iterable<String>) {
+    public fun cleanup(keyStore: KeyStore, aliases: Iterable<String>) {
         aliases.forEach { alias -> safeDelete(keyStore, alias) }
     }
 
-    fun generateAttestedEcChain(
+    public fun generateAttestedEcChain(
         keyStore: KeyStore,
         alias: String,
         challenge: ByteArray,
@@ -64,7 +64,7 @@ object AndroidKeyStoreTools {
         return readCertificateChain(keyStore, alias)
     }
 
-    fun generateAttestedRsaChain(
+    public fun generateAttestedRsaChain(
         keyStore: KeyStore,
         alias: String,
         challenge: ByteArray,
@@ -83,7 +83,7 @@ object AndroidKeyStoreTools {
         return readCertificateChain(keyStore, alias)
     }
 
-    fun generateSigningEcKey(
+    public fun generateSigningEcKey(
         keyStore: KeyStore,
         alias: String,
         subject: String,
@@ -101,7 +101,7 @@ object AndroidKeyStoreTools {
         generator.generateKeyPair()
     }
 
-    fun generateAttestOnlyEcKey(
+    public fun generateAttestOnlyEcKey(
         keyStore: KeyStore,
         alias: String,
     ): Boolean {
@@ -128,28 +128,28 @@ object AndroidKeyStoreTools {
         }.getOrDefault(false)
     }
 
-    fun readCertificateChain(keyStore: KeyStore, alias: String): List<X509Certificate> {
+    public fun readCertificateChain(keyStore: KeyStore, alias: String): List<X509Certificate> {
         return keyStore.getCertificateChain(alias)
             ?.filterIsInstance<X509Certificate>()
             .orEmpty()
     }
 
-    fun readLeafCertificate(keyStore: KeyStore, alias: String): X509Certificate? {
+    public fun readLeafCertificate(keyStore: KeyStore, alias: String): X509Certificate? {
         return keyStore.getCertificate(alias) as? X509Certificate
     }
 
-    fun readPrivateKey(keyStore: KeyStore, alias: String): PrivateKey? {
+    public fun readPrivateKey(keyStore: KeyStore, alias: String): PrivateKey? {
         return keyStore.getKey(alias, null) as? PrivateKey
     }
 
-    fun signData(privateKey: PrivateKey, payload: ByteArray): ByteArray {
+    public fun signData(privateKey: PrivateKey, payload: ByteArray): ByteArray {
         val signature = Signature.getInstance("SHA256withECDSA")
         signature.initSign(privateKey)
         signature.update(payload)
         return signature.sign()
     }
 
-    fun generateBiometricBoundAesKey(
+    public fun generateBiometricBoundAesKey(
         keyStore: KeyStore,
         alias: String,
     ) {

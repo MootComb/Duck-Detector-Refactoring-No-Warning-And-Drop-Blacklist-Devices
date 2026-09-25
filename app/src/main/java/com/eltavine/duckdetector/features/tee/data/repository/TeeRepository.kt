@@ -18,18 +18,18 @@ package com.eltavine.duckdetector.features.tee.data.repository
 
 import android.content.Context
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.attestation.AndroidAttestationCollector
+import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
 import com.eltavine.duckdetector.features.tee.data.native.TeeNativeBridge
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkConsentStore
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefsStore
 import com.eltavine.duckdetector.features.tee.data.report.TeeReportReducer
 import com.eltavine.duckdetector.features.tee.data.report.TeeScanArtifacts
 import com.eltavine.duckdetector.features.tee.data.soter.SoterCapabilityProbe
-import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyProbe
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustAnalyzer
+import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyProbe
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustAnalyzer
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.ChainStructureAnalyzer
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.DualAlgorithmChainProbe
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.GoogleAttestationRootStore
+import com.eltavine.duckdetector.capability.attestation.data.GoogleAttestationRootStore
 import com.eltavine.duckdetector.features.tee.data.verification.crl.CrlStatusService
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.IdAttestationProbe
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.AesGcmRoundTripProbe
@@ -79,7 +79,7 @@ import com.eltavine.duckdetector.features.tee.data.verification.rkp.RkpExtension
 import com.eltavine.duckdetector.features.tee.data.verification.strongbox.StrongBoxBehaviorProbeSuite
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeSoterState
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -254,7 +254,7 @@ class TeeRepository(
     private suspend fun collectDeepChecks(
         useStrongBox: Boolean,
         deepChecksAllowed: Boolean,
-        snapshot: com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot,
+        snapshot: com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot,
         vintfKeyMintVersion: VintfKeyMintVersionResult,
         timingSideChannel: com.eltavine.duckdetector.features.tee.data.verification.keystore.TimingSideChannelResult,
     ): DeferredChecks = coroutineScope {
@@ -515,7 +515,7 @@ private data class DeferredChecks(
 ) {
     companion object {
         fun skipped(
-            snapshot: com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot,
+            snapshot: com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot,
             timingSideChannel: com.eltavine.duckdetector.features.tee.data.verification.keystore.TimingSideChannelResult,
         ) = DeferredChecks(
             pairConsistency = com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyPairConsistencyResult(

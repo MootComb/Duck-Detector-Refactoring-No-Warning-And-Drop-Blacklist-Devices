@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.rkp
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 import com.eltavine.duckdetector.features.tee.domain.TeeRkpState
 import java.util.Locale
 

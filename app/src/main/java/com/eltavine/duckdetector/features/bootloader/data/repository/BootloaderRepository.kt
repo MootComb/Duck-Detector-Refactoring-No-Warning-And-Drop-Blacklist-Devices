@@ -18,6 +18,15 @@ package com.eltavine.duckdetector.features.bootloader.data.repository
 
 import android.content.Context
 import android.os.Build
+import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyProbe
+import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyResult
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustAnalyzer
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustResult
+import com.eltavine.duckdetector.capability.attestation.data.GoogleAttestationRootStore
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyConsistencyUtils
 import com.eltavine.duckdetector.capability.systemproperties.data.SystemPropertyReadUtils
 import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourcePropertyRead
@@ -40,15 +49,6 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodResu
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
-import com.eltavine.duckdetector.features.tee.data.attestation.AndroidAttestationCollector
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
-import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyProbe
-import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyResult
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustAnalyzer
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustResult
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.GoogleAttestationRootStore
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -158,8 +158,8 @@ class BootloaderRepository(
             widevineEvidence = widevineEvidence,
         )
 
-        if (findings.isEmpty() && attestation.errorMessage != null && observedPropertyCount == 0) {
-            return BootloaderReport.failed(attestation.errorMessage)
+        if (findings.isEmpty() && observedPropertyCount == 0) {
+            attestation.errorMessage?.let { return BootloaderReport.failed(it) }
         }
 
         return BootloaderReport(

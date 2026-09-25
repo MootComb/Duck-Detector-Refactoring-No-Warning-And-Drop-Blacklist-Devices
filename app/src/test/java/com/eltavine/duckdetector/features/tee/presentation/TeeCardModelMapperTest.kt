@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.presentation
 
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
@@ -27,8 +29,6 @@ import com.eltavine.duckdetector.features.tee.domain.TeeRkpState
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
 import com.eltavine.duckdetector.features.tee.domain.TeeSignal
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
 import com.eltavine.duckdetector.features.tee.ui.model.TeeFooterActionId
 import org.junit.Assert.assertEquals

@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.content.Context
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 import java.lang.reflect.InvocationTargetException
 import java.security.MessageDigest
 import org.lsposed.hiddenapibypass.HiddenApiBypass

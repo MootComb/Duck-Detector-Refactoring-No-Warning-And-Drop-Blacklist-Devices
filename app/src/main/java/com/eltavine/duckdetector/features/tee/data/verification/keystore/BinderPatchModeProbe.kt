@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate

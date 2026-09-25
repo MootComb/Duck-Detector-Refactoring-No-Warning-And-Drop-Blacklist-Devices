@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.bootloader.domain
 
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 
 enum class BootloaderStage {
     LOADING,

@@ -16,12 +16,12 @@
 
 package com.eltavine.duckdetector.features.tee.presentation
 
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
 import com.eltavine.duckdetector.features.tee.ui.model.TeeCardModel
 import com.eltavine.duckdetector.features.tee.ui.model.TeeCertificateSummaryModel
@@ -268,12 +268,12 @@ class TeeCardModelMapper {
     }
 
     private fun TeeReport.tierStatus(): DetectorStatus = when (tier) {
-        com.eltavine.duckdetector.features.tee.domain.TeeTier.STRONGBOX,
-        com.eltavine.duckdetector.features.tee.domain.TeeTier.TEE -> DetectorStatus.allClear()
+        com.eltavine.duckdetector.capability.attestation.domain.TeeTier.STRONGBOX,
+        com.eltavine.duckdetector.capability.attestation.domain.TeeTier.TEE -> DetectorStatus.allClear()
 
-        com.eltavine.duckdetector.features.tee.domain.TeeTier.SOFTWARE -> DetectorStatus.warning()
-        com.eltavine.duckdetector.features.tee.domain.TeeTier.NONE -> DetectorStatus.danger()
-        com.eltavine.duckdetector.features.tee.domain.TeeTier.UNKNOWN -> DetectorStatus.info(
+        com.eltavine.duckdetector.capability.attestation.domain.TeeTier.SOFTWARE -> DetectorStatus.warning()
+        com.eltavine.duckdetector.capability.attestation.domain.TeeTier.NONE -> DetectorStatus.danger()
+        com.eltavine.duckdetector.capability.attestation.domain.TeeTier.UNKNOWN -> DetectorStatus.info(
             InfoKind.SUPPORT
         )
     }
@@ -293,12 +293,12 @@ class TeeCardModelMapper {
         TeeSignalLevel.FAIL -> DetectorStatus.danger()
     }
 
-    private fun com.eltavine.duckdetector.features.tee.domain.TeeTier.displayName(): String =
+    private fun com.eltavine.duckdetector.capability.attestation.domain.TeeTier.displayName(): String =
         when (this) {
-            com.eltavine.duckdetector.features.tee.domain.TeeTier.UNKNOWN -> "Unknown"
-            com.eltavine.duckdetector.features.tee.domain.TeeTier.NONE -> "None"
-            com.eltavine.duckdetector.features.tee.domain.TeeTier.SOFTWARE -> "Software"
-            com.eltavine.duckdetector.features.tee.domain.TeeTier.TEE -> "TEE"
-            com.eltavine.duckdetector.features.tee.domain.TeeTier.STRONGBOX -> "StrongBox"
+            com.eltavine.duckdetector.capability.attestation.domain.TeeTier.UNKNOWN -> "Unknown"
+            com.eltavine.duckdetector.capability.attestation.domain.TeeTier.NONE -> "None"
+            com.eltavine.duckdetector.capability.attestation.domain.TeeTier.SOFTWARE -> "Software"
+            com.eltavine.duckdetector.capability.attestation.domain.TeeTier.TEE -> "TEE"
+            com.eltavine.duckdetector.capability.attestation.domain.TeeTier.STRONGBOX -> "StrongBox"
         }
 }

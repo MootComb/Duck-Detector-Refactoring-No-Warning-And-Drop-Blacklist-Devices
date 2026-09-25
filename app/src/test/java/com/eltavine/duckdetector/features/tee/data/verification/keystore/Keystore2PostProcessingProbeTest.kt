@@ -16,7 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
-import com.eltavine.duckdetector.features.tee.data.attestation.RootOfTrustSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.RootOfTrustSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

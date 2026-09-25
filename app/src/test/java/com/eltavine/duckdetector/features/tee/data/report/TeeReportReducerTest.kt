@@ -16,20 +16,20 @@
 
 package com.eltavine.duckdetector.features.tee.data.report
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedApplicationInfo
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedAuthState
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedDeviceInfo
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedKeyProperties
-import com.eltavine.duckdetector.features.tee.data.attestation.RootOfTrustSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestedApplicationInfo
+import com.eltavine.duckdetector.capability.attestation.data.AttestedAuthState
+import com.eltavine.duckdetector.capability.attestation.data.AttestedDeviceInfo
+import com.eltavine.duckdetector.capability.attestation.data.AttestedKeyProperties
+import com.eltavine.duckdetector.capability.attestation.data.RootOfTrustSnapshot
 import com.eltavine.duckdetector.features.tee.data.native.NativeTeeSnapshot
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.ChainStructureResult
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.CertificateTrustResult
+import com.eltavine.duckdetector.capability.attestation.data.CertificateTrustResult
 import com.eltavine.duckdetector.features.tee.data.verification.certificate.DualAlgorithmChainResult
 import com.eltavine.duckdetector.features.tee.data.verification.crl.CrlStatusResult
 import com.eltavine.duckdetector.features.tee.data.verification.crl.RevokedCertificate
 import com.eltavine.duckdetector.features.tee.data.verification.crl.RevokedCertificateEvidenceKind
-import com.eltavine.duckdetector.features.tee.data.verification.boot.BootConsistencyResult
+import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.IdAttestationResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.AesGcmRoundTripResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.BinderChainConsistencyResult
@@ -83,8 +83,8 @@ import com.eltavine.duckdetector.features.tee.domain.TeeNetworkState
 import com.eltavine.duckdetector.features.tee.domain.TeeRkpState
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 import com.eltavine.duckdetector.features.tee.domain.TeeSoterState
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals

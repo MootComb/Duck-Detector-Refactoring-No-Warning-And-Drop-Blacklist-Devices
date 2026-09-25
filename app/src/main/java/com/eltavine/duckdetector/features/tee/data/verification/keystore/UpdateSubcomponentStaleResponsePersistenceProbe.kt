@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.content.Context
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.io.ByteArrayInputStream
 import java.security.Key
 import java.security.KeyStore

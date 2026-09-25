@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.nio.file.Files
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

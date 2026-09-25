@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricManager
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import javax.crypto.SecretKey
 
 class BiometricTeeIntegrationProbe(

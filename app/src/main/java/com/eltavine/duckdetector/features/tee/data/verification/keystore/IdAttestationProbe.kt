@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 
 class IdAttestationProbe {
 

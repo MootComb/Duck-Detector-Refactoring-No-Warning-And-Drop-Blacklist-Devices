@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.domain
+package com.eltavine.duckdetector.capability.attestation.domain
 
-enum class TeeTier {
+public enum class TeeTier {
     UNKNOWN,
     NONE,
     SOFTWARE,

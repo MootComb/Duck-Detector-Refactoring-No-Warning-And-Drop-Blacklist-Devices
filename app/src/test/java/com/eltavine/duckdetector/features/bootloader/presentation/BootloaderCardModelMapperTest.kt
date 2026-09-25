@@ -16,6 +16,8 @@
 
 package com.eltavine.duckdetector.features.bootloader.presentation
 
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderEvidenceMode
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFinding
@@ -27,8 +29,6 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
 import com.eltavine.duckdetector.features.bootloader.ui.model.BootloaderCardAssessment
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

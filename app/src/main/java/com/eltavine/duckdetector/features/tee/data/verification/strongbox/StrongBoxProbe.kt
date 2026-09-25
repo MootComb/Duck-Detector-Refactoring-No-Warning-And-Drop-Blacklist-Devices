@@ -22,11 +22,11 @@ import android.os.Build
 import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
-import com.eltavine.duckdetector.features.tee.data.attestation.AndroidAttestationCollector
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidAttestationCollector
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.isInsideSecureHardwareCompat
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.keyInfoSecurityLevelLabel
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore

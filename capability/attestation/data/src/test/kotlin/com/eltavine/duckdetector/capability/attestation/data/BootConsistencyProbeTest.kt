@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.verification.boot
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedApplicationInfo
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedAuthState
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedDeviceInfo
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestedKeyProperties
-import com.eltavine.duckdetector.features.tee.data.attestation.RootOfTrustSnapshot
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

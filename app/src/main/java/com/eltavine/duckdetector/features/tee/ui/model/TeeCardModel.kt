@@ -16,8 +16,8 @@
 
 package com.eltavine.duckdetector.features.tee.ui.model
 
+import com.eltavine.duckdetector.capability.attestation.domain.TeeCertificateItem
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
-import com.eltavine.duckdetector.features.tee.domain.TeeCertificateItem
 
 enum class TeeFactIcon {
     TRUST,

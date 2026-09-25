@@ -17,7 +17,7 @@
 package com.eltavine.duckdetector.features.tee.data.report
 
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
+import com.eltavine.duckdetector.capability.attestation.data.AttestationSnapshot
 import com.eltavine.duckdetector.features.tee.data.verification.crl.RevokedCertificateEvidenceKind
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
@@ -28,8 +28,8 @@ import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
 import com.eltavine.duckdetector.features.tee.domain.TeeSignal
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.AesGcmRoundTripResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.GrantDomainAnomalyKind

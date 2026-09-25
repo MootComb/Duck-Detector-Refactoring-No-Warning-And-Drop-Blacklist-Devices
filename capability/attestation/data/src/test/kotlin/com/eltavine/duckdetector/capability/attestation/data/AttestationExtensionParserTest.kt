@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.attestation
+package com.eltavine.duckdetector.capability.attestation.data
 
 import java.math.BigInteger
 import java.security.Principal

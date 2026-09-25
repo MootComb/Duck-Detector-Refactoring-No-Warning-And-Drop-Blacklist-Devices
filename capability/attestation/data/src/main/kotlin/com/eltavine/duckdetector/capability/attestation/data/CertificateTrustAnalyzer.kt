@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.verification.certificate
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.domain.TeeTrustRoot
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import java.security.cert.X509Certificate
 
-class CertificateTrustAnalyzer(
+public class CertificateTrustAnalyzer(
     private val googleRoots: GoogleAttestationRootStore,
 ) {
 
-    fun inspect(chain: List<X509Certificate>): CertificateTrustResult {
+    public fun inspect(chain: List<X509Certificate>): CertificateTrustResult {
         if (chain.isEmpty()) {
             return CertificateTrustResult()
         }
@@ -85,7 +85,7 @@ class CertificateTrustAnalyzer(
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
     }
 
-    companion object {
+    public companion object {
         private val AOSP_PATTERNS = listOf(
             "Android Keystore Software Attestation",
             "Software Attestation",
@@ -94,7 +94,7 @@ class CertificateTrustAnalyzer(
     }
 }
 
-data class CertificateTrustResult(
+public data class CertificateTrustResult(
     val trustRoot: TeeTrustRoot = TeeTrustRoot.UNKNOWN,
     val chainLength: Int = 0,
     val chainSignatureValid: Boolean = false,

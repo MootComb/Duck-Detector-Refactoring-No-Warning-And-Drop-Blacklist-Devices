@@ -19,7 +19,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 import android.content.Context
 import android.os.Build
 import android.os.Process
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.nio.charset.StandardCharsets
 
 class GrantSelfDomainFullChainSplitProbe(

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.verification.certificate
+package com.eltavine.duckdetector.capability.attestation.data
 
 import android.content.Context
-import com.eltavine.duckdetector.R
 import org.json.JSONArray
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
@@ -25,14 +24,14 @@ import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.nio.charset.StandardCharsets
 
-class GoogleAttestationRootStore(
+public class GoogleAttestationRootStore(
     context: Context,
 ) {
 
     private val appContext = context.applicationContext
     private val certificateFactory = CertificateFactory.getInstance("X.509")
 
-    val certificates: List<X509Certificate> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    public val certificates: List<X509Certificate> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         val payload = appContext.resources.openRawResource(R.raw.google_attestation_roots)
             .use { stream ->
                 stream.reader(StandardCharsets.UTF_8).readText()
@@ -45,13 +44,13 @@ class GoogleAttestationRootStore(
         }
     }
 
-    val publicKeyFingerprints: Set<String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    public val publicKeyFingerprints: Set<String> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         certificates.mapTo(linkedSetOf()) { cert ->
             cert.publicKey.encoded.sha256()
         }
     }
 
-    fun contains(cert: X509Certificate): Boolean {
+    public fun contains(cert: X509Certificate): Boolean {
         val fingerprint = cert.publicKey.encoded.sha256()
         if (fingerprint in publicKeyFingerprints) {
             return true

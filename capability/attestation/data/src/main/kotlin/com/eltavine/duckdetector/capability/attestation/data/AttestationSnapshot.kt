@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.attestation
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.domain.TeeCertificateItem
-import com.eltavine.duckdetector.features.tee.domain.TeeTier
+import com.eltavine.duckdetector.capability.attestation.domain.TeeCertificateItem
+import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import java.security.cert.X509Certificate
 
-data class AttestationSnapshot(
+public data class AttestationSnapshot(
     val tier: TeeTier,
     val attestationVersion: Int?,
     val keymasterVersion: Int?,
@@ -45,14 +45,14 @@ data class AttestationSnapshot(
     val errorMessage: String? = null,
 )
 
-data class RootOfTrustSnapshot(
+public data class RootOfTrustSnapshot(
     val verifiedBootKeyHex: String?,
     val deviceLocked: Boolean?,
     val verifiedBootState: String?,
     val verifiedBootHashHex: String?,
 )
 
-data class AttestedKeyProperties(
+public data class AttestedKeyProperties(
     val algorithm: String? = null,
     val keySize: Int? = null,
     val ecCurve: String? = null,
@@ -63,7 +63,7 @@ data class AttestedKeyProperties(
     val rollbackResistant: Boolean = false,
 )
 
-data class AttestedAuthState(
+public data class AttestedAuthState(
     val noAuthRequired: Boolean? = null,
     val userAuthTypes: List<String> = emptyList(),
     val authTimeoutSeconds: Int? = null,
@@ -72,13 +72,13 @@ data class AttestedAuthState(
     val unlockedDeviceRequired: Boolean = false,
 )
 
-data class AttestedApplicationInfo(
+public data class AttestedApplicationInfo(
     val packageNames: List<String> = emptyList(),
     val signatureDigestsSha256: List<String> = emptyList(),
     val rawBytesHex: String? = null,
 )
 
-data class AttestedDeviceInfo(
+public data class AttestedDeviceInfo(
     val brand: String? = null,
     val device: String? = null,
     val product: String? = null,
@@ -89,7 +89,7 @@ data class AttestedDeviceInfo(
     val secondImei: String? = null,
     val meid: String? = null,
 ) {
-    fun asDisplayMap(): Map<String, String> = buildMap {
+    public fun asDisplayMap(): Map<String, String> = buildMap {
         brand?.let { put("Brand", it) }
         device?.let { put("Device", it) }
         product?.let { put("Product", it) }

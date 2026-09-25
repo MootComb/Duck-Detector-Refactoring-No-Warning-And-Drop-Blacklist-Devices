@@ -18,7 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import android.os.BadParcelableException
 import android.os.Build
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.security.KeyStore
 
 class ListEntriesConsistencyProbe {

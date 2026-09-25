@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.data.verification.boot
+package com.eltavine.duckdetector.capability.attestation.data
 
-import com.eltavine.duckdetector.features.tee.data.attestation.AttestationSnapshot
-
-class BootConsistencyProbe(
+public class BootConsistencyProbe(
     private val propertyReader: SystemPropertyReader = ReflectionSystemPropertyReader(),
 ) {
 
-    fun inspect(snapshot: AttestationSnapshot): BootConsistencyResult {
+    public fun inspect(snapshot: AttestationSnapshot): BootConsistencyResult {
         val property = propertyReader.read(VBMETA_DIGEST_PROP)
         val root = snapshot.rootOfTrust
         if (root == null) {
@@ -132,7 +130,7 @@ class BootConsistencyProbe(
     }
 }
 
-data class BootConsistencyResult(
+public data class BootConsistencyResult(
     val vbmetaDigestMismatch: Boolean = false,
     val vbmetaDigestMissingWhileAttestedHashPresent: Boolean = false,
     val verifiedBootHashAllZeros: Boolean = false,
@@ -159,11 +157,11 @@ private enum class ParsedBootState {
     UNKNOWN,
 }
 
-fun interface SystemPropertyReader {
-    fun read(name: String): PropertyReadResult
+public fun interface SystemPropertyReader {
+    public fun read(name: String): PropertyReadResult
 }
 
-data class PropertyReadResult(
+public data class PropertyReadResult(
     val available: Boolean,
     val value: String? = null,
 )

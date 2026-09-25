@@ -23,7 +23,7 @@ limitations under the License.
         errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/boot/BootConsistencyProbe.kt"
+            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/BootConsistencyProbe.kt"
             line="122" column="25" />
     </issue>
 
@@ -235,7 +235,7 @@ limitations under the License.
         errorLine1="                if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/keystore/AndroidKeyStoreTools.kt"
+            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/AndroidKeyStoreTools.kt"
             line="153" column="37" />
     </issue>
 
@@ -243,7 +243,7 @@ limitations under the License.
         errorLine1="                if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/keystore/AndroidKeyStoreTools.kt"
+            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/AndroidKeyStoreTools.kt"
             line="176" column="37" />
     </issue>
 

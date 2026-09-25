@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.features.tee.domain
+package com.eltavine.duckdetector.capability.attestation.domain
 
-data class TeeCertificateItem(
-    val slotLabel: String,
-    val subject: String,
-    val issuer: String,
-    val serialNumber: String,
-    val validFrom: String,
-    val validUntil: String,
-    val signatureAlgorithm: String,
-    val publicKeySummary: String,
-)
+public enum class TeeTrustRoot {
+    UNKNOWN,
+    FACTORY,
+    GOOGLE,
+    GOOGLE_RKP,
+    AOSP,
+}

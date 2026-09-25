@@ -20,7 +20,7 @@ import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyProtection
 import android.security.keystore.KeyProperties
-import com.eltavine.duckdetector.features.tee.data.keystore.AndroidKeyStoreTools
+import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
 import java.security.SecureRandom
