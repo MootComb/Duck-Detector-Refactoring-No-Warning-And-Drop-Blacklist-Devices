@@ -26,6 +26,7 @@ dependencies {
     api(project(":capability:packageinventory:data"))
     api(project(":capability:packageinventory:domain"))
     implementation(project(":core:native"))
+    implementation(project(":core:platform"))
     api(project(":feature:customrom:domain"))
     implementation(libs.kotlinx.coroutines.android)
 }

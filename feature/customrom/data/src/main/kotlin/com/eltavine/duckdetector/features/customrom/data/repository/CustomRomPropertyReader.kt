@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.customrom.data.repository
 
+import com.eltavine.duckdetector.core.platform.HiddenSystemProperties
 import java.util.concurrent.TimeUnit
 
 fun interface CustomRomPropertyReader {
@@ -31,13 +32,8 @@ internal class DefaultCustomRomPropertyReader : CustomRomPropertyReader {
         return readViaGetprop(name)
     }
 
-    @Suppress("PrivateApi")
     private fun readViaReflection(name: String): String? {
-        return runCatching {
-            val clazz = Class.forName("android.os.SystemProperties")
-            val method = clazz.getMethod("get", String::class.java)
-            (method.invoke(null, name) as? String)?.trim()
-        }.getOrNull()
+        return HiddenSystemProperties.read(name).getOrNull()?.trim()
     }
 
     private fun readViaGetprop(name: String): String? {

@@ -66,13 +66,6 @@
       "reason": "Privacy guard asserting that the snapshot type declares no field that could retain the device unique ID or key request data."
     },
     {
-      "path": "feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomPropertyReader.kt",
-      "uses": [
-        "operations"
-      ],
-      "reason": "Reads android.os.SystemProperties, which is hidden from the SDK, through reflection."
-    },
-    {
       "path": "feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt",
       "uses": [
         "operations"
