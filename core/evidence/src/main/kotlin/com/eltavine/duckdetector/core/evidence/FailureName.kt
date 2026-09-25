@@ -135,13 +135,19 @@ public object FailureName {
     }
 
     /** The name alone, or `name: message` when the failure carries a non-blank message. */
-    public fun describe(failure: Throwable): String {
-        val message = failure.message?.takeIf(String::isNotBlank) ?: return of(failure)
-        return "${of(failure)}: $message"
-    }
+    public fun describe(failure: Throwable): String = describe(failure, of(failure))
 
     /** The non-blank message when there is one, otherwise the name. */
-    public fun messageOrName(failure: Throwable): String {
-        return failure.message?.takeIf(String::isNotBlank) ?: of(failure)
+    public fun messageOrName(failure: Throwable): String = messageOrName(failure, of(failure))
+
+    /** [describe] for a [name] chosen by another namer, so every namer shares one wording rule. */
+    public fun describe(failure: Throwable, name: String): String {
+        val message = failure.message?.takeIf(String::isNotBlank) ?: return name
+        return "$name: $message"
+    }
+
+    /** [messageOrName] for a [name] chosen by another namer. */
+    public fun messageOrName(failure: Throwable, name: String): String {
+        return failure.message?.takeIf(String::isNotBlank) ?: name
     }
 }
