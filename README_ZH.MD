@@ -83,27 +83,41 @@ DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用�
 
 ```text
 Duck-Detector-Refactoring/
-├─ app/
-│  ├─ src/main/java/com/eltavine/duckdetector/
-│  │  ├─ core/            # 通用平台能力与 UI 基础设施
-│  │  ├─ features/        # 检测功能与辅助功能包
-│  │  └─ ui/              # 应用外壳、导航与主题
-│  └─ src/main/cpp/       # C++、JNI 与各架构汇编代码
-├─ build-logic/           # 约定插件与资源生成任务
+├─ app/                   # UI 组合根：Activity、仪表盘卡片、通知
+├─ sdk/runtime/           # Headless 组合根：检测器目录、扫描 API、原生库注册表
+├─ sdk/aar/               # 可分发的 SDK：把所有 headless 模块融合成一个 AAR
+├─ core/                  # 契约：证据、原生载荷、报告、扫描生命周期、检测器、UI
+├─ capability/            # 多个检测器共享的证据采集
+├─ feature/               # 每个目录一个检测器或辅助功能，按层拆分
+├─ samples/sdk-consumer/  # 只依赖已发布 AAR 构建的独立示例应用
+├─ build-logic/           # 约定插件、模块边界与依赖校验、生成资源任务
+├─ docs/                  # 架构概览、指南、ADR 与后续事项
+├─ .github/policies/      # 模块、原生、检测器接触点与反射策略
 ├─ gradle/                # 版本目录与 Gradle Wrapper 文件
-├─ scripts/               # 仓库维护脚本
+├─ scripts/               # 检测器脚手架与仓库维护脚本
 ├─ build.gradle.kts
 └─ settings.gradle.kts
 ```
 
-功能包会在适用时遵循以下边界：
+每个检测器是 `feature/<name>/` 下的一组 Gradle 模块：
 
+- `domain`：结果模型、报告模型、状态定义与判定规则（纯 JVM）
 - `data`：探针、解析器、Repository、JNI 桥接和 Android 服务访问
-- `domain`：报告、结果模型和状态定义
-- `presentation`：ViewModel、报告到 UI 的映射和界面状态
-- `ui`：Compose 卡片、页面和功能专用展示模型
+- `presentation`：卡片模型、从领域报告到卡片的映射与报告投影（纯 JVM）
+- `detector`：唯一的 headless `<Name>Detector` 对象，把其余各层绑定给 SDK 与应用
+- `ui`：Compose 卡片，以及检测器接入仪表盘的入口
 
-原生源码最终编译为共享库 `libduckdetector.so`，Kotlin 代码通过各功能域的 JNI 桥接读取原生结果。
+依赖方向为 `:app` 指向 SDK，二者指向 feature，feature 指向 capability，capability 指向 core；feature 之间互不依赖，每个模块只声明自己实际使用的依赖。构建与 CI 会校验这些规则，详见[架构概览](./docs/architecture/README.md)与[架构决策记录](./docs/adr/)。
+
+原生源码按单元组织：每个单元位于其所属模块的 `src/main/cpp/<unit>/`，编译为独立的 object library 并链接进 `libduckdetector.so`；Kotlin 代码通过同一模块中的 JNI 桥接读取原生结果。
+
+新增检测器只改动它自己的目录，以及 `DetectorCatalog`、`DetectorFeatures` 各一行。一条命令即可生成全部代码；生成结果可以直接构建，在探针写好之前显示“Not evaluated”：
+
+```bash
+python3 scripts/new_detector.py <name> --description "检测什么，以及为什么它构成证据"
+```
+
+后续步骤见 [Adding a detector](./docs/guides/adding-a-detector.md)。要在其他应用中运行这些检测器，见 [Using the SDK](./docs/guides/sdk-integration.md)。
 
 # 构建
 
@@ -129,7 +143,13 @@ gradlew.bat :app:assembleDebug
 本地完整校验可执行：
 
 ```bash
-./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:assembleDebug
+./gradlew unitTest :app:assembleDebug :app:lintDebug buildHealth
+```
+
+同一次构建还会产出不含任何 UI 的 headless SDK，打包为一个 AAR 并发布到 `sdk/aar/build/repository`（见 [Using the SDK](./docs/guides/sdk-integration.md)）：
+
+```bash
+./gradlew :sdk:aar:publish
 ```
 
 参与开发前请阅读 [`CODING_STANDARDS.md`](./CODING_STANDARDS.md)。

@@ -45,10 +45,11 @@
 
 - `domain`：结果与报告模型、状态定义、判定规则（纯 JVM）
 - `data`：采集、解析、桥接、底层探测
-- `presentation`：卡片模型、报告投影与摘要映射（纯 JVM）
-- `ui`：Compose 卡片、ViewModel 与 `DetectorFeature` 实现
+- `presentation`：卡片模型、报告投影与卡片映射（纯 JVM）
+- `detector`（仅检测器）：唯一的 headless `<Name>Detector` 对象，把 data、domain 与 presentation 绑定给 SDK 与 UI
+- `ui`：Compose 卡片与对话框（`internal`），以及用 `CardDetectorFeature` 构造的 `DetectorFeature`
 
-依赖方向为 `:app` → `:feature` → `:capability` → `:core`，feature 之间、capability 之间互不依赖。模块职责、禁止知识与扩展规则见 [`docs/architecture/README.md`](./docs/architecture/README.md)；`.github/policies/` 中的边界策略在构建与 CI 中校验。
+依赖方向为 `:app` → `:sdk` → `:feature` → `:capability` → `:core`，feature 之间、capability 之间互不依赖。新增检测器只改动 `feature/<name>/` 与 `DetectorCatalog`、`DetectorFeatures` 各一行。模块职责、禁止知识与扩展规则见 [`docs/architecture/README.md`](./docs/architecture/README.md)；`.github/policies/` 中的边界策略在构建与 CI 中校验。
 
 不要出现这些情况：
 
@@ -140,6 +141,9 @@
 - Native / JNI 改动：`python3 .github/scripts/check-jni-contracts.py` + `python3 .github/scripts/check-native-boundaries.py`
 - 模块边界或 build-logic 改动：`./gradlew :build-logic:test`
 - 依赖或模块改动（任何 `build.gradle.kts`、`libs.versions.toml`、新增模块）：`./gradlew buildHealth`，按报告增删依赖或调整 `api` / `implementation`
+- 新增检测器：用 `python3 scripts/new_detector.py <name> --description "..."` 生成，按 [docs/guides/adding-a-detector.md](./docs/guides/adding-a-detector.md) 填写各层；新增或修改检测器后运行 `python3 .github/scripts/check-detector-touch-points.py`
+- SDK 或 headless 模块改动：`./gradlew :sdk:aar:publish :sdk:aar:verifySdkAar`，再运行 `./gradlew -p samples/sdk-consumer assembleDebug`
+- 脚手架或模板改动：`python3 scripts/test_new_detector.py`
 - 检查脚本改动：运行对应的 `.github/scripts/test-*.py` 自测
 - 文案或卡片映射改动：对应 mapper / reducer tests
 

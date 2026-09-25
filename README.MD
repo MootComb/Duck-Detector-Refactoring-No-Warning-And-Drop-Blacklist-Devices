@@ -85,14 +85,16 @@ Supporting modules provide the dashboard, device information, settings, update c
 Duck-Detector-Refactoring/
 ├─ app/                   # UI composition root: activities, dashboard cards, notifications
 ├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, native library registry
+├─ sdk/aar/               # The distributable SDK: every headless module fused into one AAR
 ├─ core/                  # Contracts: evidence, native payloads, reports, scan lifecycle, detector, UI
 ├─ capability/            # Evidence collection shared by several detectors
 ├─ feature/               # One detector or supporting feature per directory, split into layers
-├─ build-logic/           # Convention plugins, module boundary validation, generated-asset tasks
-├─ docs/                  # Architecture overview, ADRs, and follow-ups
-├─ .github/policies/      # Module and native boundary policies
+├─ samples/sdk-consumer/  # A separate application built from the published AAR alone
+├─ build-logic/           # Convention plugins, module boundary and dependency validation, generated assets
+├─ docs/                  # Architecture overview, guides, ADRs, and follow-ups
+├─ .github/policies/      # Module, native, detector touch point, and reflection policies
 ├─ gradle/                # Version catalog and Gradle wrapper files
-├─ scripts/               # Repository maintenance scripts
+├─ scripts/               # Detector scaffold and repository maintenance scripts
 ├─ build.gradle.kts
 └─ settings.gradle.kts
 ```
@@ -101,10 +103,19 @@ Each detector is a set of Gradle modules under `feature/<name>/`:
 
 - `domain`: result models, report models, status definitions, and judgement rules (pure JVM)
 - `data`: probes, parsers, repositories, JNI bridges, and Android service access
-- `presentation`: card models, report projection, and summary mapping (pure JVM)
-- `ui`: Compose cards, the view model, and the detector's integration with the dashboard
+- `presentation`: the card model, its mapping from the domain report, and the report projection (pure JVM)
+- `detector`: the one headless `<Name>Detector` object that binds the other layers for the SDK and the app
+- `ui`: the Compose card and the detector's integration with the dashboard
 
-Dependencies point from `:app` to features, from features to capabilities, and from capabilities to core; features never depend on each other. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
+Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
+
+A new detector touches only its own directory and one line in each of `DetectorCatalog` and `DetectorFeatures`. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
+
+```bash
+python3 scripts/new_detector.py <name> --description "what it looks for and why that is evidence"
+```
+
+Continue with [Adding a detector](./docs/guides/adding-a-detector.md). To run the detectors inside another application, see [Using the SDK](./docs/guides/sdk-integration.md).
 
 Native sources are organized into units. Each unit lives in `src/main/cpp/<unit>/` of the module that owns it, is compiled as its own object library and is linked into `libduckdetector.so`; Kotlin code reaches native results through the JNI bridges of that same module.
 
@@ -132,10 +143,10 @@ gradlew.bat :app:assembleDebug
 For the standard local validation path:
 
 ```bash
-./gradlew unitTest :app:assembleDebug :app:lintDebug
+./gradlew unitTest :app:assembleDebug :app:lintDebug buildHealth
 ```
 
-The same build also produces the headless SDK as one AAR, without any UI, published to `sdk/aar/build/repository`:
+The same build also produces the headless SDK as one AAR, without any UI, published to `sdk/aar/build/repository` (see [Using the SDK](./docs/guides/sdk-integration.md)):
 
 ```bash
 ./gradlew :sdk:aar:publish

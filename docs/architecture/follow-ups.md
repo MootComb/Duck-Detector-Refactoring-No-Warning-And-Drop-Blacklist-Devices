@@ -28,8 +28,12 @@ Each detector still collects its own platform evidence during its scan, even whe
 
 ## Startup policy wires the TEE network consent
 
-The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. It is composition-root wiring rather than a detection rule, but it is the only place outside `DetectorFeatures` where the shell names a detector. If another feature needs startup consent, replace it with a typed consent contract in `:core`.
+The startup policy screens and app shell in `:app` read and write `TeeNetworkConsentStore` and `TeeNetworkPrefs` from `:feature:tee:data`. This lets the user consent to downloading Google's revocation feed before the first scan. When the consent changes, the shell finds the TEE session by `TeeDetector.id` and rescans it. This is composition-root wiring rather than a detection rule, but these files are where the shell names a detector outside `DetectorFeatures`, each recorded as a touch point exception. If another feature needs startup consent, replace this with a typed consent contract in `:core`.
 
-## Composable detector sessions
+## The SDK's app zygote preload names Native Root
 
-`DetectorSession.Card()` is `@Composable`, which makes `:core:detector` an Android library. The scan and report contracts it builds on are pure JVM, so a JVM-only session contract with a separate UI binding would allow composition-level tests without Robolectric or instrumentation. This only matters if such tests become necessary.
+`DuckDetectorZygotePreload` in `:sdk:runtime` calls `NativeRootZygotePreload.installThroneHuntWatch` directly, before the SELinux context validity capture. It is the one place where the SDK names a detector outside `DetectorCatalog`, recorded as a touch point exception. If a second detector needs app zygote work, give `Detector` an optional preload hook that the SDK runs in catalog order, keeping the order the carriers depend on.
+
+## Early launch capture starts a fixed activity
+
+The transparent `NativeActivity` in the `preload` unit starts `<applicationId>.MainActivity` by name after its capture. An SDK host whose launch activity has another name cannot reuse the launcher, so its Mount and Virtualization detectors report the early capture as unavailable. Reading the target activity from a `<meta-data>` entry on the `NativeActivity` would lift this; the app's behaviour must stay identical.
