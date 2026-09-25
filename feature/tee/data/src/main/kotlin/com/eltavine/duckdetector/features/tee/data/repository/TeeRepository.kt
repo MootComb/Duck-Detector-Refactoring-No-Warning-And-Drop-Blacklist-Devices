@@ -79,7 +79,7 @@ import com.eltavine.duckdetector.features.tee.data.verification.keystore.VintfKe
 import com.eltavine.duckdetector.features.tee.data.verification.rkp.RkpExtensionAnalyzer
 import com.eltavine.duckdetector.features.tee.data.verification.strongbox.StrongBoxBehaviorProbeSuite
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
-import com.eltavine.duckdetector.features.tee.domain.TeeScanner
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.tee.domain.TeeSoterState
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
 import kotlinx.coroutines.Dispatchers
@@ -92,7 +92,7 @@ class TeeRepository(
     private val collector: AndroidAttestationCollector = AndroidAttestationCollector(),
     private val nativeBridge: TeeNativeBridge = TeeNativeBridge(),
     private val reducer: TeeReportReducer = TeeReportReducer(),
-) : TeeScanner {
+) : DetectorScanner<TeeReport> {
 
     private val appContext = context.applicationContext
     private val consentStore: TeeNetworkPrefsStore = TeeNetworkConsentStore.getInstance(appContext)

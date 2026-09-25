@@ -24,6 +24,7 @@ android {
 }
 
 dependencies {
+    api(project(":core:detector"))
     api(project(":core:evidence"))
     api(project(":core:report"))
     api(project(":core:scan"))

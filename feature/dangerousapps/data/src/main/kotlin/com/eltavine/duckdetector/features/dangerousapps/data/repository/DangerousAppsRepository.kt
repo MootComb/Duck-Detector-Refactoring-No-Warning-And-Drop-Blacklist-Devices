@@ -25,6 +25,7 @@ import android.text.TextUtils
 import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.data.PackageDataDirectoryProbe
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.CreatePackageContextZipProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.OpenApkFdPackageProbe
@@ -34,7 +35,6 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppFindi
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppTarget
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
-import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsScanner
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousDetectionMethod
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousDetectionMethodKind
@@ -54,7 +54,7 @@ class DangerousAppsRepository(
     private val openApkFdPackageProbe: OpenApkFdPackageProbe = OpenApkFdPackageProbe(),
     private val sceneDebugfsContextProbe: SceneDebugfsContextProbe = SceneDebugfsContextProbe(),
     private val sceneLoopbackProbe: SceneLoopbackProbe = SceneLoopbackProbe(),
-) : DangerousAppsScanner {
+) : DetectorScanner<DangerousAppsReport> {
     override suspend fun scan(): DangerousAppsReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->

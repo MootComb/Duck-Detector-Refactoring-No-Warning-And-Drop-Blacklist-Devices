@@ -26,6 +26,7 @@ import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNat
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationTrapResult
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmCounterTrapProbe
 import com.eltavine.duckdetector.features.virtualization.data.probes.AsmRawSyscallTrapProbe
 import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbe
@@ -39,7 +40,6 @@ import com.eltavine.duckdetector.features.virtualization.data.probes.Virtualizat
 import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationServiceProbe
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationImpact
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
-import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationScanner
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalGroup
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalSeverity
@@ -101,7 +101,7 @@ class VirtualizationRepository(
     private val processInfoProvider: () -> VirtualizationProcessInfo = {
         VirtualizationProcessInfo.fromContext(context?.applicationContext)
     },
-) : VirtualizationScanner {
+) : DetectorScanner<VirtualizationReport> {
     override suspend fun scan(): VirtualizationReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->

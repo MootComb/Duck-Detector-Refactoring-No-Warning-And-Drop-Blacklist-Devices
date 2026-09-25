@@ -27,7 +27,7 @@ import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckCvePatchState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckScanner
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelIdentityRead
 import java.io.File
@@ -41,7 +41,7 @@ class KernelCheckRepository(
         KernelIdentityConsistencyUtils(),
     private val cpuIdentityEvaluator: Arm64CpuIdentityConsistencyEvaluator =
         Arm64CpuIdentityConsistencyEvaluator(),
-) : KernelCheckScanner {
+) : DetectorScanner<KernelCheckReport> {
 
     override suspend fun scan(): KernelCheckReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }

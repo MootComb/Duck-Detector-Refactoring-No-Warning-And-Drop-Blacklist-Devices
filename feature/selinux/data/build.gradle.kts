@@ -24,6 +24,7 @@ android {
 
 dependencies {
     api(project(":capability:selinuxpolicy:data"))
+    api(project(":core:detector"))
     implementation(project(":core:native"))
     api(project(":feature:selinux:domain"))
     implementation(libs.kotlinx.coroutines.android)

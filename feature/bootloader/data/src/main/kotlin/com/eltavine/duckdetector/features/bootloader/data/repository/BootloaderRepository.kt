@@ -30,13 +30,13 @@ import com.eltavine.duckdetector.capability.systemproperties.domain.MultiSourceP
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertyCategory
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.bootloader.data.rules.BootloaderCatalog
 import com.eltavine.duckdetector.features.bootloader.data.widevine.WidevineBootContext
 import com.eltavine.duckdetector.features.bootloader.data.widevine.WidevineBootloaderEvidence
 import com.eltavine.duckdetector.features.bootloader.data.widevine.WidevineCredentialRepository
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderEvidenceMode
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
-import com.eltavine.duckdetector.features.bootloader.domain.BootloaderScanner
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ class BootloaderRepository(
     private val collector: AndroidAttestationCollector = AndroidAttestationCollector(),
     private val readUtils: SystemPropertyReadUtils = SystemPropertyReadUtils(),
     private val consistencyUtils: SystemPropertyConsistencyUtils = SystemPropertyConsistencyUtils(),
-) : BootloaderScanner {
+) : DetectorScanner<BootloaderReport> {
 
     private val appContext = context.applicationContext
     private val trustAnalyzer = CertificateTrustAnalyzer(GoogleAttestationRootStore(appContext))

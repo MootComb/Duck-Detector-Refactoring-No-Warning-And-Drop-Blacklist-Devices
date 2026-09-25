@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.customrom.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
-import com.eltavine.duckdetector.features.customrom.domain.CustomRomScanner
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomStage
 import com.eltavine.duckdetector.features.customrom.presentation.CustomRomCardModelMapper
 import com.eltavine.duckdetector.features.customrom.presentation.CustomRomUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class CustomRomViewModel(
-    private val repository: CustomRomScanner,
+    private val repository: DetectorScanner<CustomRomReport>,
     private val mapper: CustomRomCardModelMapper = CustomRomCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class CustomRomViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> CustomRomScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<CustomRomReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

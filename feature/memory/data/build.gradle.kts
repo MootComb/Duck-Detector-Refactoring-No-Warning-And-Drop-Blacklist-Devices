@@ -23,6 +23,7 @@ android {
 }
 
 dependencies {
+    api(project(":core:detector"))
     implementation(project(":core:native"))
     api(project(":feature:memory:domain"))
     implementation(libs.kotlinx.coroutines.android)

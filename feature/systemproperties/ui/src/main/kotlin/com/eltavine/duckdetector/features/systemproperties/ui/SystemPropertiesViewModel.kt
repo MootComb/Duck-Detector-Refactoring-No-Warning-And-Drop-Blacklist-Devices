@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.systemproperties.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesScanner
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
 import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesCardModelMapper
 import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class SystemPropertiesViewModel(
-    private val repository: SystemPropertiesScanner,
+    private val repository: DetectorScanner<SystemPropertiesReport>,
     private val mapper: SystemPropertiesCardModelMapper = SystemPropertiesCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class SystemPropertiesViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> SystemPropertiesScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<SystemPropertiesReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

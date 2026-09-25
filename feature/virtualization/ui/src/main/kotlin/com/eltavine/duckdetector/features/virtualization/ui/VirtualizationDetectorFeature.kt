@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationScanner
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
 import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationDetectorId
 import com.eltavine.duckdetector.features.virtualization.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.virtualization.ui.card.VirtualizationDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class VirtualizationDetectorFeature(
-    private val createScanner: (Context) -> VirtualizationScanner,
+    private val createScanner: (Context) -> DetectorScanner<VirtualizationReport>,
 ) : DetectorFeature {
     override val id: DetectorId = VirtualizationDetectorId
 

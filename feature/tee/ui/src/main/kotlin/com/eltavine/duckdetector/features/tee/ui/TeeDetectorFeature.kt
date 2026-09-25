@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.tee.domain.TeeScanner
+import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.presentation.TeeDetectorId
 import com.eltavine.duckdetector.features.tee.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.tee.ui.card.TeeDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class TeeDetectorFeature(
-    private val createScanner: (Context) -> TeeScanner,
+    private val createScanner: (Context) -> DetectorScanner<TeeReport>,
 ) : DetectorFeature {
     override val id: DetectorId = TeeDetectorId
 

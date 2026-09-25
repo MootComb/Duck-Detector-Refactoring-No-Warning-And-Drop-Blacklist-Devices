@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.virtualization.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
-import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationScanner
 import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationStage
 import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationCardModelMapper
 import com.eltavine.duckdetector.features.virtualization.presentation.VirtualizationUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class VirtualizationViewModel(
-    private val repository: VirtualizationScanner,
+    private val repository: DetectorScanner<VirtualizationReport>,
     private val mapper: VirtualizationCardModelMapper = VirtualizationCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class VirtualizationViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> VirtualizationScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<VirtualizationReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

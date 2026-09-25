@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.lsposed.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedScanner
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedCardModelMapper
 import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class LSPosedViewModel(
-    private val repository: LSPosedScanner,
+    private val repository: DetectorScanner<LSPosedReport>,
     private val mapper: LSPosedCardModelMapper = LSPosedCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class LSPosedViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> LSPosedScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<LSPosedReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

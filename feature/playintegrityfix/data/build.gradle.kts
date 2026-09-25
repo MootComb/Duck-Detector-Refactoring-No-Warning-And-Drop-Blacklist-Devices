@@ -23,6 +23,7 @@ android {
 }
 
 dependencies {
+    api(project(":core:detector"))
     implementation(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:playintegrityfix:domain"))

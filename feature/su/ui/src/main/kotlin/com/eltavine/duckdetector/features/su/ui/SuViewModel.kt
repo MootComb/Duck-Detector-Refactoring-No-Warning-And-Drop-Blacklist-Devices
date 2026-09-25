@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.su.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.su.domain.SuReport
-import com.eltavine.duckdetector.features.su.domain.SuScanner
 import com.eltavine.duckdetector.features.su.domain.SuStage
 import com.eltavine.duckdetector.features.su.presentation.SuCardModelMapper
 import com.eltavine.duckdetector.features.su.presentation.SuUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class SuViewModel(
-    private val repository: SuScanner,
+    private val repository: DetectorScanner<SuReport>,
     private val mapper: SuCardModelMapper = SuCardModelMapper(),
 ) : ViewModel() {
 
@@ -86,7 +86,7 @@ class SuViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> SuScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<SuReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

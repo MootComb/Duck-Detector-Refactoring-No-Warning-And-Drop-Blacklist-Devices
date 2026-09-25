@@ -25,6 +25,7 @@ android {
 dependencies {
     api(project(":capability:attestation:data"))
     api(project(":capability:attestation:domain"))
+    api(project(":core:detector"))
     implementation(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:tee:domain"))

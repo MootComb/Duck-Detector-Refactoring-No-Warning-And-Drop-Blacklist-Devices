@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.playintegrityfix.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixReport
-import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixScanner
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixStage
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixCardModelMapper
 import com.eltavine.duckdetector.features.playintegrityfix.presentation.PlayIntegrityFixUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class PlayIntegrityFixViewModel(
-    private val repository: PlayIntegrityFixScanner,
+    private val repository: DetectorScanner<PlayIntegrityFixReport>,
     private val mapper: PlayIntegrityFixCardModelMapper = PlayIntegrityFixCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class PlayIntegrityFixViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> PlayIntegrityFixScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<PlayIntegrityFixReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

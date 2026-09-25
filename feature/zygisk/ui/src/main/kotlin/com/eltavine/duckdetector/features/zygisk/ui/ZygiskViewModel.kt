@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.zygisk.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskScanner
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskStage
 import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskCardModelMapper
 import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class ZygiskViewModel(
-    private val repository: ZygiskScanner,
+    private val repository: DetectorScanner<ZygiskReport>,
     private val mapper: ZygiskCardModelMapper = ZygiskCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class ZygiskViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> ZygiskScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<ZygiskReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

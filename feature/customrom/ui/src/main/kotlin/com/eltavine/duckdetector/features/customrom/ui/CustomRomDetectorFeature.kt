@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.customrom.domain.CustomRomScanner
+import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
 import com.eltavine.duckdetector.features.customrom.presentation.CustomRomDetectorId
 import com.eltavine.duckdetector.features.customrom.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.customrom.ui.card.CustomRomDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class CustomRomDetectorFeature(
-    private val createScanner: (Context) -> CustomRomScanner,
+    private val createScanner: (Context) -> DetectorScanner<CustomRomReport>,
 ) : DetectorFeature {
     override val id: DetectorId = CustomRomDetectorId
 

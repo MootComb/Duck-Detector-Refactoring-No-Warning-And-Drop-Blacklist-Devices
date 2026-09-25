@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.memory.data.repository
 
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.memory.data.native.MemoryNativeBridge
 import com.eltavine.duckdetector.features.memory.data.native.MemoryNativeFinding
 import com.eltavine.duckdetector.features.memory.data.native.MemoryNativeSnapshot
@@ -25,14 +26,13 @@ import com.eltavine.duckdetector.features.memory.domain.MemoryFindingSeverity
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodOutcome
 import com.eltavine.duckdetector.features.memory.domain.MemoryMethodResult
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
-import com.eltavine.duckdetector.features.memory.domain.MemoryScanner
 import com.eltavine.duckdetector.features.memory.domain.MemoryStage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MemoryRepository(
     private val nativeBridge: MemoryNativeBridge = MemoryNativeBridge(),
-) : MemoryScanner {
+) : DetectorScanner<MemoryReport> {
 
     override suspend fun scan(): MemoryReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }

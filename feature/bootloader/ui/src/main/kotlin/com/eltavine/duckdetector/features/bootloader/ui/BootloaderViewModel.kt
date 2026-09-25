@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.bootloader.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderReport
-import com.eltavine.duckdetector.features.bootloader.domain.BootloaderScanner
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderCardModelMapper
 import com.eltavine.duckdetector.features.bootloader.presentation.BootloaderUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class BootloaderViewModel(
-    private val repository: BootloaderScanner,
+    private val repository: DetectorScanner<BootloaderReport>,
     private val mapper: BootloaderCardModelMapper = BootloaderCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class BootloaderViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> BootloaderScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<BootloaderReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

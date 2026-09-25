@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.nativeroot.data.repository
 
 import android.content.Context
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.nativeroot.data.native.NativeRootNativeBridge
 import com.eltavine.duckdetector.features.nativeroot.data.native.NativeRootNativeFinding
 import com.eltavine.duckdetector.features.nativeroot.data.probes.CgroupProcessLeakProbe
@@ -31,7 +32,6 @@ import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFinding
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootFindingSeverity
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootGroup
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
-import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootScanner
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -52,7 +52,7 @@ class NativeRootRepository(
         context?.applicationContext
     ),
     private val throneHuntProbe: KernelSuThroneHuntProbe = KernelSuThroneHuntProbe(),
-) : NativeRootScanner {
+) : DetectorScanner<NativeRootReport> {
 
     override suspend fun scan(): NativeRootReport = withContext(Dispatchers.IO) {
         try {

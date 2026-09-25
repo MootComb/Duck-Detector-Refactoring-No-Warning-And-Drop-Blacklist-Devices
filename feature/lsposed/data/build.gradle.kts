@@ -26,6 +26,7 @@ dependencies {
     api(project(":capability:packageinventory:data"))
     api(project(":capability:packageinventory:domain"))
     api(project(":capability:selinuxpolicy:data"))
+    api(project(":core:detector"))
     implementation(project(":core:native"))
     implementation(project(":core:platform"))
     api(project(":feature:lsposed:domain"))

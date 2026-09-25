@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.mount.domain.MountScanner
+import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.presentation.MountDetectorId
 import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.mount.ui.card.MountDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class MountDetectorFeature(
-    private val createScanner: (Context) -> MountScanner,
+    private val createScanner: (Context) -> DetectorScanner<MountReport>,
 ) : DetectorFeature {
     override val id: DetectorId = MountDetectorId
 

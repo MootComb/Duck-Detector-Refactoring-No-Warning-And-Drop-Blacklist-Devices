@@ -27,7 +27,7 @@ import com.eltavine.duckdetector.features.zygisk.data.native.ZygiskNativeTrace
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodOutcome
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodResult
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskScanner
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignal
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalGroup
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalSeverity
@@ -40,7 +40,7 @@ class ZygiskRepository(
     context: Context,
     private val nativeBridge: ZygiskNativeBridge = ZygiskNativeBridge(),
     private val fdTrapManager: ZygiskFdTrapManager = ZygiskFdTrapManager(),
-) : ZygiskScanner {
+) : DetectorScanner<ZygiskReport> {
 
     private val appContext = context.applicationContext
 

@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadS
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationIsolatedProbeManager
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteProfile
 import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationRemoteSnapshot
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
@@ -36,7 +37,6 @@ import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountImpact
 import com.eltavine.duckdetector.features.mount.domain.MountReport
-import com.eltavine.duckdetector.features.mount.domain.MountScanner
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextExposure
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
@@ -55,7 +55,7 @@ class MountRepository(
         VirtualizationIsolatedProbeManager(context?.applicationContext),
     private val zygoteNextProbeManager: ZygoteNextProbeManager =
         ZygoteNextProbeManager(context?.applicationContext),
-) : MountScanner {
+) : DetectorScanner<MountReport> {
     override suspend fun scan(): MountReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->

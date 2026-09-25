@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.selinux.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxScanner
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import com.eltavine.duckdetector.features.selinux.presentation.SelinuxCardModelMapper
 import com.eltavine.duckdetector.features.selinux.presentation.SelinuxUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class SelinuxViewModel(
-    private val repository: SelinuxScanner,
+    private val repository: DetectorScanner<SelinuxReport>,
     private val mapper: SelinuxCardModelMapper = SelinuxCardModelMapper(),
 ) : ViewModel() {
 
@@ -86,7 +86,7 @@ class SelinuxViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> SelinuxScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<SelinuxReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

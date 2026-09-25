@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.playintegrityfix.data.repository
 
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.playintegrityfix.data.rules.PlayIntegrityFixCatalog
 import com.eltavine.duckdetector.features.playintegrityfix.data.utils.PlayIntegrityConsistencyUtils
 import com.eltavine.duckdetector.features.playintegrityfix.data.utils.PlayIntegrityMultiSourceRead
@@ -25,7 +26,6 @@ import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityF
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixMethodResult
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixPropertyCategory
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixReport
-import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixScanner
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixSignal
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixSignalSeverity
 import com.eltavine.duckdetector.features.playintegrityfix.domain.PlayIntegrityFixSource
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 class PlayIntegrityFixRepository(
     private val readUtils: PlayIntegrityPropertyReadUtils = PlayIntegrityPropertyReadUtils(),
     private val consistencyUtils: PlayIntegrityConsistencyUtils = PlayIntegrityConsistencyUtils(),
-) : PlayIntegrityFixScanner {
+) : DetectorScanner<PlayIntegrityFixReport> {
 
     override suspend fun scan(): PlayIntegrityFixReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }

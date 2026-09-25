@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.kernelcheck.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckScanner
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckStage
 import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckCardModelMapper
 import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class KernelCheckViewModel(
-    private val repository: KernelCheckScanner,
+    private val repository: DetectorScanner<KernelCheckReport>,
     private val mapper: KernelCheckCardModelMapper = KernelCheckCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class KernelCheckViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> KernelCheckScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<KernelCheckReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

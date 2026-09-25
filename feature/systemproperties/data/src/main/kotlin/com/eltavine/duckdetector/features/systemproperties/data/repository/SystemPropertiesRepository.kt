@@ -25,10 +25,10 @@ import com.eltavine.duckdetector.capability.systemproperties.domain.SystemProper
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySeverity
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertiesCatalog
 import com.eltavine.duckdetector.features.systemproperties.data.rules.SystemPropertyRule
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesScanner
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 class SystemPropertiesRepository(
     private val readUtils: SystemPropertyReadUtils = SystemPropertyReadUtils(),
     private val consistencyUtils: SystemPropertyConsistencyUtils = SystemPropertyConsistencyUtils(),
-) : SystemPropertiesScanner {
+) : DetectorScanner<SystemPropertiesReport> {
     override suspend fun scan(): SystemPropertiesReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->

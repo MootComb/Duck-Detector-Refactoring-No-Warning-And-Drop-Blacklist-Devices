@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.nativeroot.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootReport
-import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootScanner
 import com.eltavine.duckdetector.features.nativeroot.domain.NativeRootStage
 import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootCardModelMapper
 import com.eltavine.duckdetector.features.nativeroot.presentation.NativeRootUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class NativeRootViewModel(
-    private val repository: NativeRootScanner,
+    private val repository: DetectorScanner<NativeRootReport>,
     private val mapper: NativeRootCardModelMapper = NativeRootCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class NativeRootViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> NativeRootScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<NativeRootReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskScanner
+import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
 import com.eltavine.duckdetector.features.zygisk.presentation.ZygiskDetectorId
 import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.zygisk.ui.card.ZygiskDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class ZygiskDetectorFeature(
-    private val createScanner: (Context) -> ZygiskScanner,
+    private val createScanner: (Context) -> DetectorScanner<ZygiskReport>,
 ) : DetectorFeature {
     override val id: DetectorId = ZygiskDetectorId
 

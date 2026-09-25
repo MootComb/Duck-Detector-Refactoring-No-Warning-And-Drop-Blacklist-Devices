@@ -16,12 +16,12 @@
 
 package com.eltavine.duckdetector.features.su.data.repository
 
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.su.data.native.SuNativeBridge
 import com.eltavine.duckdetector.features.su.domain.SuDaemonFinding
 import com.eltavine.duckdetector.features.su.domain.SuMethodOutcome
 import com.eltavine.duckdetector.features.su.domain.SuMethodResult
 import com.eltavine.duckdetector.features.su.domain.SuReport
-import com.eltavine.duckdetector.features.su.domain.SuScanner
 import com.eltavine.duckdetector.features.su.domain.SuStage
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 
 class SuRepository(
     private val nativeBridge: SuNativeBridge = SuNativeBridge(),
-) : SuScanner {
+) : DetectorScanner<SuReport> {
 
     override suspend fun scan(): SuReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }

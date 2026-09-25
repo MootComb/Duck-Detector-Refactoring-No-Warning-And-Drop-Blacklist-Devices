@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckScanner
+import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckReport
 import com.eltavine.duckdetector.features.kernelcheck.presentation.KernelCheckDetectorId
 import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.kernelcheck.ui.card.KernelCheckDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class KernelCheckDetectorFeature(
-    private val createScanner: (Context) -> KernelCheckScanner,
+    private val createScanner: (Context) -> DetectorScanner<KernelCheckReport>,
 ) : DetectorFeature {
     override val id: DetectorId = KernelCheckDetectorId
 

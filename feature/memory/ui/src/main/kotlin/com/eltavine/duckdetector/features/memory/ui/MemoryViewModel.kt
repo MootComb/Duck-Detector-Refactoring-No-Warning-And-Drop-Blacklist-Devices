@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.memory.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.memory.domain.MemoryReport
-import com.eltavine.duckdetector.features.memory.domain.MemoryScanner
 import com.eltavine.duckdetector.features.memory.domain.MemoryStage
 import com.eltavine.duckdetector.features.memory.presentation.MemoryCardModelMapper
 import com.eltavine.duckdetector.features.memory.presentation.MemoryUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class MemoryViewModel(
-    private val repository: MemoryScanner,
+    private val repository: DetectorScanner<MemoryReport>,
     private val mapper: MemoryCardModelMapper = MemoryCardModelMapper(),
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class MemoryViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> MemoryScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<MemoryReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

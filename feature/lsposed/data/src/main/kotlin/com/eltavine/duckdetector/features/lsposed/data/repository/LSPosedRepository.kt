@@ -43,7 +43,7 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedScanner
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
@@ -65,7 +65,7 @@ class LSPosedRepository(
     private val runtimeArtifactProbe: LSPosedRuntimeArtifactProbe = LSPosedRuntimeArtifactProbe(),
     private val logcatProbe: LSPosedLogcatProbe = LSPosedLogcatProbe(),
     private val dirtyPolicyProbe: LSPosedDirtyPolicyProbe = LSPosedDirtyPolicyProbe(),
-) : LSPosedScanner {
+) : DetectorScanner<LSPosedReport> {
 
     private val appContext = context.applicationContext
     private val dirtyPolicyCarrierManager =

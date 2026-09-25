@@ -19,10 +19,10 @@ package com.eltavine.duckdetector.features.mount.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.mount.domain.MountReport
-import com.eltavine.duckdetector.features.mount.domain.MountScanner
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.presentation.MountCardModelMapper
 import com.eltavine.duckdetector.features.mount.presentation.MountUiStage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class MountViewModel(
-    private val repository: MountScanner,
+    private val repository: DetectorScanner<MountReport>,
     private val mapper: MountCardModelMapper = MountCardModelMapper(),
 ) : ViewModel() {
 
@@ -91,7 +91,7 @@ class MountViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> MountScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<MountReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

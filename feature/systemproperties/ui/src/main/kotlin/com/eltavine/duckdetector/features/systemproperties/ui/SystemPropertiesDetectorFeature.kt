@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesScanner
+import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.presentation.SystemPropertiesDetectorId
 import com.eltavine.duckdetector.features.systemproperties.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.systemproperties.ui.card.SystemPropertiesDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class SystemPropertiesDetectorFeature(
-    private val createScanner: (Context) -> SystemPropertiesScanner,
+    private val createScanner: (Context) -> DetectorScanner<SystemPropertiesReport>,
 ) : DetectorFeature {
     override val id: DetectorId = SystemPropertiesDetectorId
 

@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.capability.packageinventory.data.AndroidInstall
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryReader
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
 import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.platform.HiddenServiceManager
 import com.eltavine.duckdetector.features.customrom.data.native.CustomRomNativeBridge
 import com.eltavine.duckdetector.features.customrom.data.rules.CustomRomCatalog
@@ -29,7 +30,6 @@ import com.eltavine.duckdetector.features.customrom.domain.CustomRomFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomModificationFinding
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomPackageVisibility
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomReport
-import com.eltavine.duckdetector.features.customrom.domain.CustomRomScanner
 import com.eltavine.duckdetector.features.customrom.domain.CustomRomStage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +42,7 @@ class CustomRomRepository(
     private val nativeBridge: CustomRomNativeBridge = CustomRomNativeBridge(),
     private val fileExists: (String) -> Boolean = { path -> File(path).exists() },
     private val propertyReader: CustomRomPropertyReader = DefaultCustomRomPropertyReader(),
-) : CustomRomScanner {
+) : DetectorScanner<CustomRomReport> {
     private val modificationProbe = CustomRomModificationProbe()
 
     override suspend fun scan(): CustomRomReport = withContext(Dispatchers.IO) {

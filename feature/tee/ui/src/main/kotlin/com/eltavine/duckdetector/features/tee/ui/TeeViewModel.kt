@@ -19,11 +19,11 @@ package com.eltavine.duckdetector.features.tee.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
-import com.eltavine.duckdetector.features.tee.domain.TeeScanner
 import com.eltavine.duckdetector.features.tee.presentation.TeeCardModelMapper
 import com.eltavine.duckdetector.features.tee.presentation.TeeUiStage
 import com.eltavine.duckdetector.features.tee.presentation.TeeUiState
@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class TeeViewModel(
-    private val repository: TeeScanner,
+    private val repository: DetectorScanner<TeeReport>,
     private val mapper: TeeCardModelMapper = TeeCardModelMapper(),
 ) : ViewModel() {
 
@@ -114,7 +114,7 @@ class TeeViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> TeeScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<TeeReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

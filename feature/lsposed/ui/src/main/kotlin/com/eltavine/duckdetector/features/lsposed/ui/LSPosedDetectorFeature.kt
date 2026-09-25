@@ -23,19 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.ui.detector.DetectorFeature
 import com.eltavine.duckdetector.core.ui.detector.DetectorSession
-import com.eltavine.duckdetector.features.lsposed.domain.LSPosedScanner
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.presentation.LSPosedDetectorId
 import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
 import com.eltavine.duckdetector.features.lsposed.ui.card.LSPosedDetectorCard
 import kotlinx.coroutines.flow.StateFlow
 
 class LSPosedDetectorFeature(
-    private val createScanner: (Context) -> LSPosedScanner,
+    private val createScanner: (Context) -> DetectorScanner<LSPosedReport>,
 ) : DetectorFeature {
     override val id: DetectorId = LSPosedDetectorId
 

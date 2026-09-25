@@ -19,11 +19,11 @@ package com.eltavine.duckdetector.features.dangerousapps.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.scan.ScanSessionRunner
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsCatalog
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsReport
-import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsScanner
 import com.eltavine.duckdetector.features.dangerousapps.domain.DangerousAppsStage
 import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsCardModelMapper
 import com.eltavine.duckdetector.features.dangerousapps.presentation.DangerousAppsUiStage
@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class DangerousAppsViewModel(
-    private val repository: DangerousAppsScanner,
+    private val repository: DetectorScanner<DangerousAppsReport>,
     private val mapper: DangerousAppsCardModelMapper = DangerousAppsCardModelMapper(),
 ) : ViewModel() {
 
@@ -91,7 +91,7 @@ class DangerousAppsViewModel(
     }
 
     companion object {
-        fun factory(createScanner: () -> DangerousAppsScanner): ViewModelProvider.Factory {
+        fun factory(createScanner: () -> DetectorScanner<DangerousAppsReport>): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

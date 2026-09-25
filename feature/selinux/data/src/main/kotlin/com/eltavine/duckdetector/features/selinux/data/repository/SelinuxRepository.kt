@@ -27,7 +27,7 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegritySt
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxScanner
+import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,7 @@ class SelinuxRepository(
     private val contextValidityProbe: SelinuxContextValidityProbe = SelinuxContextValidityProbe(),
     private val contextValidityCarrierManager: SelinuxContextValidityCarrierManager =
         SelinuxContextValidityCarrierManager(context?.applicationContext),
-) : SelinuxScanner {
+) : DetectorScanner<SelinuxReport> {
 
     override suspend fun scan(): SelinuxReport = withContext(Dispatchers.IO) {
         try {
