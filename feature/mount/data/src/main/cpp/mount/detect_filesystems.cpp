@@ -63,7 +63,6 @@ namespace duckdetector::mount::detail {
             return;
         }
 
-        snapshot.namespaceAnomalyDetected = true;
         if (selfNs != initNs) {
             add_finding(
                     snapshot,
@@ -75,6 +74,7 @@ namespace duckdetector::mount::detail {
                     "self=" + selfNs + ", init=" + initNs
             );
         } else {
+            snapshot.namespaceAnomalyDetected = true;
             add_finding(
                     snapshot,
                     dedupe,
