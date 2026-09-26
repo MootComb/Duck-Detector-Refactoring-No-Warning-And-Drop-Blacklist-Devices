@@ -15,6 +15,7 @@
  */
 
 #include "preload/early_detector.h"
+#include "preload/preload_extras.h"
 #include "preload/virtualization_early_detector.h"
 
 #include <android/log.h>
@@ -52,131 +53,6 @@ namespace {
             env->CallVoidMethod(activity, finish);
         }
         env->DeleteLocalRef(activityClass);
-    }
-
-    void put_boolean_extra(JNIEnv *env, jobject intent, jclass intentClass, const char *key,
-                           bool value) {
-        jmethodID putBooleanExtra = env->GetMethodID(
-                intentClass,
-                "putExtra",
-                "(Ljava/lang/String;Z)Landroid/content/Intent;"
-        );
-        if (putBooleanExtra == nullptr) {
-            return;
-        }
-        jstring keyString = env->NewStringUTF(key);
-        env->CallObjectMethod(intent, putBooleanExtra, keyString, static_cast<jboolean>(value));
-        env->DeleteLocalRef(keyString);
-    }
-
-    void put_long_extra(JNIEnv *env, jobject intent, jclass intentClass, const char *key,
-                        std::int64_t value) {
-        jmethodID putLongExtra = env->GetMethodID(
-                intentClass,
-                "putExtra",
-                "(Ljava/lang/String;J)Landroid/content/Intent;"
-        );
-        if (putLongExtra == nullptr) {
-            return;
-        }
-        jstring keyString = env->NewStringUTF(key);
-        env->CallObjectMethod(intent, putLongExtra, keyString, static_cast<jlong>(value));
-        env->DeleteLocalRef(keyString);
-    }
-
-    void put_string_extra(JNIEnv *env, jobject intent, jclass intentClass, const char *key,
-                          const std::string &value) {
-        jmethodID putStringExtra = env->GetMethodID(
-                intentClass,
-                "putExtra",
-                "(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;"
-        );
-        if (putStringExtra == nullptr) {
-            return;
-        }
-        jstring keyString = env->NewStringUTF(key);
-        jstring valueString = env->NewStringUTF(value.c_str());
-        env->CallObjectMethod(intent, putStringExtra, keyString, valueString);
-        env->DeleteLocalRef(keyString);
-        env->DeleteLocalRef(valueString);
-    }
-
-    void attach_preload_extras(
-            JNIEnv *env,
-            jobject intent,
-            jclass intentClass,
-            const duckdetector::preload::EarlyMountPreloadResult &result
-    ) {
-        put_boolean_extra(env, intent, intentClass, "early_detection_has_run", true);
-        put_boolean_extra(env, intent, intentClass, "early_detection_detected", result.detected);
-        put_string_extra(env, intent, intentClass, "early_detection_method",
-                         result.detectionMethod);
-        put_string_extra(env, intent, intentClass, "early_detection_details", result.details);
-        put_boolean_extra(
-                env,
-                intent,
-                intentClass,
-                "early_preload_context_valid",
-                duckdetector::preload::is_preload_context_valid()
-        );
-        put_boolean_extra(env, intent, intentClass, "early_futile_hide", result.futileHideDetected);
-        put_boolean_extra(env, intent, intentClass, "early_mnt_strings", result.mntStringsDetected);
-        put_boolean_extra(env, intent, intentClass, "early_mount_id_gap",
-                          result.mountIdGapDetected);
-        put_boolean_extra(env, intent, intentClass, "early_minor_dev_gap",
-                          result.minorDevGapDetected);
-        put_boolean_extra(env, intent, intentClass, "early_peer_group_gap",
-                          result.peerGroupGapDetected);
-        put_long_extra(env, intent, intentClass, "early_ns_mnt_ctime_delta_ns",
-                       result.nsMntCtimeDeltaNs);
-        put_long_extra(env, intent, intentClass, "early_mountinfo_ctime_delta_ns",
-                       result.mountInfoCtimeDeltaNs);
-        put_string_extra(env, intent, intentClass, "early_mnt_strings_source",
-                         result.mntStringsSource);
-        put_string_extra(env, intent, intentClass, "early_mnt_strings_target",
-                         result.mntStringsTarget);
-        put_string_extra(env, intent, intentClass, "early_mnt_strings_fs", result.mntStringsFs);
-    }
-
-    void attach_virtualization_preload_extras(
-            JNIEnv *env,
-            jobject intent,
-            jclass intentClass,
-            const duckdetector::preload::virtualization::EarlyVirtualizationResult &result
-    ) {
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_has_run", true);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_detected",
-                          result.detected);
-        put_string_extra(env, intent, intentClass, "early_virtualization_method",
-                         result.detectionMethod);
-        put_string_extra(env, intent, intentClass, "early_virtualization_details", result.details);
-        put_boolean_extra(
-                env,
-                intent,
-                intentClass,
-                "early_virtualization_context_valid",
-                duckdetector::preload::virtualization::is_preload_context_valid()
-        );
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_qemu_property",
-                          result.qemuPropertyDetected);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_emulator_hardware",
-                          result.emulatorHardwareDetected);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_device_node",
-                          result.deviceNodeDetected);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_avf_runtime",
-                          result.avfRuntimeDetected);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_authfs_runtime",
-                          result.authfsRuntimeDetected);
-        put_boolean_extra(env, intent, intentClass, "early_virtualization_native_bridge",
-                          result.nativeBridgeDetected);
-        put_string_extra(env, intent, intentClass, "early_virtualization_mount_namespace_inode",
-                         result.mountNamespaceInode);
-        put_string_extra(env, intent, intentClass, "early_virtualization_apex_mount_key",
-                         result.apexMountKey);
-        put_string_extra(env, intent, intentClass, "early_virtualization_system_mount_key",
-                         result.systemMountKey);
-        put_string_extra(env, intent, intentClass, "early_virtualization_vendor_mount_key",
-                         result.vendorMountKey);
     }
 
     // Each lookup goes through the public declaration, and every failure returns at once, so no
@@ -367,8 +243,8 @@ namespace {
                 FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_SINGLE_TOP
         );
 
-        attach_preload_extras(env, intent, intentClass, result);
-        attach_virtualization_preload_extras(env, intent, intentClass, virtualizationResult);
+        duckdetector::preload::attach_preload_extras(env, intent, intentClass, result);
+        duckdetector::preload::attach_virtualization_preload_extras(env, intent, intentClass, virtualizationResult);
 
         env->CallVoidMethod(activity, startActivity, intent);
         env->CallVoidMethod(activity, finish);
