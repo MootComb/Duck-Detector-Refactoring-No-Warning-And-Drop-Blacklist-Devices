@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.tee.presentation
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.tee.domain.TeeGrantProbe
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
@@ -151,60 +152,33 @@ class TeeCardModelMapper {
         }
 
     private fun TeeReport.topFindingDetail(): String? {
-        if (
-            !summary.contains("Grant self-domain") &&
-            !summary.contains("Grant isolated-domain") &&
-            !summary.contains("Grant handle")
-        ) {
-            return null
-        }
+        // Only a summary that quotes a grant probe's item leads to a grant finding.
+        val summaryGrant = summaryGrant ?: return null
         // Grant stage details can include Java/hidden/private summaries. Keep that audit text inside
         // the TEE card; Dashboard top findings should be a short routing hint, not a diagnostic dump.
         // Grant 阶段细节可能包含 Java/hidden/private 摘要。审计文本留在 TEE 卡片内；Dashboard 顶层 finding 只给短路由提示，不承载诊断 dump。
-        val grantFailure = sections
-            .asSequence()
-            .flatMap { section -> section.items.asSequence() }
-            .firstOrNull { item ->
-                item.level == TeeSignalLevel.FAIL &&
-                    (
-                        item.title == "Grant self-domain" ||
-                            item.title == "Grant isolated-domain" ||
-                            item.title == "Grant caller binding"
-                        )
-            }
-            ?: sections
-                .asSequence()
-                .flatMap { section -> section.items.asSequence() }
-                .firstOrNull { item ->
-                    item.level == TeeSignalLevel.WARN &&
-                        (
-                            item.title == "Grant self-domain" ||
-                                item.title == "Grant isolated-domain" ||
-                                item.title == "Grant caller binding"
-                            )
-                }
-                ?: return null
-
+        val grantItems = sections.asSequence().flatMap { section -> section.items.asSequence() }
+        val grantFailure = grantItems.firstOrNull { it.grant != null && it.level == TeeSignalLevel.FAIL }
+            ?: grantItems.firstOrNull { it.grant != null && it.level == TeeSignalLevel.WARN }
+            ?: return null
+        val grant = checkNotNull(grantFailure.grant)
         val keyVisibilityDiverged =
-            summary.contains("key visibility", ignoreCase = true) ||
-                grantFailure.body.contains("key visibility", ignoreCase = true) ||
-                grantFailure.body.contains("KEY_NOT_FOUND", ignoreCase = true)
-        return when (grantFailure.title) {
-            "Grant self-domain" -> if (keyVisibilityDiverged) {
+            summaryGrant.namesKeyVisibility || grant.namesKeyVisibility || grant.namesMissingKey
+        return when (grant.probe) {
+            TeeGrantProbe.SELF_DOMAIN -> if (keyVisibilityDiverged) {
                 "Grant self-domain key visibility diverged; open TEE details for stage diagnostics."
             } else {
                 "Grant self-domain certificate chain diverged; open TEE details for stage diagnostics."
             }
-            "Grant isolated-domain" -> if (keyVisibilityDiverged) {
+            TeeGrantProbe.ISOLATED_DOMAIN -> if (keyVisibilityDiverged) {
                 "Grant isolated-domain key visibility diverged; open TEE details for stage diagnostics."
             } else if (grantFailure.level == TeeSignalLevel.WARN) {
                 "Grant isolated-domain runtime crash; open TEE details for stage diagnostics."
             } else {
                 "Grant isolated-domain certificate chain diverged; open TEE details for stage diagnostics."
             }
-            "Grant caller binding" ->
+            TeeGrantProbe.CALLER_BINDING ->
                 "Grant handle caller binding failed; open TEE details for stage diagnostics."
-            else -> null
         }
     }
 

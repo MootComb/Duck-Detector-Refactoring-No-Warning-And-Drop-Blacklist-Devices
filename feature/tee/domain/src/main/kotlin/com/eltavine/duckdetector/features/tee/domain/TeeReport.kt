@@ -45,6 +45,8 @@ data class TeeReport(
     val networkState: TeeNetworkState = TeeNetworkState(),
     val exportText: String = "",
     val failureMessage: String? = null,
+    /** The grant evidence of the item [summary] quotes, when it quotes a grant probe's item. */
+    val summaryGrant: TeeGrantEvidence? = null,
 ) {
     companion object {
         fun loading(): TeeReport = TeeReport(

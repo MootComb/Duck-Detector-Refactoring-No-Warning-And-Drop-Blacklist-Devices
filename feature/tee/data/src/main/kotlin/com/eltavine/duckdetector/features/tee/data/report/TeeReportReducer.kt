@@ -93,6 +93,12 @@ class TeeReportReducer(
             networkState = artifacts.crl.networkState,
             exportText = "",
             failureMessage = artifacts.snapshot.errorMessage,
+            summaryGrant = summarySourceFor(
+                verdict = verdict,
+                policyHardIndicators = policyHardIndicators,
+                policySoftIndicators = policySoftIndicators,
+                supplementaryIndicators = supplementaryIndicators,
+            )?.grant,
         )
         return report.copy(exportText = exportFormatter.format(report))
     }

@@ -240,6 +240,7 @@ internal fun buildSections(
                         grantDomainFullChainSplitLevel(artifacts),
                         hiddenCopyText = artifacts.grantDomainFullChainSplit.diagnosticCopyText
                             .takeIf { it.isNotBlank() },
+                        grant = isolatedDomainGrantEvidence(artifacts),
                     )
                 )
                 add(
@@ -249,6 +250,7 @@ internal fun buildSections(
                         syntheticGrantGranteeBlindReadbackLevel(artifacts),
                         hiddenCopyText = artifacts.syntheticGrantGranteeBlindReadback.diagnosticCopyText
                             .takeIf { it.isNotBlank() },
+                        grant = callerBindingGrantEvidence(artifacts),
                     )
                 )
                 add(
@@ -267,6 +269,7 @@ internal fun buildSections(
                         grantSelfDomainFullChainSplitLevel(artifacts),
                         hiddenCopyText = artifacts.grantSelfDomainFullChainSplit.diagnosticCopyText
                             .takeIf { it.isNotBlank() },
+                        grant = selfDomainGrantEvidence(artifacts),
                     )
                 )
                 add(

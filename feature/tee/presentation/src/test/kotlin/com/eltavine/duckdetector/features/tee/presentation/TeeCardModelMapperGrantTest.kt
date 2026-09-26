@@ -21,6 +21,8 @@ import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
+import com.eltavine.duckdetector.features.tee.domain.TeeGrantEvidence
+import com.eltavine.duckdetector.features.tee.domain.TeeGrantProbe
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
 import com.eltavine.duckdetector.features.tee.domain.TeeSignal
@@ -42,6 +44,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = "Grant isolated-domain certificate-chain narrative split detected. Attestation and trust-path checks still aligned.",
+                summaryGrant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Grant isolated-domain certificate-chain narrative split detected. Attestation and trust-path checks still aligned."),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -64,6 +67,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant isolated-domain",
                                 "Matched kind=ISOLATED_CHAIN_SPLIT • mismatchIndex=2 • owner=3 grantee=2",
                                 TeeSignalLevel.FAIL,
+                                grant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Matched kind=ISOLATED_CHAIN_SPLIT • mismatchIndex=2 • owner=3 grantee=2"),
                             ),
                         ),
                     ),
@@ -85,6 +89,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = "Grant isolated-domain key visibility divergence detected. Attestation and trust-path checks still aligned.",
+                summaryGrant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Grant isolated-domain key visibility divergence detected. Attestation and trust-path checks still aligned."),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -107,6 +112,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant isolated-domain",
                                 "Unavailable kind=ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN • private grant failed: ServiceSpecificException(code 7): No key found by the given alias",
                                 TeeSignalLevel.FAIL,
+                                grant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Unavailable kind=ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN • private grant failed: ServiceSpecificException(code 7): No key found by the given alias"),
                             ),
                         ),
                     ),
@@ -128,6 +134,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = "Grant handle remained readable by its non-grantee owner. Attestation and trust-path checks still aligned.",
+                summaryGrant = grant(TeeGrantProbe.CALLER_BINDING, "Grant handle remained readable by its non-grantee owner. Attestation and trust-path checks still aligned."),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -146,6 +153,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant caller binding",
                                 "Matched kind=NON_GRANTEE_READBACK_ALLOWED uid=99001 ownerReplay=true",
                                 TeeSignalLevel.FAIL,
+                                grant = grant(TeeGrantProbe.CALLER_BINDING, "Matched kind=NON_GRANTEE_READBACK_ALLOWED uid=99001 ownerReplay=true"),
                             ),
                         ),
                     ),
@@ -171,6 +179,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = "Grant isolated-domain isolated private readback crashed after grant succeeded. Attestation and trust-path checks still aligned.",
+                summaryGrant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Grant isolated-domain isolated private readback crashed after grant succeeded. Attestation and trust-path checks still aligned."),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -193,6 +202,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant isolated-domain",
                                 "Grant isolated-domain isolated private readback crashed after grant succeeded. kind=ISOLATED_PRIVATE_READBACK_CRASH owner=3 uid=99001",
                                 TeeSignalLevel.WARN,
+                                grant = grant(TeeGrantProbe.ISOLATED_DOMAIN, "Grant isolated-domain isolated private readback crashed after grant succeeded. kind=ISOLATED_PRIVATE_READBACK_CRASH owner=3 uid=99001"),
                                 hiddenCopyText = "java.lang.reflect.InvocationTargetException\nCaused by: android.os.ServiceSpecificException: system/security/keystore2/src/service.rs:157: while trying to load key info.\n\nCaused by:\n    0: No legacy keys for key descriptor.\n    1: Error::Rc(r#KEY_NOT_FOUND) (code 7)",
                             ),
                         ),
@@ -227,6 +237,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = longGrantSummary,
+                summaryGrant = grant(TeeGrantProbe.SELF_DOMAIN, longGrantSummary),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -249,6 +260,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant self-domain",
                                 "Matched kind=SELF_CHAIN_SPLIT owner=3 grant=2 mismatchIndex=2",
                                 TeeSignalLevel.FAIL,
+                                grant = grant(TeeGrantProbe.SELF_DOMAIN, "Matched kind=SELF_CHAIN_SPLIT owner=3 grant=2 mismatchIndex=2"),
                             ),
                         ),
                     ),
@@ -275,6 +287,7 @@ class TeeCardModelMapperGrantTest {
                 tier = TeeTier.TEE,
                 headline = "Attestation aligned; local probes need review",
                 summary = "Grant self-domain key visibility divergence detected. Attestation and trust-path checks still aligned.",
+                summaryGrant = grant(TeeGrantProbe.SELF_DOMAIN, "Grant self-domain key visibility divergence detected. Attestation and trust-path checks still aligned."),
                 collapsedSummary = "Aligned • local review",
                 trustRoot = TeeTrustRoot.GOOGLE,
                 trustSummary = "Local trust path",
@@ -297,6 +310,7 @@ class TeeCardModelMapperGrantTest {
                                 "Grant self-domain",
                                 "Unavailable kind=SELF_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN owner=4 • private grant failed: ServiceSpecificException(code 7): No key found by the given alias",
                                 TeeSignalLevel.FAIL,
+                                grant = grant(TeeGrantProbe.SELF_DOMAIN, "Unavailable kind=SELF_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN owner=4 • private grant failed: ServiceSpecificException(code 7): No key found by the given alias"),
                             ),
                         ),
                     ),
@@ -452,4 +466,10 @@ class TeeCardModelMapperGrantTest {
 
         assertEquals(DetectorStatus.danger(), model.status)
     }
+
+    private fun grant(probe: TeeGrantProbe, text: String) = TeeGrantEvidence(
+        probe = probe,
+        namesKeyVisibility = text.contains("key visibility", ignoreCase = true),
+        namesMissingKey = text.contains("KEY_NOT_FOUND", ignoreCase = true),
+    )
 }

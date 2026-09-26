@@ -148,6 +148,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.FAIL,
                     hiddenCopyText = artifacts.grantDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = isolatedDomainGrantEvidence(artifacts),
                 )
             )
         }
@@ -161,6 +162,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.FAIL,
                     hiddenCopyText = artifacts.grantDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = isolatedDomainGrantEvidence(artifacts, sentenceNamesKeyVisibility = true),
                 )
             )
         }
@@ -174,6 +176,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.WARN,
                     hiddenCopyText = artifacts.grantDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = isolatedDomainGrantEvidence(artifacts),
                 )
             )
         }
@@ -193,6 +196,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                 TeeSignalLevel.FAIL,
                 hiddenCopyText = artifacts.syntheticGrantGranteeBlindReadback.diagnosticCopyText
                     .takeIf { it.isNotBlank() },
+                grant = callerBindingGrantEvidence(artifacts),
             )
         )
     }
@@ -223,6 +227,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.FAIL,
                     hiddenCopyText = artifacts.grantSelfDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = selfDomainGrantEvidence(artifacts),
                 )
             )
         }
@@ -236,6 +241,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.FAIL,
                     hiddenCopyText = artifacts.grantSelfDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = selfDomainGrantEvidence(artifacts, sentenceNamesKeyVisibility = true),
                 )
             )
         }
@@ -249,6 +255,7 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                     TeeSignalLevel.FAIL,
                     hiddenCopyText = artifacts.grantSelfDomainFullChainSplit.diagnosticCopyText
                         .takeIf { it.isNotBlank() },
+                    grant = selfDomainGrantEvidence(artifacts),
                 )
             )
         }

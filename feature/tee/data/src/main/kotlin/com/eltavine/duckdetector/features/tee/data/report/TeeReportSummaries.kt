@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.report
 
 import android.os.Build
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
+import com.eltavine.duckdetector.features.tee.domain.TeeGrantEvidence
 import com.eltavine.duckdetector.features.tee.domain.TeePatchGrade
 import com.eltavine.duckdetector.features.tee.domain.TeePatchState
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
@@ -67,6 +68,21 @@ internal fun headlineFor(
     TeeVerdict.BROKEN -> "Hardware-backed local verification was not established"
     TeeVerdict.INCONCLUSIVE -> "Local verification stayed inconclusive"
     TeeVerdict.LOADING -> "TEE"
+}
+
+/** The indicator whose body [summaryFor] quotes for [verdict], if it quotes one. */
+internal fun summarySourceFor(
+    verdict: TeeVerdict,
+    policyHardIndicators: List<TeeEvidenceItem>,
+    policySoftIndicators: List<TeeEvidenceItem>,
+    supplementaryIndicators: List<TeeEvidenceItem>,
+): TeeEvidenceItem? = when (verdict) {
+    TeeVerdict.CONSISTENT -> supplementaryIndicators.highestPriority()
+    TeeVerdict.TAMPERED -> policyHardIndicators.firstOrNull()
+    TeeVerdict.SUSPICIOUS -> policySoftIndicators.firstOrNull()
+    TeeVerdict.BROKEN,
+    TeeVerdict.INCONCLUSIVE,
+    TeeVerdict.LOADING -> null
 }
 
 internal fun summaryFor(
@@ -144,9 +160,11 @@ internal fun fact(
     body: String,
     level: TeeSignalLevel,
     hiddenCopyText: String? = null,
+    grant: TeeGrantEvidence? = null,
 ): TeeEvidenceItem = TeeEvidenceItem(
     title = title,
     body = body,
     level = level,
     hiddenCopyText = hiddenCopyText,
+    grant = grant,
 )
