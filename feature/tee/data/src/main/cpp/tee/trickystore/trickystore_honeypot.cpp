@@ -42,42 +42,6 @@
 
 namespace ducktee::trickystore::detail {
 
-    int raw_open(const char *path, int flags) {
-#if defined(__NR_openat)
-        return static_cast<int>(syscall(__NR_openat, AT_FDCWD, path, flags, 0));
-#else
-        return open(path, flags);
-#endif
-    }
-
-    int open_binder_device() {
-        int fd = raw_open("/dev/binder", O_RDWR | O_CLOEXEC);
-        if (fd < 0) {
-            fd = raw_open("/dev/vndbinder", O_RDWR | O_CLOEXEC);
-        }
-        return fd;
-    }
-
-    std::vector<ducktee::common::SyscallBackend> available_backends() {
-        std::vector<ducktee::common::SyscallBackend> backends;
-        for (const auto backend: kIoctlBackends) {
-            if (ducktee::common::backend_available(backend)) {
-                backends.push_back(backend);
-            }
-        }
-        return backends;
-    }
-
-    std::vector<ducktee::common::SyscallBackend> rotated_available_backends(const int attempt) {
-        auto backends = available_backends();
-        if (backends.empty()) {
-            return backends;
-        }
-        const auto rotation = static_cast<std::size_t>(attempt) % backends.size();
-        std::rotate(backends.begin(), backends.begin() + rotation, backends.end());
-        return backends;
-    }
-
     ducktee::common::SyscallCallResult call_ioctl_backend(
             const ducktee::common::SyscallBackend backend,
             const int fd,
