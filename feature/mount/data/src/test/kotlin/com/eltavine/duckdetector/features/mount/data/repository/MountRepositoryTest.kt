@@ -21,10 +21,12 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadS
 import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
 import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.ProcMountViewRootToken
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
+import com.eltavine.duckdetector.features.mount.domain.MountRootToken
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -230,7 +232,7 @@ class MountRepositoryTest {
                     procMountViewPidCount = 40,
                     procMountViewDivergent = true,
                     procMountViewTokenHit = true,
-                    procMountViewTokenKind = "/adb/",
+                    procMountViewToken = ProcMountViewRootToken.ADB,
                     procMountViewTokenDetail = "/data/adb/modules/example",
                     procMountViewDetail = "Two views and a direct token.",
                 ),
@@ -243,7 +245,7 @@ class MountRepositoryTest {
         assertEquals(40, report.procMountViewPidCount)
         assertTrue(report.procMountViewDivergent)
         assertTrue(report.procMountViewTokenHit)
-        assertEquals("/adb/", report.procMountViewTokenKind)
+        assertEquals(MountRootToken.ADB, report.procMountViewRootToken)
     }
 
     private fun cleanSnapshot(): MountNativeSnapshot {

@@ -117,7 +117,7 @@ internal object HelperProbePayloadBuilder {
             appendLine("PROC_MOUNT_VIEW_PIDS=${mountView.scannedPidCount}")
             appendLine("PROC_MOUNT_VIEW_DIVERGENT=${if (mountView.divergent) 1 else 0}")
             appendLine("PROC_MOUNT_VIEW_TOKEN_HIT=${if (mountView.tokenHit) 1 else 0}")
-            appendLine("PROC_MOUNT_VIEW_TOKEN_KIND=${mountView.tokenKind.encodeValue()}")
+            appendLine("PROC_MOUNT_VIEW_TOKEN_KIND=${mountView.token?.sequence.orEmpty().encodeValue()}")
             appendLine("PROC_MOUNT_VIEW_TOKEN_DETAIL=${mountView.tokenHitDetail.encodeValue()}")
             appendLine("PROC_MOUNT_VIEW_DETAIL=${mountView.detail.encodeValue()}")
         }

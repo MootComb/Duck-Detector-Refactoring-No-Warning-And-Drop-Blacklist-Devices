@@ -78,7 +78,7 @@ class ProcMountViewScannerTest {
 
         assertTrue(result.available)
         assertTrue(result.tokenHit)
-        assertEquals("magisk", result.tokenKind)
+        assertEquals(ProcMountViewRootToken.MAGISK, result.token)
         assertEquals(magiskView[1], result.tokenHitDetail)
         assertEquals(2, reads)
         assertEquals(2, result.scannedPidCount)

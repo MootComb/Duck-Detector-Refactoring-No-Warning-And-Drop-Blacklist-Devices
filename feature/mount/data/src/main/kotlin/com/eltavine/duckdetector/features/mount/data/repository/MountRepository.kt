@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadS
 import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessProfile
 import com.eltavine.duckdetector.capability.helperprocess.data.HelperProcessSnapshot
 import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.ProcMountViewRootToken
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
@@ -37,6 +38,7 @@ import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountImpact
 import com.eltavine.duckdetector.features.mount.domain.MountReport
+import com.eltavine.duckdetector.features.mount.domain.MountRootToken
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextExposure
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
@@ -139,7 +141,7 @@ class MountRepository(
             procMountViewPidCount = snapshot.procMountViewPidCount,
             procMountViewDivergent = snapshot.procMountViewDivergent,
             procMountViewTokenHit = snapshot.procMountViewTokenHit,
-            procMountViewTokenKind = snapshot.procMountViewTokenKind,
+            procMountViewRootToken = snapshot.procMountViewToken?.toMountRootToken(),
             procMountViewTokenDetail = snapshot.procMountViewTokenDetail,
             procMountViewDetail = snapshot.procMountViewDetail.ifBlank { snapshot.errorDetail },
         )
@@ -413,4 +415,10 @@ class MountRepository(
             ((snapshot.permissionAccessible.toDouble() / snapshot.permissionTotal.toDouble()) * 100.0).toInt()
         }
     }
+}
+
+private fun ProcMountViewRootToken.toMountRootToken(): MountRootToken = when (this) {
+    ProcMountViewRootToken.MAGISK -> MountRootToken.MAGISK
+    ProcMountViewRootToken.KSU -> MountRootToken.KSU
+    ProcMountViewRootToken.ADB -> MountRootToken.ADB
 }

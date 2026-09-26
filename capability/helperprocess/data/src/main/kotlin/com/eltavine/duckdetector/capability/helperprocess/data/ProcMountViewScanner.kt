@@ -40,7 +40,7 @@ internal data class ProcMountViewScanResult(
     val expectedViewCount: Int,
     val scannedPidCount: Int,
     val tokenHit: Boolean,
-    val tokenKind: String,
+    val token: ProcMountViewRootToken?,
     val tokenHitDetail: String,
     val detail: String,
 ) {
@@ -175,7 +175,7 @@ internal class ProcMountViewScanner(
             val builder = StringBuilder()
             for (mount in sorted) {
                 val signature = mount.signature()
-                val matchedToken = ROOT_TOKEN_SEQUENCES.firstOrNull { signature.contains(it) }
+                val matchedToken = ProcMountViewRootToken.entries.firstOrNull { signature.contains(it.sequence) }
                 if (matchedToken != null) {
                     return ProcMountViewScanResult(
                         available = true,
@@ -183,7 +183,7 @@ internal class ProcMountViewScanner(
                         expectedViewCount = expectedViewCount,
                         scannedPidCount = scannedPidCount,
                         tokenHit = true,
-                        tokenKind = matchedToken,
+                        token = matchedToken,
                         tokenHitDetail = mount.rawLine,
                         detail = buildString {
                             append("Scanned ")
@@ -207,7 +207,7 @@ internal class ProcMountViewScanner(
                 expectedViewCount = expectedViewCount,
                 scannedPidCount = scannedPidCount,
                 tokenHit = false,
-                tokenKind = "",
+                token = null,
                 tokenHitDetail = "",
                 detail = buildString {
                     append("Scanned ")
@@ -223,7 +223,7 @@ internal class ProcMountViewScanner(
             expectedViewCount = expectedViewCount,
             scannedPidCount = scannedPidCount,
             tokenHit = false,
-            tokenKind = "",
+            token = null,
             tokenHitDetail = "",
             detail = buildString {
                 append("Scanned ")
@@ -246,15 +246,13 @@ internal class ProcMountViewScanner(
             expectedViewCount = 1,
             scannedPidCount = 0,
             tokenHit = false,
-            tokenKind = "",
+            token = null,
             tokenHitDetail = "",
             detail = reason,
         )
     }
 
     private companion object {
-        val ROOT_TOKEN_SEQUENCES = listOf("magisk", "KSU", "/adb/")
-
         fun readMountInfoLines(directory: File): List<String> {
             val mountInfo = File(directory, "mountinfo")
             return runCatching {

@@ -308,6 +308,13 @@ data class MountZygoteNextReport(
     }
 }
 
+/** The root manager a cross-process mount view names, as its signature spells it. */
+enum class MountRootToken(val sequence: String) {
+    MAGISK("magisk"),
+    KSU("KSU"),
+    ADB("/adb/"),
+}
+
 data class MountReport(
     val stage: MountStage,
     val nativeAvailable: Boolean,
@@ -338,7 +345,7 @@ data class MountReport(
     val procMountViewPidCount: Int = 0,
     val procMountViewDivergent: Boolean = false,
     val procMountViewTokenHit: Boolean = false,
-    val procMountViewTokenKind: String = "",
+    val procMountViewRootToken: MountRootToken? = null,
     val procMountViewTokenDetail: String = "",
     val procMountViewDetail: String = "",
 ) {

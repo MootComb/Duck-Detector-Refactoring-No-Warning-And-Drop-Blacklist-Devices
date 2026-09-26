@@ -103,7 +103,7 @@ class HelperProcessSnapshotTest {
         assertEquals(47, snapshot.procMountViewPidCount)
         assertTrue(snapshot.procMountViewDivergent)
         assertTrue(snapshot.procMountViewTokenHit)
-        assertEquals("magisk", snapshot.procMountViewTokenKind)
+        assertEquals(ProcMountViewRootToken.MAGISK, snapshot.procMountViewToken)
         assertEquals("/magisk /system overlay rw", snapshot.procMountViewTokenDetail)
         assertTrue(snapshot.procMountViewDetail.contains("3 distinct view(s)"))
     }

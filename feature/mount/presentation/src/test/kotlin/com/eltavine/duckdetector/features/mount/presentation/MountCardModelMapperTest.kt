@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountMethodOutcome
 import com.eltavine.duckdetector.features.mount.domain.MountMethodResult
 import com.eltavine.duckdetector.features.mount.domain.MountReport
+import com.eltavine.duckdetector.features.mount.domain.MountRootToken
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.presentation.model.MountHeaderFact
 import org.junit.Assert.assertEquals
@@ -164,7 +165,7 @@ class MountCardModelMapperTest {
                 procMountViewPidCount = 40,
                 procMountViewDivergent = true,
                 procMountViewTokenHit = true,
-                procMountViewTokenKind = "KSU",
+                procMountViewRootToken = MountRootToken.KSU,
                 procMountViewTokenDetail = "KSU /data/adb/modules",
                 procMountViewDetail = "Direct root token exposed.",
             ),
@@ -210,7 +211,7 @@ class MountCardModelMapperTest {
                 findings = emptyList(),
                 procMountViewProbeAvailable = true,
                 procMountViewTokenHit = true,
-                procMountViewTokenKind = "KSU",
+                procMountViewRootToken = MountRootToken.KSU,
                 procMountViewTokenDetail = "KSU /data/adb/modules",
             ),
         )
@@ -237,7 +238,7 @@ class MountCardModelMapperTest {
         procMountViewPidCount: Int = 0,
         procMountViewDivergent: Boolean = false,
         procMountViewTokenHit: Boolean = false,
-        procMountViewTokenKind: String = "",
+        procMountViewRootToken: MountRootToken? = null,
         procMountViewTokenDetail: String = "",
         procMountViewDetail: String = "",
     ): MountReport {
@@ -269,7 +270,7 @@ class MountCardModelMapperTest {
             procMountViewPidCount = procMountViewPidCount,
             procMountViewDivergent = procMountViewDivergent,
             procMountViewTokenHit = procMountViewTokenHit,
-            procMountViewTokenKind = procMountViewTokenKind,
+            procMountViewRootToken = procMountViewRootToken,
             procMountViewTokenDetail = procMountViewTokenDetail,
             procMountViewDetail = procMountViewDetail,
         )

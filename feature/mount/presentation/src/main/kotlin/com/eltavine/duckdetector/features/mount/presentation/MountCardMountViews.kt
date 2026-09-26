@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.mount.presentation
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.mount.domain.MountReport
+import com.eltavine.duckdetector.features.mount.domain.MountRootToken
 import com.eltavine.duckdetector.features.mount.domain.MountStage
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextNamespaceAssessment
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
@@ -30,8 +31,8 @@ internal fun procMountViewRow(report: MountReport): MountDetailRowModel {
     // 其他 probe 失败时仍保留该 row，完整 detail 通过 hiddenCopyText 取证复制。
     val value = when {
         report.stage == MountStage.LOADING -> "Pending"
-        report.procMountViewTokenKind == "KSU" -> "KSU mount"
-        report.procMountViewTokenKind == "magisk" -> "Magisk mount"
+        report.procMountViewRootToken == MountRootToken.KSU -> "KSU mount"
+        report.procMountViewRootToken == MountRootToken.MAGISK -> "Magisk mount"
         report.procMountViewTokenHit -> "Root mount"
         report.procMountViewDivergent -> "${report.procMountViewDistinctCount} view(s)"
         report.procMountViewProbeAvailable -> "Clean"
@@ -68,7 +69,7 @@ internal fun procMountViewRow(report: MountReport): MountDetailRowModel {
             appendLine("Divergent: ${report.procMountViewDivergent}")
             appendLine("Root token hit: ${report.procMountViewTokenHit}")
             appendLine(
-                "Matched token: ${report.procMountViewTokenKind.ifBlank { "None" }}",
+                "Matched token: ${report.procMountViewRootToken?.sequence ?: "None"}",
             )
             appendLine(
                 "Matched mountinfo line: ${report.procMountViewTokenDetail.ifBlank { "None" }}",

@@ -23,6 +23,19 @@ public enum class HelperProcessProfile {
     ISOLATED,
 }
 
+
+/** A root manager's trace as it appears in a mount view signature; the first one found is recorded. */
+public enum class ProcMountViewRootToken(public val sequence: String) {
+    MAGISK("magisk"),
+    KSU("KSU"),
+    ADB("/adb/"),
+    ;
+
+    internal companion object {
+        fun fromSequence(sequence: String): ProcMountViewRootToken? = entries.firstOrNull { it.sequence == sequence }
+    }
+}
+
 public data class HelperProcessSnapshot(
     val available: Boolean = false,
     val profile: HelperProcessProfile = HelperProcessProfile.REGULAR,
@@ -45,7 +58,7 @@ public data class HelperProcessSnapshot(
     val procMountViewPidCount: Int = 0,
     val procMountViewDivergent: Boolean = false,
     val procMountViewTokenHit: Boolean = false,
-    val procMountViewTokenKind: String = "",
+    val procMountViewToken: ProcMountViewRootToken? = null,
     val procMountViewTokenDetail: String = "",
     val procMountViewDetail: String = "",
     val filesDir: String = "",
@@ -84,7 +97,7 @@ public data class HelperProcessSnapshot(
             var procMountViewPidCount = 0
             var procMountViewDivergent = false
             var procMountViewTokenHit = false
-            var procMountViewTokenKind = ""
+            var procMountViewToken: ProcMountViewRootToken? = null
             var procMountViewTokenDetail = ""
             var procMountViewDetail = ""
             var filesDir = ""
@@ -147,7 +160,7 @@ public data class HelperProcessSnapshot(
                                     value.toIntOrNull() ?: 0
                                 "PROC_MOUNT_VIEW_DIVERGENT" -> procMountViewDivergent = value.asBool()
                                 "PROC_MOUNT_VIEW_TOKEN_HIT" -> procMountViewTokenHit = value.asBool()
-                                "PROC_MOUNT_VIEW_TOKEN_KIND" -> procMountViewTokenKind = value
+                                "PROC_MOUNT_VIEW_TOKEN_KIND" -> procMountViewToken = ProcMountViewRootToken.fromSequence(value)
                                 "PROC_MOUNT_VIEW_TOKEN_DETAIL" -> procMountViewTokenDetail = value
                                 "PROC_MOUNT_VIEW_DETAIL" -> procMountViewDetail = value
                                 "FILES_DIR" -> filesDir = value
@@ -181,7 +194,7 @@ public data class HelperProcessSnapshot(
                 procMountViewPidCount = procMountViewPidCount,
                 procMountViewDivergent = procMountViewDivergent,
                 procMountViewTokenHit = procMountViewTokenHit,
-                procMountViewTokenKind = procMountViewTokenKind,
+                procMountViewToken = procMountViewToken,
                 procMountViewTokenDetail = procMountViewTokenDetail,
                 procMountViewDetail = procMountViewDetail,
                 filesDir = filesDir,
