@@ -17,6 +17,7 @@
 plugins {
     id("duckdetector.jvm.library")
     id("duckdetector.public-api")
+    id("duckdetector.contract-values")
 }
 
 kotlin {

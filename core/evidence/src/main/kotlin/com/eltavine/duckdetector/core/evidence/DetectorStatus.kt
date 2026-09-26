@@ -16,7 +16,8 @@
 
 package com.eltavine.duckdetector.core.evidence
 
-public data class DetectorStatus(
+@ContractValue
+public class DetectorStatus(
     public val severity: DetectionSeverity,
     public val infoKind: InfoKind? = null,
 ) {

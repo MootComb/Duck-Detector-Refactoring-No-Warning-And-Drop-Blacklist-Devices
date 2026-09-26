@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.json)
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.dependency.analysis.gradle.plugin)
+    implementation(libs.poko.gradle.plugin)
     compileOnly(libs.kotlin.abi.tools.api)
     testImplementation(libs.junit)
 }
@@ -68,6 +69,10 @@ gradlePlugin {
         register("duckDetectorDependencyAnalysis") {
             id = "duckdetector.dependency-analysis"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorDependencyAnalysisPlugin"
+        }
+        register("duckDetectorContractValues") {
+            id = "duckdetector.contract-values"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorContractValuesPlugin"
         }
         register("duckDetectorPublicApi") {
             id = "duckdetector.public-api"

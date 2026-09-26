@@ -16,17 +16,20 @@
 
 package com.eltavine.duckdetector.core.report
 
+import com.eltavine.duckdetector.core.evidence.ContractValue
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 
-public data class ReportFact(
-    val label: String,
-    val value: String,
+@ContractValue
+public class ReportFact(
+    public val label: String,
+    public val value: String,
 )
 
-public data class ReportRow(
-    val label: String,
-    val value: String,
-    val detail: String? = null,
+@ContractValue
+public class ReportRow(
+    public val label: String,
+    public val value: String,
+    public val detail: String? = null,
 )
 
 /** One titled section of a detector's exported report. */
@@ -34,21 +37,24 @@ public sealed interface ReportBlock {
     public val title: String
 
     /** Label/value rows with optional detail; omitted when there are no rows. */
-    public data class Rows(
+    @ContractValue
+    public class Rows(
         override val title: String,
-        val rows: List<ReportRow>,
+        public val rows: List<ReportRow>,
     ) : ReportBlock
 
     /** Free-text items; continuation lines of an item stay indented under it; omitted when empty. */
-    public data class Bullets(
+    @ContractValue
+    public class Bullets(
         override val title: String,
-        val items: List<String>,
+        public val items: List<String>,
     ) : ReportBlock
 
     /** Lines a detector lays out itself; always emitted, so the detector decides whether to include it. */
-    public data class Verbatim(
+    @ContractValue
+    public class Verbatim(
         override val title: String,
-        val lines: List<String>,
+        public val lines: List<String>,
     ) : ReportBlock
 }
 
@@ -58,25 +64,28 @@ public sealed interface ReportBlock {
  * Each detector builds its own from typed card data, so the exporter never inspects a
  * detector's models and changing one detector's report cannot affect another's.
  */
-public data class DetectorReport(
-    val title: String,
-    val verdict: String,
-    val severity: DetectionSeverity,
-    val quickFacts: List<ReportFact>,
-    val blocks: List<ReportBlock>,
+@ContractValue
+public class DetectorReport(
+    public val title: String,
+    public val verdict: String,
+    public val severity: DetectionSeverity,
+    public val quickFacts: List<ReportFact>,
+    public val blocks: List<ReportBlock>,
 )
 
 /** Identity of the inspected device as shown in the report banner. */
-public data class ReportDeviceIdentity(
-    val brand: String?,
-    val model: String?,
-    val androidRelease: String?,
-    val sdk: String?,
+@ContractValue
+public class ReportDeviceIdentity(
+    public val brand: String?,
+    public val model: String?,
+    public val androidRelease: String?,
+    public val sdk: String?,
 )
 
 /** The device specification appendix that closes an exported report. */
-public data class DeviceReport(
-    val identity: ReportDeviceIdentity,
-    val quickFacts: List<ReportFact>,
-    val sections: List<ReportBlock.Verbatim>,
+@ContractValue
+public class DeviceReport(
+    public val identity: ReportDeviceIdentity,
+    public val quickFacts: List<ReportFact>,
+    public val sections: List<ReportBlock.Verbatim>,
 )

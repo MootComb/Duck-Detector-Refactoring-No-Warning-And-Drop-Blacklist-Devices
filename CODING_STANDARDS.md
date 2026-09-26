@@ -94,6 +94,7 @@ TEE 的证据较多，在 data 层另有 `TeeReportReducer` 负责汇总。
 
 - 命名优先表达语义，不优先缩写。
 - 返回结构化结果，不要靠字符串做判断。presentation、ui、core、SDK、app 与 native 代码不得比较、搜索或截取其他层写的文字（label、title、summary、detail 等）；需要区分时，在产生证据的地方带上枚举、类型化 id 或标志，由枚举自带 label（`check-text-protocols.py` 校验）。data 层可以解读平台给出的文字，例如错误信息，但要在那里转成类型。
+- SDK 契约模块（`:sdk:runtime`、`:core:detector`、`:core:report`、`:core:evidence`）不声明 `data class`：以后给它加属性会改变 `copy` 与 `componentN` 的签名，破坏已编译宿主的二进制兼容（见 Kotlin 的库作者兼容性指南）。值类型写成 `@ContractValue` 普通类，模块应用 `duckdetector.contract-values`，由 Poko 生成与 data class 相同的 `equals`、`hashCode` 与 `toString`。
 - 文案不经反射获得：不要用类名拼出文案或报告内容，异常用 `FailureName`（`:core:evidence`）或 `PlatformFailureName`（`:core:platform`）命名；探针确需反射访问隐藏 API 时，写进 `reflection-allowlist.json` 并说明原因（`check-reflection-boundaries.py` 校验）。
 - `Result` 数据类要让“成功 / 失败 / 跳过”状态清晰可区分。
 - 对异常路径，优先保留可审计的 `detail`，不要只返回布尔值。

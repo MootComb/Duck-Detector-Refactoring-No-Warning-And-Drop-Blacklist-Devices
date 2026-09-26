@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.core.report
 
+import com.eltavine.duckdetector.core.evidence.ContractValue
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 
@@ -25,8 +26,9 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
  * [status] is the detector's own verdict, so a caller can act on it without reading the report's
  * wording, and [report] is the same structured report the export renders.
  */
-public data class DetectorResult(
-    val id: DetectorId,
-    val status: DetectorStatus,
-    val report: DetectorReport,
+@ContractValue
+public class DetectorResult(
+    public val id: DetectorId,
+    public val status: DetectorStatus,
+    public val report: DetectorReport,
 )

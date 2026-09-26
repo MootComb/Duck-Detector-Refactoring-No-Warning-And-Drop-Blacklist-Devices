@@ -12,13 +12,6 @@ public final class com/eltavine/duckdetector/core/report/DetectorHeadline$Defaul
 
 public final class com/eltavine/duckdetector/core/report/DetectorReport {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;Ljava/util/List;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
-	public final fun component4 ()Ljava/util/List;
-	public final fun component5 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;Ljava/util/List;Ljava/util/List;)Lcom/eltavine/duckdetector/core/report/DetectorReport;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/DetectorReport;Ljava/lang/String;Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/DetectorReport;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBlocks ()Ljava/util/List;
 	public final fun getQuickFacts ()Ljava/util/List;
@@ -31,11 +24,6 @@ public final class com/eltavine/duckdetector/core/report/DetectorReport {
 
 public final class com/eltavine/duckdetector/core/report/DetectorResult {
 	public synthetic fun <init> (Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;Lcom/eltavine/duckdetector/core/report/DetectorReport;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1-YyyATdw ()Ljava/lang/String;
-	public final fun component2 ()Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;
-	public final fun component3 ()Lcom/eltavine/duckdetector/core/report/DetectorReport;
-	public final fun copy-__0-aTQ (Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;Lcom/eltavine/duckdetector/core/report/DetectorReport;)Lcom/eltavine/duckdetector/core/report/DetectorResult;
-	public static synthetic fun copy-__0-aTQ$default (Lcom/eltavine/duckdetector/core/report/DetectorResult;Ljava/lang/String;Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;Lcom/eltavine/duckdetector/core/report/DetectorReport;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/DetectorResult;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getId-YyyATdw ()Ljava/lang/String;
 	public final fun getReport ()Lcom/eltavine/duckdetector/core/report/DetectorReport;
@@ -46,11 +34,6 @@ public final class com/eltavine/duckdetector/core/report/DetectorResult {
 
 public final class com/eltavine/duckdetector/core/report/DeviceReport {
 	public fun <init> (Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;Ljava/util/List;Ljava/util/List;)V
-	public final fun component1 ()Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;
-	public final fun component2 ()Ljava/util/List;
-	public final fun component3 ()Ljava/util/List;
-	public final fun copy (Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;Ljava/util/List;Ljava/util/List;)Lcom/eltavine/duckdetector/core/report/DeviceReport;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/DeviceReport;Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/DeviceReport;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getIdentity ()Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;
 	public final fun getQuickFacts ()Ljava/util/List;
@@ -65,10 +48,6 @@ public abstract interface class com/eltavine/duckdetector/core/report/ReportBloc
 
 public final class com/eltavine/duckdetector/core/report/ReportBlock$Bullets : com/eltavine/duckdetector/core/report/ReportBlock {
 	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Bullets;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportBlock$Bullets;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Bullets;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getItems ()Ljava/util/List;
 	public fun getTitle ()Ljava/lang/String;
@@ -78,10 +57,6 @@ public final class com/eltavine/duckdetector/core/report/ReportBlock$Bullets : c
 
 public final class com/eltavine/duckdetector/core/report/ReportBlock$Rows : com/eltavine/duckdetector/core/report/ReportBlock {
 	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Rows;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportBlock$Rows;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Rows;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getRows ()Ljava/util/List;
 	public fun getTitle ()Ljava/lang/String;
@@ -91,10 +66,6 @@ public final class com/eltavine/duckdetector/core/report/ReportBlock$Rows : com/
 
 public final class com/eltavine/duckdetector/core/report/ReportBlock$Verbatim : com/eltavine/duckdetector/core/report/ReportBlock {
 	public fun <init> (Ljava/lang/String;Ljava/util/List;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/util/List;
-	public final fun copy (Ljava/lang/String;Ljava/util/List;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Verbatim;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportBlock$Verbatim;Ljava/lang/String;Ljava/util/List;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportBlock$Verbatim;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLines ()Ljava/util/List;
 	public fun getTitle ()Ljava/lang/String;
@@ -104,12 +75,6 @@ public final class com/eltavine/duckdetector/core/report/ReportBlock$Verbatim : 
 
 public final class com/eltavine/duckdetector/core/report/ReportDeviceIdentity {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportDeviceIdentity;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getAndroidRelease ()Ljava/lang/String;
 	public final fun getBrand ()Ljava/lang/String;
@@ -121,10 +86,6 @@ public final class com/eltavine/duckdetector/core/report/ReportDeviceIdentity {
 
 public final class com/eltavine/duckdetector/core/report/ReportFact {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lcom/eltavine/duckdetector/core/report/ReportFact;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportFact;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportFact;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getLabel ()Ljava/lang/String;
 	public final fun getValue ()Ljava/lang/String;
@@ -135,11 +96,6 @@ public final class com/eltavine/duckdetector/core/report/ReportFact {
 public final class com/eltavine/duckdetector/core/report/ReportRow {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/eltavine/duckdetector/core/report/ReportRow;
-	public static synthetic fun copy$default (Lcom/eltavine/duckdetector/core/report/ReportRow;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcom/eltavine/duckdetector/core/report/ReportRow;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDetail ()Ljava/lang/String;
 	public final fun getLabel ()Ljava/lang/String;

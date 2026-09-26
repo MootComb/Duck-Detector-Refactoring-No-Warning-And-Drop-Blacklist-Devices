@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id("duckdetector.jvm.library")
-    id("duckdetector.public-api")
-    id("duckdetector.contract-values")
-}
+package com.eltavine.duckdetector.core.evidence
 
-kotlin {
-    explicitApi()
-}
-
-dependencies {
-    api(project(":core:evidence"))
-}
+/**
+ * Marks a value type of the SDK contract. Poko generates its `equals`, `hashCode` and `toString` from
+ * the primary constructor's properties, as for a data class, but no `copy` or `componentN`: their
+ * signatures would change whenever a property is added, breaking hosts compiled against an earlier
+ * release. A module that declares such types applies `duckdetector.contract-values`.
+ */
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+public annotation class ContractValue
