@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.kernelcheck.data.repository.KernelCheckRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.kernelcheck.presentation.toDetectorRep
  * Collected by [KernelCheckRepository], judged by `KernelCheckReport.toDetectorStatus()` in the
  * domain layer, and described by [KernelCheckCardModelMapper].
  */
+@DetectorSpecificApi
 public object KernelCheckDetector : Detector<KernelCheckReport, KernelCheckCardModel> {
     override val id: DetectorId = DetectorId("kernel_check")
 

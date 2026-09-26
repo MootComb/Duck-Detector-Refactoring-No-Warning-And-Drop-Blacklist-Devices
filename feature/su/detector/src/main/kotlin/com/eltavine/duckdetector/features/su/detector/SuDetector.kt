@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.su.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.su.data.repository.SuRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.su.presentation.toDetectorReport
  * Collected by [SuRepository], judged by `SuReport.toDetectorStatus()` in the domain layer, and
  * described by [SuCardModelMapper].
  */
+@DetectorSpecificApi
 public object SuDetector : Detector<SuReport, SuCardModel> {
     override val id: DetectorId = DetectorId("su")
 

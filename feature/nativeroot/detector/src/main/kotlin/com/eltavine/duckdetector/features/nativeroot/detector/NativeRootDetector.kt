@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.nativeroot.data.repository.NativeRootRepository
@@ -37,6 +38,7 @@ import com.eltavine.duckdetector.features.nativeroot.presentation.toDetectorRepo
  * Collected by [NativeRootRepository], judged by `NativeRootReport.toDetectorStatus()` in the
  * domain layer, and described by [NativeRootCardModelMapper].
  */
+@DetectorSpecificApi
 public object NativeRootDetector : Detector<NativeRootReport, NativeRootCardModel> {
     override val id: DetectorId = DetectorId("native_root")
 

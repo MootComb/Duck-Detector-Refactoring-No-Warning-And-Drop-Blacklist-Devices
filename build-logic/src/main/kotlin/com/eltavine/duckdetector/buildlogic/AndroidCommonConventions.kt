@@ -68,6 +68,9 @@ internal fun Project.configureAndroidCommon(extension: CommonExtension) {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             moduleName.set(kotlinModuleName())
+            if (composesDetectors()) {
+                optIn.add(DETECTOR_SPECIFIC_API)
+            }
         }
     }
 }

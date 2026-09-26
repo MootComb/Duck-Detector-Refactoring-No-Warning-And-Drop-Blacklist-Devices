@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.systemproperties.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.systemproperties.data.repository.SystemPropertiesRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.systemproperties.presentation.toDetect
  * `SystemPropertiesReport.toDetectorStatus()` in the domain layer, and described by
  * [SystemPropertiesCardModelMapper].
  */
+@DetectorSpecificApi
 public object SystemPropertiesDetector : Detector<SystemPropertiesReport, SystemPropertiesCardModel> {
     override val id: DetectorId = DetectorId("system_properties")
 

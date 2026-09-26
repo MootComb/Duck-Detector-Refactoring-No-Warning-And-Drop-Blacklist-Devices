@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.customrom.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.customrom.data.repository.CustomRomRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.customrom.presentation.toDetectorRepor
  * Collected by [CustomRomRepository], judged by `CustomRomReport.toDetectorStatus()` in the
  * domain layer, and described by [CustomRomCardModelMapper].
  */
+@DetectorSpecificApi
 public object CustomRomDetector : Detector<CustomRomReport, CustomRomCardModel> {
     override val id: DetectorId = DetectorId("custom_rom")
 

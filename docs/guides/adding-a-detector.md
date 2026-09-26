@@ -54,7 +54,7 @@ The generated detector builds and passes every guard. Until its probe observes t
 | `data` (Android) | The probe in `<Name>Repository.collect()`. Set `probed = true` only when a probe actually observed the device, and state `unavailableReason` when it could not. An exception becomes a FAILED report named by `FailureName` | Collect; do not judge. Evidence another detector also needs comes from a capability |
 | `data`, native unit | `collect_snapshot()` in `src/main/cpp/<name>/native_bridge.cpp`. Emit `AVAILABLE=1` only when the probe observed the device, and escape every value with `escape_payload_value` | The unit may include only `common/`. List new sources in the unit's `CMakeLists.txt` |
 | `presentation` (pure JVM) | The card's words and rows in `<Name>CardModelMapper`, and its export blocks in `<Name>DetectorReport.kt` | Project the domain verdict; never decide it again |
-| `detector` | Usually nothing | No Compose |
+| `detector` | Usually nothing; the object stays marked `@DetectorSpecificApi`, so SDK hosts opt in before using its typed models | No Compose |
 | `ui` | Sections of `<Name>DetectorCard`, built from the `:core:ui` card components | No probes and no rules |
 
 State what was observed and what it implies, never that a device is secure or compromised (AGENTS.md §19). Build user-facing text in the mapper from typed values. Do not assemble text in the data layer, and never derive wording from class names.

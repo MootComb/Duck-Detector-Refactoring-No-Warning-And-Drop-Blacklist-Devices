@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.mount.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.mount.data.repository.MountRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.mount.presentation.toDetectorReport
  * Collected by [MountRepository], judged by `MountReport.toDetectorStatus()` in the domain
  * layer, and described by [MountCardModelMapper].
  */
+@DetectorSpecificApi
 public object MountDetector : Detector<MountReport, MountCardModel> {
     override val id: DetectorId = DetectorId("mount")
 

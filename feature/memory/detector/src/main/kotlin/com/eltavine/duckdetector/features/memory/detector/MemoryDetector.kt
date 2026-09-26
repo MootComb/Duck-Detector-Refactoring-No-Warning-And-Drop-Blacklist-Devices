@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.memory.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.memory.data.repository.MemoryRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.memory.presentation.toDetectorReport
  * Collected by [MemoryRepository], judged by `MemoryReport.toDetectorStatus()` in the domain
  * layer, and described by [MemoryCardModelMapper].
  */
+@DetectorSpecificApi
 public object MemoryDetector : Detector<MemoryReport, MemoryCardModel> {
     override val id: DetectorId = DetectorId("memory")
 

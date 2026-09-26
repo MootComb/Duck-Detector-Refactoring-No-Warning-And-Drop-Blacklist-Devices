@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.lsposed.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.lsposed.data.repository.LSPosedRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.lsposed.presentation.toDetectorReport
  * Collected by [LSPosedRepository], judged by `LSPosedReport.toDetectorStatus()` in the domain
  * layer, and described by [LSPosedCardModelMapper].
  */
+@DetectorSpecificApi
 public object LSPosedDetector : Detector<LSPosedReport, LSPosedCardModel> {
     override val id: DetectorId = DetectorId("lsposed")
 

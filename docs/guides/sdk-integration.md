@@ -48,12 +48,13 @@ The AAR's manifest brings in the SDK's services, the MIME group Native Root's th
 ```kotlin
 val results: List<DetectorResult> = DuckDetector.scan(context)       // every detector, concurrently
 DuckDetector.results(context).collect { result -> show(result) }     // each result as it finishes
-val su: DetectorResult = SuDetector.run(context)                     // one detector, through its typed object
+val su = DuckDetector.detectors.first { it.id == DetectorId("su") }  // one detector, by its id
+val result: DetectorResult = su.run(context)
 ```
 
 `DuckDetector.detectors` lists every detector in the order `scan` starts them. A `DetectorResult` carries the detector's `id`, its `status` and the structured `report` that the app exports for the same evidence. Each detector moves its own collection off the calling dispatcher.
 
-The contract you compile against is recorded: the public API of `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence` is committed under each module's `api/` directory. CI fails when it changes without the dump being updated, so any change to it is a reviewed diff. Each detector's own typed objects, such as `SuDetector` and its card model, belong to that detector and are not part of this contract.
+The contract you compile against is recorded: the public API of `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence` is committed under each module's `api/` directory. CI fails when it changes without the dump being updated, so any change to it is a reviewed diff. Each detector's own typed object, such as `SuDetector` with its report and card model, belongs to that detector and is not part of this contract. It is marked `@DetectorSpecificApi`, so using it needs `@OptIn(DetectorSpecificApi::class)`, as the sample does, and an acknowledgement that it may change in any release.
 
 Results are diagnostic evidence, not a verdict on the device. Read the status as follows:
 

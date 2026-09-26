@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.zygisk.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.zygisk.data.repository.ZygiskRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.zygisk.presentation.toDetectorReport
  * Collected by [ZygiskRepository], judged by `ZygiskReport.toDetectorStatus()` in the domain
  * layer, and described by [ZygiskCardModelMapper].
  */
+@DetectorSpecificApi
 public object ZygiskDetector : Detector<ZygiskReport, ZygiskCardModel> {
     override val id: DetectorId = DetectorId("zygisk")
 

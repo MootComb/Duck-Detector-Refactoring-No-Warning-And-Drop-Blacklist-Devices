@@ -3,6 +3,7 @@ package {{package}}.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import {{package}}.data.repository.{{Class}}Repository
@@ -17,6 +18,7 @@ import {{package}}.presentation.toDetectorReport
  * Collected by [{{Class}}Repository], judged by `{{Class}}Report.toDetectorStatus()` in the domain
  * layer, and described by [{{Class}}CardModelMapper].
  */
+@DetectorSpecificApi
 public object {{Class}}Detector : Detector<{{Class}}Report, {{Class}}CardModel> {
     override val id: DetectorId = DetectorId("{{id}}")
 

@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.bootloader.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.bootloader.data.repository.BootloaderRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.bootloader.presentation.toDetectorRepo
  * Collected by [BootloaderRepository], judged by `BootloaderReport.toDetectorStatus()` in the
  * domain layer, and described by [BootloaderCardModelMapper].
  */
+@DetectorSpecificApi
 public object BootloaderDetector : Detector<BootloaderReport, BootloaderCardModel> {
     override val id: DetectorId = DetectorId("bootloader")
 

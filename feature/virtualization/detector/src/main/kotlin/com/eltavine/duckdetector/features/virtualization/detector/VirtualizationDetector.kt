@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.virtualization.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.virtualization.data.repository.VirtualizationRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.virtualization.presentation.toDetector
  * Collected by [VirtualizationRepository], judged by `VirtualizationReport.toDetectorStatus()`
  * in the domain layer, and described by [VirtualizationCardModelMapper].
  */
+@DetectorSpecificApi
 public object VirtualizationDetector : Detector<VirtualizationReport, VirtualizationCardModel> {
     override val id: DetectorId = DetectorId("virtualization")
 

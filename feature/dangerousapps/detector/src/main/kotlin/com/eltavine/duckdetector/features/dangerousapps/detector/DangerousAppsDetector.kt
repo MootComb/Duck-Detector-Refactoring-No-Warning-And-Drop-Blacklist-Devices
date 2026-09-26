@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.dangerousapps.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.dangerousapps.data.repository.DangerousAppsRepository
@@ -35,6 +36,7 @@ import com.eltavine.duckdetector.features.dangerousapps.presentation.toDetectorR
  * Collected by [DangerousAppsRepository], judged by `DangerousAppsReport.toDetectorStatus()` in
  * the domain layer, and described by [DangerousAppsCardModelMapper].
  */
+@DetectorSpecificApi
 public object DangerousAppsDetector : Detector<DangerousAppsReport, DangerousAppsCardModel> {
     override val id: DetectorId = DetectorId("dangerous_apps")
 

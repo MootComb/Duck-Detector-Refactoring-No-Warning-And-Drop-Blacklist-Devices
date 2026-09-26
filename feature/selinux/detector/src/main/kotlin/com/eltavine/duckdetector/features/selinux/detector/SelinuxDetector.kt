@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.selinux.detector
 import android.content.Context
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.evidence.DetectorId
 import com.eltavine.duckdetector.core.report.DetectorReport
 import com.eltavine.duckdetector.features.selinux.data.repository.SelinuxRepository
@@ -34,6 +35,7 @@ import com.eltavine.duckdetector.features.selinux.presentation.toDetectorReport
  * Collected by [SelinuxRepository], judged by `SelinuxReport.toDetectorStatus()` in the domain
  * layer, and described by [SelinuxCardModelMapper].
  */
+@DetectorSpecificApi
 public object SelinuxDetector : Detector<SelinuxReport, SelinuxCardModel> {
     override val id: DetectorId = DetectorId("selinux")
 

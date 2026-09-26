@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import com.eltavine.duckdetector.core.detector.DetectorSpecificApi
 import com.eltavine.duckdetector.core.detector.run
 import com.eltavine.duckdetector.core.report.DetectorResult
 import com.eltavine.duckdetector.features.su.detector.SuDetector
@@ -30,8 +31,10 @@ import kotlinx.coroutines.launch
 
 /**
  * Runs one detector, then every detector, through the SDK alone and lists each verdict. The SDK's
- * launcher starts it with the early launch evidence.
+ * launcher starts it with the early launch evidence. Running SU through `SuDetector` opts in to
+ * that detector's own API, which may change in any release.
  */
+@OptIn(DetectorSpecificApi::class)
 class ScanActivity : Activity() {
 
     private val scope = MainScope()

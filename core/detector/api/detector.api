@@ -50,3 +50,6 @@ public abstract interface class com/eltavine/duckdetector/core/detector/Detector
 	public abstract fun scan (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface annotation class com/eltavine/duckdetector/core/detector/DetectorSpecificApi : java/lang/annotation/Annotation {
+}
+
