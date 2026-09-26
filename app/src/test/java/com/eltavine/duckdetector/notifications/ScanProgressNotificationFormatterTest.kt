@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.notifications
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetric
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetricModel
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewCounts
@@ -140,7 +141,7 @@ class ScanProgressNotificationFormatterTest {
         counts = OverviewCounts(danger = 0, warning = 0, ready = 15, pending = 0),
         metrics = listOf(
             DashboardOverviewMetricModel(
-                label = "Ready",
+                metric = DashboardOverviewMetric.READY,
                 value = "15",
                 status = DetectorStatus.allClear(),
             ),

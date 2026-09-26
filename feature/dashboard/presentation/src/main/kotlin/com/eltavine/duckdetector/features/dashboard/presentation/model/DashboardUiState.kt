@@ -26,11 +26,21 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/** The counts the overview shows, in the order it shows them. */
+enum class DashboardOverviewMetric(val label: String) {
+    DANGER("Danger"),
+    WARNING("Warning"),
+    READY("Ready"),
+    PENDING("Pending"),
+}
+
 data class DashboardOverviewMetricModel(
-    val label: String,
+    val metric: DashboardOverviewMetric,
     val value: String,
     val status: DetectorStatus,
-)
+) {
+    val label: String get() = metric.label
+}
 
 /** The overall outcome that [DashboardOverviewModel.headline] describes in words. */
 enum class OverviewVerdict {
@@ -156,24 +166,24 @@ fun buildDashboardOverview(
         ),
         metrics = listOf(
             DashboardOverviewMetricModel(
-                label = "Danger",
+                metric = DashboardOverviewMetric.DANGER,
                 value = dangerCount.toString(),
                 status = if (dangerCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             DashboardOverviewMetricModel(
-                label = "Warning",
+                metric = DashboardOverviewMetric.WARNING,
                 value = warningCount.toString(),
                 status = if (warningCount > 0) DetectorStatus.warning() else DetectorStatus.allClear(),
             ),
             DashboardOverviewMetricModel(
-                label = "Ready",
+                metric = DashboardOverviewMetric.READY,
                 value = readyCount.toString(),
                 status = if (readyCount > 0) DetectorStatus.allClear() else DetectorStatus.info(
                     InfoKind.SUPPORT
                 ),
             ),
             DashboardOverviewMetricModel(
-                label = "Pending",
+                metric = DashboardOverviewMetric.PENDING,
                 value = pendingCount.toString(),
                 status = if (pendingCount > 0) DetectorStatus.info(InfoKind.SUPPORT) else DetectorStatus.allClear(),
             ),

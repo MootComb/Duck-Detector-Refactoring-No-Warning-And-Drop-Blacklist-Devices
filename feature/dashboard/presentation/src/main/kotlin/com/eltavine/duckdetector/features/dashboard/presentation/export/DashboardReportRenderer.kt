@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.core.report.ReportBlock
 import com.eltavine.duckdetector.core.report.ReportFact
 import com.eltavine.duckdetector.core.report.ReportRow
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardFindingModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetric
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 
 /** Values the report banner shows, already formatted for display by the caller. */
@@ -91,11 +92,11 @@ object DashboardReportRenderer {
         appendLine()
         appendLine("  Scan Statistics:")
         overview.metrics.forEach { metric ->
-            val icon = when (metric.label.lowercase()) {
-                "danger" -> "[✖]"
-                "warning" -> "[▲]"
-                "ready" -> "[✔]"
-                else -> "[·]"
+            val icon = when (metric.metric) {
+                DashboardOverviewMetric.DANGER -> "[✖]"
+                DashboardOverviewMetric.WARNING -> "[▲]"
+                DashboardOverviewMetric.READY -> "[✔]"
+                DashboardOverviewMetric.PENDING -> "[·]"
             }
             appendLine("    $icon ${metric.label.padEnd(9)}: ${metric.value}")
         }
