@@ -1,6 +1,6 @@
 # Duck Detector module architecture
 
-Duck Detector 使用 ports-and-adapters 边界。Android framework、Binder、KeyStore、JNI 与 native 探测只允许出现在 data 适配器、capability 采集模块和两个组合根 `:sdk:runtime`、`:app` 中；detector 层只把 Android `Context` 交给 data 层的 scanner。证据、报告与扫描契约以及 feature 的 domain 与 presentation 层是纯 JVM 模块，不依赖 Android framework。
+Duck Detector uses ports-and-adapters boundaries. Probes, meaning Android framework calls, Binder, KeyStore, JNI and native code, live only in the data modules of features and capabilities, on top of the platform access `:core:platform` shares. The two composition roots, `:sdk:runtime` and `:app`, wire them together and own the process entry points, and a detector layer only hands an Android `Context` to its data layer's scanner. The evidence, native payload, report and scan contracts, every domain layer and every presentation layer are pure JVM modules without the Android framework.
 
 To add a detector, follow [Adding a detector](../guides/adding-a-detector.md). To run the detectors inside another application, see [Using the SDK](../guides/sdk-integration.md).
 
@@ -29,8 +29,8 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity, and the hidden `SystemProperties` and `ServiceManager` access | Detector semantics, verdicts, UI |
 | `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks; `DetectorHeadline`, which every card model states; `DetectorResult` | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
-| `:core:detector` | The headless detector contract: `Detector` (identity, scanner, loading report, card model, export), the `DetectorScanner` port and `run`, which returns a `DetectorResult` without any UI | Compose, specific detectors, probes |
-| `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings, the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with, and `CardDetectorFeature`, the one session and view model every standard card shares | Detector rules, probes, specific detectors |
+| `:core:detector` | The headless detector contract: `Detector` (identity, scanner, loading report, card model, export, consents and app zygote work), `DetectorConsent`, the `DetectorScanner` port and `run`, which returns a `DetectorResult` without any UI | Compose, specific detectors, probes |
+| `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings, the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with, `ConsentCard`, which shows a detector's consent, and `CardDetectorFeature`, the one session and view model every standard card shares | Detector rules, probes, specific detectors |
 | `:capability:<unit>:domain` | Evidence types a capability shares with several features | Android, feature interpretation, UI |
 | `:capability:<unit>:data` | Collection of shared evidence: package inventory, early preload capture, system property reads, helper processes, SELinux policy carriers, attestation | Feature verdicts, presentation, other capabilities |
 | `:feature:<unit>:domain` | The feature's result and report models and pure judgement rules | Android, JNI, UI, other features |
@@ -42,7 +42,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:feature:settings:*`, `:feature:update:*`, `:feature:deviceinfo:*` | Supporting features with the same layering | Detector internals |
 | `:sdk:runtime` | The headless composition root: `DetectorCatalog`, the one list of detectors in scan-start order; `DuckDetector`, which runs them without any UI; the native libraries; and the process-level hooks: `DuckDetectorZygotePreload`, which its manifest names, launch evidence capture and the mount-view sampler | Compose, UI modules, per-detector branching |
 | `:sdk:aar` | The distributable: fuses `:sdk:runtime` and every headless module it is made of into one AAR with its native libraries and services; `verifySdkAar` fails when a project module is left unfused or a UI library reaches it | Code of its own |
-| `:app` | The UI composition root: activities, the dashboard cards, generated from every detector's ui layer, notifications, startup policy and package visibility; it names the SDK's zygote preload and calls its launch hooks | Detection rules, probes, report semantics, per-detector branching |
+| `:app` | The UI composition root: activities, the dashboard cards, generated from every detector's ui layer, notifications, startup policy with the detectors' consents, and package visibility; it declares the early capture launcher and calls the SDK's launch hooks | Detection rules, probes, report semantics, per-detector branching |
 
 ### Capabilities and their consumers
 
@@ -65,6 +65,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `check-native-boundaries.py` with `native-boundaries.json` | Every native file belongs to one unit and lives in the module that owns it, include direction, per-unit CMake targets and their registration, JNI exports owned by the unit's module | `test-native-boundaries.py` |
 | `check-detector-touch-points.py` with `detector-touch-points.json` | Outside `feature/<name>/`, a detector is named only by `DetectorCatalog`, which must name every detector, by tooling indexes, and by reviewed exceptions that state a reason | `test-detector-touch-points.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
+| `check-reflection-boundaries.py` with `reflection-allowlist.json` | Kotlin and Java code uses reflection only in reviewed files, each naming its reason: member lookups, reflective class loading, proxies and hidden API access only where a probe needs a hidden platform API, and runtime class names only where that identity is itself the evidence. Report wording never comes from a class name | `test-reflection-boundaries.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
 | `check-text-protocols.py` with `text-protocols.json` | Presentation, ui, core, SDK, app and native code decide from typed values, never by comparing, searching or stripping text another layer or unit wrote; reviewed files that read text by nature state a reason | `test-text-protocols.py`; `scripts/test_new_detector.py` runs it on a scaffolded detector |
 | `check-evidence-records.py` | Every detector and capability keeps an `EVIDENCE.md` whose signal entries fill every AGENTS.md §12 field, cite a primary source or declare `Discovery only:`, and are not drafts | `test-evidence-records.py`; `scripts/test_new_detector.py` checks the scaffold writes a draft CI rejects |
@@ -74,7 +75,7 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `scripts/new_detector.py` | A generated detector builds and passes every guard, and changes nothing outside `feature/<name>/` except its registrations | `scripts/test_new_detector.py`; CI also scaffolds a native detector and builds it |
 | `DashboardExportGoldenTest` | The export of every detector recorded in `golden-detectors.txt` stays byte-identical | Golden fixtures in `app/src/test/.../integration/dashboard` |
 
-The CI `contracts` job runs the Python checkers and their self-tests. The `verify` job runs `:build-logic:test`, every module's `unitTest`, `:app:assembleDebug` for all four ABIs, `buildHealth`, `:sdk:aar:publish` with `:sdk:aar:verifySdkAar`, the sample application built from the published AAR alone, and `:app:lintDebug`, which analyses every dependency of `:app`. It ends by scaffolding a native detector in the checkout, checking which files changed, and building and testing the result.
+The CI `contracts` job runs the Python checkers and their self-tests. The `verify` job runs `:build-logic:test`, every module's `unitTest`, `checkPublicApi`, `:app:assembleDebug` for all four ABIs, `buildHealth`, `:sdk:aar:publish` with `:sdk:aar:verifySdkAar`, the sample application built from the published AAR alone, and `:app:lintDebug`, which analyses every dependency of `:app`. It ends by scaffolding a native detector in the checkout, checking which files changed, and building and testing the result.
 
 ## Composition invariants
 
