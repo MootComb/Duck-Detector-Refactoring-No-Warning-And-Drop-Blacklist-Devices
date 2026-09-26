@@ -18,7 +18,10 @@ package com.eltavine.duckdetector.features.selinux.data.probes
 
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityBridge
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
+import com.eltavine.duckdetector.features.selinux.data.repository.EvidenceSource
 import com.eltavine.duckdetector.features.selinux.data.repository.buildContextValidityMethod
+import com.eltavine.duckdetector.features.selinux.data.repository.buildProcAttrCurrentMethod
 import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityReading
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
@@ -62,6 +65,34 @@ class SelinuxContextValidityMethodTest {
         assertEquals(AppZygoteCarrierSupportState.FAILED, contextValiditySupportState(failed))
         assertTrue(failed.details.orEmpty().contains("Carrier state=failed"))
     }
+
+    @Test
+    fun `attr current detections list exactly the targets the status names`() {
+        val result = SelinuxContextValidityProbe(
+            nativeBridge = FakeBridge(
+                trustedSnapshot().copy(
+                    procAttrCurrentProbeAttempted = true,
+                    procAttrCurrentResults = listOf(
+                        attrResult("KernelSU", SelinuxProcAttrCurrentResult.OUTCOME_DETECTED_NON_EINVAL),
+                        attrResult("Magisk", SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL),
+                        attrResult("LSPosed file", SelinuxProcAttrCurrentResult.OUTCOME_SUCCESS),
+                    ),
+                ),
+            ),
+        ).inspectLocal()
+
+        val method = buildProcAttrCurrentMethod(result, EvidenceSource.DEDICATED_CARRIER)
+
+        assertEquals(listOf("KernelSU", "LSPosed file"), method.attrCurrentDetections)
+        assertEquals("Detected: ${method.attrCurrentDetections.joinToString()}", method.status)
+    }
+
+    private fun attrResult(label: String, outcome: String) = SelinuxProcAttrCurrentResult(
+        label = label,
+        targetContext = "u:r:$label:s0",
+        outcomeClass = outcome,
+        rawMessage = outcome,
+    )
 
     private fun methodFor(snapshot: SelinuxContextValiditySnapshot) =
         buildContextValidityMethod(SelinuxContextValidityProbe(nativeBridge = FakeBridge(snapshot)).inspectLocal())

@@ -198,7 +198,7 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
     }
     when {
         procAttrCurrent?.isSecure == false -> items += SelinuxImpactItemModel(
-            "The dedicated app_zygote carrier observed anomalous /proc/self/attr/current writes for ${procAttrCurrent.status.removePrefix("Detected: ")}.",
+            "The dedicated app_zygote carrier observed anomalous /proc/self/attr/current writes for ${procAttrCurrent.attrCurrentDetections.joinToString()}.",
             DetectorStatus.danger(),
         )
 

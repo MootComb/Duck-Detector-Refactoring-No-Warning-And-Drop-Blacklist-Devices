@@ -42,6 +42,8 @@ data class SelinuxCheckResult(
     val contextValidity: SelinuxContextValidityReading? = null,
     /** The policy rule this result answers; set only on policy rule queries. */
     val policyRule: SelinuxPolicyRule? = null,
+    /** The targets whose attr/current writes behaved anomalously; set only on that oracle's result. */
+    val attrCurrentDetections: List<String> = emptyList(),
 )
 
 /** What a policy analysis note says about the loaded policy. */

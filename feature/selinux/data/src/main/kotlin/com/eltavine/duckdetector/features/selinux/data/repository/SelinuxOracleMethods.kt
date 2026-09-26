@@ -232,6 +232,7 @@ internal fun buildProcAttrCurrentMethod(
         },
         permissionDenied = false,
         details = detail,
+        attrCurrentDetections = detected.map { it.label },
     )
 }
 

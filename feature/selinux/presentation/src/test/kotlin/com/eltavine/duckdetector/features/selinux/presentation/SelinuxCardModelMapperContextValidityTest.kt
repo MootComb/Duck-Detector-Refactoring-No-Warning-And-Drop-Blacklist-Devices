@@ -330,6 +330,7 @@ class SelinuxCardModelMapperContextValidityTest {
                     permissionDenied = false,
                     details = "Magisk=DETECTED_NON_EINVAL | LSPosed file=SUCCESS",
                     oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
+                    attrCurrentDetections = listOf("Magisk", "LSPosed file"),
                 ),
             ),
         )

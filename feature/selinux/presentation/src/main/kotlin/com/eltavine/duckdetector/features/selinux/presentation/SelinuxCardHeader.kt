@@ -134,7 +134,7 @@ internal fun buildSummary(report: SelinuxReport): String {
                     if (procAttrCurrent?.isSecure == false) {
                         add(
                             "The dedicated app_zygote carrier hit anomalous /proc/self/attr/current write outcomes while probing privileged contexts: ${
-                                procAttrCurrent.status.removePrefix("Detected: ")
+                                procAttrCurrent.attrCurrentDetections.joinToString()
                             }.",
                         )
                     }
