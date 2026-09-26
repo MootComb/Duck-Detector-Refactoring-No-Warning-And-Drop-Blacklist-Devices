@@ -1,6 +1,7 @@
 duckdetector_native_unit(duckdetector_virtualization
     egl_probe.cpp
     snapshot_builder.cpp
+    snapshot_process_scan.cpp
     honeypot_traps.cpp
     native_bridge.cpp
     sacrificial_syscall_pack.cpp
