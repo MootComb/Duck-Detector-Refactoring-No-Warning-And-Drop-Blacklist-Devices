@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
+#include "tee/common/local_timer.h"
 #include "tee/common/result_codec.h"
-#include "tee/common/syscall_facade.h"
 #include "tee/der/der_probe.h"
 #include "tee/keystore/environment_probe.h"
 #include "tee/trickystore/trickystore_probe.h"

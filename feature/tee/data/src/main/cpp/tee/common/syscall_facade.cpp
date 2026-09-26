@@ -16,8 +16,10 @@
 
 #include "tee/common/syscall_facade.h"
 
+#include "tee/common/local_timer.h"
+#include "tee/common/local_timer_internal.h"
+
 #include <cerrno>
-#include <sched.h>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
@@ -48,13 +50,6 @@ namespace ducktee::common {
 #if defined(__aarch64__)
         extern "C" unsigned long long tee_arm64_read_cntvct();
         extern "C" unsigned long long tee_arm64_read_cntfrq();
-
-        struct SavedThreadAffinity {
-            cpu_set_t mask{};
-            unsigned int bind_depth = 0;
-        };
-
-        thread_local SavedThreadAffinity g_saved_thread_affinity;
 #endif
 
         SyscallCallResult make_unavailable_result() {
@@ -161,6 +156,12 @@ namespace ducktee::common {
             *out_ns = seconds * kNanosPerSecond + (remainder * kNanosPerSecond) / frequency;
             return true;
         }
+#endif
+
+    }  // namespace
+
+#if defined(__aarch64__)
+    namespace detail {
 
         bool arm64_cntvct_self_check(std::string *failure_reason) {
             const std::uint64_t frequency = arm64_effective_frequency_hz();
@@ -224,9 +225,9 @@ namespace ducktee::common {
             }
             return true;
         }
-#endif
 
-    }  // namespace
+    }  // namespace detail
+#endif
 
     const char *backend_label(SyscallBackend backend) {
         switch (backend) {
@@ -366,97 +367,6 @@ namespace ducktee::common {
 #else
         static_cast<void>(out_ns);
         return false;
-#endif
-    }
-
-    bool bind_current_thread_to_cpu0() {
-#if defined(__aarch64__)
-#if defined(__NR_gettid)
-        const auto tid = static_cast<pid_t>(syscall(__NR_gettid));
-#else
-        const auto tid = getpid();
-#endif
-        cpu_set_t cpu0_mask;
-        CPU_ZERO(&cpu0_mask);
-        CPU_SET(0, &cpu0_mask);
-
-        if (g_saved_thread_affinity.bind_depth == 0 &&
-            sched_getaffinity(tid, sizeof(g_saved_thread_affinity.mask),
-                              &g_saved_thread_affinity.mask) != 0) {
-            return false;
-        }
-        if (sched_setaffinity(tid, sizeof(cpu0_mask), &cpu0_mask) != 0) {
-            return false;
-        }
-        ++g_saved_thread_affinity.bind_depth;
-        return true;
-#else
-        return false;
-#endif
-    }
-
-    bool restore_current_thread_affinity() {
-#if defined(__aarch64__)
-        if (g_saved_thread_affinity.bind_depth == 0) {
-            return false;
-        }
-        if (g_saved_thread_affinity.bind_depth > 1) {
-            --g_saved_thread_affinity.bind_depth;
-            return true;
-        }
-
-#if defined(__NR_gettid)
-        const auto tid = static_cast<pid_t>(syscall(__NR_gettid));
-#else
-        const auto tid = getpid();
-#endif
-        if (sched_setaffinity(tid, sizeof(g_saved_thread_affinity.mask),
-                              &g_saved_thread_affinity.mask) != 0) {
-            return false;
-        }
-        g_saved_thread_affinity.bind_depth = 0;
-        CPU_ZERO(&g_saved_thread_affinity.mask);
-        return true;
-#else
-        return false;
-#endif
-    }
-
-    bool select_preferred_local_timer(
-            const bool request_cpu0_affinity,
-            LocalTimerSelection *out
-    ) {
-        if (out == nullptr) {
-            return false;
-        }
-
-        *out = LocalTimerSelection{};
-
-#if defined(__aarch64__)
-        const bool affinity_attempted = request_cpu0_affinity;
-        bool affinity_ok = false;
-        if (affinity_attempted) {
-            affinity_ok = bind_current_thread_to_cpu0();
-            out->affinity_status = affinity_ok ? "bound_cpu0" : "bind_failed";
-        }
-
-        std::string failure_reason;
-        if (arm64_cntvct_self_check(&failure_reason)) {
-            out->kind = LocalTimerKind::Arm64Cntvct;
-            out->source_label = "arm64_cntvct";
-            return true;
-        }
-
-        out->fallback_reason = failure_reason;
-        out->source_label = "clock_monotonic";
-        return true;
-#else
-        out->source_label = "clock_monotonic";
-        out->fallback_reason = "arm64 counter timer unavailable on this ABI";
-        if (request_cpu0_affinity) {
-            out->affinity_status = "unsupported_abi";
-        }
-        return true;
 #endif
     }
 

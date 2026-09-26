@@ -37,6 +37,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "tee/common/local_timer.h"
 #include "tee/common/syscall_facade.h"
 #include "tee/common/timing_stats.h"
 

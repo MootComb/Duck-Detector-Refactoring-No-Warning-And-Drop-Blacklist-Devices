@@ -1,6 +1,7 @@
 duckdetector_native_unit(duckdetector_tee
     common/jni_bridge.cpp
     common/result_codec.cpp
+    common/local_timer_setup.cpp
     common/syscall_facade.cpp
     common/timing_stats.cpp
     keystore/environment_probe.cpp

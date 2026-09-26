@@ -19,7 +19,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string>
 
 namespace ducktee::common {
 
@@ -33,18 +32,6 @@ namespace ducktee::common {
         long value = -1;
         int error_number = 0;
         bool available = false;
-    };
-
-    enum class LocalTimerKind {
-        Monotonic,
-        Arm64Cntvct,
-    };
-
-    struct LocalTimerSelection {
-        LocalTimerKind kind = LocalTimerKind::Monotonic;
-        std::string source_label = "clock_monotonic";
-        std::string fallback_reason;
-        std::string affinity_status = "not_requested";
     };
 
     const char *backend_label(SyscallBackend backend);
@@ -80,19 +67,6 @@ namespace ducktee::common {
     SyscallCallResult invoke_getpid(SyscallBackend backend);
 
     bool monotonic_time_ns(SyscallBackend backend, std::uint64_t *out_ns);
-
-    bool register_timer_time_ns(std::uint64_t *out_ns);
-
-    bool bind_current_thread_to_cpu0();
-
-    bool restore_current_thread_affinity();
-
-    bool select_preferred_local_timer(
-            bool request_cpu0_affinity,
-            LocalTimerSelection *out
-    );
-
-    bool local_timer_now_ns(const LocalTimerSelection &timer, std::uint64_t *out_ns);
 
     bool bytes_equal(const void *lhs, const void *rhs, std::size_t length);
 
