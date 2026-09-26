@@ -107,14 +107,16 @@ namespace duckdetector::virtualization {
         void add_finding(
                 Snapshot &snapshot,
                 std::set<std::string> &dedupe,
-                const std::string &group,
+                const SnapshotGroup group,
                 const std::string &severity,
                 const std::string &label,
                 const std::string &value,
-                const std::string &detail
+                const std::string &detail,
+                const EarlySignal earlySignal = EarlySignal::kNone
         ) {
             const std::string key =
-                    group + "|" + severity + "|" + label + "|" + value + "|" + detail;
+                    std::string(group_name(group)) + "|" + severity + "|" + label + "|" + value + "|" +
+                    detail;
             if (!dedupe.insert(key).second) {
                 return;
             }
@@ -124,14 +126,19 @@ namespace duckdetector::virtualization {
                     label,
                     value,
                     detail,
+                    earlySignal,
             });
             if (severity == "WARNING" || severity == "DANGER") {
-                if (group == "ENVIRONMENT") {
-                    snapshot.environmentHitCount += 1;
-                } else if (group == "TRANSLATION") {
-                    snapshot.translationHitCount += 1;
-                } else if (group == "RUNTIME") {
-                    snapshot.runtimeArtifactHitCount += 1;
+                switch (group) {
+                    case SnapshotGroup::kEnvironment:
+                        snapshot.environmentHitCount += 1;
+                        break;
+                    case SnapshotGroup::kTranslation:
+                        snapshot.translationHitCount += 1;
+                        break;
+                    case SnapshotGroup::kRuntime:
+                        snapshot.runtimeArtifactHitCount += 1;
+                        break;
                 }
             }
         }
@@ -142,11 +149,12 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "ENVIRONMENT",
+                        SnapshotGroup::kEnvironment,
                         "DANGER",
                         "ro.kernel.qemu",
                         "Guest",
-                        "ro.kernel.qemu=1 is a direct emulator guest property."
+                        "ro.kernel.qemu=1 is a direct emulator guest property.",
+                        EarlySignal::kQemuProperty
                 );
             }
 
@@ -168,11 +176,12 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "ENVIRONMENT",
+                        SnapshotGroup::kEnvironment,
                         "DANGER",
                         "QEMU guest properties",
                         "Present",
-                        detail.str()
+                        detail.str(),
+                        EarlySignal::kQemuProperty
                 );
             }
 
@@ -195,11 +204,12 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "ENVIRONMENT",
+                        SnapshotGroup::kEnvironment,
                         "DANGER",
                         "Emulator hardware props",
                         "goldfish/ranchu",
-                        hardware_detail.str()
+                        hardware_detail.str(),
+                        EarlySignal::kEmulatorHardware
                 );
             }
 
@@ -208,7 +218,7 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "TRANSLATION",
+                        SnapshotGroup::kTranslation,
                         "WARNING",
                         "ro.dalvik.vm.native.bridge",
                         nativeBridge,
@@ -222,7 +232,7 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "ENVIRONMENT",
+                        SnapshotGroup::kEnvironment,
                         "INFO",
                         "Hypervisor capability",
                         hypervisorSupported,
@@ -243,11 +253,12 @@ namespace duckdetector::virtualization {
                     add_finding(
                             snapshot,
                             dedupe,
-                            "RUNTIME",
+                            SnapshotGroup::kRuntime,
                             "DANGER",
                             "Emulator device node",
                             node,
-                            std::string("Current app context can see emulator device node: ") + node
+                            std::string("Current app context can see emulator device node: ") + node,
+                            EarlySignal::kEmulatorDeviceNode
                     );
                 }
             }
@@ -274,7 +285,7 @@ namespace duckdetector::virtualization {
                         add_finding(
                                 snapshot,
                                 dedupe,
-                                "TRANSLATION",
+                                SnapshotGroup::kTranslation,
                                 "WARNING",
                                 "Mapped translation library",
                                 token,
@@ -289,7 +300,7 @@ namespace duckdetector::virtualization {
                     add_finding(
                             snapshot,
                             dedupe,
-                            "RUNTIME",
+                            SnapshotGroup::kRuntime,
                             "DANGER",
                             "Mapped emulator library",
                             "Present",
@@ -314,11 +325,12 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "RUNTIME",
+                        SnapshotGroup::kRuntime,
                         "DANGER",
                         "AVF runtime",
                         joined.str(),
-                        "Multiple AVF or Microdroid runtime tokens were visible from /proc/self/maps."
+                        "Multiple AVF or Microdroid runtime tokens were visible from /proc/self/maps.",
+                        EarlySignal::kAvfRuntime
                 );
             }
         }
@@ -383,7 +395,7 @@ namespace duckdetector::virtualization {
                     add_finding(
                             snapshot,
                             dedupe,
-                            "RUNTIME",
+                            SnapshotGroup::kRuntime,
                             "DANGER",
                             "Mount anchor artifact",
                             mount_point,
@@ -396,22 +408,24 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "RUNTIME",
+                        SnapshotGroup::kRuntime,
                         "DANGER",
                         "authfs runtime",
                         "Present",
-                        "authfs mount was visible from /proc/self/mountinfo."
+                        "authfs mount was visible from /proc/self/mountinfo.",
+                        EarlySignal::kAuthfsRuntime
                 );
             }
             if (authfs_seen && avf_other_seen) {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "RUNTIME",
+                        SnapshotGroup::kRuntime,
                         "DANGER",
                         "AVF runtime",
                         "Present",
-                        "Mount table contains authfs together with additional AVF or Microdroid tokens."
+                        "Mount table contains authfs together with additional AVF or Microdroid tokens.",
+                        EarlySignal::kAvfRuntime
                 );
             }
         }
@@ -451,7 +465,7 @@ namespace duckdetector::virtualization {
                         add_finding(
                                 snapshot,
                                 dedupe,
-                                "TRANSLATION",
+                                SnapshotGroup::kTranslation,
                                 "WARNING",
                                 "FD target translation residue",
                                 token,
@@ -465,7 +479,7 @@ namespace duckdetector::virtualization {
                     add_finding(
                             snapshot,
                             dedupe,
-                            "RUNTIME",
+                            SnapshotGroup::kRuntime,
                             "DANGER",
                             "FD target runtime artifact",
                             "Present",
@@ -482,7 +496,7 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "TRANSLATION",
+                        SnapshotGroup::kTranslation,
                         "WARNING",
                         "Cmdline native bridge",
                         "Present",
@@ -509,7 +523,7 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "RUNTIME",
+                        SnapshotGroup::kRuntime,
                         "WARNING",
                         "Graphics renderer",
                         renderer.renderer.empty() ? "Detected" : renderer.renderer,
@@ -519,7 +533,7 @@ namespace duckdetector::virtualization {
                 add_finding(
                         snapshot,
                         dedupe,
-                        "RUNTIME",
+                        SnapshotGroup::kRuntime,
                         "INFO",
                         "Graphics renderer",
                         renderer.renderer.empty() ? "SwiftShader" : renderer.renderer,
@@ -572,7 +586,7 @@ namespace duckdetector::virtualization {
             // contain a tab or a newline. Escaping only the last column let such a value shift the
             // columns after it, or end the record and turn its remainder into bogus keys.
             output << "FINDING="
-                   << encode_value(finding.group) << '\t'
+                   << encode_value(group_name(finding.group)) << '\t'
                    << encode_value(finding.severity) << '\t'
                    << encode_value(finding.label) << '\t'
                    << encode_value(finding.value) << '\t'

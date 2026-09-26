@@ -14,10 +14,6 @@ The SELinux card's policy and audit notes are typed, but each kind keeps the sta
 
 The context validity oracle is untrusted either because its controls failed or because its repeated writes disagreed, and the repository reports both as one self-test failure. The card has separate verdicts for the two ("untrusted" and "unstable context oracle"), but its reading sets `repeatabilityFailed` for every self-test failure, as the old text match on "repeatability failed" did. The probe result keeps `oracleControlsPassed` and `ksuResultsStable`, so the reading could tell the causes apart. Doing so changes the card's and the export's verdict for devices whose controls fail, so it needs a deliberate change.
 
-## Early virtualization preload matches finding labels
-
-`preload/virtualization_early_detector.cpp` derives its early flags by comparing the finding labels and groups produced by `virtualization::collect_snapshot`, such as `"ro.kernel.qemu"`, `"Emulator device node"` and `"TRANSLATION"`. This is the reason for the one include exception in `native-boundaries.json`. The include itself is legitimate, because both captures must come from one probe implementation, but the label matching is a text protocol between two native units. Give `virtualization::SnapshotFinding` a typed kind and match on it.
-
 ## Release native builds never use the Release configuration
 
 Release variants build the native libraries with CMake's `RelWithDebInfo` configuration because nothing selects `Release`. The `$<CONFIG:Release>` flags in `sdk/runtime/src/main/cpp/CMakeLists.txt` therefore never reach shipped builds. These flags are `-ffunction-sections`, `-fdata-sections`, hidden visibility, `INTERPROCEDURAL_OPTIMIZATION_RELEASE` and `-Wl,--gc-sections`. The shipped `libduckdetector.so` is compiled with `-O2 -g` and default visibility; only `libmain.so` always hides its symbols. The refactor kept this behavior and verified it unchanged. Enabling the flags changes shipped binaries and the code layout of timing-sensitive probes, so it needs on-device validation of the timing and trap probes before it lands.

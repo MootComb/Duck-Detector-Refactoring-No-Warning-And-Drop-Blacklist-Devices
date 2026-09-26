@@ -59,22 +59,26 @@ namespace duckdetector::preload::virtualization {
                     finding.label + "|" + finding.value + "|" + finding.severity
             );
 
-            if (finding.label == "ro.kernel.qemu" || finding.label == "QEMU guest properties") {
-                result.qemuPropertyDetected = true;
+            switch (finding.earlySignal) {
+                case duckdetector::virtualization::EarlySignal::kQemuProperty:
+                    result.qemuPropertyDetected = true;
+                    break;
+                case duckdetector::virtualization::EarlySignal::kEmulatorHardware:
+                    result.emulatorHardwareDetected = true;
+                    break;
+                case duckdetector::virtualization::EarlySignal::kEmulatorDeviceNode:
+                    result.deviceNodeDetected = true;
+                    break;
+                case duckdetector::virtualization::EarlySignal::kAvfRuntime:
+                    result.avfRuntimeDetected = true;
+                    break;
+                case duckdetector::virtualization::EarlySignal::kAuthfsRuntime:
+                    result.authfsRuntimeDetected = true;
+                    break;
+                case duckdetector::virtualization::EarlySignal::kNone:
+                    break;
             }
-            if (finding.label == "Emulator hardware props") {
-                result.emulatorHardwareDetected = true;
-            }
-            if (finding.label == "Emulator device node") {
-                result.deviceNodeDetected = true;
-            }
-            if (finding.label == "AVF runtime") {
-                result.avfRuntimeDetected = true;
-            }
-            if (finding.label == "authfs runtime") {
-                result.authfsRuntimeDetected = true;
-            }
-            if (finding.group == "TRANSLATION") {
+            if (finding.group == duckdetector::virtualization::SnapshotGroup::kTranslation) {
                 result.nativeBridgeDetected = true;
             }
         }

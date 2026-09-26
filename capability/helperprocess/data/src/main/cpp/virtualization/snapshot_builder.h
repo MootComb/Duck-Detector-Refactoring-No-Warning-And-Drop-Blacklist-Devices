@@ -21,12 +21,42 @@
 
 namespace duckdetector::virtualization {
 
+    // The groups a finding counts toward; the snapshot payload names them with group_name().
+    enum class SnapshotGroup {
+        kEnvironment,
+        kTranslation,
+        kRuntime,
+    };
+
+    inline const char *group_name(const SnapshotGroup group) {
+        switch (group) {
+            case SnapshotGroup::kEnvironment:
+                return "ENVIRONMENT";
+            case SnapshotGroup::kTranslation:
+                return "TRANSLATION";
+            case SnapshotGroup::kRuntime:
+                return "RUNTIME";
+        }
+        return "RUNTIME";
+    }
+
+    // The findings the early launch capture reports on their own; most findings are none of them.
+    enum class EarlySignal {
+        kNone,
+        kQemuProperty,
+        kEmulatorHardware,
+        kEmulatorDeviceNode,
+        kAvfRuntime,
+        kAuthfsRuntime,
+    };
+
     struct SnapshotFinding {
-        std::string group;
+        SnapshotGroup group;
         std::string severity;
         std::string label;
         std::string value;
         std::string detail;
+        EarlySignal earlySignal = EarlySignal::kNone;
     };
 
     struct Snapshot {
