@@ -82,6 +82,8 @@ The CI `contracts` job runs the Python checkers and their self-tests. The `verif
 
 Consents follow the same path ([ADR 0013](../adr/0013-detector-consents.md)). A detector lists the user decisions it needs in `Detector.consents`, and its ui module describes each one in `DetectorFeature.consentCards`. The startup policy screen shows one card per consent, and settings shows one switch per consent. A change calls `decide` and rescans the session of the detector that owns the consent, so neither screen names a detector.
 
+Process hooks need no entry either. A detector with app zygote work overrides `Detector.appZygotePreload`, which `DuckDetectorZygotePreload` runs in catalog order ([ADR 0012](../adr/0012-detector-app-zygote-preload.md)). The SDK's manifest names that preload, and each module's manifest declares the services and intent filters its probes need, so neither the app nor an SDK host declares anything for a detector ([ADR 0015](../adr/0015-sdk-manifest-process-hooks.md)).
+
 Scan lifecycle is owned explicitly ([ADR 0003](../adr/0003-scan-lifecycle-ownership.md)):
 
 ```text
@@ -112,9 +114,9 @@ Native code is split into units ([ADR 0005](../adr/0005-native-unit-boundaries.m
 2. Put judgement rules in the feature's domain layer and keep them pure JVM; the data layer collects and the presentation layer projects.
 3. Share evidence acquisition only through a capability used by at least two features. The capability must not interpret the evidence for any of them.
 4. Never add a dependency between two feature units or two capability units. If they need the same evidence, extract a capability; if they need the same contract, it belongs in `:core`.
-5. Export and dashboard output change only through a feature's own `DetectorReport` projection. Update the golden fixtures deliberately, never to silence a diff. A new detector does not have to join them; regenerating them records every catalogued detector.
+5. Decide from typed values. A layer or native unit never compares, searches or strips text another one wrote; carry an enum, id or flag from where the evidence is produced ([ADR 0014](../adr/0014-no-text-protocols-across-layers.md)). Export and dashboard output change only through a feature's own `DetectorReport` projection. Update the golden fixtures deliberately, never to silence a diff. A new detector does not have to join them; regenerating them records every catalogued detector.
 6. Add native code as `src/main/cpp/<unit>/` in the module that owns it, with a `CMakeLists.txt` that declares its `duckdetector_native_unit` target, one line in the `DUCKDETECTOR_NATIVE_UNITS` registry and a `native-boundaries.json` entry. Cross-unit includes need a header-level exception with a reason.
 7. Keep JNI bridges inside the module that owns the native unit. Kotlin `external` functions must be public or private members of a class or object other than a companion object, and must not be overloaded.
-8. Keep `:app` a composition root. It may wire adapters and platform entry points but must not acquire detection rules or per-detector branching.
+8. Keep `:app` a composition root. It may wire adapters and platform entry points but must not acquire detection rules or per-detector branching. Manifest entries a probe needs belong in the manifest of the module that owns the probe.
 9. Split any file that approaches 600 lines along semantic ownership ([ADR 0006](../adr/0006-source-file-length-limit.md)); there is no baseline to hide in.
 10. Record every deliberate boundary exception in [follow-ups](./follow-ups.md) or an ADR, together with the reason it is still needed.

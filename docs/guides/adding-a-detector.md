@@ -59,6 +59,18 @@ The generated detector builds and passes every guard. Until its probe observes t
 
 State what was observed and what it implies, never that a device is secure or compromised (AGENTS.md §19). Build user-facing text in the mapper from typed values. Do not assemble text in the data layer, and never derive wording from class names.
 
+Decide from typed values too. When the card or the export has to choose a row, an icon or a status, carry an enum, id or flag from where the evidence is produced, and let enums own their labels. Never compare, search or strip the words another layer wrote; `check-text-protocols.py` rejects it ([ADR 0014](../adr/0014-no-text-protocols-across-layers.md)).
+
+### When the detector needs the process or the user
+
+Declare the need on the detector; both composition roots apply it without naming the detector.
+
+| Need | Declare it in | Applied by |
+|---|---|---|
+| Work in the app zygote, before any isolated process forks | `appZygotePreload` on the `Detector` ([ADR 0012](../adr/0012-detector-app-zygote-preload.md)) | `DuckDetectorZygotePreload`, which the SDK's manifest names |
+| A decision only the user can make | `consents` on the `Detector`, with the prompt and setting in the ui module's `consentCards` ([ADR 0013](../adr/0013-detector-consents.md)) | The app's startup policy screen and settings; an SDK host reads and records them itself |
+| A service, an intent filter or a package query | The data module's `AndroidManifest.xml`, on the component that uses it ([ADR 0015](../adr/0015-sdk-manifest-process-hooks.md)) | The manifest merger, for the app and every SDK host |
+
 ## 4. Verify
 
 ```bash
@@ -67,7 +79,7 @@ State what was observed and what it implies, never that a device is secure or co
 python3 .github/scripts/check-detector-touch-points.py
 ```
 
-Also run `check-evidence-records.py`. With a native unit, run `check-jni-contracts.py` and `check-native-boundaries.py` as well. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
+Also run `check-evidence-records.py` and `check-text-protocols.py`. With a native unit, run `check-jni-contracts.py` and `check-native-boundaries.py` as well. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
 
 JVM tests prove the rules, not the probe. Validate the probe on clean, modified and unsupported devices, as AGENTS.md §23 requires.
 
@@ -79,6 +91,7 @@ JVM tests prove the rules, not the probe. Validate the probe on clean, modified 
 | `module-boundaries.json` | Every layer is classified by its path |
 | `app/build.gradle.kts`, `sdk/runtime/build.gradle.kts`, `sdk/aar` | The ui and detector layers are discovered, and the AAR fuses every headless module |
 | `DetectorFeatures` in the app | Its cards come from `detectorCards`, which the build generates from every ui module's `detectorFeature` |
+| The app's manifest, startup screen and settings | Components come from module manifests, and consents are shown from `consentCards` |
 | Dashboard, export and notification code | They work on sessions and `DetectorReport` values, never on a specific detector |
 | The golden export | It covers the detectors recorded in `golden-detectors.txt`, so a new detector does not have to join it |
 
