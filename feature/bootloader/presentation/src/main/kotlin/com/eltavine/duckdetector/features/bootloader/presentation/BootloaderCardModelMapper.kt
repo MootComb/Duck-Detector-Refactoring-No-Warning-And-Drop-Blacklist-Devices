@@ -20,7 +20,6 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderEvidenceMode
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFinding
-import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingGroup
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingSeverity
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodOutcome
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodResult
@@ -29,13 +28,11 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderStage
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderState
 import com.eltavine.duckdetector.features.bootloader.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardModel
-import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderCardAssessment
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderDetailRowModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFact
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderHeaderFactModel
 import com.eltavine.duckdetector.features.bootloader.presentation.model.BootloaderImpactItemModel
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTier
-import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 
 class BootloaderCardModelMapper {
 
@@ -259,85 +256,6 @@ class BootloaderCardModelMapper {
         }
     }
 
-    private fun buildScanRows(report: BootloaderReport): List<BootloaderDetailRowModel> {
-        return when (report.stage) {
-            BootloaderStage.LOADING -> placeholderRows(
-                scanPlaceholders(),
-                "Pending",
-                DetectorStatus.info(InfoKind.SUPPORT)
-            )
-
-            BootloaderStage.FAILED -> placeholderRows(
-                scanPlaceholders(),
-                "Error",
-                DetectorStatus.info(InfoKind.ERROR)
-            )
-
-            BootloaderStage.READY -> listOf(
-                BootloaderDetailRowModel(
-                    label = "Properties checked",
-                    value = report.checkedPropertyCount.toString(),
-                    status = DetectorStatus.info(InfoKind.SUPPORT),
-                ),
-                BootloaderDetailRowModel(
-                    label = "Properties observed",
-                    value = report.observedPropertyCount.toString(),
-                    status = if (report.observedPropertyCount > 0) DetectorStatus.allClear() else DetectorStatus.info(
-                        InfoKind.SUPPORT
-                    ),
-                ),
-                BootloaderDetailRowModel(
-                    label = "Native hits",
-                    value = report.nativePropertyHitCount.toString(),
-                    status = if (report.nativePropertyHitCount > 0) DetectorStatus.allClear() else DetectorStatus.info(
-                        InfoKind.SUPPORT
-                    ),
-                ),
-                BootloaderDetailRowModel(
-                    label = "Raw boot hits",
-                    value = report.rawBootParamHitCount.toString(),
-                    status = if (report.rawBootParamHitCount > 0) DetectorStatus.allClear() else DetectorStatus.info(
-                        InfoKind.SUPPORT
-                    ),
-                ),
-                BootloaderDetailRowModel(
-                    label = "Source mismatches",
-                    value = report.sourceMismatchCount.toString(),
-                    status = if (report.sourceMismatchCount > 0) DetectorStatus.warning() else DetectorStatus.allClear(),
-                ),
-                BootloaderDetailRowModel(
-                    label = "Cross-checks",
-                    value = report.consistencyFindingCount.toString(),
-                    status = if (report.consistencyFindingCount > 0) {
-                        if (report.dangerFindings.any { it.group == BootloaderFindingGroup.CONSISTENCY }) {
-                            DetectorStatus.danger()
-                        } else {
-                            DetectorStatus.warning()
-                        }
-                    } else {
-                        DetectorStatus.allClear()
-                    },
-                ),
-                BootloaderDetailRowModel(
-                    label = "Attestation chain",
-                    value = report.attestationChainLength.toString(),
-                    status = when {
-                        report.attestationChainLength == 0 -> DetectorStatus.danger()
-                        report.attestationAvailable -> DetectorStatus.allClear()
-                        else -> DetectorStatus.info(InfoKind.SUPPORT)
-                    },
-                ),
-                BootloaderDetailRowModel(
-                    label = "Hardware-backed",
-                    value = if (report.hardwareBacked) "Yes" else "No",
-                    status = if (report.hardwareBacked) DetectorStatus.allClear() else DetectorStatus.info(
-                        InfoKind.SUPPORT
-                    ),
-                ),
-            )
-        }
-    }
-
     private fun findingRow(finding: BootloaderFinding): BootloaderDetailRowModel {
         return BootloaderDetailRowModel(
             label = finding.label,
@@ -358,20 +276,6 @@ class BootloaderCardModelMapper {
             BootloaderHeaderFactModel(BootloaderHeaderFact.TIER, value, status),
             BootloaderHeaderFactModel(BootloaderHeaderFact.TRUST, value, status),
         )
-    }
-
-    private fun placeholderRows(
-        labels: List<String>,
-        value: String,
-        status: DetectorStatus,
-    ): List<BootloaderDetailRowModel> {
-        return labels.map { label ->
-            BootloaderDetailRowModel(
-                label = label,
-                value = value,
-                status = status,
-            )
-        }
     }
 
     private fun statePlaceholders(): List<String> =
@@ -413,17 +317,6 @@ class BootloaderCardModelMapper {
         "Widevine credential",
     )
 
-    private fun scanPlaceholders(): List<String> = listOf(
-        "Properties checked",
-        "Properties observed",
-        "Native hits",
-        "Raw boot hits",
-        "Source mismatches",
-        "Cross-checks",
-        "Attestation chain",
-        "Hardware-backed",
-    )
-
     private fun List<BootloaderFinding>.areWidevineOnly(): Boolean {
         return isNotEmpty() && all { finding -> finding.id.startsWith(WIDEVINE_FINDING_PREFIX) }
     }
@@ -446,92 +339,8 @@ class BootloaderCardModelMapper {
         }
     }
 
-    private fun proofLabel(mode: BootloaderEvidenceMode): String {
-        return when (mode) {
-            BootloaderEvidenceMode.ATTESTATION -> "Attest"
-            BootloaderEvidenceMode.PROPERTIES_ONLY -> "Props"
-            BootloaderEvidenceMode.UNAVAILABLE -> "N/A"
-        }
-    }
-
-    private fun stateLabel(state: BootloaderState): String {
-        return when (state) {
-            BootloaderState.VERIFIED -> "Verified"
-            BootloaderState.SELF_SIGNED -> "Custom"
-            BootloaderState.UNLOCKED -> "Unlocked"
-            BootloaderState.FAILED_VERIFICATION -> "Failed"
-            BootloaderState.LOCKED_UNKNOWN -> "Locked?"
-            BootloaderState.UNKNOWN -> "Unknown"
-        }
-    }
-
-    private fun tierLabel(tier: TeeTier): String {
-        return when (tier) {
-            TeeTier.STRONGBOX -> "StrongBox"
-            TeeTier.TEE -> "TEE"
-            TeeTier.SOFTWARE -> "Software"
-            TeeTier.NONE -> "None"
-            TeeTier.UNKNOWN -> "Unknown"
-        }
-    }
-
-    private fun trustLabel(trustRoot: TeeTrustRoot): String {
-        return when (trustRoot) {
-            TeeTrustRoot.GOOGLE -> "Google"
-            TeeTrustRoot.GOOGLE_RKP -> "RKP"
-            TeeTrustRoot.AOSP -> "AOSP"
-            TeeTrustRoot.FACTORY -> "Factory"
-            TeeTrustRoot.UNKNOWN -> "Unknown"
-        }
-    }
-
-    private fun trustStatus(report: BootloaderReport): DetectorStatus {
-        return when {
-            report.attestationChainLength == 0 -> DetectorStatus.danger()
-            report.trustRoot == TeeTrustRoot.UNKNOWN -> DetectorStatus.danger()
-            report.trustRoot == TeeTrustRoot.GOOGLE || report.trustRoot == TeeTrustRoot.GOOGLE_RKP ->
-                DetectorStatus.allClear()
-
-            report.trustRoot == TeeTrustRoot.AOSP -> DetectorStatus.warning()
-            report.trustRoot == TeeTrustRoot.FACTORY -> DetectorStatus.info(InfoKind.SUPPORT)
-            else -> DetectorStatus.info(InfoKind.SUPPORT)
-        }
-    }
-
     private fun badgeValue(value: String): String {
         return if (value.length > 18) value.take(17) + "…" else value
     }
 
-    private fun BootloaderReport.toCardAssessment(): BootloaderCardAssessment {
-        val widevineFindings = findings.filter { finding ->
-            finding.id.startsWith(WIDEVINE_FINDING_PREFIX)
-        }
-        return when {
-            widevineFindings.any { it.severity == BootloaderFindingSeverity.DANGER } ->
-                BootloaderCardAssessment.CONSISTENCY_CONFLICT
-
-            widevineFindings.any { it.severity == BootloaderFindingSeverity.WARNING } ->
-                BootloaderCardAssessment.CONSISTENCY_REVIEW
-
-            else -> BootloaderCardAssessment.AUTHORITATIVE
-        }
-    }
-
-    // Card severity may include Widevine; the State fact remains authoritative.
-    private fun BootloaderReport.authoritativeStateStatus(): DetectorStatus {
-        return when (state) {
-            BootloaderState.VERIFIED -> DetectorStatus.allClear()
-            BootloaderState.SELF_SIGNED,
-            BootloaderState.LOCKED_UNKNOWN -> DetectorStatus.warning()
-
-            BootloaderState.UNLOCKED,
-            BootloaderState.FAILED_VERIFICATION -> DetectorStatus.danger()
-
-            BootloaderState.UNKNOWN -> DetectorStatus.info(InfoKind.SUPPORT)
-        }
-    }
-
-    private companion object {
-        const val WIDEVINE_FINDING_PREFIX = "widevine_"
-    }
 }
