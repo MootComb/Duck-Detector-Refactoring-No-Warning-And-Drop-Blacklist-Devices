@@ -88,6 +88,23 @@ runs:
       with:
         cache-read-only: ${{ inputs.cache-read-only }}
 
+    # A standard GitHub-hosted Linux runner for a public repository has 16 GB of memory. The
+    # project's gradle.properties gives the Gradle daemon an 8 GB heap for local builds, and the
+    # Kotlin daemon inherits that limit unless kotlin.daemon.jvmargs is set, so with test and lint
+    # workers the two can claim more than the runner has. Gradle properties in GRADLE_USER_HOME
+    # take precedence over the project's, so this sizes CI alone.
+    - name: Size the Gradle and Kotlin daemons for the runner
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        gradle_user_home="${GRADLE_USER_HOME:-$HOME/.gradle}"
+        mkdir -p "${gradle_user_home}"
+        cat >> "${gradle_user_home}/gradle.properties" <<'PROPERTIES'
+        org.gradle.jvmargs=-Xmx5g -Dfile.encoding=UTF-8
+        kotlin.daemon.jvmargs=-Xmx2g
+        PROPERTIES
+
     - name: Set up Android SDK
       uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
       with:

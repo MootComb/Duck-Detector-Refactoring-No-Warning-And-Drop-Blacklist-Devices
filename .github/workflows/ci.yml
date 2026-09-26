@@ -152,6 +152,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Lint analyses every module. A fresh daemon starts it without the heap the earlier
+          # steps left behind, and the Kotlin daemon stops with the Gradle daemon.
+          ./gradlew --stop
           ./gradlew --stacktrace :app:lintDebug
 
       # Adding a detector has to stay one command that changes nothing outside feature/<name>/ but
