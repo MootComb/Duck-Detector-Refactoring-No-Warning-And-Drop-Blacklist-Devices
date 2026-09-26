@@ -19,7 +19,6 @@ package com.eltavine.duckdetector.features.dangerousapps.ui.card
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.ui.components.ContextLine
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
@@ -53,9 +50,6 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFact
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFactModel
-import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHiddenPackageItemModel
-import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHmaAlertModel
-import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsPackageItemModel
 import com.eltavine.duckdetector.features.dangerousapps.ui.DangerousAppsTargetsDialog
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -208,218 +202,5 @@ private fun DangerousAppsFactPairRow(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
-    }
-}
-
-@Composable
-private fun DangerousAppsHmaSection(
-    alert: DangerousAppsHmaAlertModel,
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.42f),
-        shape = ShapeTokens.CornerExtraLarge,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
-                    shape = ShapeTokens.CornerLarge,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.VisibilityOff,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier
-                            .padding(9.dp)
-                            .size(18.dp),
-                    )
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    WrapSafeText(
-                        text = alert.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                    WrapSafeText(
-                        text = alert.summary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                alert.hiddenPackages.forEachIndexed { index, item ->
-                    DangerousAppsHiddenPackageRow(item = item)
-                    if (index < alert.hiddenPackages.lastIndex) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.14f),
-                            thickness = 1.dp,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun DangerousAppsHiddenPackageRow(
-    item: DangerousAppsHiddenPackageItemModel,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        WrapSafeText(
-            text = item.appName,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        WrapSafeText(
-            text = item.packageName,
-            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item.methods.forEach { method ->
-                DangerousAppsMethodChip(
-                    label = method,
-                    warningTone = true,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DangerousAppsPackageSection(
-    model: DangerousAppsCardModel,
-) {
-    when {
-        model.packageItems.isEmpty() -> {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = ShapeTokens.CornerLargeIncreased,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 14.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    WrapSafeText(
-                        text = "No package hits",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    WrapSafeText(
-                        text = model.summary,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-
-        else -> {
-            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                model.packageItems.forEachIndexed { index, item ->
-                    DangerousAppsPackageRow(item = item)
-                    if (index < model.packageItems.lastIndex) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.18f),
-                            thickness = 1.dp,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun DangerousAppsPackageRow(
-    item: DangerousAppsPackageItemModel,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        WrapSafeText(
-            text = item.appName,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        WrapSafeText(
-            text = item.packageName,
-            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item.methods.forEach { method ->
-                DangerousAppsMethodChip(label = method)
-            }
-        }
-    }
-}
-
-@Composable
-private fun DangerousAppsMethodChip(
-    label: String,
-    warningTone: Boolean = false,
-) {
-    val containerColor = if (warningTone) {
-        MaterialTheme.colorScheme.error.copy(alpha = 0.08f)
-    } else {
-        MaterialTheme.colorScheme.surfaceContainerHighest
-    }
-    val iconTint = if (warningTone) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.primary
-    }
-
-    Surface(
-        color = containerColor,
-        shape = ShapeTokens.CornerFull,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(14.dp),
-            )
-            WrapSafeText(
-                text = label,
-                style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
     }
 }
