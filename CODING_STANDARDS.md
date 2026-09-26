@@ -24,6 +24,8 @@
 - 一个类只负责一件清晰的事。
 - 一个 probe 只负责一种探测语义，不要把多个独立异常揉进一个大类里。
 - 一个 reducer 负责汇总与判定，不负责底层采集。
+- 一个源文件只放语义上紧密相关的声明。任何源文件（Kotlin、Java、C/C++、汇编、Gradle 脚本、Python、Shell）都不得达到 400 行，这对应 Kotlin 编码规范“文件不超过几百行”的建议，由 `check-source-file-length.py` 强制。接近上限时按语义归属拆分，不要压缩格式，也没有基线豁免。
+- 拆分计时敏感的 native 代码时，计时读取与被测调用这条测量路径留在同一个翻译单元，只移走测量之前或之后运行的代码。
 
 ### 2.2 小步提交
 
@@ -139,7 +141,7 @@ TEE 的证据较多，在 data 层另有 `TeeReportReducer` 负责汇总。
 每次改动至少执行以下验证：
 
 - `./gradlew unitTest :app:assembleDebug :app:lintDebug`：运行所有模块的单测，构建四个 ABI 的 native 库，并执行覆盖全部依赖模块的 lint
-- `for s in .github/scripts/check-*.py; do python3 "$s"; done`：全部仓库守卫，几秒内完成，包括源文件不得达到 600 行、检测器触点、证据记录、JNI 契约、native 边界、反射与文本协议
+- `for s in .github/scripts/check-*.py; do python3 "$s"; done`：全部仓库守卫，几秒内完成，包括源文件不得达到 400 行、检测器触点、证据记录、JNI 契约、native 边界、反射与文本协议
 
 按改动类型追加以下验证。CI 会运行其中全部的 Gradle 任务、SDK 构建与自测，并额外生成一个 native 检测器来检查脚手架：
 

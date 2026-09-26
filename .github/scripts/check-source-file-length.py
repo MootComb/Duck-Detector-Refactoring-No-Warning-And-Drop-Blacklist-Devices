@@ -16,8 +16,10 @@
 """Fail when a source file reaches the repository's line limit.
 
 A file that accumulates this many lines almost always owns several independent reasons
-to change. The limit is a review trigger for splitting along semantic ownership, not a
-target to pad or compress towards.
+to change. The Kotlin coding conventions keep a file "not exceeding a few hundred lines"
+(Source file organization), and the limit applies that to every source language here. It is
+a review trigger for splitting along semantic ownership, not a target to pad or compress
+towards.
 """
 
 from __future__ import annotations
@@ -26,7 +28,7 @@ import argparse
 import os
 import sys
 
-LINE_LIMIT = 600
+LINE_LIMIT = 400
 SOURCE_SUFFIXES = (
     ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".S", ".s",
     ".java", ".kt", ".kts", ".gradle",

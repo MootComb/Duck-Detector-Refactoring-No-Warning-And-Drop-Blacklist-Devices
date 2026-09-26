@@ -25,7 +25,7 @@ import tempfile
 import unittest
 
 CHECKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-source-file-length.py")
-LIMIT = 600
+LIMIT = 400
 
 
 class SourceFileLengthCheckerTest(unittest.TestCase):
@@ -64,11 +64,11 @@ class SourceFileLengthCheckerTest(unittest.TestCase):
 
     def test_rejects_file_at_the_limit(self) -> None:
         self.write_lines("app/src/main/java/Large.kt", LIMIT)
-        self.assert_rejected("app/src/main/java/Large.kt has 600 lines")
+        self.assert_rejected(f"app/src/main/java/Large.kt has {LIMIT} lines")
 
     def test_counts_final_line_without_newline(self) -> None:
         self.write_lines("app/src/main/cpp/large.cpp", LIMIT, trailing_newline=False)
-        self.assert_rejected("large.cpp has 600 lines")
+        self.assert_rejected(f"large.cpp has {LIMIT} lines")
 
     def test_covers_build_scripts_and_tooling(self) -> None:
         for path in ("build.gradle.kts", "tools/check.py", "tools/run.sh", "lib/probe.S", "lib/probe.h"):
@@ -90,8 +90,8 @@ class SourceFileLengthCheckerTest(unittest.TestCase):
         self.write_lines("feature/b/src/main/kotlin/B.kt", LIMIT + 50)
         result = self.run_checker()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("A.kt has 600 lines", result.stderr)
-        self.assertIn("B.kt has 650 lines", result.stderr)
+        self.assertIn(f"A.kt has {LIMIT} lines", result.stderr)
+        self.assertIn(f"B.kt has {LIMIT + 50} lines", result.stderr)
 
     def test_a_leftover_baseline_file_grants_no_exemption(self) -> None:
         self.write_lines("app/src/main/java/Legacy.kt", 700)
