@@ -586,8 +586,13 @@ jobs:
                   "Expected exactly two uploaded assets: one APK and one SDK AAR."
               )
 
-          apk_assets = [asset for asset in release_assets if asset.get("name") == apk_path.name]
-          aar_assets = [asset for asset in release_assets if asset.get("name") == aar_path.name]
+          # GitHub may normalize an asset's download name (for example, spaces become dots).
+          # The release action retains the requested filename in its label in that case.
+          def matches_file(asset: dict, path: Path) -> bool:
+              return asset.get("name") == path.name or asset.get("label") == path.name
+
+          apk_assets = [asset for asset in release_assets if matches_file(asset, apk_path)]
+          aar_assets = [asset for asset in release_assets if matches_file(asset, aar_path)]
           if len(apk_assets) != 1 or len(aar_assets) != 1:
               raise SystemExit("Release action did not return the expected APK and SDK AAR assets.")
           apk_asset = apk_assets[0]
