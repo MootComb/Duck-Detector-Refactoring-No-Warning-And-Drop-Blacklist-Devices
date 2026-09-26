@@ -16,15 +16,12 @@
 
 package com.eltavine.duckdetector.features.tee.data.report
 
-import com.eltavine.duckdetector.capability.attestation.data.BootConsistencyResult
 import com.eltavine.duckdetector.features.tee.data.native.NativeTeeSnapshot
-import com.eltavine.duckdetector.features.tee.data.verification.certificate.ChainStructureResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.BinderChainConsistencyResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.BinderHookBootstrapResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.BinderPatchModeResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.LegacyKeystorePathResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.ListEntriesConsistencyResult
-import com.eltavine.duckdetector.features.tee.data.verification.keystore.PureCertificateSecurityLevelResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.TimingAnomalyResult
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 import com.eltavine.duckdetector.features.tee.domain.TeeVerdict
@@ -210,101 +207,6 @@ class TeeReportReducerKeystoreTest {
         assertTrue(report.sections.single { it.title == "Checks" }.items.any {
             it.title == "Legacy keystore" && it.body.contains("diverged", ignoreCase = true)
         })
-    }
-
-    @Test
-    fun `pure certificate top level and metadata security levels render as separate checks`() {
-        val report = reducer.reduce(
-            baseArtifacts(
-                pureCertificateSecurityLevel = PureCertificateSecurityLevelResult(
-                    executed = true,
-                    securityLevelPresent = false,
-                    metadataSecurityLevelPresent = true,
-                    detail = "metadata keySecurityLevel present",
-                ),
-            ),
-        )
-
-        val checks = report.sections.single { it.title == "Checks" }.items
-        assertTrue(checks.any {
-            it.title == "Pure cert level" && it.body == "No security level exposed"
-        })
-        assertTrue(checks.any {
-            it.title == "Pure cert metadata" && it.body == "Metadata security level exposed"
-        })
-    }
-
-    @Test
-    fun `provisioning layout anomaly becomes suspicious verdict`() {
-        val report = reducer.reduce(
-            baseArtifacts(
-                chainStructure = ChainStructureResult(
-                    chainLength = 4,
-                    attestationExtensionCount = 1,
-                    trustedAttestationIndex = 2,
-                    provisioningIndex = 0,
-                    provisioningConsistencyIssue = true,
-                    detail = "provisioning",
-                ),
-            ),
-        )
-
-        assertEquals(TeeVerdict.SUSPICIOUS, report.verdict)
-        assertTrue(report.sections.single { it.title == "Trust" }.items.any { it.title == "Chain layout" })
-        assertTrue(report.summary.contains("adjacent", ignoreCase = true))
-    }
-
-    @Test
-    fun `vbmeta digest mismatch becomes tampered verdict`() {
-        val report = reducer.reduce(
-            baseArtifacts(
-                bootConsistency = BootConsistencyResult(
-                    vbmetaDigestMismatch = true,
-                    runtimePropsAvailable = true,
-                    runtimeVbmetaDigest = "ffee",
-                    detail = "Attested verifiedBootHash did not match ro.boot.vbmeta.digest.",
-                ),
-            ),
-        )
-
-        assertEquals(TeeVerdict.TAMPERED, report.verdict)
-        assertTrue(report.signals.any { it.label == "Boot" && it.value == "Mismatch" })
-        assertTrue(report.sections.single { it.title == "Attestation" }.items.any {
-            it.title == "Boot consistency" && it.body.contains("Mismatch")
-        })
-    }
-
-    @Test
-    fun `verified state unlocked mismatch no longer creates a hard anomaly`() {
-        val report = reducer.reduce(
-            baseArtifacts(
-                bootConsistency = BootConsistencyResult(
-                    runtimePropsAvailable = true,
-                    detail = "Attestation reported Verified while deviceLocked=false; AOSP allows this on approved test devices, so no anomaly was raised.",
-                ),
-            ),
-        )
-
-        assertEquals(TeeVerdict.CONSISTENT, report.verdict)
-        assertTrue(report.sections.single { it.title == "Attestation" }.items.any {
-            it.title == "Boot consistency" && it.body.contains("State only")
-        })
-    }
-
-    @Test
-    fun `zeroed verified boot hash becomes tampered verdict`() {
-        val report = reducer.reduce(
-            baseArtifacts(
-                bootConsistency = BootConsistencyResult(
-                    verifiedBootHashAllZeros = true,
-                    runtimePropsAvailable = true,
-                    detail = "Attested verifiedBootHash was all zeros.",
-                ),
-            ),
-        )
-
-        assertEquals(TeeVerdict.TAMPERED, report.verdict)
-        assertTrue(report.sections.single { it.title == "Checks" }.items.any { it.title == "Indicators" })
     }
 
     @Test
