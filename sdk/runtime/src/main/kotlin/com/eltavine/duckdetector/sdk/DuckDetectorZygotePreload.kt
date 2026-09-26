@@ -23,10 +23,11 @@ import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextVal
 /**
  * The detection work that has to run in the app zygote, before any isolated process forks from it.
  *
- * Name this class in `android:zygotePreloadName`, or delegate to it from the host's own
- * [ZygotePreload]. It runs every detector's app zygote preload in catalog order and then captures
- * the SELinux context validity evidence that the SELinux and LSPosed detectors read from their app
- * zygote carriers. Without it, both carriers report their app zygote evidence as unavailable.
+ * The SDK's manifest names this class in `android:zygotePreloadName`, so a host gets it without
+ * declaring anything; a host with its own [ZygotePreload] delegates to it. It runs every
+ * detector's app zygote preload in catalog order and then captures the SELinux context validity
+ * evidence that the SELinux and LSPosed detectors read from their app zygote carriers. Without it,
+ * both carriers report their app zygote evidence as unavailable.
  */
 public class DuckDetectorZygotePreload : ZygotePreload {
     private val selinuxContextValidity = SelinuxContextValidityPreload()

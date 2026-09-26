@@ -41,7 +41,7 @@ dependencies {
 }
 ```
 
-The AAR's manifest brings in the SDK's services, and `soter-core` brings the SOTER keystore permission, library and package query. The SDK itself declares no permissions; see [Permissions](#permissions).
+The AAR's manifest brings in the SDK's services and its app zygote preload, and `soter-core` brings the SOTER keystore permission, library and package query. The SDK itself declares no permissions; see [Permissions](#permissions).
 
 ## Scan
 
@@ -70,13 +70,26 @@ Some evidence can only be captured at points of the process lifecycle that belon
 
 ### App zygote preload
 
-Name the SDK's preload in the application element, or delegate to it from your own `ZygotePreload`:
+The AAR's manifest names `DuckDetectorZygotePreload` in `android:zygotePreloadName`, and the manifest merger gives it to your application; there is nothing to declare. If your application has its own `ZygotePreload`, the merger reports a conflict rather than dropping either. Keep yours and call the SDK's from it:
 
 ```xml
-<application android:zygotePreloadName="com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload">
+<application
+    android:zygotePreloadName="com.example.HostZygotePreload"
+    tools:replace="android:zygotePreloadName">
 ```
 
-It runs each detector's app zygote work, such as Native Root's throne-hunt watch, and then captures the SELinux context validity evidence, before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
+```kotlin
+class HostZygotePreload : ZygotePreload {
+    private val duckDetector = DuckDetectorZygotePreload()
+
+    override fun doPreload(appInfo: ApplicationInfo) {
+        duckDetector.doPreload(appInfo)
+        // the host's own app zygote work
+    }
+}
+```
+
+The preload runs each detector's app zygote work, such as Native Root's throne-hunt watch, and then captures the SELinux context validity evidence, before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
 
 ### Throne-hunt anchor
 

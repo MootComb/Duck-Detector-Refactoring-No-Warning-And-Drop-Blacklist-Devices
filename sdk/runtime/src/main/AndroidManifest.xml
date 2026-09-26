@@ -14,18 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application android:label="DuckDetector SDK consumer">
-        <activity
-            android:name=".ScanActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+    <!-- The manifest merger gives this attribute to a host that declares none. A host with its own
+         preload gets a merge conflict instead, keeps its class with tools:replace and delegates to
+         DuckDetectorZygotePreload, so the SDK's app zygote work is never dropped silently. -->
+    <application android:zygotePreloadName="com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload" />
 
 </manifest>
