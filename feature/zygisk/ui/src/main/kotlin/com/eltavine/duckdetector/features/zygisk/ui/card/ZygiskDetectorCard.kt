@@ -51,6 +51,7 @@ import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetail
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFact
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
+import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskRowIcon
 
 @Composable
 internal fun ZygiskDetectorCard(
@@ -271,17 +272,10 @@ private fun rowIcon(
     row: ZygiskDetailRowModel,
     fallback: ImageVector,
 ): ImageVector {
-    return when {
-        row.label.contains("fd trap", ignoreCase = true) ||
-                row.label.contains("cross-process", ignoreCase = true) -> Icons.Rounded.SyncAlt
-
-        row.label.contains("linker", ignoreCase = true) ||
-                row.label.contains("namespace", ignoreCase = true) -> Icons.Rounded.FolderZip
-
-        row.label.contains("heap", ignoreCase = true) ||
-                row.label.contains("maps", ignoreCase = true) ||
-                row.label.contains("smaps", ignoreCase = true) -> Icons.Rounded.Memory
-
-        else -> fallback
+    return when (row.icon) {
+        ZygiskRowIcon.CROSS_PROCESS -> Icons.Rounded.SyncAlt
+        ZygiskRowIcon.LINKER -> Icons.Rounded.FolderZip
+        ZygiskRowIcon.MEMORY -> Icons.Rounded.Memory
+        null -> fallback
     }
 }

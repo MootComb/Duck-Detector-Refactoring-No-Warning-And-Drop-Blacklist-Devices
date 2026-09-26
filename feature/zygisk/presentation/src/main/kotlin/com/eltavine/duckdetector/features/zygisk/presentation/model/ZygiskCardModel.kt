@@ -49,12 +49,20 @@ data class ZygiskHeaderFactModel(
     val label: String get() = fact.label
 }
 
+/** A row icon that names what the row is about; rows without one show their status icon. */
+enum class ZygiskRowIcon {
+    CROSS_PROCESS,
+    LINKER,
+    MEMORY,
+}
+
 data class ZygiskDetailRowModel(
     val label: String,
     val value: String,
     val status: DetectorStatus,
     val detail: String? = null,
     val detailMonospace: Boolean = false,
+    val icon: ZygiskRowIcon? = null,
 )
 
 data class ZygiskImpactItemModel(

@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignal
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalGroup
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalSeverity
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskStage
+import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskRowIcon
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -95,6 +96,67 @@ class ZygiskCardModelMapperTest {
             ),
         )
         assertEquals(DetectorStatus.info(InfoKind.SUPPORT), model.status)
+    }
+
+    @Test
+    fun `signal rows take their icon from their group`() {
+        val model = mapper.map(
+            report(
+                signals = ZygiskSignalGroup.entries.mapIndexed { index, group ->
+                    ZygiskSignal(
+                        id = "zygisk_trace_$index",
+                        label = group.name,
+                        value = "Warning",
+                        group = group,
+                        severity = ZygiskSignalSeverity.WARNING,
+                        detail = "detail",
+                        direct = false,
+                    )
+                },
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                ZygiskRowIcon.CROSS_PROCESS,
+                null,
+                ZygiskRowIcon.LINKER,
+                ZygiskRowIcon.MEMORY,
+                ZygiskRowIcon.MEMORY,
+                null,
+                null,
+            ),
+            model.signalRows.map { it.icon },
+        )
+    }
+
+    @Test
+    fun `loading placeholders keep their labels and icons`() {
+        val model = mapper.map(ZygiskReport.loading())
+
+        assertEquals(
+            listOf(
+                "Cross-process FD trap" to ZygiskRowIcon.CROSS_PROCESS,
+                "Native snapshot" to null,
+                "Linker and namespace" to ZygiskRowIcon.LINKER,
+                "Maps and smaps" to ZygiskRowIcon.MEMORY,
+                "Threads and FDs" to null,
+                "Solist, atexit, heap" to ZygiskRowIcon.MEMORY,
+            ),
+            model.methodRows.map { it.label to it.icon },
+        )
+        assertEquals(
+            listOf(
+                "Cross-process" to ZygiskRowIcon.CROSS_PROCESS,
+                "Runtime" to null,
+                "Linker" to ZygiskRowIcon.LINKER,
+                "Maps" to ZygiskRowIcon.MEMORY,
+                "Heap" to ZygiskRowIcon.MEMORY,
+                "Threads" to null,
+                "FDs" to null,
+            ),
+            model.signalRows.map { it.label to it.icon },
+        )
     }
 
     private fun report(

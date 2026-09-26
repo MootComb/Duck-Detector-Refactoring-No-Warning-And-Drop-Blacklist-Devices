@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.zygisk.data.fdtrap.ZygiskFdTrapNativeB
 import com.eltavine.duckdetector.features.zygisk.data.native.ZygiskNativeBridge
 import com.eltavine.duckdetector.features.zygisk.data.native.ZygiskNativeSnapshot
 import com.eltavine.duckdetector.features.zygisk.data.native.ZygiskNativeTrace
+import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethod
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodOutcome
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodResult
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
@@ -137,7 +138,7 @@ class ZygiskRepository(
 
         return listOf(
             ZygiskMethodResult(
-                label = "Cross-process FD trap",
+                method = ZygiskMethod.CROSS_PROCESS_FD_TRAP,
                 summary = when {
                     fdTrap.detected -> fdTrap.summary
                     fdTrap.available -> "Clean"
@@ -153,7 +154,7 @@ class ZygiskRepository(
                 },
             ),
             ZygiskMethodResult(
-                label = "Native snapshot",
+                method = ZygiskMethod.NATIVE_SNAPSHOT,
                 summary = when {
                     !snapshot.available -> "Unavailable"
                     snapshot.strongHitCount > 0 || snapshot.heuristicHitCount > 0 -> "Signals captured"
@@ -168,7 +169,7 @@ class ZygiskRepository(
                 detail = "Collects linker, namespace, maps, smaps, thread, fd, and heap traces from the current app process.",
             ),
             ZygiskMethodResult(
-                label = "Linker and namespace",
+                method = ZygiskMethod.LINKER_AND_NAMESPACE,
                 summary = when {
                     snapshot.linkerHookHitCount > 0 || snapshot.namespaceHitCount > 0 -> "Bypassed"
                     !snapshot.available -> "Unavailable"
@@ -182,7 +183,7 @@ class ZygiskRepository(
                 detail = "Checks whether linker entry points still belong to the expected loader and whether restricted-path libraries appear in the current process. The check that an entry point immediately branches out of the loader decodes arm64 instructions, so on other ABIs only the owning-image check runs.",
             ),
             ZygiskMethodResult(
-                label = "Maps and smaps",
+                method = ZygiskMethod.MAPS_AND_SMAPS,
                 summary = when {
                     !snapshot.available -> "Unavailable"
                     snapshot.vmapHitCount + snapshot.smapsHitCount > 0 -> "Anomalies"
@@ -196,7 +197,7 @@ class ZygiskRepository(
                 detail = "Looks for suspicious executable mappings, deleted loaders, JIT drift, and dirty system library pages.",
             ),
             ZygiskMethodResult(
-                label = "Threads and FDs",
+                method = ZygiskMethod.THREADS_AND_FDS,
                 summary = when {
                     !snapshot.available -> "Unavailable"
                     snapshot.tracerPid > 0 || snapshot.threadHitCount + snapshot.fdHitCount > 0 -> "Residue"
@@ -211,7 +212,7 @@ class ZygiskRepository(
                 detail = "Correlates TracerPid, suspicious thread names, and open descriptor targets that frequently survive runtime tampering stacks.",
             ),
             ZygiskMethodResult(
-                label = "Solist, atexit, heap",
+                method = ZygiskMethod.SOLIST_ATEXIT_HEAP,
                 summary = when {
                     !snapshot.available -> "Unavailable"
                     heuristicFamilies > 0 -> "Drift"

@@ -57,12 +57,25 @@ data class ZygiskSignal(
     val detailMonospace: Boolean = false,
 )
 
+/** The methods a Zygisk scan reports, in report order; [label] is the key each method is listed under. */
+enum class ZygiskMethod(val label: String) {
+    CROSS_PROCESS_FD_TRAP("Cross-process FD trap"),
+    NATIVE_SNAPSHOT("Native snapshot"),
+    LINKER_AND_NAMESPACE("Linker and namespace"),
+    MAPS_AND_SMAPS("Maps and smaps"),
+    THREADS_AND_FDS("Threads and FDs"),
+    SOLIST_ATEXIT_HEAP("Solist, atexit, heap"),
+}
+
 data class ZygiskMethodResult(
-    val label: String,
+    val method: ZygiskMethod,
     val summary: String,
     val outcome: ZygiskMethodOutcome,
     val detail: String,
-)
+) {
+    val label: String
+        get() = method.label
+}
 
 data class ZygiskReport(
     val stage: ZygiskStage,

@@ -608,22 +608,24 @@ Line two 30
 Line two 7
 
   Line three
-    • 
+    •    : key = value 10
+
+  [Signals]
+    •    : Padded value 19
+    • A long detail line that deliberately exceeds sixty characters in length 21: Unicode ✓ détail 22
+        key = value 23
 
   [Methods]
-    •    
-        Padded value 17
+    •   Padded value 15  : Padded value 16
+        key = value 17
 
   [Impact & Guidance]
-    • left | right 12
-    • Unicode ✓ détail 14
+    • Unicode ✓ détail 13
+    • key = value 14
 
   [References]
-    • Unicode ✓ détail 18
-    • Line one 19
-Line two 19
-
-  Line three  
+    • 
+    • A long detail line that deliberately exceeds sixty characters in length 25
 
 
 ================================================================================
@@ -1525,41 +1527,44 @@ Line two 5
         Line one 8
         Line two 8
           Line three
-    • Line one 9
-Line two 9
+    • : Line one 10
+Line two 10
 
-  Line three  
+  Line three
+        Line one 11
+        Line two 11
+          Line three
 
   [Signals]
-    • A long detail line that deliberately exceeds sixty characters in length 24: left | right 25 (Value 26)
-    • key = value 27: left | right 28 (Unicode ✓ détail 29)
-    • Value 30: key = value 31
+    • Value 23: Padded value 24
+        left | right 25
+    •    : Value 27
+        A long detail line that deliberately exceeds sixty characters in length 28
 
   [Methods]
-    • Line one 15
-Line two 15
+    • Line one 14
+Line two 14
 
   Line three  
-        Value 17
-    • Line one 18
-Line two 18
+        Value 16
+    • Line one 17
+Line two 17
 
-  Line three  : Line one 19
-Line two 19
+  Line three  : key = value 18 (Padded value 19)
+    • Line one 20
+Line two 20
 
-  Line three (Unicode ✓ détail 20)
-    • Unicode ✓ détail 21
-        Unicode ✓ détail 23
+  Line three  : Unicode ✓ détail 21
+        left | right 22
 
   [Impact & Guidance]
-    • key = value 12
-    • Line one 14
-      Line two 14
+    • Line one 13
+      Line two 13
         Line three
 
   [References]
-    •   Padded value 33  
-    • left | right 34
+    •   Padded value 29  
+    • left | right 30
 
 
 ================================================================================
@@ -2199,28 +2204,19 @@ Line two 33
   Verdict      : 
   Quick Facts  : State: A long detail line that deliberately exceeds sixty characters in length 4  |  Native: Value 5
 
-  [Signals]
-    • left | right 15: Unicode ✓ détail 16
-        key = value 17
-    • Value 18
-        left | right 20
-
   [Methods]
     • key = value 6
         Line one 8
         Line two 8
           Line three
-    • Unicode ✓ détail 9
-    • : Line one 13
+    •    : left | right 10 (Value 11)
+    • Line one 12
+Line two 12
+
+  Line three  : Line one 13
 Line two 13
 
-  Line three
-        Line one 14
-        Line two 14
-          Line three
-
-  [References]
-    • key = value 21
+  Line three (Padded value 14)
 
 
 ================================================================================
@@ -3176,26 +3172,30 @@ Line two 6
 
   Line three  
         left | right 8
-    • A long detail line that deliberately exceeds sixty characters in length 9: Value 10
+    • Value 9: A long detail line that deliberately exceeds sixty characters in length 10
+        left | right 11
 
   [Signals]
-    •    
-        A long detail line that deliberately exceeds sixty characters in length 26
-    • key = value 27
+    • A long detail line that deliberately exceeds sixty characters in length 23: key = value 24
+    •   Padded value 26  : Padded value 27
 
   [Methods]
-    • Unicode ✓ détail 15: Unicode ✓ détail 16
-    •   Padded value 18  : Value 19 (Padded value 20)
-    •    : left | right 22
-        key = value 23
+    • Unicode ✓ détail 14: Unicode ✓ détail 15
+    • Value 17
+    • Unicode ✓ détail 20: key = value 21
+        Line one 22
+        Line two 22
+          Line three
 
   [Impact & Guidance]
-    • Padded value 12
-    • Value 14
+    • Value 13
 
   [References]
-    • Unicode ✓ détail 30
-    •    
+    • left | right 29
+    • Line one 30
+Line two 30
+
+  Line three  
 
 
 ================================================================================
