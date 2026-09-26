@@ -39,6 +39,7 @@ import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedStackProbe
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedZygotePermissionProbe
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedZygotePermissionProbeResult
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityCarrierManager
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethod
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
@@ -183,25 +184,25 @@ class LSPosedRepository(
                 packageVisibility != LSPosedPackageVisibility.FULL
         return listOf(
             LSPosedMethodResult(
-                label = "Class load",
+                method = LSPosedMethod.CLASS_LOAD,
                 summary = if (classHitCount > 0) "$classHitCount hit(s)" else "Clean",
                 outcome = if (classHitCount > 0) LSPosedMethodOutcome.DETECTED else LSPosedMethodOutcome.CLEAN,
                 detail = "Resolve known Xposed, libXposed, and LSPosed runtime classes through boot and app-facing class loaders.",
             ),
             LSPosedMethodResult(
-                label = "ClassLoader chain",
+                method = LSPosedMethod.CLASS_LOADER_CHAIN,
                 summary = probeSummary(classLoaderResult.signals),
                 outcome = probeOutcome(classLoaderResult.signals, available = true),
                 detail = "Walks app-facing ClassLoader parent chains and flags loader names or chain depth that resemble LSPosed/Xposed injection.",
             ),
             LSPosedMethodResult(
-                label = "XposedBridge fields",
+                method = LSPosedMethod.XPOSED_BRIDGE_FIELDS,
                 summary = probeSummary(bridgeFieldResult.signals),
                 outcome = probeOutcome(bridgeFieldResult.signals, available = true),
                 detail = "Reflects XposedBridge.disableHooks and XposedBridge.sHookedMethodCallbacks to confirm live bridge state rather than class residue alone.",
             ),
             LSPosedMethodResult(
-                label = "Package catalog",
+                method = LSPosedMethod.PACKAGE_CATALOG,
                 summary = when {
                     managerPackageCount > 0 -> "$managerPackageCount installed"
                     packageVisibility == LSPosedPackageVisibility.FULL -> "Clean"
@@ -216,7 +217,7 @@ class LSPosedRepository(
                 detail = "Checks for LSPosed, LSPatch, EdXposed, Xposed installer, TaiChi, VirtualXposed, and common module-manager packages.",
             ),
             LSPosedMethodResult(
-                label = "Xposed meta-data",
+                method = LSPosedMethod.XPOSED_META_DATA,
                 summary = when {
                     moduleAppCount > 0 -> "$moduleAppCount module(s)"
                     packageVisibility == LSPosedPackageVisibility.FULL -> "Clean"
@@ -231,25 +232,25 @@ class LSPosedRepository(
                 detail = "Scans installed app manifest meta-data such as xposedmodule, xposedminversion, and xposedscope.",
             ),
             LSPosedMethodResult(
-                label = "Stack trace",
+                method = LSPosedMethod.STACK_TRACE,
                 summary = if (stackHitCount > 0) "$stackHitCount matched" else "Clean",
                 outcome = if (stackHitCount > 0) LSPosedMethodOutcome.DETECTED else LSPosedMethodOutcome.CLEAN,
                 detail = "Analyzes current-thread and synthetic throwable stacks for XposedBridge, LSPosedBridge, LSPHooker_, and related hook callback tokens.",
             ),
             LSPosedMethodResult(
-                label = "Hook callbacks",
+                method = LSPosedMethod.HOOK_CALLBACKS,
                 summary = probeSummary(hookCallbackResult.signals),
                 outcome = probeOutcome(hookCallbackResult.signals, available = true),
                 detail = "Checks whether the default uncaught-exception handler class points back to Xposed or LSPosed runtime code.",
             ),
             LSPosedMethodResult(
-                label = "Binder bridge",
+                method = LSPosedMethod.BINDER_BRIDGE,
                 summary = if (binderHitCount > 0) "$binderHitCount hit(s)" else "Clean",
                 outcome = if (binderHitCount > 0) LSPosedMethodOutcome.DETECTED else LSPosedMethodOutcome.CLEAN,
                 detail = "Probes activity and serial Binder services for LSPosed bridge transaction behavior and descriptors.",
             ),
             LSPosedMethodResult(
-                label = "Zygote permissions",
+                method = LSPosedMethod.ZYGOTE_PERMISSIONS,
                 summary = when {
                     !zygotePermissionResult.available -> "Unavailable"
                     zygotePermissionResult.mismatchCount > 0 -> "${zygotePermissionResult.mismatchCount} mismatch(es)"
@@ -265,7 +266,7 @@ class LSPosedRepository(
                 detail = "Compares granted app permissions against the zygote-assigned supplemental GIDs exposed through /proc/self/status. ${zygotePermissionResult.detail}",
             ),
             LSPosedMethodResult(
-                label = "Runtime artifacts",
+                method = LSPosedMethod.RUNTIME_ARTIFACTS,
                 summary = runtimeProbeSummary(runtimeArtifactResult),
                 outcome = probeOutcome(
                     signals = runtimeArtifactResult.signals,
@@ -275,7 +276,7 @@ class LSPosedRepository(
                     ?: "Scans /proc/self/net/unix, /proc/self/fd, and environment variables for LSPosed/Xposed runtime residue that leaks into the current app process.",
             ),
             LSPosedMethodResult(
-                label = "Logcat leaks",
+                method = LSPosedMethod.LOGCAT_LEAKS,
                 summary = runtimeProbeSummary(logcatResult),
                 outcome = probeOutcome(
                     signals = logcatResult.signals,
@@ -285,13 +286,13 @@ class LSPosedRepository(
                     ?: "Samples recent logcat buffers for LSPosed tags, control messages, bridge traces, and org.lsposed.daemon process leakage without requesting extra permissions.",
             ),
             LSPosedMethodResult(
-                label = "Dirty sepolicy",
+                method = LSPosedMethod.DIRTY_SEPOLICY,
                 summary = dirtyPolicyResult.summary,
                 outcome = dirtyPolicyResult.outcome,
                 detail = dirtyPolicyResult.detail,
             ),
             LSPosedMethodResult(
-                label = "Native maps",
+                method = LSPosedMethod.NATIVE_MAPS,
                 summary = when {
                     nativeSnapshot.mapsHitCount > 0 -> "${nativeSnapshot.mapsHitCount} hit(s)"
                     nativeSnapshot.mapsAvailable -> "Clean"
@@ -305,7 +306,7 @@ class LSPosedRepository(
                 detail = "Scans /proc/self/maps for LSPosed, XposedBridge, libXposed, LSPlant, EdXposed, and LSPatch runtime mappings.",
             ),
             LSPosedMethodResult(
-                label = "Native heap",
+                method = LSPosedMethod.NATIVE_HEAP,
                 summary = when {
                     nativeSnapshot.heapHitCount > 0 -> "${nativeSnapshot.heapHitCount} residual(s)"
                     nativeSnapshot.heapAvailable -> "Clean"
@@ -319,13 +320,13 @@ class LSPosedRepository(
                 detail = "Samples readable Dalvik heap regions through /proc/self/mem for LSPosed and Xposed keyword residuals.",
             ),
             LSPosedMethodResult(
-                label = "Native library",
+                method = LSPosedMethod.NATIVE_LIBRARY,
                 summary = if (nativeSnapshot.available) "Loaded" else "Unavailable",
                 outcome = if (nativeSnapshot.available) LSPosedMethodOutcome.CLEAN else LSPosedMethodOutcome.SUPPORT,
                 detail = "JNI-backed maps and heap probes for LSPosed-specific runtime evidence.",
             ),
             LSPosedMethodResult(
-                label = "Signal summary",
+                method = LSPosedMethod.SIGNAL_SUMMARY,
                 summary = when {
                     signals.any { it.severity == LSPosedSignalSeverity.DANGER } -> "${signals.count { it.severity == LSPosedSignalSeverity.DANGER }} strong"
                     signals.isNotEmpty() -> "${signals.size} weak"

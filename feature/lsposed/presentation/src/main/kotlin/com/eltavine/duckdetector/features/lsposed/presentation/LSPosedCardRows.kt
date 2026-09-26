@@ -18,15 +18,18 @@ package com.eltavine.duckdetector.features.lsposed.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethod
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodOutcome
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedMethodResult
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedPackageVisibility
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedReport
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedDetailRowModel
+import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedRowIcon
 
 internal fun buildRowsForGroup(
     report: LSPosedReport,
@@ -34,16 +37,22 @@ internal fun buildRowsForGroup(
     fallbackLabel: String,
 ): List<LSPosedDetailRowModel> {
     return when (report.stage) {
-        LSPosedStage.LOADING -> placeholderRows(
-            listOf(fallbackLabel),
-            DetectorStatus.info(InfoKind.SUPPORT),
-            "Pending"
+        LSPosedStage.LOADING -> listOf(
+            LSPosedDetailRowModel(
+                label = fallbackLabel,
+                value = "Pending",
+                status = DetectorStatus.info(InfoKind.SUPPORT),
+                icon = group.fallbackIcon(),
+            ),
         )
 
-        LSPosedStage.FAILED -> placeholderRows(
-            listOf(fallbackLabel),
-            DetectorStatus.info(InfoKind.ERROR),
-            "Error"
+        LSPosedStage.FAILED -> listOf(
+            LSPosedDetailRowModel(
+                label = fallbackLabel,
+                value = "Error",
+                status = DetectorStatus.info(InfoKind.ERROR),
+                icon = group.fallbackIcon(),
+            ),
         )
 
         LSPosedStage.READY -> {
@@ -63,6 +72,7 @@ internal fun buildRowsForGroup(
                         },
                         status = DetectorStatus.info(InfoKind.SUPPORT),
                         detail = "This LSPosed evidence slice was unavailable or scoped, so it is not treated as clean.",
+                        icon = group.fallbackIcon(),
                     ),
                 )
             } else {
@@ -72,6 +82,7 @@ internal fun buildRowsForGroup(
                         value = "Clean",
                         status = DetectorStatus.allClear(),
                         detail = "No signal surfaced in this LSPosed evidence slice.",
+                        icon = group.fallbackIcon(),
                     ),
                 )
             }
@@ -86,21 +97,8 @@ private fun signalRow(signal: LSPosedSignal): LSPosedDetailRowModel {
         status = signalStatus(signal),
         detail = signal.detail,
         detailMonospace = signal.detailMonospace,
+        icon = signal.probe.rowIcon(),
     )
-}
-
-internal fun placeholderRows(
-    labels: List<String>,
-    status: DetectorStatus,
-    value: String,
-): List<LSPosedDetailRowModel> {
-    return labels.map { label ->
-        LSPosedDetailRowModel(
-            label = label,
-            value = value,
-            status = status,
-        )
-    }
 }
 
 private fun signalStatus(signal: LSPosedSignal): DetectorStatus {
@@ -139,6 +137,7 @@ internal fun buildMethodRows(report: LSPosedReport): List<LSPosedDetailRowModel>
                 status = methodStatus(method),
                 detail = method.detail,
                 detailMonospace = false,
+                icon = method.method.rowIcon(),
             )
         }
     }
@@ -148,30 +147,48 @@ private fun placeholderMethodRows(
     status: DetectorStatus,
     value: String,
 ): List<LSPosedDetailRowModel> {
-    return listOf(
-        "Class load",
-        "ClassLoader chain",
-        "XposedBridge fields",
-        "Package catalog",
-        "Xposed meta-data",
-        "Stack trace",
-        "Hook callbacks",
-        "Binder bridge",
-        "Zygote permissions",
-        "Runtime artifacts",
-        "Logcat leaks",
-        "Dirty sepolicy",
-        "Native maps",
-        "Native heap",
-        "Native library",
-        "Signal summary",
-    ).map { label ->
+    return LSPosedMethod.entries.map { method ->
         LSPosedDetailRowModel(
-            label = label,
+            label = method.label,
             value = value,
             status = status,
+            icon = method.rowIcon(),
         )
     }
+}
+
+private fun LSPosedProbe.rowIcon(): LSPosedRowIcon? = when (this) {
+    LSPosedProbe.BINDER,
+    LSPosedProbe.BRIDGE_FIELD -> LSPosedRowIcon.BRIDGE
+    LSPosedProbe.PACKAGE -> LSPosedRowIcon.PACKAGE
+    LSPosedProbe.NATIVE_TRACE -> LSPosedRowIcon.MEMORY
+    LSPosedProbe.DIRTY_POLICY -> LSPosedRowIcon.POLICY
+    LSPosedProbe.CLASS,
+    LSPosedProbe.STACK -> LSPosedRowIcon.HOOK
+    LSPosedProbe.CLASS_LOADER,
+    LSPosedProbe.HOOK_CALLBACK,
+    LSPosedProbe.ZYGOTE_PERMISSION,
+    LSPosedProbe.RUNTIME_ARTIFACT,
+    LSPosedProbe.LOGCAT -> null
+}
+
+private fun LSPosedSignalGroup.fallbackIcon(): LSPosedRowIcon? = when (this) {
+    LSPosedSignalGroup.PACKAGES -> LSPosedRowIcon.PACKAGE
+    LSPosedSignalGroup.POLICY -> LSPosedRowIcon.POLICY
+    LSPosedSignalGroup.NATIVE,
+    LSPosedSignalGroup.RUNTIME,
+    LSPosedSignalGroup.BINDER -> null
+}
+
+private fun LSPosedMethod.rowIcon(): LSPosedRowIcon? = when (this) {
+    LSPosedMethod.XPOSED_BRIDGE_FIELDS,
+    LSPosedMethod.BINDER_BRIDGE -> LSPosedRowIcon.BRIDGE
+    LSPosedMethod.PACKAGE_CATALOG -> LSPosedRowIcon.PACKAGE
+    LSPosedMethod.NATIVE_HEAP -> LSPosedRowIcon.MEMORY
+    LSPosedMethod.DIRTY_SEPOLICY -> LSPosedRowIcon.POLICY
+    LSPosedMethod.XPOSED_META_DATA,
+    LSPosedMethod.STACK_TRACE -> LSPosedRowIcon.HOOK
+    else -> null
 }
 
 private fun methodStatus(method: LSPosedMethodResult): DetectorStatus {

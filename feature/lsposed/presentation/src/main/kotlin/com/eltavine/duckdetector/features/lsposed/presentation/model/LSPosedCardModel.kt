@@ -52,12 +52,22 @@ data class LSPosedHeaderFactModel(
     val label: String get() = fact.label
 }
 
+/** A row icon that names what the row is about; rows without one show their status icon. */
+enum class LSPosedRowIcon {
+    BRIDGE,
+    PACKAGE,
+    MEMORY,
+    POLICY,
+    HOOK,
+}
+
 data class LSPosedDetailRowModel(
     val label: String,
     val value: String,
     val status: DetectorStatus,
     val detail: String? = null,
     val detailMonospace: Boolean = false,
+    val icon: LSPosedRowIcon? = null,
 )
 
 data class LSPosedImpactItemModel(

@@ -50,6 +50,7 @@ import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedDeta
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFact
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedHeaderFactModel
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedImpactItemModel
+import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedRowIcon
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
@@ -298,28 +299,12 @@ private fun rowIcon(
     row: LSPosedDetailRowModel,
     fallback: ImageVector,
 ): ImageVector {
-    return when {
-        row.label.contains("bridge", ignoreCase = true) ||
-                row.label.contains("service", ignoreCase = true) -> Icons.Rounded.AccountTree
-
-        row.value.equals("Installed", ignoreCase = true) ||
-                row.value.equals("Module", ignoreCase = true) ||
-                row.label.contains("package", ignoreCase = true) ||
-                row.label.contains("manager", ignoreCase = true) -> Icons.Rounded.Apps
-
-        row.value.equals("Mapped", ignoreCase = true) ||
-                row.value.equals("Residual", ignoreCase = true) ||
-                row.label.contains("heap", ignoreCase = true) ||
-                row.label.contains("mapping", ignoreCase = true) -> Icons.Rounded.Memory
-
-        row.label.contains("policy", ignoreCase = true) ||
-                row.label.contains("selinux", ignoreCase = true) ||
-                row.label.contains("execmem", ignoreCase = true) -> Icons.Rounded.Security
-
-        row.label.contains("stack", ignoreCase = true) ||
-                row.label.contains("xposed", ignoreCase = true) ||
-                row.label.contains("lsposed", ignoreCase = true) -> Icons.Rounded.BugReport
-
-        else -> fallback
+    return when (row.icon) {
+        LSPosedRowIcon.BRIDGE -> Icons.Rounded.AccountTree
+        LSPosedRowIcon.PACKAGE -> Icons.Rounded.Apps
+        LSPosedRowIcon.MEMORY -> Icons.Rounded.Memory
+        LSPosedRowIcon.POLICY -> Icons.Rounded.Security
+        LSPosedRowIcon.HOOK -> Icons.Rounded.BugReport
+        null -> fallback
     }
 }

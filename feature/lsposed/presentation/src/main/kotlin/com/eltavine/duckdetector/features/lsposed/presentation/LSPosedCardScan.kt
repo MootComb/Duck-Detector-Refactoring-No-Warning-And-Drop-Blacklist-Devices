@@ -26,64 +26,17 @@ import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
 import com.eltavine.duckdetector.features.lsposed.domain.LSPosedStage
 import com.eltavine.duckdetector.features.lsposed.domain.hasReducedCoverage
 import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedDetailRowModel
+import com.eltavine.duckdetector.features.lsposed.presentation.model.LSPosedRowIcon
 
 internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
     return when (report.stage) {
-        LSPosedStage.LOADING -> placeholderRows(
-            listOf(
-                "Danger signals",
-                "Review signals",
-                "Class hits",
-                "ClassLoader hits",
-                "Bridge field hits",
-                "Stack hits",
-                "Callback hits",
-                "Binder hits",
-                "Runtime artifact hits",
-                "Runtime artifacts availability",
-                "Logcat hits",
-                "Logcat availability",
-                "Dirty policy hits",
-                "Dirty policy availability",
-                "Manager packages",
-                "Module apps",
-                "Native maps",
-                "Native heap",
-                "Package visibility",
-            ),
-            DetectorStatus.info(InfoKind.SUPPORT),
-            "Pending",
-        )
+        LSPosedStage.LOADING -> ScanRow.entries.map { it.placeholder(DetectorStatus.info(InfoKind.SUPPORT), "Pending") }
 
-        LSPosedStage.FAILED -> placeholderRows(
-            listOf(
-                "Danger signals",
-                "Review signals",
-                "Class hits",
-                "ClassLoader hits",
-                "Bridge field hits",
-                "Stack hits",
-                "Callback hits",
-                "Binder hits",
-                "Runtime artifact hits",
-                "Runtime artifacts availability",
-                "Logcat hits",
-                "Logcat availability",
-                "Dirty policy hits",
-                "Dirty policy availability",
-                "Manager packages",
-                "Module apps",
-                "Native maps",
-                "Native heap",
-                "Package visibility",
-            ),
-            DetectorStatus.info(InfoKind.ERROR),
-            "Error",
-        )
+        LSPosedStage.FAILED -> ScanRow.entries.map { it.placeholder(DetectorStatus.info(InfoKind.ERROR), "Error") }
 
         LSPosedStage.READY -> listOf(
             LSPosedDetailRowModel(
-                label = "Danger signals",
+                label = ScanRow.DANGER_SIGNALS.label,
                 value = report.dangerSignalCount.toString(),
                 status = when {
                     report.dangerSignalCount > 0 -> DetectorStatus.danger()
@@ -92,7 +45,7 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Review signals",
+                label = ScanRow.REVIEW_SIGNALS.label,
                 value = report.warningSignalCount.toString(),
                 status = when {
                     report.warningSignalCount > 0 -> DetectorStatus.warning()
@@ -101,12 +54,12 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Class hits",
+                label = ScanRow.CLASS_HITS.label,
                 value = report.classHitCount.toString(),
                 status = if (report.classHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "ClassLoader hits",
+                label = ScanRow.CLASS_LOADER_HITS.label,
                 value = report.classLoaderHitCount.toString(),
                 status = when {
                     report.signals.any {
@@ -119,27 +72,29 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Bridge field hits",
+                label = ScanRow.BRIDGE_FIELD_HITS.label,
+                icon = ScanRow.BRIDGE_FIELD_HITS.icon,
                 value = report.bridgeFieldHitCount.toString(),
                 status = if (report.bridgeFieldHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Stack hits",
+                label = ScanRow.STACK_HITS.label,
+                icon = ScanRow.STACK_HITS.icon,
                 value = report.stackHitCount.toString(),
                 status = if (report.stackHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Callback hits",
+                label = ScanRow.CALLBACK_HITS.label,
                 value = report.callbackHitCount.toString(),
                 status = if (report.callbackHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Binder hits",
+                label = ScanRow.BINDER_HITS.label,
                 value = report.binderHitCount.toString(),
                 status = if (report.binderHitCount > 0) DetectorStatus.danger() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Runtime artifact hits",
+                label = ScanRow.RUNTIME_ARTIFACT_HITS.label,
                 value = report.runtimeArtifactHitCount.toString(),
                 status = when {
                     report.signals.any {
@@ -153,14 +108,14 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Runtime artifacts availability",
+                label = ScanRow.RUNTIME_ARTIFACTS_AVAILABILITY.label,
                 value = if (report.runtimeArtifactAvailable) "Checked" else "Unavailable",
                 status = if (report.runtimeArtifactAvailable) DetectorStatus.allClear() else DetectorStatus.info(
                     InfoKind.SUPPORT
                 ),
             ),
             LSPosedDetailRowModel(
-                label = "Logcat hits",
+                label = ScanRow.LOGCAT_HITS.label,
                 value = report.logcatHitCount.toString(),
                 status = when {
                     report.signals.any {
@@ -174,14 +129,15 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Logcat availability",
+                label = ScanRow.LOGCAT_AVAILABILITY.label,
                 value = if (report.logcatAvailable) "Checked" else "Unavailable",
                 status = if (report.logcatAvailable) DetectorStatus.allClear() else DetectorStatus.info(
                     InfoKind.SUPPORT
                 ),
             ),
             LSPosedDetailRowModel(
-                label = "Dirty policy hits",
+                label = ScanRow.DIRTY_POLICY_HITS.label,
+                icon = ScanRow.DIRTY_POLICY_HITS.icon,
                 value = report.policySignalCount.toString(),
                 status = when {
                     report.signals.any {
@@ -195,24 +151,26 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Dirty policy availability",
+                label = ScanRow.DIRTY_POLICY_AVAILABILITY.label,
+                icon = ScanRow.DIRTY_POLICY_AVAILABILITY.icon,
                 value = if (report.dirtyPolicyAvailable) "Checked" else "Unavailable",
                 status = if (report.dirtyPolicyAvailable) DetectorStatus.allClear() else DetectorStatus.info(
                     InfoKind.SUPPORT
                 ),
             ),
             LSPosedDetailRowModel(
-                label = "Manager packages",
+                label = ScanRow.MANAGER_PACKAGES.label,
+                icon = ScanRow.MANAGER_PACKAGES.icon,
                 value = report.managerPackageCount.toString(),
                 status = if (report.managerPackageCount > 0) DetectorStatus.warning() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Module apps",
+                label = ScanRow.MODULE_APPS.label,
                 value = report.moduleAppCount.toString(),
                 status = if (report.moduleAppCount > 0) DetectorStatus.warning() else DetectorStatus.allClear(),
             ),
             LSPosedDetailRowModel(
-                label = "Native maps",
+                label = ScanRow.NATIVE_MAPS.label,
                 value = if (report.nativeMapsAvailable || report.nativeMapsHitCount > 0) {
                     report.nativeMapsHitCount.toString()
                 } else {
@@ -225,7 +183,8 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Native heap",
+                label = ScanRow.NATIVE_HEAP.label,
+                icon = ScanRow.NATIVE_HEAP.icon,
                 value = if (report.nativeHeapAvailable || report.nativeHeapHitCount > 0) {
                     "${report.nativeHeapHitCount}/${report.nativeHeapScannedRegions}"
                 } else {
@@ -238,7 +197,8 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
                 },
             ),
             LSPosedDetailRowModel(
-                label = "Package visibility",
+                label = ScanRow.PACKAGE_VISIBILITY.label,
+                icon = ScanRow.PACKAGE_VISIBILITY.icon,
                 value = visibilityLabel(report.packageVisibility),
                 status = when (report.packageVisibility) {
                     LSPosedPackageVisibility.FULL -> DetectorStatus.allClear()
@@ -248,4 +208,31 @@ internal fun buildScanRows(report: LSPosedReport): List<LSPosedDetailRowModel> {
             ),
         )
     }
+}
+
+/** The scan section's rows, in order, with the icon each row shows. */
+private enum class ScanRow(val label: String, val icon: LSPosedRowIcon? = null) {
+    DANGER_SIGNALS("Danger signals"),
+    REVIEW_SIGNALS("Review signals"),
+    CLASS_HITS("Class hits"),
+    CLASS_LOADER_HITS("ClassLoader hits"),
+    BRIDGE_FIELD_HITS("Bridge field hits", LSPosedRowIcon.BRIDGE),
+    STACK_HITS("Stack hits", LSPosedRowIcon.HOOK),
+    CALLBACK_HITS("Callback hits"),
+    BINDER_HITS("Binder hits"),
+    RUNTIME_ARTIFACT_HITS("Runtime artifact hits"),
+    RUNTIME_ARTIFACTS_AVAILABILITY("Runtime artifacts availability"),
+    LOGCAT_HITS("Logcat hits"),
+    LOGCAT_AVAILABILITY("Logcat availability"),
+    DIRTY_POLICY_HITS("Dirty policy hits", LSPosedRowIcon.POLICY),
+    DIRTY_POLICY_AVAILABILITY("Dirty policy availability", LSPosedRowIcon.POLICY),
+    MANAGER_PACKAGES("Manager packages", LSPosedRowIcon.PACKAGE),
+    MODULE_APPS("Module apps"),
+    NATIVE_MAPS("Native maps"),
+    NATIVE_HEAP("Native heap", LSPosedRowIcon.MEMORY),
+    PACKAGE_VISIBILITY("Package visibility", LSPosedRowIcon.PACKAGE),
+    ;
+
+    fun placeholder(status: DetectorStatus, value: String) =
+        LSPosedDetailRowModel(label = label, value = value, status = status, icon = icon)
 }

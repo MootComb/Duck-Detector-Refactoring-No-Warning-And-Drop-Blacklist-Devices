@@ -77,12 +77,35 @@ data class LSPosedSignal(
     val detailMonospace: Boolean = false,
 )
 
+/** The methods an LSPosed scan reports, in report order; [label] is the key each method is listed under. */
+enum class LSPosedMethod(val label: String) {
+    CLASS_LOAD("Class load"),
+    CLASS_LOADER_CHAIN("ClassLoader chain"),
+    XPOSED_BRIDGE_FIELDS("XposedBridge fields"),
+    PACKAGE_CATALOG("Package catalog"),
+    XPOSED_META_DATA("Xposed meta-data"),
+    STACK_TRACE("Stack trace"),
+    HOOK_CALLBACKS("Hook callbacks"),
+    BINDER_BRIDGE("Binder bridge"),
+    ZYGOTE_PERMISSIONS("Zygote permissions"),
+    RUNTIME_ARTIFACTS("Runtime artifacts"),
+    LOGCAT_LEAKS("Logcat leaks"),
+    DIRTY_SEPOLICY("Dirty sepolicy"),
+    NATIVE_MAPS("Native maps"),
+    NATIVE_HEAP("Native heap"),
+    NATIVE_LIBRARY("Native library"),
+    SIGNAL_SUMMARY("Signal summary"),
+}
+
 data class LSPosedMethodResult(
-    val label: String,
+    val method: LSPosedMethod,
     val summary: String,
     val outcome: LSPosedMethodOutcome,
     val detail: String,
-)
+) {
+    val label: String
+        get() = method.label
+}
 
 data class LSPosedReport(
     val stage: LSPosedStage,
