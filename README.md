@@ -159,6 +159,8 @@ The same build also produces the headless SDK as one AAR, without any UI, publis
 ./gradlew :sdk:aar:publish
 ```
 
+The [Nightly release](https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly) includes the SDK AAR alongside the APK.
+
 Before contributing, read [`CODING_STANDARDS.md`](./CODING_STANDARDS.md).
 
 ## Release signing

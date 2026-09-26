@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build APK And Push To Telegram
+name: Build APK And SDK AAR And Push To Telegram
 
 on:
   push:
@@ -140,7 +140,7 @@ jobs:
           echo "sha256=${expected_sha256}" >> "$GITHUB_OUTPUT"
           echo "signer_name=${signer_name}" >> "$GITHUB_OUTPUT"
 
-      - name: Build release APK
+      - name: Build release APK and SDK AAR
         id: build
         shell: bash
         env:
@@ -159,7 +159,8 @@ jobs:
             -Pduckdetector.buildTimeUtc="${build_time_utc}" \
             -Pduckdetector.teeCrl.refresh=true \
             -Pduckdetector.githubContributors.refresh=true \
-            :app:assembleRelease
+            :app:assembleRelease \
+            :sdk:aar:assemble
           end_time=$(date +%s)
 
           duration_seconds=$((end_time - start_time))
@@ -415,11 +416,41 @@ jobs:
             exit 1
           fi
 
+      - name: Prepare SDK AAR artifact
+        id: aar
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          aar_source=sdk/aar/build/outputs/aar/aar.aar
+          if [ ! -s "$aar_source" ]; then
+            echo "SDK AAR is missing or empty: $aar_source" >&2
+            exit 1
+          fi
+          unzip -tq "$aar_source" >/dev/null
+
+          aar_name="duckdetector-sdk-${GITHUB_SHA:0:8}.aar"
+          aar_path="sdk/aar/build/outputs/aar/$aar_name"
+          cp "$aar_source" "$aar_path"
+          {
+            echo "aar_name=$aar_name"
+            echo "aar_path=$aar_path"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.metadata.outputs.apk_name }}
           path: ${{ steps.metadata.outputs.apk_path }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Upload SDK AAR artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.aar.outputs.aar_name }}
+          path: ${{ steps.aar.outputs.aar_path }}
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
@@ -431,7 +462,7 @@ jobs:
           set -euo pipefail
 
           cat <<EOF > nightly-release-note.md
-          Nightly APK build
+          Nightly APK and SDK AAR build
 
           Commit: ${GITHUB_SHA}
           Branch: ${GITHUB_REF_NAME}
@@ -493,14 +524,14 @@ jobs:
           fi
           echo "asset_ids=${asset_ids}" >> "$GITHUB_OUTPUT"
 
-      - name: Update nightly APK release
+      - name: Update nightly APK and SDK AAR release
         id: nightly_release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         if: github.ref_name == github.event.repository.default_branch
         with:
           tag_name: nightly
           target_commitish: ${{ github.sha }}
-          name: Nightly APK Build
+          name: Nightly APK and SDK AAR Build
           body_path: nightly-release-note.md
           prerelease: true
           make_latest: false
@@ -508,6 +539,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             ${{ steps.metadata.outputs.apk_path }}
+            ${{ steps.aar.outputs.aar_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -517,6 +549,7 @@ jobs:
         shell: bash
         env:
           APK_PATH: ${{ steps.metadata.outputs.apk_path }}
+          AAR_PATH: ${{ steps.aar.outputs.aar_path }}
           # Keep publishing the legacy value until pre-migration clients have upgraded.
           NIGHTLY_MANIFEST_BRANCH: master
           BUILD_TIME_ISO: ${{ steps.build.outputs.build_time_iso }}
@@ -538,17 +571,27 @@ jobs:
           apk_path = Path(os.environ["APK_PATH"])
           if not apk_path.is_file() or apk_path.stat().st_size <= 0:
               raise SystemExit(f"Release APK is missing or empty: {apk_path}")
+          aar_path = Path(os.environ["AAR_PATH"])
+          if not aar_path.is_file() or aar_path.stat().st_size <= 0:
+              raise SystemExit(f"SDK AAR is missing or empty: {aar_path}")
 
           try:
               release_assets = json.loads(os.environ["RELEASE_ASSETS_JSON"])
           except json.JSONDecodeError as exc:
               raise SystemExit(f"Release action returned invalid asset JSON: {exc}") from exc
-          if not isinstance(release_assets, list) or len(release_assets) != 1:
+          if not isinstance(release_assets, list) or len(release_assets) != 2 or any(
+              not isinstance(asset, dict) for asset in release_assets
+          ):
               raise SystemExit(
-                  f"Expected exactly one uploaded APK asset, got {len(release_assets) if isinstance(release_assets, list) else 'invalid output'}."
+                  "Expected exactly two uploaded assets: one APK and one SDK AAR."
               )
 
-          apk_asset = release_assets[0]
+          apk_assets = [asset for asset in release_assets if asset.get("name") == apk_path.name]
+          aar_assets = [asset for asset in release_assets if asset.get("name") == aar_path.name]
+          if len(apk_assets) != 1 or len(aar_assets) != 1:
+              raise SystemExit("Release action did not return the expected APK and SDK AAR assets.")
+          apk_asset = apk_assets[0]
+          aar_asset = aar_assets[0]
           apk_asset_id = apk_asset.get("id")
           apk_name = apk_asset.get("name", "")
           apk_url = apk_asset.get("browser_download_url", "")
@@ -567,6 +610,24 @@ jobs:
           url_name = unquote(Path(urlsplit(apk_url).path).name)
           if not apk_url.startswith(expected_prefix) or url_name != apk_name:
               raise SystemExit(f"Unexpected Nightly APK URL: {apk_url}")
+
+          aar_asset_id = aar_asset.get("id")
+          aar_name = aar_asset.get("name", "")
+          aar_url = aar_asset.get("browser_download_url", "")
+          if not isinstance(aar_asset_id, int) or aar_asset_id <= 0:
+              raise SystemExit(f"Release action returned an invalid SDK AAR asset id: {aar_asset_id!r}")
+          if aar_asset.get("state") != "uploaded":
+              raise SystemExit(f"SDK AAR release asset is not uploaded: {aar_asset.get('state')!r}")
+          if not isinstance(aar_name, str) or not aar_name.lower().endswith(".aar"):
+              raise SystemExit(f"Release action returned an invalid SDK AAR asset name: {aar_name!r}")
+          if not isinstance(aar_url, str) or not aar_url.startswith(expected_prefix) or \
+                  unquote(Path(urlsplit(aar_url).path).name) != aar_name:
+              raise SystemExit(f"Unexpected Nightly SDK AAR URL: {aar_url}")
+          aar_size = aar_path.stat().st_size
+          if aar_asset.get("size") != aar_size:
+              raise SystemExit(
+                  f"Uploaded SDK AAR size mismatch: local={aar_size}, release={aar_asset.get('size')!r}"
+              )
 
           apk_size = apk_path.stat().st_size
           remote_size = apk_asset.get("size")
@@ -591,6 +652,13 @@ jobs:
           if remote_digest and str(remote_digest).lower() != f"sha256:{apk_sha256}":
               raise SystemExit(
                   f"Uploaded APK digest mismatch: local=sha256:{apk_sha256}, release={remote_digest}"
+              )
+
+          aar_sha256 = hashlib.sha256(aar_path.read_bytes()).hexdigest()
+          aar_remote_digest = aar_asset.get("digest")
+          if aar_remote_digest and str(aar_remote_digest).lower() != f"sha256:{aar_sha256}":
+              raise SystemExit(
+                  f"Uploaded SDK AAR digest mismatch: local=sha256:{aar_sha256}, release={aar_remote_digest}"
               )
 
           commit_sha = git("rev-parse", "HEAD")
@@ -622,6 +690,8 @@ jobs:
           )
           with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
               output.write(f"apk_asset_id={apk_asset_id}\n")
+              output.write(f"aar_asset_id={aar_asset_id}\n")
+              output.write(f"aar_public_url={aar_url}\n")
           PY
 
           jq -e '
@@ -649,7 +719,7 @@ jobs:
         with:
           tag_name: nightly
           target_commitish: ${{ github.sha }}
-          name: Nightly APK Build
+          name: Nightly APK and SDK AAR Build
           body_path: nightly-release-note.md
           prerelease: true
           make_latest: false
@@ -664,9 +734,13 @@ jobs:
         if: github.ref_name == github.event.repository.default_branch
         shell: bash
         env:
+          AAR_ASSET_ID: ${{ steps.update_manifest.outputs.aar_asset_id }}
+          AAR_NAME: ${{ steps.aar.outputs.aar_name }}
+          AAR_PATH: ${{ steps.aar.outputs.aar_path }}
           APK_ASSET_ID: ${{ steps.update_manifest.outputs.apk_asset_id }}
           APK_NAME: ${{ steps.update_manifest.outputs.apk_name }}
           APK_RELEASE_ID: ${{ steps.nightly_release.outputs.id }}
+          EXPECTED_AAR_URL: ${{ steps.update_manifest.outputs.aar_public_url }}
           EXPECTED_APK_URL: ${{ steps.update_manifest.outputs.apk_public_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MANIFEST_ASSETS_JSON: ${{ steps.nightly_manifest_release.outputs.assets }}
@@ -712,12 +786,12 @@ jobs:
             done
           }
 
-          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$APK_RELEASE_ID" =~ ^[0-9]+$ && "$MANIFEST_RELEASE_ID" =~ ^[0-9]+$ ]]; then
+          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$AAR_ASSET_ID" =~ ^[0-9]+$ && "$APK_RELEASE_ID" =~ ^[0-9]+$ && "$MANIFEST_RELEASE_ID" =~ ^[0-9]+$ ]]; then
             echo "Release action returned an invalid asset or release id." >&2
             exit 1
           fi
           if [ "$APK_RELEASE_ID" != "$MANIFEST_RELEASE_ID" ]; then
-            echo "APK and manifest were uploaded to different releases." >&2
+            echo "APK, SDK AAR and manifest were uploaded to different releases." >&2
             exit 1
           fi
 
@@ -751,6 +825,24 @@ jobs:
             exit 1
           fi
 
+          expected_aar_size=$(stat -c '%s' "$AAR_PATH")
+          expected_aar_digest="sha256:$(sha256sum "$AAR_PATH" | cut -d' ' -f1)"
+          aar_asset_json=$(gh_api_get "repos/${GITHUB_REPOSITORY}/releases/assets/${AAR_ASSET_ID}")
+          if ! jq -e \
+            --arg name "$AAR_NAME" \
+            --arg url "$EXPECTED_AAR_URL" \
+            --arg digest "$expected_aar_digest" \
+            --argjson size "$expected_aar_size" \
+            '.name == $name and
+             .browser_download_url == $url and
+             .state == "uploaded" and
+             .size == $size and
+             (.digest == null or (.digest | ascii_downcase) == $digest)' \
+            <<<"$aar_asset_json" >/dev/null; then
+            echo "Published SDK AAR metadata does not match the built artifact." >&2
+            exit 1
+          fi
+
           manifest_asset_json=$(gh_api_get "repos/${GITHUB_REPOSITORY}/releases/assets/${manifest_asset_id}")
           if ! jq -e '.name == "update.json" and .state == "uploaded" and .size > 0' \
             <<<"$manifest_asset_json" >/dev/null; then
@@ -770,6 +862,8 @@ jobs:
         if: github.ref_name == github.event.repository.default_branch
         shell: bash
         env:
+          AAR_ASSET_ID: ${{ steps.update_manifest.outputs.aar_asset_id }}
+          AAR_NAME: ${{ steps.aar.outputs.aar_name }}
           APK_ASSET_ID: ${{ steps.update_manifest.outputs.apk_asset_id }}
           APK_NAME: ${{ steps.update_manifest.outputs.apk_name }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -779,7 +873,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$RELEASE_ID" =~ ^[0-9]+$ ]]; then
+          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$AAR_ASSET_ID" =~ ^[0-9]+$ && "$RELEASE_ID" =~ ^[0-9]+$ ]]; then
             echo "Release action returned an invalid asset or release id." >&2
             exit 1
           fi
@@ -802,7 +896,7 @@ jobs:
 
           while IFS= read -r asset_id; do
             [ -n "$asset_id" ] || continue
-            if [ "$asset_id" = "$APK_ASSET_ID" ] || [ "$asset_id" = "$manifest_asset_id" ]; then
+            if [ "$asset_id" = "$APK_ASSET_ID" ] || [ "$asset_id" = "$AAR_ASSET_ID" ] || [ "$asset_id" = "$manifest_asset_id" ]; then
               continue
             fi
 
@@ -835,13 +929,20 @@ jobs:
               2>"$error_file"); then
               if jq -e \
                 --arg apk_name "$APK_NAME" \
+                --arg aar_name "$AAR_NAME" \
                 --argjson apk_id "$APK_ASSET_ID" \
+                --argjson aar_id "$AAR_ASSET_ID" \
                 --argjson manifest_id "$manifest_asset_id" \
                 '[.[][]] as $assets |
-                 ($assets | length) == 2 and
+                 ($assets | length) == 3 and
                  ([$assets[] | select(
                    .id == $apk_id and
                    .name == $apk_name and
+                   .state == "uploaded"
+                 )] | length) == 1 and
+                 ([$assets[] | select(
+                   .id == $aar_id and
+                   .name == $aar_name and
                    .state == "uploaded"
                  )] | length) == 1 and
                  ([$assets[] | select(
@@ -865,7 +966,7 @@ jobs:
           done
 
           if [ "$final_assets_verified" != true ]; then
-            echo "Nightly release did not converge to exactly the current APK and update.json." >&2
+            echo "Nightly release did not converge to exactly the current APK, SDK AAR and update.json." >&2
             exit 1
           fi
 

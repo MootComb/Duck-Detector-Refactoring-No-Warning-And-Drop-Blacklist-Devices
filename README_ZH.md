@@ -159,6 +159,8 @@ for s in .github/scripts/check-*.py; do python3 "$s"; done
 ./gradlew :sdk:aar:publish
 ```
 
+[Nightly Release](https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly) 会同时提供 APK 和 SDK AAR。
+
 参与开发前请阅读 [`CODING_STANDARDS.md`](./CODING_STANDARDS.md)。
 
 ## Release 签名
