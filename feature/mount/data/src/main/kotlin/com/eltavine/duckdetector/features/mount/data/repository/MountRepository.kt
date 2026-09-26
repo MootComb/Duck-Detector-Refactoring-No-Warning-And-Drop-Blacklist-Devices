@@ -25,24 +25,19 @@ import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperPro
 import com.eltavine.duckdetector.capability.helperprocess.data.ProcMountViewRootToken
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeBridge
-import com.eltavine.duckdetector.features.mount.data.native.MountNativeFinding
 import com.eltavine.duckdetector.features.mount.data.native.MountNativeSnapshot
 import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbe
-import com.eltavine.duckdetector.features.mount.data.probes.ShellTmpConcealmentProbeResult
 import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextMountMarker
 import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeManager
 import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeResult
 import com.eltavine.duckdetector.features.mount.data.zygotenext.ZygoteNextProbeState
 import com.eltavine.duckdetector.features.mount.domain.MountFinding
-import com.eltavine.duckdetector.features.mount.domain.MountFindingGroup
 import com.eltavine.duckdetector.features.mount.domain.MountFindingSeverity
 import com.eltavine.duckdetector.features.mount.domain.MountImpact
 import com.eltavine.duckdetector.features.mount.domain.MountReport
 import com.eltavine.duckdetector.features.mount.domain.MountRootToken
 import com.eltavine.duckdetector.features.mount.domain.MountStage
-import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextExposure
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextMarker
-import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextNamespaceAssessment
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextReport
 import com.eltavine.duckdetector.features.mount.domain.MountZygoteNextState
 import kotlinx.coroutines.Dispatchers
@@ -145,119 +140,6 @@ class MountRepository(
             procMountViewTokenDetail = snapshot.procMountViewTokenDetail,
             procMountViewDetail = snapshot.procMountViewDetail.ifBlank { snapshot.errorDetail },
         )
-    }
-
-    private fun buildFindings(
-        snapshot: MountNativeSnapshot,
-        preloadResult: EarlyMountPreloadResult,
-        shellTmpResult: ShellTmpConcealmentProbeResult,
-        zygoteNext: MountZygoteNextReport,
-    ): List<MountFinding> {
-        val mapped = snapshot.findings.mapIndexed { index, finding ->
-            MountFinding(
-                id = "native_$index",
-                label = finding.label,
-                value = finding.value,
-                group = finding.group.toGroup(),
-                severity = finding.severity.toSeverity(),
-                detail = finding.detail.takeIf { it.isNotBlank() },
-                detailMonospace = shouldRenderMonospace(finding),
-            )
-        }
-
-        val informational = buildList {
-            if (!snapshot.initNamespaceReadable) {
-                add(
-                    MountFinding(
-                        id = "init_namespace_scope",
-                        label = "Init namespace access",
-                        value = "Restricted",
-                        group = MountFindingGroup.CONSISTENCY,
-                        severity = MountFindingSeverity.INFO,
-                        detail = "Reading /proc/1/ns/mnt is normally blocked for unprivileged apps, so namespace comparison coverage is partial.",
-                    ),
-                )
-            }
-            if (snapshot.permissionTotal > 0 && snapshot.permissionDenied > 0) {
-                add(
-                    MountFinding(
-                        id = "permission_coverage",
-                        label = "Path coverage",
-                        value = "${coveragePercent(snapshot)}%",
-                        group = MountFindingGroup.CONSISTENCY,
-                        severity = if (snapshot.permissionDenied * 2 >= snapshot.permissionTotal) {
-                            MountFindingSeverity.WARNING
-                        } else {
-                            MountFindingSeverity.INFO
-                        },
-                        detail = "Accessible checks: ${snapshot.permissionAccessible}/${snapshot.permissionTotal}. Permission-denied checks: ${snapshot.permissionDenied}.",
-                    ),
-                )
-            }
-            if (snapshot.overlayfsKernelSupport && mapped.none { it.label == "Overlayfs kernel support" }) {
-                add(
-                    MountFinding(
-                        id = "overlayfs_support",
-                        label = "Overlayfs kernel support",
-                        value = "Present",
-                        group = MountFindingGroup.FILESYSTEM,
-                        severity = MountFindingSeverity.INFO,
-                        detail = "Kernel overlayfs support exists. This only matters when combined with suspicious mount behavior.",
-                    ),
-                )
-            }
-        }
-
-        val runtimeAndInformational = mapped + informational + buildZygoteNextFindings(zygoteNext)
-        val withShellTmp = runtimeAndInformational + shellTmpResult.findings
-        val preloadFindings = buildPreloadFindings(preloadResult)
-        val merged = mergePreloadFindings(
-            baseFindings = withShellTmp,
-            preloadFindings = preloadFindings,
-        )
-
-        return merged.sortedWith(
-            compareBy<MountFinding> { severityPriority(it.severity) }
-                .thenBy { groupPriority(it.group) }
-                .thenBy { it.label },
-        )
-    }
-
-    private fun buildZygoteNextFindings(
-        zygoteNext: MountZygoteNextReport,
-    ): List<MountFinding> {
-        return buildList {
-            if (zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.PRIVATE_ANOMALY ||
-                zygoteNext.namespaceAssessment == MountZygoteNextNamespaceAssessment.INCONSISTENT
-            ) {
-                add(
-                    MountFinding(
-                        id = "zygote_next_namespace_anomaly",
-                        label = "Zygote next namespace anomaly",
-                        value = zygoteNext.namespaceAssessment.name,
-                        group = MountFindingGroup.CONSISTENCY,
-                        severity = MountFindingSeverity.WARNING,
-                        detail = zygoteNext.namespaceAssessmentDetail,
-                    ),
-                )
-            }
-            if (zygoteNext.exposure == MountZygoteNextExposure.ROOT_MOUNT_EXPOSURE) {
-                add(
-                    MountFinding(
-                        id = "zygote_next_root_mount_exposure",
-                        label = "Root mount exposure",
-                        value = "ROOT_MOUNT_EXPOSURE",
-                        group = MountFindingGroup.RUNTIME,
-                        severity = MountFindingSeverity.DANGER,
-                        detail = zygoteNext.dangerousMarkers.joinToString("\n") { marker ->
-                            "${marker.labels.joinToString("+")}: ${marker.mountPoint} " +
-                                "[${marker.fileSystemType}; root=${marker.mountRoot}; source=${marker.source}]"
-                        },
-                        detailMonospace = true,
-                    ),
-                )
-            }
-        }
     }
 
     private fun buildImpacts(
@@ -364,57 +246,6 @@ class MountRepository(
         )
     }
 
-    private fun shouldRenderMonospace(finding: MountNativeFinding): Boolean {
-        return finding.detail.contains("/proc/") ||
-                finding.detail.contains("/system/") ||
-                finding.detail.contains("/data/adb") ||
-                finding.detail.contains("0x")
-    }
-
-    private fun String.toGroup(): MountFindingGroup {
-        return when (uppercase()) {
-            "ARTIFACTS" -> MountFindingGroup.ARTIFACTS
-            "RUNTIME" -> MountFindingGroup.RUNTIME
-            "FILESYSTEM" -> MountFindingGroup.FILESYSTEM
-            "CONSISTENCY" -> MountFindingGroup.CONSISTENCY
-            else -> MountFindingGroup.CONSISTENCY
-        }
-    }
-
-    private fun String.toSeverity(): MountFindingSeverity {
-        return when (uppercase()) {
-            "DANGER" -> MountFindingSeverity.DANGER
-            "WARNING" -> MountFindingSeverity.WARNING
-            "SAFE" -> MountFindingSeverity.SAFE
-            else -> MountFindingSeverity.INFO
-        }
-    }
-
-    private fun severityPriority(severity: MountFindingSeverity): Int {
-        return when (severity) {
-            MountFindingSeverity.DANGER -> 0
-            MountFindingSeverity.WARNING -> 1
-            MountFindingSeverity.INFO -> 2
-            MountFindingSeverity.SAFE -> 3
-        }
-    }
-
-    private fun groupPriority(group: MountFindingGroup): Int {
-        return when (group) {
-            MountFindingGroup.ARTIFACTS -> 0
-            MountFindingGroup.RUNTIME -> 1
-            MountFindingGroup.FILESYSTEM -> 2
-            MountFindingGroup.CONSISTENCY -> 3
-        }
-    }
-
-    private fun coveragePercent(snapshot: MountNativeSnapshot): Int {
-        return if (snapshot.permissionTotal <= 0) {
-            100
-        } else {
-            ((snapshot.permissionAccessible.toDouble() / snapshot.permissionTotal.toDouble()) * 100.0).toInt()
-        }
-    }
 }
 
 private fun ProcMountViewRootToken.toMountRootToken(): MountRootToken = when (this) {
