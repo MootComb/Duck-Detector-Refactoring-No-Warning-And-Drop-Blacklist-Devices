@@ -22,17 +22,12 @@ import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethod
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodOutcome
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskMethodResult
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskReport
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignal
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalGroup
-import com.eltavine.duckdetector.features.zygisk.domain.ZygiskSignalSeverity
 import com.eltavine.duckdetector.features.zygisk.domain.ZygiskStage
 import com.eltavine.duckdetector.features.zygisk.domain.toDetectorStatus
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskCardModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskDetailRowModel
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFact
 import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskHeaderFactModel
-import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskImpactItemModel
-import com.eltavine.duckdetector.features.zygisk.presentation.model.ZygiskRowIcon
 
 class ZygiskCardModelMapper {
 
@@ -210,72 +205,6 @@ class ZygiskCardModelMapper {
         }
     }
 
-    private fun buildImpactItems(
-        report: ZygiskReport,
-    ): List<ZygiskImpactItemModel> {
-        return when (report.stage) {
-            ZygiskStage.LOADING -> listOf(
-                ZygiskImpactItemModel(
-                    text = "Collecting the cross-process FD trap result and the native runtime snapshot in parallel.",
-                    status = DetectorStatus.info(InfoKind.SUPPORT),
-                ),
-            )
-
-            ZygiskStage.FAILED -> listOf(
-                ZygiskImpactItemModel(
-                    text = report.errorMessage ?: "Zygisk detection failed.",
-                    status = DetectorStatus.info(InfoKind.ERROR),
-                ),
-            )
-
-            ZygiskStage.READY -> when (report.toDetectorStatus()) {
-                DetectorStatus.danger() -> listOf(
-                    ZygiskImpactItemModel(
-                        text = "A red result means this process exposed direct runtime evidence or the cross-process specialization path behaved like a Zygisk-sanitized child process.",
-                        status = DetectorStatus.danger(),
-                    ),
-                    ZygiskImpactItemModel(
-                        text = "This is stronger than package residue because it touches live loader behavior, specialization side effects, or process runtime state directly.",
-                        status = DetectorStatus.warning(),
-                    ),
-                )
-
-                DetectorStatus.warning() -> listOf(
-                    ZygiskImpactItemModel(
-                        text = "Yellow means only weaker corroboration traces were found, not a single decisive runtime primitive on their own.",
-                        status = DetectorStatus.warning(),
-                    ),
-                    ZygiskImpactItemModel(
-                        text = "Read this together with Memory and Mount, which can still surface loader and mapping residue in parallel.",
-                        status = DetectorStatus.info(InfoKind.SUPPORT),
-                    ),
-                )
-
-                DetectorStatus.allClear() -> listOf(
-                    ZygiskImpactItemModel(
-                        text = "No direct runtime or converging heuristic signal surfaced in the current app process.",
-                        status = DetectorStatus.allClear(),
-                    ),
-                    ZygiskImpactItemModel(
-                        text = "A clean result reduces confidence in active Zygisk-style tampering for this process, but it does not prove the whole device is stock.",
-                        status = DetectorStatus.info(InfoKind.SUPPORT),
-                    ),
-                )
-
-                else -> listOf(
-                    ZygiskImpactItemModel(
-                        text = "The detector completed, but at least one major path was unavailable, so this result is support-only rather than clean.",
-                        status = DetectorStatus.info(InfoKind.SUPPORT),
-                    ),
-                    ZygiskImpactItemModel(
-                        text = "Unavailable service binding, an unsupported heap helper, or a missing native snapshot can all reduce confidence without implying a positive detection.",
-                        status = DetectorStatus.info(InfoKind.SUPPORT),
-                    ),
-                )
-            }
-        }
-    }
-
     private fun buildMethodRows(
         report: ZygiskReport,
     ): List<ZygiskDetailRowModel> {
@@ -297,55 +226,6 @@ class ZygiskCardModelMapper {
         }
     }
 
-    private fun buildSignalRows(
-        report: ZygiskReport,
-    ): List<ZygiskDetailRowModel> {
-        return when (report.stage) {
-            ZygiskStage.LOADING -> placeholderSignalRows(DetectorStatus.info(InfoKind.SUPPORT), "Pending")
-
-            ZygiskStage.FAILED -> placeholderSignalRows(DetectorStatus.info(InfoKind.ERROR), "Error")
-
-            ZygiskStage.READY -> {
-                if (report.signals.isEmpty()) {
-                    listOf(
-                        ZygiskDetailRowModel(
-                            label = "Signals",
-                            value = if (report.fullyClean) "Clean" else "Unavailable",
-                            status = if (report.fullyClean) {
-                                DetectorStatus.allClear()
-                            } else {
-                                DetectorStatus.info(InfoKind.SUPPORT)
-                            },
-                            detail = if (report.fullyClean) {
-                                "No positive runtime signal surfaced in the current process."
-                            } else {
-                                "No positive signal surfaced, but a major scan path was unavailable so the result is support-only."
-                            },
-                        ),
-                    )
-                } else {
-                    report.signals.map(::signalRow)
-                }
-            }
-        }
-    }
-
-    private fun signalRow(
-        signal: ZygiskSignal,
-    ): ZygiskDetailRowModel {
-        return ZygiskDetailRowModel(
-            label = signal.label,
-            value = signal.value,
-            status = when (signal.severity) {
-                ZygiskSignalSeverity.DANGER -> DetectorStatus.danger()
-                ZygiskSignalSeverity.WARNING -> DetectorStatus.warning()
-            },
-            detail = signal.detail,
-            detailMonospace = signal.detailMonospace,
-            icon = signal.group.rowIcon(),
-        )
-    }
-
     private fun placeholderMethodRows(
         status: DetectorStatus,
         value: String,
@@ -353,44 +233,6 @@ class ZygiskCardModelMapper {
         return ZygiskMethod.entries.map { method ->
             ZygiskDetailRowModel(label = method.label, value = value, status = status, icon = method.rowIcon())
         }
-    }
-
-    private fun placeholderSignalRows(
-        status: DetectorStatus,
-        value: String,
-    ): List<ZygiskDetailRowModel> {
-        return ZygiskSignalGroup.entries.map { group ->
-            ZygiskDetailRowModel(label = group.placeholderLabel(), value = value, status = status, icon = group.rowIcon())
-        }
-    }
-
-    private fun ZygiskSignalGroup.placeholderLabel(): String = when (this) {
-        ZygiskSignalGroup.CROSS_PROCESS -> "Cross-process"
-        ZygiskSignalGroup.RUNTIME -> "Runtime"
-        ZygiskSignalGroup.LINKER -> "Linker"
-        ZygiskSignalGroup.MAPS -> "Maps"
-        ZygiskSignalGroup.HEAP -> "Heap"
-        ZygiskSignalGroup.THREADS -> "Threads"
-        ZygiskSignalGroup.FD -> "FDs"
-    }
-
-    private fun ZygiskSignalGroup.rowIcon(): ZygiskRowIcon? = when (this) {
-        ZygiskSignalGroup.CROSS_PROCESS -> ZygiskRowIcon.CROSS_PROCESS
-        ZygiskSignalGroup.LINKER -> ZygiskRowIcon.LINKER
-        ZygiskSignalGroup.MAPS,
-        ZygiskSignalGroup.HEAP -> ZygiskRowIcon.MEMORY
-        ZygiskSignalGroup.RUNTIME,
-        ZygiskSignalGroup.THREADS,
-        ZygiskSignalGroup.FD -> null
-    }
-
-    private fun ZygiskMethod.rowIcon(): ZygiskRowIcon? = when (this) {
-        ZygiskMethod.CROSS_PROCESS_FD_TRAP -> ZygiskRowIcon.CROSS_PROCESS
-        ZygiskMethod.LINKER_AND_NAMESPACE -> ZygiskRowIcon.LINKER
-        ZygiskMethod.MAPS_AND_SMAPS,
-        ZygiskMethod.SOLIST_ATEXIT_HEAP -> ZygiskRowIcon.MEMORY
-        ZygiskMethod.NATIVE_SNAPSHOT,
-        ZygiskMethod.THREADS_AND_FDS -> null
     }
 
     private fun placeholderFacts(
