@@ -1,0 +1,66 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="about_clipboard_build_hash_line">ビルドハッシュ: %1$s</string>
+    <string name="about_clipboard_build_time_line">ビルド時刻 (UTC): %1$s UTC</string>
+    <string name="about_clipboard_label">Duck Detector ビルド情報</string>
+    <string name="about_clipboard_version_line">バージョン: %1$s (%2$d)</string>
+    <string name="about_copy_build_info_summary">バージョン、ビルド時刻、ビルドハッシュをコピー</string>
+    <string name="about_copy_toast">ビルド情報をコピーしました</string>
+    <string name="about_label_build_hash">ビルドハッシュ</string>
+    <string name="about_label_build_time">ビルド時刻</string>
+    <string name="about_label_copy_build_info">ビルド情報をコピー</string>
+    <string name="about_label_email">メール</string>
+    <string name="about_label_privacy">プライバシー / データ利用</string>
+    <string name="about_label_version">バージョン</string>
+    <string name="about_label_website">ウェブサイト</string>
+    <string name="about_privacy_summary">チェックは端末上で実行され、検出結果はアップロードされません。コールドスタートごとに GitHub へ一度接続して Nightly 更新メタデータを取得します。オンライン CRL 更新は任意です。</string>
+    <string name="about_subtitle">プロジェクトリンクとビルドメタデータです。</string>
+    <string name="about_title">このアプリについて</string>
+    <string name="about_value_build_time">%1$s UTC</string>
+    <string name="about_value_version">%1$s (%2$d)</string>
+    <string name="author_boundary_toast">終点</string>
+    <string name="author_summary_baka">TEE と Zygisk</string>
+    <string name="author_summary_eltavine">UI、C++、ASM、Kotlin を担当</string>
+    <string name="author_summary_wxx">CI (Kotlin)</string>
+    <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
+    <string name="author_swipe_hint_paged">左右にスワイプして作者を表示します。%1$d/%2$d</string>
+    <string name="author_swipe_hint_single">左右にスワイプして作者を表示します。</string>
+    <string name="licenses_dialog_close">閉じる</string>
+    <string name="licenses_dialog_home_page">ホームページ</string>
+    <string name="licenses_dialog_licenses">ライセンス: %1$s</string>
+    <string name="licenses_dialog_no_license_text">利用可能なライセンステキストはありません。</string>
+    <string name="licenses_dialog_open">開く</string>
+    <string name="licenses_dialog_source_repo">ソースリポジトリ</string>
+    <string name="licenses_dialog_version">バージョン %1$s</string>
+    <string name="licenses_entry_label">透明性</string>
+    <string name="licenses_entry_subtitle">このビルドに含まれるサードパーティープロジェクトを確認し、ライセンス通知を閲覧します。</string>
+    <string name="licenses_entry_title">オープンソースライブラリ</string>
+    <string name="licenses_inventory_subtitle">任意の dependency をタップして、ライセンステキストと上流プロジェクトのリンクを確認してください。</string>
+    <string name="licenses_inventory_title">同梱ライブラリ一覧</string>
+    <string name="licenses_screen_back">戻る</string>
+    <string name="licenses_screen_subtitle">このビルドに同梱されているサードパーティーコンポーネントです。</string>
+    <string name="licenses_screen_title">オープンソースライセンス</string>
+    <string name="settings_subtitle">オンライン検証の制御と GitHub Nightly 更新状況です。</string>
+    <string name="settings_title">設定</string>
+    <string name="update_settings_label">更新を確認</string>
+    <string name="update_status_available">新しい Nightly ビルドがあります。タップして詳細を表示</string>
+    <string name="update_status_checking">GitHub を確認しています…</string>
+    <string name="update_status_current">最新の Nightly ビルドです</string>
+    <string name="update_status_failed">GitHub を確認できませんでした。タップして再試行</string>
+    <string name="update_status_idle">コールドスタート後に GitHub Main Nightly を確認します。タップして今すぐ確認</string>
+</resources>

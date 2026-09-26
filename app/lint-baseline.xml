@@ -23,35 +23,8 @@ limitations under the License.
         errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/boot/BootConsistencyProbe.kt"
-            line="122" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt"
+            file="../feature/customrom/data/src/main/kotlin/com/eltavine/duckdetector/features/customrom/data/repository/CustomRomRepository.kt"
             line="433" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/eltavine/duckdetector/features/playintegrityfix/data/utils/PlayIntegrityPropertyReadUtils.kt"
-            line="57" column="25" />
-    </issue>
-
-    <issue id="PrivateApi"
-        message="Accessing internal APIs via reflection is not supported and may not work on all devices or in the future"
-        errorLine1="            val clazz = Class.forName(&quot;android.os.SystemProperties&quot;)"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/eltavine/duckdetector/features/systemproperties/data/utils/SystemPropertyReadUtils.kt"
-            line="67" column="25" />
     </issue>
 
     <issue id="SdCardPath"
@@ -59,8 +32,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/MT2&quot; to &quot;bin.mt.termex&quot;,"
         errorLine2="         ~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="171" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="190" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -68,8 +41,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/NP&quot; to &quot;com.wn.app.np&quot;,"
         errorLine2="         ~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="172" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="191" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -77,8 +50,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/xinhao&quot; to &quot;com.termux&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="173" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="192" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -86,8 +59,8 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/Download/advanced/&quot; to &quot;com.byyoung.setting&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="174" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="193" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -95,32 +68,32 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/.OShin&quot; to &quot;com.suqi8.oshin&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="175" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="194" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/MT2&quot;," errorLine2="         ~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="179" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="200" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/NP&quot;," errorLine2="         ~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="180" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="201" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/xinhao&quot;," errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="181" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="202" column="10" />
     </issue>
 
     <issue id="SdCardPath"
@@ -128,15 +101,15 @@ limitations under the License.
         errorLine1="        &quot;/sdcard/Download/advanced/&quot;,"
         errorLine2="         ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
-            line="182" column="10" />
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
+            line="203" column="10" />
     </issue>
 
     <issue id="SdCardPath"
         message="Do not hardcode &quot;/sdcard/&quot;; use `Environment.getExternalStorageDirectory().getPath()` instead"
         errorLine1="        &quot;/sdcard/.OShin&quot;," errorLine2="         ~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/rules/DangerousAppsCatalog.kt"
+            file="../feature/dangerousapps/domain/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/domain/DangerousAppsCatalog.kt"
             line="183" column="10" />
     </issue>
 
@@ -145,8 +118,8 @@ limitations under the License.
         errorLine1="        listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;).forEach { targetPath ->"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="209" column="17" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="27" column="13" />
     </issue>
 
     <issue id="SdCardPath"
@@ -154,8 +127,8 @@ limitations under the License.
         errorLine1="        listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;).forEach { targetPath ->"
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="209" column="41" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="27" column="37" />
     </issue>
 
     <issue id="SdCardPath"
@@ -163,8 +136,8 @@ limitations under the License.
         errorLine1="        val basePath = &quot;/sdcard/Android/data/&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="222" column="25" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="40" column="21" />
     </issue>
 
     <issue id="SdCardPath"
@@ -172,8 +145,8 @@ limitations under the License.
         errorLine1="        val targetDirs = listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;)"
         errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="229" column="34" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="47" column="30" />
     </issue>
 
     <issue id="SdCardPath"
@@ -181,8 +154,8 @@ limitations under the License.
         errorLine1="        val targetDirs = listOf(&quot;/sdcard/Android/data&quot;, &quot;/sdcard/Android/obb&quot;)"
         errorLine2="                                                         ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="229" column="58" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="47" column="54" />
     </issue>
 
     <issue id="SdCardPath"
@@ -190,8 +163,8 @@ limitations under the License.
         errorLine1="                    &quot;/sdcard/${bypassChar}Android/${targetPath.substringAfterLast(&quot;/&quot;)}&quot;,"
         errorLine2="                     ~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="238" column="22" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="56" column="18" />
     </issue>
 
     <issue id="SdCardPath"
@@ -199,8 +172,8 @@ limitations under the License.
         errorLine1="                    &quot;/sdcard$bypassChar/Android/${targetPath.substringAfterLast(&quot;/&quot;)}&quot;,"
         errorLine2="                     ~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/dangerousapps/data/repository/DangerousAppsRepository.kt"
-            line="239" column="22" />
+            file="../feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/repository/SharedStorageProbes.kt"
+            line="57" column="18" />
     </issue>
 
     <issue id="SdCardPath"
@@ -208,7 +181,7 @@ limitations under the License.
         errorLine1="        val targetPath = &quot;/sdcard/Android/data&quot;"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/kernelcheck/data/repository/KernelCheckRepository.kt"
+            file="../feature/kernelcheck/data/src/main/kotlin/com/eltavine/duckdetector/features/kernelcheck/data/probes/KernelCvePatchProbe.kt"
             line="606" column="27" />
     </issue>
 
@@ -228,14 +201,14 @@ limitations under the License.
 
     <issue id="PackagedPrivateKey"
         message="The `raw/eltavine_marker_key.pem` file seems to be a private key file. Please make sure not to embed this in your APK file.">
-        <location file="src/main/res/raw/eltavine_marker_key.pem" />
+        <location file="../feature/tee/data/src/main/res/raw/eltavine_marker_key.pem" />
     </issue>
 
     <issue id="ObsoleteSdkInt" message="Unnecessary; `SDK_INT` is always >= 29"
         errorLine1="                if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/keystore/AndroidKeyStoreTools.kt"
+            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/AndroidKeyStoreTools.kt"
             line="153" column="37" />
     </issue>
 
@@ -243,7 +216,7 @@ limitations under the License.
         errorLine1="                if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/keystore/AndroidKeyStoreTools.kt"
+            file="../capability/attestation/data/src/main/kotlin/com/eltavine/duckdetector/capability/attestation/data/AndroidKeyStoreTools.kt"
             line="176" column="37" />
     </issue>
 
@@ -251,7 +224,7 @@ limitations under the License.
         errorLine1="            if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/OperationPruningProbe.kt"
+            file="../feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/OperationPruningProbe.kt"
             line="22" column="33" />
     </issue>
 
@@ -259,15 +232,15 @@ limitations under the License.
         errorLine1="        if (filesystemActive &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/selinux/data/repository/SelinuxRepository.kt"
-            line="697" column="33" />
+            file="../feature/selinux/data/src/main/kotlin/com/eltavine/duckdetector/features/selinux/data/repository/SelinuxStatusProbes.kt"
+            line="365" column="29" />
     </issue>
 
     <issue id="ObsoleteSdkInt" message="Unnecessary; `SDK_INT` is always >= 29"
         errorLine1="            if (useStrongBox &amp;&amp; Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/eltavine/duckdetector/features/tee/data/verification/keystore/UpdateSubcomponentProbe.kt"
+            file="../feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/UpdateSubcomponentProbe.kt"
             line="19" column="33" />
     </issue>
 

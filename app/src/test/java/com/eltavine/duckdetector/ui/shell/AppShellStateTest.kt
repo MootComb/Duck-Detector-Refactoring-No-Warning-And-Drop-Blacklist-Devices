@@ -16,10 +16,9 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.core.notifications.ScanNotificationPermissionState
-import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
+import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
+import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.sdk.PackageVisibility
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -30,7 +29,7 @@ class AppShellStateTest {
     @Test
     fun `null prefs stay in loading gate`() {
         val gateState = resolveStartupGateState(
-            teePrefs = null,
+            consentDecisionsLoaded = false,
             notificationPrefs = null,
             notificationPermissionState = ScanNotificationPermissionState(
                 notificationsGranted = false,
@@ -38,7 +37,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = false,
-            packageVisibility = InstalledPackageVisibility.UNKNOWN,
+            packageVisibility = PackageVisibility.Scope.UNKNOWN,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -49,12 +48,7 @@ class AppShellStateTest {
     @Test
     fun `missing notification permission requires notification decision`() {
         val gateState = resolveStartupGateState(
-            teePrefs = TeeNetworkPrefs(
-                consentAsked = true,
-                consentGranted = true,
-                crlCacheJson = null,
-                crlFetchedAt = 0L,
-            ),
+            consentDecisionsLoaded = true,
             notificationPrefs = ScanNotificationPrefs(
                 notificationsPrompted = false,
                 liveUpdatesPrompted = false,
@@ -65,7 +59,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -76,12 +70,7 @@ class AppShellStateTest {
     @Test
     fun `missing promoted access requires live update decision`() {
         val gateState = resolveStartupGateState(
-            teePrefs = TeeNetworkPrefs(
-                consentAsked = true,
-                consentGranted = true,
-                crlCacheJson = null,
-                crlFetchedAt = 0L,
-            ),
+            consentDecisionsLoaded = true,
             notificationPrefs = ScanNotificationPrefs(
                 notificationsPrompted = true,
                 liveUpdatesPrompted = false,
@@ -92,7 +81,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -101,14 +90,9 @@ class AppShellStateTest {
     }
 
     @Test
-    fun `unanswered CRL refresh prefs do not block detector creation`() {
+    fun `detector consents do not block detector creation once their decisions load`() {
         val gateState = resolveStartupGateState(
-            teePrefs = TeeNetworkPrefs(
-                consentAsked = false,
-                consentGranted = false,
-                crlCacheJson = null,
-                crlFetchedAt = 0L,
-            ),
+            consentDecisionsLoaded = true,
             notificationPrefs = ScanNotificationPrefs(
                 notificationsPrompted = true,
                 liveUpdatesPrompted = true,
@@ -119,7 +103,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -130,12 +114,7 @@ class AppShellStateTest {
     @Test
     fun `restricted package visibility requires explicit acknowledgement`() {
         val gateState = resolveStartupGateState(
-            teePrefs = TeeNetworkPrefs(
-                consentAsked = true,
-                consentGranted = true,
-                crlCacheJson = null,
-                crlFetchedAt = 0L,
-            ),
+            consentDecisionsLoaded = true,
             notificationPrefs = ScanNotificationPrefs(
                 notificationsPrompted = true,
                 liveUpdatesPrompted = true,
@@ -146,7 +125,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.RESTRICTED,
+            packageVisibility = PackageVisibility.Scope.RESTRICTED,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -157,12 +136,7 @@ class AppShellStateTest {
     @Test
     fun `answered prefs unlock detector creation`() {
         val gateState = resolveStartupGateState(
-            teePrefs = TeeNetworkPrefs(
-                consentAsked = true,
-                consentGranted = true,
-                crlCacheJson = null,
-                crlFetchedAt = 0L,
-            ),
+            consentDecisionsLoaded = true,
             notificationPrefs = ScanNotificationPrefs(
                 notificationsPrompted = true,
                 liveUpdatesPrompted = true,
@@ -173,7 +147,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = true,
         )
 

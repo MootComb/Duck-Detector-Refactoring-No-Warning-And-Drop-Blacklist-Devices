@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">Tôi hiểu, tiếp tục</string>
+    <string name="alpha_continue_waiting">Tôi hiểu (%1$d giây)</string>
+    <string name="alpha_dismiss_ready">Bạn có thể đóng cảnh báo này ngay bây giờ.</string>
+    <string name="alpha_dismiss_waiting">Có thể đóng sau %1$d giây.</string>
+    <string name="alpha_helper">Trợ giúp crash log: AppErrorsTracking có sẵn trên GitHub Actions và Telegram CI.</string>
+    <string name="alpha_message">Đây là bản build thử nghiệm alpha. Vì có đợt refactor lớn liên quan đến C++ và assembly, có thể xảy ra crash không ổn định.</string>
+    <string name="alpha_title">Bản build ALPHA</string>
+    <string name="alpha_warning_download">Nếu bạn chưa biết cách lấy crash log, hãy tải AppErrorsTracking từ một trong các liên kết bên dưới.</string>
+    <string name="alpha_warning_report">Nếu gặp sự cố, vui lòng báo cáo. Các bước tái hiện rõ ràng sẽ đặc biệt hữu ích.</string>
+    <string name="alpha_warning_runtime">Nhánh này vẫn có thể gặp lỗi khởi động ngoài ý muốn hoặc crash khi chạy.</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+</resources>

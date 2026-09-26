@@ -1,0 +1,352 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.su.presentation
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.su.domain.SuMethodOutcome
+import com.eltavine.duckdetector.features.su.domain.SuMethodResult
+import com.eltavine.duckdetector.features.su.domain.SuReport
+import com.eltavine.duckdetector.features.su.domain.SuStage
+import com.eltavine.duckdetector.features.su.domain.toDetectorStatus
+import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFact
+import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFactModel
+import com.eltavine.duckdetector.features.su.presentation.model.SuImpactItemModel
+
+class SuCardModelMapper {
+
+    fun map(
+        report: SuReport,
+    ): SuCardModel {
+        return SuCardModel(
+            title = "SU",
+            subtitle = buildSubtitle(report),
+            status = report.toDetectorStatus(),
+            verdict = buildVerdict(report),
+            summary = buildSummary(report),
+            headerFacts = buildHeaderFacts(report),
+            artifactRows = buildArtifactRows(report),
+            contextRows = buildContextRows(report),
+            impactItems = buildImpactItems(report),
+            methodRows = buildMethodRows(report),
+            scanRows = buildScanRows(report),
+        )
+    }
+
+    private fun buildSubtitle(report: SuReport): String {
+        return when (report.stage) {
+            SuStage.LOADING -> "su paths + PATH + adb daemons + native context"
+            SuStage.FAILED -> "local root probe failed"
+            SuStage.READY -> buildString {
+                append("${report.checkedSuPathCount} su paths")
+                append(" · ${report.checkedDaemonPathCount} adb daemon paths")
+                append(
+                    if (report.nativeAvailable) {
+                        " · native /proc scan"
+                    } else {
+                        " · fallback self context"
+                    },
+                )
+            }
+        }
+    }
+
+    private fun buildVerdict(report: SuReport): String {
+        return when (report.stage) {
+            SuStage.LOADING -> "Scanning root artifacts"
+            SuStage.FAILED -> "SU scan failed"
+            SuStage.READY -> when {
+                report.daemons.isNotEmpty() -> "${daemonNames(report)} daemon detected"
+                report.selfContextAbnormal || report.suspiciousProcesses.isNotEmpty() -> "Abnormal root context detected"
+                report.suBinaries.isNotEmpty() -> "SU binary detected"
+                !report.nativeAvailable -> "No root indicators from available probes"
+                else -> "No root indicators"
+            }
+        }
+    }
+
+    private fun buildSummary(report: SuReport): String {
+        return when (report.stage) {
+            SuStage.LOADING ->
+                "File, PATH, adb-daemon, SELinux context, and /proc visibility probes are collecting local evidence."
+
+            SuStage.FAILED ->
+                report.errorMessage ?: "SU scan failed before root evidence could be assembled."
+
+            SuStage.READY -> when {
+                report.daemons.isNotEmpty() ->
+                    "${daemonNames(report)} footprints were found under /data/adb, which is a direct root-management signal."
+
+                report.selfContextAbnormal || report.suspiciousProcesses.isNotEmpty() ->
+                    "SELinux context probes surfaced abnormal app labels or corroborating root-like process-context residue."
+
+                report.suBinaries.isNotEmpty() ->
+                    "Common su binaries were found in system or adb-managed locations."
+
+                !report.nativeAvailable ->
+                    "File and daemon probes were clean, but JNI-backed /proc process enumeration was unavailable."
+
+                else ->
+                    "Common su binaries, adb daemons, and native SELinux context probes stayed clean."
+            }
+        }
+    }
+
+    private fun buildHeaderFacts(report: SuReport): List<SuHeaderFactModel> {
+        return when (report.stage) {
+            SuStage.LOADING -> placeholderFacts(
+                value = "Pending",
+                status = DetectorStatus.info(InfoKind.SUPPORT),
+            )
+
+            SuStage.FAILED -> listOf(
+                SuHeaderFactModel(SuHeaderFact.ARTIFACTS, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.DAEMONS, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.CONTEXT, "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuHeaderFactModel(SuHeaderFact.PROCESSES, "N/A", DetectorStatus.info(InfoKind.SUPPORT)),
+            )
+
+            SuStage.READY -> listOf(
+                SuHeaderFactModel(
+                    fact = SuHeaderFact.ARTIFACTS,
+                    value = if (report.suBinaries.isEmpty()) "None" else report.suBinaries.size.toString(),
+                    status = if (report.suBinaries.isEmpty()) DetectorStatus.allClear() else DetectorStatus.danger(),
+                ),
+                SuHeaderFactModel(
+                    fact = SuHeaderFact.DAEMONS,
+                    value = if (report.daemons.isEmpty()) "None" else daemonNames(report),
+                    status = if (report.daemons.isEmpty()) DetectorStatus.allClear() else DetectorStatus.danger(),
+                ),
+                SuHeaderFactModel(
+                    fact = SuHeaderFact.CONTEXT,
+                    value = when {
+                        report.selfContextAbnormal -> "Abnormal"
+                        report.selfContext.isNotBlank() -> "Normal"
+                        else -> "Unknown"
+                    },
+                    status = when {
+                        report.selfContextAbnormal -> DetectorStatus.danger()
+                        report.selfContext.isNotBlank() -> DetectorStatus.allClear()
+                        else -> DetectorStatus.info(InfoKind.SUPPORT)
+                    },
+                ),
+                SuHeaderFactModel(
+                    fact = SuHeaderFact.PROCESSES,
+                    value = when {
+                        !report.nativeAvailable -> "N/A"
+                        report.suspiciousProcesses.isEmpty() -> "0"
+                        else -> report.suspiciousProcesses.size.toString()
+                    },
+                    status = when {
+                        !report.nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
+                        report.suspiciousProcesses.isEmpty() -> DetectorStatus.allClear()
+                        else -> DetectorStatus.danger()
+                    },
+                ),
+            )
+        }
+    }
+
+    private fun buildImpactItems(report: SuReport): List<SuImpactItemModel> {
+        return when (report.stage) {
+            SuStage.LOADING -> listOf(
+                SuImpactItemModel(
+                    text = "Gathering local root evidence.",
+                    status = DetectorStatus.info(InfoKind.SUPPORT),
+                ),
+            )
+
+            SuStage.FAILED -> listOf(
+                SuImpactItemModel(
+                    text = report.errorMessage ?: "SU scan failed.",
+                    status = DetectorStatus.info(InfoKind.ERROR),
+                ),
+            )
+
+            SuStage.READY -> when {
+                report.hasRootIndicators -> listOf(
+                    SuImpactItemModel(
+                        text = "Privilege-escalation tooling is present or visible from this app context.",
+                        status = DetectorStatus.danger(),
+                    ),
+                    SuImpactItemModel(
+                        text = "Root managers can hide files, alter system behavior, and weaken app trust signals.",
+                        status = DetectorStatus.danger(),
+                    ),
+                    SuImpactItemModel(
+                        text = "Banking, payment, DRM, and integrity-sensitive apps may refuse to run.",
+                        status = DetectorStatus.danger(),
+                    ),
+                )
+
+                report.nativeAvailable -> listOf(
+                    SuImpactItemModel(
+                        text = "No common SU binaries or adb root daemons surfaced.",
+                        status = DetectorStatus.allClear(),
+                    ),
+                    SuImpactItemModel(
+                        text = "Native SELinux context probes stayed within normal app boundaries.",
+                        status = DetectorStatus.allClear(),
+                    ),
+                    SuImpactItemModel(
+                        text = "This remains heuristic evidence, not proof of an unmodified device.",
+                        status = DetectorStatus.info(InfoKind.SUPPORT),
+                    ),
+                )
+
+                else -> listOf(
+                    SuImpactItemModel(
+                        text = "File and adb-daemon probes were clean.",
+                        status = DetectorStatus.allClear(),
+                    ),
+                    SuImpactItemModel(
+                        text = "Native /proc process-context coverage was unavailable on this build.",
+                        status = DetectorStatus.info(InfoKind.SUPPORT),
+                    ),
+                    SuImpactItemModel(
+                        text = "Absence of common SU artifacts is not proof that root is impossible.",
+                        status = DetectorStatus.info(InfoKind.SUPPORT),
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun buildMethodRows(report: SuReport): List<SuDetailRowModel> {
+        return when (report.stage) {
+            SuStage.LOADING -> placeholderMethodRows(
+                DetectorStatus.info(InfoKind.SUPPORT),
+                "Pending"
+            )
+
+            SuStage.FAILED -> placeholderMethodRows(DetectorStatus.info(InfoKind.ERROR), "Failed")
+            SuStage.READY -> report.methods.map { result ->
+                SuDetailRowModel(
+                    label = result.label,
+                    value = result.summary,
+                    status = methodStatus(result),
+                    detail = result.detail,
+                    detailMonospace = true,
+                )
+            }
+        }
+    }
+
+    private fun buildScanRows(report: SuReport): List<SuDetailRowModel> {
+        return when (report.stage) {
+            SuStage.LOADING -> listOf(
+                SuDetailRowModel(
+                    "SU paths checked",
+                    "Pending",
+                    DetectorStatus.info(InfoKind.SUPPORT)
+                ),
+                SuDetailRowModel(
+                    "Daemon paths checked",
+                    "Pending",
+                    DetectorStatus.info(InfoKind.SUPPORT)
+                ),
+                SuDetailRowModel(
+                    "Proc contexts checked",
+                    "Pending",
+                    DetectorStatus.info(InfoKind.SUPPORT)
+                ),
+                SuDetailRowModel(
+                    "Proc reads denied",
+                    "Pending",
+                    DetectorStatus.info(InfoKind.SUPPORT)
+                ),
+            )
+
+            SuStage.FAILED -> listOf(
+                SuDetailRowModel("SU paths checked", "Error", DetectorStatus.info(InfoKind.ERROR)),
+                SuDetailRowModel(
+                    "Daemon paths checked",
+                    "Error",
+                    DetectorStatus.info(InfoKind.ERROR)
+                ),
+                SuDetailRowModel(
+                    "Proc contexts checked",
+                    "N/A",
+                    DetectorStatus.info(InfoKind.SUPPORT)
+                ),
+                SuDetailRowModel("Proc reads denied", "N/A", DetectorStatus.info(InfoKind.SUPPORT)),
+            )
+
+            SuStage.READY -> listOf(
+                SuDetailRowModel(
+                    label = "SU paths checked",
+                    value = report.checkedSuPathCount.toString(),
+                    status = DetectorStatus.info(InfoKind.SUPPORT),
+                ),
+                SuDetailRowModel(
+                    label = "Daemon paths checked",
+                    value = report.checkedDaemonPathCount.toString(),
+                    status = DetectorStatus.info(InfoKind.SUPPORT),
+                ),
+                SuDetailRowModel(
+                    label = "Proc contexts checked",
+                    value = if (report.nativeAvailable) report.checkedProcessCount.toString() else "N/A",
+                    status = when {
+                        !report.nativeAvailable -> DetectorStatus.info(InfoKind.SUPPORT)
+                        report.checkedProcessCount > 0 -> DetectorStatus.allClear()
+                        else -> DetectorStatus.info(InfoKind.SUPPORT)
+                    },
+                ),
+                SuDetailRowModel(
+                    label = "Proc reads denied",
+                    value = if (report.nativeAvailable) report.deniedProcessCount.toString() else "N/A",
+                    status = DetectorStatus.info(InfoKind.SUPPORT),
+                ),
+            )
+        }
+    }
+
+    private fun placeholderFacts(
+        value: String,
+        status: DetectorStatus,
+    ): List<SuHeaderFactModel> {
+        return listOf(
+            SuHeaderFactModel(SuHeaderFact.ARTIFACTS, value, status),
+            SuHeaderFactModel(SuHeaderFact.DAEMONS, value, status),
+            SuHeaderFactModel(SuHeaderFact.CONTEXT, value, status),
+            SuHeaderFactModel(SuHeaderFact.PROCESSES, value, status),
+        )
+    }
+
+    private fun placeholderMethodRows(
+        status: DetectorStatus,
+        value: String,
+    ): List<SuDetailRowModel> {
+        return listOf(
+            SuDetailRowModel("daemonScan", value, status),
+            SuDetailRowModel("fileScan", value, status),
+            SuDetailRowModel("nativeSyscall", value, status),
+            SuDetailRowModel("nativeLibrary", value, status),
+        )
+    }
+
+    private fun methodStatus(result: SuMethodResult): DetectorStatus {
+        return when (result.outcome) {
+            SuMethodOutcome.CLEAN -> DetectorStatus.allClear()
+            SuMethodOutcome.DETECTED -> DetectorStatus.danger()
+            SuMethodOutcome.SUPPORT -> DetectorStatus.info(InfoKind.SUPPORT)
+        }
+    }
+
+}

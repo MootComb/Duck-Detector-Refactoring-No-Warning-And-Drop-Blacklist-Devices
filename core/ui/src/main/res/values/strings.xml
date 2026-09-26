@@ -1,0 +1,32 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">I understand, continue</string>
+    <string name="alpha_continue_waiting">I understand (%1$ds)</string>
+    <string name="alpha_dismiss_ready">You can dismiss this warning now.</string>
+    <string name="alpha_dismiss_waiting">Dismiss available in %1$ds.</string>
+    <string name="alpha_helper">Crash Log Helper: AppErrorsTracking is available on GitHub Actions and Telegram CI.</string>
+    <string name="alpha_message">This build is an alpha testing build. Because it includes a large-scale refactor touching C++ and assembly, unstable crashes may occur.</string>
+    <string name="alpha_title">ALPHA BUILD</string>
+    <string name="alpha_warning_download">If you do not know how to capture crash logs, download AppErrorsTracking from one of the links below.</string>
+    <string name="alpha_warning_report">If you hit a problem, please report it. Clear reproduction steps are especially useful.</string>
+    <string name="alpha_warning_runtime">Unexpected startup failures or runtime crashes can still happen in this branch.</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+    <string name="tee_diagnostic_copied_toast">Diagnostic detail copied</string>
+</resources>

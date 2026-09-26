@@ -1,0 +1,67 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.mount.presentation.model
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
+
+data class MountCardModel(
+    override val title: String,
+    val subtitle: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
+    val headerFacts: List<MountHeaderFactModel>,
+    val procMountViewRows: List<MountDetailRowModel>,
+    val artifactRows: List<MountDetailRowModel>,
+    val runtimeRows: List<MountDetailRowModel>,
+    val filesystemRows: List<MountDetailRowModel>,
+    val consistencyRows: List<MountDetailRowModel>,
+    val impactItems: List<MountImpactItemModel>,
+    val methodRows: List<MountDetailRowModel>,
+    val scanRows: List<MountDetailRowModel>,
+) : DetectorHeadline
+
+/** The facts in the card's header, in the order the export lists them. */
+enum class MountHeaderFact(val label: String) {
+    CRITICAL("Critical"),
+    REVIEW("Review"),
+    COVERAGE("Coverage"),
+    NATIVE("Native"),
+}
+
+data class MountHeaderFactModel(
+    val fact: MountHeaderFact,
+    val value: String,
+    val status: DetectorStatus,
+) {
+    val label: String get() = fact.label
+}
+
+data class MountDetailRowModel(
+    val label: String,
+    val value: String,
+    val status: DetectorStatus,
+    val detail: String? = null,
+    val detailMonospace: Boolean = false,
+    val hiddenCopyText: String? = null,
+)
+
+data class MountImpactItemModel(
+    val text: String,
+    val status: DetectorStatus,
+)

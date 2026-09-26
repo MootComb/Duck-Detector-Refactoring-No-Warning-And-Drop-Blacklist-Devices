@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">รับทราบแล้ว ดำเนินการต่อ</string>
+    <string name="alpha_continue_waiting">รับทราบแล้ว (%1$d วินาที)</string>
+    <string name="alpha_dismiss_ready">คุณปิดคำเตือนนี้ได้แล้ว</string>
+    <string name="alpha_dismiss_waiting">ปิดได้ในอีก %1$d วินาที</string>
+    <string name="alpha_helper">ตัวช่วย crash log: AppErrorsTracking ใช้ได้ผ่าน GitHub Actions และ Telegram CI</string>
+    <string name="alpha_message">นี่คือบิลด์ทดสอบ alpha เนื่องจากมีการรีแฟกเตอร์ครั้งใหญ่ที่แตะ C++ และ assembly จึงอาจเกิดการแครชที่ไม่เสถียรได้</string>
+    <string name="alpha_title">บิลด์ ALPHA</string>
+    <string name="alpha_warning_download">หากคุณยังไม่รู้วิธีเก็บ crash log ให้ดาวน์โหลด AppErrorsTracking จากลิงก์ด้านล่าง</string>
+    <string name="alpha_warning_report">หากคุณพบปัญหา โปรดรายงาน ยิ่งมีขั้นตอนการทำซ้ำที่ชัดเจนก็ยิ่งช่วยได้มาก</string>
+    <string name="alpha_warning_runtime">สาขานี้ยังอาจเกิดความล้มเหลวขณะเริ่มต้นหรือแครชระหว่างทำงานได้</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+</resources>

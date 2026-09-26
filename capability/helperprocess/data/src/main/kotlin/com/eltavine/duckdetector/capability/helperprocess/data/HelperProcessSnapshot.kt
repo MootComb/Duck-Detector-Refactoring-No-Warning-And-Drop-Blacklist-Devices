@@ -1,0 +1,224 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.capability.helperprocess.data
+
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+
+public enum class HelperProcessProfile {
+    REGULAR,
+    ISOLATED,
+}
+
+
+/** A root manager's trace as it appears in a mount view signature; the first one found is recorded. */
+public enum class ProcMountViewRootToken(public val sequence: String) {
+    MAGISK("magisk"),
+    KSU("KSU"),
+    ADB("/adb/"),
+    ;
+
+    internal companion object {
+        fun fromSequence(sequence: String): ProcMountViewRootToken? = entries.firstOrNull { it.sequence == sequence }
+    }
+}
+
+public data class HelperProcessSnapshot(
+    val available: Boolean = false,
+    val profile: HelperProcessProfile = HelperProcessProfile.REGULAR,
+    val nativeAvailable: Boolean = false,
+    val uid: Int = -1,
+    val packageName: String = "",
+    val processName: String = "",
+    val uidName: String = "",
+    val packagesForUid: List<String> = emptyList(),
+    val classPathEntries: List<String> = emptyList(),
+    val sourceDir: String = "",
+    val splitSourceDirs: List<String> = emptyList(),
+    val mountNamespaceInode: String = "",
+    val apexMountKey: String = "",
+    val systemMountKey: String = "",
+    val vendorMountKey: String = "",
+    val procMountViewAvailable: Boolean = false,
+    val procMountViewCount: Int = 0,
+    val procMountViewExpected: Int = 1,
+    val procMountViewPidCount: Int = 0,
+    val procMountViewDivergent: Boolean = false,
+    val procMountViewTokenHit: Boolean = false,
+    val procMountViewToken: ProcMountViewRootToken? = null,
+    val procMountViewTokenDetail: String = "",
+    val procMountViewDetail: String = "",
+    val filesDir: String = "",
+    val cacheDir: String = "",
+    val codePath: String = "",
+    val findings: List<VirtualizationNativeFinding> = emptyList(),
+    val errorDetail: String = "",
+) {
+    val artifactKeys: Set<String>
+        get() = findings.mapTo(linkedSetOf()) { "${it.group}:${it.label}:${it.value}" }
+
+    public companion object {
+        public fun parse(raw: String): HelperProcessSnapshot {
+            if (raw.isBlank()) {
+                return HelperProcessSnapshot()
+            }
+
+            var available = false
+            var profile = HelperProcessProfile.REGULAR
+            var nativeAvailable = false
+            var uid = -1
+            var packageName = ""
+            var processName = ""
+            var uidName = ""
+            var packagesForUid = emptyList<String>()
+            var classPathEntries = emptyList<String>()
+            var sourceDir = ""
+            var splitSourceDirs = emptyList<String>()
+            var mountNamespaceInode = ""
+            var apexMountKey = ""
+            var systemMountKey = ""
+            var vendorMountKey = ""
+            var procMountViewAvailable = false
+            var procMountViewCount = 0
+            var procMountViewExpected = 1
+            var procMountViewPidCount = 0
+            var procMountViewDivergent = false
+            var procMountViewTokenHit = false
+            var procMountViewToken: ProcMountViewRootToken? = null
+            var procMountViewTokenDetail = ""
+            var procMountViewDetail = ""
+            var filesDir = ""
+            var cacheDir = ""
+            var codePath = ""
+            var errorDetail = ""
+            val findings = mutableListOf<VirtualizationNativeFinding>()
+
+            // Keep the Binder payload small and line-oriented so it is inspectable in tests/logs.
+            // Values with newlines are escaped by the producer and decoded exactly once here.
+            // 保持协议简单可审计；换行字段由 producer 转义，并在此处只 decode 一次。
+            raw.lineSequence()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .forEach { line ->
+                    when {
+                        line.startsWith("FINDING=") -> {
+                            val parts = line.removePrefix("FINDING=").split('\t')
+                            if (parts.size >= 5) {
+                                findings += VirtualizationNativeFinding(
+                                    group = parts[0].decodeValue(),
+                                    severity = parts[1].decodeValue(),
+                                    label = parts[2].decodeValue(),
+                                    value = parts[3].decodeValue(),
+                                    detail = parts[4].decodeValue(),
+                                )
+                            }
+                        }
+
+                        line.contains('=') -> {
+                            val key = line.substringBefore('=')
+                            val value = line.substringAfter('=').decodeValue()
+                            when (key) {
+                                "AVAILABLE" -> available = value.asBool()
+                                "PROFILE" -> {
+                                    profile = value.takeIf { it.isNotBlank() }?.let {
+                                        runCatching { HelperProcessProfile.valueOf(it) }
+                                            .getOrDefault(HelperProcessProfile.REGULAR)
+                                    } ?: HelperProcessProfile.REGULAR
+                                }
+
+                                "NATIVE_AVAILABLE" -> nativeAvailable = value.asBool()
+                                "UID" -> uid = value.toIntOrNull() ?: -1
+                                "PACKAGE_NAME" -> packageName = value
+                                "PROCESS_NAME" -> processName = value
+                                "UID_NAME" -> uidName = value
+                                "PACKAGES_FOR_UID" -> packagesForUid = value.decodeList()
+                                "CLASS_PATH_ENTRIES" -> classPathEntries = value.decodeList()
+                                "SOURCE_DIR" -> sourceDir = value
+                                "SPLIT_SOURCE_DIRS" -> splitSourceDirs = value.decodeList()
+                                "MOUNT_NAMESPACE_INODE" -> mountNamespaceInode = value
+                                "APEX_MOUNT_KEY" -> apexMountKey = value
+                                "SYSTEM_MOUNT_KEY" -> systemMountKey = value
+                                "VENDOR_MOUNT_KEY" -> vendorMountKey = value
+                                "PROC_MOUNT_VIEW_AVAILABLE" -> procMountViewAvailable = value.asBool()
+                                "PROC_MOUNT_VIEW_COUNT" -> procMountViewCount = value.toIntOrNull() ?: 0
+                                "PROC_MOUNT_VIEW_EXPECTED" -> procMountViewExpected =
+                                    value.toIntOrNull() ?: 1
+                                "PROC_MOUNT_VIEW_PIDS" -> procMountViewPidCount =
+                                    value.toIntOrNull() ?: 0
+                                "PROC_MOUNT_VIEW_DIVERGENT" -> procMountViewDivergent = value.asBool()
+                                "PROC_MOUNT_VIEW_TOKEN_HIT" -> procMountViewTokenHit = value.asBool()
+                                "PROC_MOUNT_VIEW_TOKEN_KIND" -> procMountViewToken = ProcMountViewRootToken.fromSequence(value)
+                                "PROC_MOUNT_VIEW_TOKEN_DETAIL" -> procMountViewTokenDetail = value
+                                "PROC_MOUNT_VIEW_DETAIL" -> procMountViewDetail = value
+                                "FILES_DIR" -> filesDir = value
+                                "CACHE_DIR" -> cacheDir = value
+                                "CODE_PATH" -> codePath = value
+                                "ERROR" -> errorDetail = value
+                            }
+                        }
+                    }
+                }
+
+            return HelperProcessSnapshot(
+                available = available,
+                profile = profile,
+                nativeAvailable = nativeAvailable,
+                uid = uid,
+                packageName = packageName,
+                processName = processName,
+                uidName = uidName,
+                packagesForUid = packagesForUid,
+                classPathEntries = classPathEntries,
+                sourceDir = sourceDir,
+                splitSourceDirs = splitSourceDirs,
+                mountNamespaceInode = mountNamespaceInode,
+                apexMountKey = apexMountKey,
+                systemMountKey = systemMountKey,
+                vendorMountKey = vendorMountKey,
+                procMountViewAvailable = procMountViewAvailable,
+                procMountViewCount = procMountViewCount,
+                procMountViewExpected = procMountViewExpected,
+                procMountViewPidCount = procMountViewPidCount,
+                procMountViewDivergent = procMountViewDivergent,
+                procMountViewTokenHit = procMountViewTokenHit,
+                procMountViewToken = procMountViewToken,
+                procMountViewTokenDetail = procMountViewTokenDetail,
+                procMountViewDetail = procMountViewDetail,
+                filesDir = filesDir,
+                cacheDir = cacheDir,
+                codePath = codePath,
+                findings = findings,
+                errorDetail = errorDetail,
+            )
+        }
+
+        private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
+
+        private fun String.decodeList(): List<String> {
+            if (isBlank()) {
+                return emptyList()
+            }
+            return split(LIST_SEPARATOR)
+                .map { it.decodeValue() }
+                .filter { it.isNotBlank() }
+                .distinct()
+        }
+
+        private fun String.asBool(): Boolean = NativePayloadCodec.decodeFlag(this)
+
+        private const val LIST_SEPARATOR = "\u001f"
+    }
+}

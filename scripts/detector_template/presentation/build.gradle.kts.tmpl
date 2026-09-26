@@ -1,0 +1,9 @@
+plugins {
+    id("duckdetector.jvm.library")
+}
+
+dependencies {
+    api(project(":core:evidence"))
+    api(project(":core:report"))
+    api(project(":feature:{{name}}:domain"))
+}

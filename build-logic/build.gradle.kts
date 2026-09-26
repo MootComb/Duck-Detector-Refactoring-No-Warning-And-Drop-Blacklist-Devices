@@ -30,17 +30,57 @@ dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.json)
     implementation(libs.kotlin.gradle.plugin)
+    implementation(libs.dependency.analysis.gradle.plugin)
+    implementation(libs.poko.gradle.plugin)
+    compileOnly(libs.kotlin.abi.tools.api)
+    testImplementation(libs.junit)
+}
+
+tasks.test {
+    useJUnit()
 }
 
 gradlePlugin {
     plugins {
+        register("duckDetectorModuleBoundaries") {
+            id = "duckdetector.module-boundaries"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.boundaries.DuckDetectorModuleBoundariesPlugin"
+        }
         register("duckDetectorAndroidApplication") {
             id = "duckdetector.android.application"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidApplicationConventionPlugin"
         }
+        register("duckDetectorAndroidLibrary") {
+            id = "duckdetector.android.library"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidLibraryConventionPlugin"
+        }
+        register("duckDetectorAndroidCompose") {
+            id = "duckdetector.android.compose"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorAndroidComposeConventionPlugin"
+        }
+        register("duckDetectorJvmLibrary") {
+            id = "duckdetector.jvm.library"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorJvmLibraryConventionPlugin"
+        }
         register("duckDetectorAndroidApkArtifacts") {
             id = "duckdetector.android.apk-artifacts"
             implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorApkArtifactsConventionPlugin"
+        }
+        register("duckDetectorDependencyAnalysis") {
+            id = "duckdetector.dependency-analysis"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorDependencyAnalysisPlugin"
+        }
+        register("duckDetectorContractValues") {
+            id = "duckdetector.contract-values"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorContractValuesPlugin"
+        }
+        register("duckDetectorPublicApi") {
+            id = "duckdetector.public-api"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.api.DuckDetectorPublicApiPlugin"
+        }
+        register("duckDetectorSdkDistribution") {
+            id = "duckdetector.sdk.distribution"
+            implementationClass = "com.eltavine.duckdetector.buildlogic.DuckDetectorSdkDistributionPlugin"
         }
     }
 }

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import com.eltavine.duckdetector.buildlogic.detectorModules
+import com.eltavine.duckdetector.buildlogic.generateDetectorCards
+
 plugins {
     id("duckdetector.android.application")
     id("duckdetector.android.apk-artifacts")
@@ -27,16 +30,44 @@ android {
     }
 }
 
+// Every detector's dashboard card, discovered like the ui modules the application depends on.
+generateDetectorCards(packageName = "com.eltavine.duckdetector.ui")
+
 dependencies {
+    implementation(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    implementation(project(":core:scan"))
+    implementation(project(":core:ui"))
+    implementation(project(":feature:dashboard:presentation"))
+    implementation(project(":feature:dashboard:ui"))
+    implementation(project(":feature:deviceinfo:data"))
+    implementation(project(":feature:deviceinfo:domain"))
+    implementation(project(":feature:deviceinfo:ui"))
+    implementation(project(":feature:settings:presentation"))
+    implementation(project(":feature:settings:ui"))
+    implementation(project(":feature:update:data"))
+    implementation(project(":feature:update:domain"))
+    implementation(project(":feature:update:presentation"))
+    implementation(project(":feature:update:ui"))
+    implementation(project(":sdk:runtime"))
+    // Every detector's dashboard card, discovered like the SDK discovers the detectors.
+    detectorModules("ui").forEach { implementation(project(it)) }
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.app.runtime)
-    implementation(libs.bundles.app.compose)
-    implementation(libs.aboutlibraries.compose.m3) {
-        exclude(group = "com.github.skydoves", module = "compose-stability-runtime")
-    }
-    implementation(libs.bundles.app.security)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.material)
+    testImplementation(project(":core:report"))
+    testImplementation(project(":feature:deviceinfo:presentation"))
     testImplementation(libs.bundles.test.unit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.bundles.test.android)
+    androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.ui.tooling)
 }

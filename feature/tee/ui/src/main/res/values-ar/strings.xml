@@ -1,0 +1,32 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_diagnostic_clipboard_label">تفاصيل تشخيص TEE</string>
+    <string name="tee_revocation_network_title">تحديث CRL عبر الإنترنت</string>
+    <string name="tee_revocation_network_prompt_headline">اختر ما إذا كان يمكن لفحوصات إبطال TEE جلب تحديثات عبر الإنترنت.</string>
+    <string name="tee_revocation_network_prompt_detail">يفحص Duck Detector دائمًا لقطة الإبطال المدمجة. يتيح السماح بالشبكة جلب أحدث Google attestation revocation feed أثناء التحقق من TEE.</string>
+    <string name="tee_revocation_network_allow">السماح بالتحديث</string>
+    <string name="tee_revocation_network_decline">المدمج فقط</string>
+    <string name="tee_revocation_network_granted_headline">تم السماح بتحديث CRL عبر الإنترنت.</string>
+    <string name="tee_revocation_network_granted_detail">يفحص التحقق من TEE اللقطة المدمجة وقد يحدث Google attestation revocation feed عندما تسمح ظروف الشبكة.</string>
+    <string name="tee_revocation_network_declined_status">محلي</string>
+    <string name="tee_revocation_network_declined_headline">تستخدم فحوصات إبطال TEE اللقطة المدمجة.</string>
+    <string name="tee_revocation_network_declined_detail">لن ينفذ Duck Detector تحديث CRL عبر الإنترنت حتى تعيد تمكينه من الإعدادات. تبقى فحوصات الإبطال المدمجة مفعلة.</string>
+    <string name="tee_revocation_network_setting_title">السماح بتحديث CRL عبر الإنترنت</string>
+    <string name="tee_revocation_network_setting_summary">تستخدم فحوصات إبطال TEE دائمًا لقطة مدمجة؛ يسمح هذا الخيار فقط بجلب أحدث Google attestation revocation feed.</string>
+    <string name="tee_revocation_network_setting_footer">تُطبَّق التغييرات فورًا على سلوك التحديث عبر الإنترنت. تبقى فحوصات إبطال TEE المدمجة مفعلة.</string>
+</resources>

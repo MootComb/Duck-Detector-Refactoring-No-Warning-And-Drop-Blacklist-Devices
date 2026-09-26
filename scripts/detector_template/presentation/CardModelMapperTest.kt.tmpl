@@ -1,0 +1,36 @@
+package {{package}}.presentation
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.core.report.ReportBlock
+import {{package}}.domain.{{Class}}Report
+import {{package}}.domain.{{Class}}Signal
+import {{package}}.domain.{{Class}}Stage
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class {{Class}}CardModelMapperTest {
+
+    private val mapper = {{Class}}CardModelMapper()
+
+    @Test
+    fun `an unprobed scan reads as not evaluated`() {
+        val model = mapper.map({{Class}}Report(stage = {{Class}}Stage.READY, signals = emptyList(), probed = false))
+
+        assertEquals(DetectorStatus.info(InfoKind.SUPPORT), model.status)
+        assertEquals("Not evaluated", model.verdict)
+    }
+
+    @Test
+    fun `every signal becomes a row of the card and of the export`() {
+        val signal = {{Class}}Signal(label = "label", detail = "detail")
+        val model = mapper.map({{Class}}Report(stage = {{Class}}Stage.READY, signals = listOf(signal), probed = true))
+        val export = model.toDetectorReport()
+
+        assertEquals(listOf("label"), model.signalRows.map { it.label })
+        assertEquals(model.verdict, export.verdict)
+        assertEquals(model.status.severity, export.severity)
+        val rows = export.blocks.filterIsInstance<ReportBlock.Rows>().single { it.title == "Signals" }.rows
+        assertEquals(listOf("detail"), rows.map { it.detail })
+    }
+}

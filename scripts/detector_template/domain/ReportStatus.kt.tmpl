@@ -1,0 +1,20 @@
+package {{package}}.domain
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.InfoKind
+
+/**
+ * The verdict of a {{title}} scan.
+ *
+ * A scan whose probes could not observe the device is informational, never clean: an empty list of
+ * signals is evidence of absence only when a probe actually looked.
+ */
+fun {{Class}}Report.toDetectorStatus(): DetectorStatus = when (stage) {
+    {{Class}}Stage.LOADING -> DetectorStatus.info(InfoKind.SUPPORT)
+    {{Class}}Stage.FAILED -> DetectorStatus.info(InfoKind.ERROR)
+    {{Class}}Stage.READY -> when {
+        signals.isNotEmpty() -> DetectorStatus.warning()
+        !probed -> DetectorStatus.info(InfoKind.SUPPORT)
+        else -> DetectorStatus.allClear()
+    }
+}

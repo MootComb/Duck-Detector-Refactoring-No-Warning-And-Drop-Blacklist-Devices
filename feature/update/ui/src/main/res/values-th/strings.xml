@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="update_dialog_title">มีอัปเดต Nightly</string>
+    <string name="update_version_change">%1$s → %2$s</string>
+    <string name="update_branch_hash_label">สาขาและ commit</string>
+    <string name="update_author_label">ผู้เขียน commit ล่าสุด</string>
+    <string name="update_time_label">อัปเดตเมื่อ</string>
+    <string name="update_changelog_title">การเปลี่ยนแปลงตั้งแต่รุ่นปัจจุบัน</string>
+    <plurals name="update_remaining_commits">
+        <item quantity="one">ยังไม่แสดง commit อีก 1 รายการ</item>
+        <item quantity="other">ยังไม่แสดง commit อีก %1$d รายการ</item>
+    </plurals>
+    <string name="update_later">ภายหลัง</string>
+    <string name="update_view_changes">ดูการเปลี่ยนแปลงทั้งหมดบน GitHub</string>
+    <string name="update_download">เปิดหน้าดาวน์โหลด</string>
+</resources>

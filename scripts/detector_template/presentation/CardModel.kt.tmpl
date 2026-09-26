@@ -1,0 +1,21 @@
+package {{package}}.presentation.model
+
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.report.DetectorHeadline
+
+data class {{Class}}CardModel(
+    override val title: String,
+    val subtitle: String,
+    override val status: DetectorStatus,
+    override val verdict: String,
+    override val summary: String,
+    val signalRows: List<{{Class}}DetailRowModel>,
+    val scanRows: List<{{Class}}DetailRowModel>,
+) : DetectorHeadline
+
+data class {{Class}}DetailRowModel(
+    val label: String,
+    val value: String,
+    val status: DetectorStatus,
+    val detail: String? = null,
+)

@@ -1,0 +1,66 @@
+public abstract interface annotation class com/eltavine/duckdetector/core/evidence/ContractValue : java/lang/annotation/Annotation {
+}
+
+public final class com/eltavine/duckdetector/core/evidence/DetectionSeverity : java/lang/Enum {
+	public static final field ALL_CLEAR Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public static final field DANGER Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public static final field INFO Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public static final field WARNING Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public static fun values ()[Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+}
+
+public final class com/eltavine/duckdetector/core/evidence/DetectorId {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lcom/eltavine/duckdetector/core/evidence/DetectorId;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class com/eltavine/duckdetector/core/evidence/DetectorStatus {
+	public static final field Companion Lcom/eltavine/duckdetector/core/evidence/DetectorStatus$Companion;
+	public fun <init> (Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;Lcom/eltavine/duckdetector/core/evidence/InfoKind;)V
+	public synthetic fun <init> (Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;Lcom/eltavine/duckdetector/core/evidence/InfoKind;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getInfoKind ()Lcom/eltavine/duckdetector/core/evidence/InfoKind;
+	public final fun getSeverity ()Lcom/eltavine/duckdetector/core/evidence/DetectionSeverity;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eltavine/duckdetector/core/evidence/DetectorStatus$Companion {
+	public final fun allClear ()Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;
+	public final fun danger ()Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;
+	public final fun info (Lcom/eltavine/duckdetector/core/evidence/InfoKind;)Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;
+	public final fun warning ()Lcom/eltavine/duckdetector/core/evidence/DetectorStatus;
+}
+
+public final class com/eltavine/duckdetector/core/evidence/FailureName {
+	public static final field INSTANCE Lcom/eltavine/duckdetector/core/evidence/FailureName;
+	public final fun describe (Ljava/lang/Throwable;)Ljava/lang/String;
+	public final fun describe (Ljava/lang/Throwable;Ljava/lang/String;)Ljava/lang/String;
+	public final fun messageOrName (Ljava/lang/Throwable;)Ljava/lang/String;
+	public final fun messageOrName (Ljava/lang/Throwable;Ljava/lang/String;)Ljava/lang/String;
+	public final fun of (Ljava/lang/Throwable;)Ljava/lang/String;
+}
+
+public final class com/eltavine/duckdetector/core/evidence/InfoKind : java/lang/Enum {
+	public static final field ERROR Lcom/eltavine/duckdetector/core/evidence/InfoKind;
+	public static final field SUPPORT Lcom/eltavine/duckdetector/core/evidence/InfoKind;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/eltavine/duckdetector/core/evidence/InfoKind;
+	public static fun values ()[Lcom/eltavine/duckdetector/core/evidence/InfoKind;
+}
+
+public abstract interface class com/eltavine/duckdetector/core/evidence/NamedFailure {
+	public abstract fun getFailureName ()Ljava/lang/String;
+}
+

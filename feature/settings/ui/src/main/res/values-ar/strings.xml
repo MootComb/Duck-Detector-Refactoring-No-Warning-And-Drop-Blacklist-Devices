@@ -1,0 +1,71 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="about_clipboard_build_hash_line">مُعرف البناء: %1$s</string>
+    <string name="about_clipboard_build_time_line">وقت البناء (UTC): %1$s UTC</string>
+    <string name="about_clipboard_label">معلومات بناء Duck Detector</string>
+    <string name="about_clipboard_version_line">الإصدار: %1$s (%2$d)</string>
+    <string name="about_copy_build_info_summary">نسخ الإصدار ووقت البناء ومُعرف البناء</string>
+    <string name="about_copy_toast">تم نسخ معلومات البناء</string>
+    <string name="about_label_build_hash">مُعرف البناء</string>
+    <string name="about_label_build_time">وقت البناء</string>
+    <string name="about_label_copy_build_info">نسخ معلومات البناء</string>
+    <string name="about_label_email">البريد الإلكتروني</string>
+    <string name="about_label_privacy">الخصوصية / استخدام البيانات</string>
+    <string name="about_label_version">الإصدار</string>
+    <string name="about_label_website">الموقع الإلكتروني</string>
+    <string name="about_privacy_summary">تعمل الفحوصات محليًا ولا تُرفع نتائج الكشف. يتصل التطبيق بـ GitHub مرة واحدة عند كل تشغيل بارد لجلب بيانات تحديث Nightly. يظل تحديث CRL عبر الإنترنت اختياريًا.</string>
+    <string name="about_subtitle">روابط المشروع وبيانات البناء.</string>
+    <string name="about_title">حول</string>
+    <string name="about_value_build_time">%1$s UTC</string>
+    <string name="about_value_version">%1$s (%2$d)</string>
+    <string name="author_boundary_toast">نهاية القائمة</string>
+    <string name="author_summary_alex">SELinux(C++, Kotlin)</string>
+    <string name="author_summary_baka">TEE و Zygisk</string>
+    <string name="author_summary_eltavine">ساهم في واجهة المستخدم و C++ و ASM و Kotlin.</string>
+    <string name="author_summary_lingqing">TEE</string>
+    <string name="author_summary_mirin">UI</string>
+    <string name="author_summary_sqmy">Kotlin</string>
+    <string name="author_summary_victor">CI</string>
+    <string name="author_summary_wxx">CI ‏(Kotlin)</string>
+    <string name="author_summary_xiaotong">TEE ‏(C++، Kotlin)</string>
+    <string name="author_swipe_hint_paged">اسحب لليمين أو اليسار للتنقل بين المطورين. %1$d/%2$d</string>
+    <string name="author_swipe_hint_single">اسحب لليمين أو اليسار للتنقل بين المطورين.</string>
+    <string name="licenses_dialog_close">إغلاق</string>
+    <string name="licenses_dialog_home_page">الصفحة الرئيسية</string>
+    <string name="licenses_dialog_licenses">التراخيص: %1$s</string>
+    <string name="licenses_dialog_no_license_text">لا يتوفر نص ترخيص.</string>
+    <string name="licenses_dialog_open">فتح</string>
+    <string name="licenses_dialog_source_repo">مستودع المصدر</string>
+    <string name="licenses_dialog_version">الإصدار %1$s</string>
+    <string name="licenses_entry_label">الشفافية</string>
+    <string name="licenses_entry_subtitle">استعرض مشاريع الجهات الخارجية المضمَّنة في هذا البناء واطّلع على إشعارات تراخيصها.</string>
+    <string name="licenses_entry_title">مكتبات مفتوحة المصدر</string>
+    <string name="licenses_inventory_subtitle">اضغط على أي dependency لعرض نص الترخيص وروابط المشروع الأصلي.</string>
+    <string name="licenses_inventory_title">فهرس المكتبات المضمَّنة</string>
+    <string name="licenses_screen_back">رجوع</string>
+    <string name="licenses_screen_subtitle">مكونات الجهات الخارجية المضمَّنة في هذا البناء.</string>
+    <string name="licenses_screen_title">تراخيص المصادر المفتوحة</string>
+    <string name="settings_subtitle">عناصر تحكم التحقق عبر الإنترنت وحالة تحديث GitHub Nightly.</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="update_settings_label">التحقق من التحديثات</string>
+    <string name="update_status_available">يتوفر إصدار Nightly أحدث؛ اضغط للتفاصيل</string>
+    <string name="update_status_checking">جارٍ التحقق من GitHub…</string>
+    <string name="update_status_current">لديك أحدث إصدار Nightly</string>
+    <string name="update_status_failed">تعذر التحقق من GitHub؛ اضغط لإعادة المحاولة</string>
+    <string name="update_status_idle">يتم فحص GitHub Main Nightly بعد التشغيل البارد؛ اضغط للفحص الآن</string>
+</resources>

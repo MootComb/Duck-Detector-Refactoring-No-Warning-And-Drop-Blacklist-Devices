@@ -1,0 +1,20 @@
+plugins {
+    id("duckdetector.android.library")
+}
+
+android {
+    namespace = "{{package}}.detector"
+}
+
+kotlin {
+    explicitApi()
+}
+
+dependencies {
+    api(project(":core:detector"))
+    implementation(project(":core:evidence"))
+    api(project(":core:report"))
+    implementation(project(":feature:{{name}}:data"))
+    api(project(":feature:{{name}}:domain"))
+    api(project(":feature:{{name}}:presentation"))
+}

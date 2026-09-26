@@ -1,0 +1,30 @@
+package {{package}}.data.native
+
+import com.eltavine.duckdetector.core.native.NativePayloadContractViolation
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class {{Class}}NativeBridgeTest {
+
+    private val bridge = {{Class}}NativeBridge()
+
+    @Test
+    fun `parses availability and escaped signals`() {
+        val snapshot = bridge.parse("AVAILABLE=1\nSIGNAL=first\\tcolumn\nSIGNAL=second\n")
+
+        assertTrue(snapshot.available)
+        assertEquals(listOf("first\tcolumn", "second"), snapshot.signals)
+    }
+
+    @Test
+    fun `a probe that did not observe the device is unavailable`() {
+        assertFalse(bridge.parse("AVAILABLE=0\n").available)
+    }
+
+    @Test(expected = NativePayloadContractViolation::class)
+    fun `a payload without AVAILABLE is rejected`() {
+        bridge.parse("SIGNAL=orphan\n")
+    }
+}

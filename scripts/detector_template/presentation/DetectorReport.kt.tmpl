@@ -1,0 +1,21 @@
+package {{package}}.presentation
+
+import com.eltavine.duckdetector.core.report.DetectorReport
+import com.eltavine.duckdetector.core.report.ReportBlock
+import com.eltavine.duckdetector.core.report.ReportRow
+import {{package}}.presentation.model.{{Class}}CardModel
+import {{package}}.presentation.model.{{Class}}DetailRowModel
+
+fun {{Class}}CardModel.toDetectorReport(): DetectorReport = DetectorReport(
+    title = title,
+    verdict = verdict,
+    severity = status.severity,
+    quickFacts = emptyList(),
+    blocks = listOf(
+        ReportBlock.Rows("Signals", signalRows.toReportRows()),
+        ReportBlock.Rows("Scan", scanRows.toReportRows()),
+    ),
+)
+
+private fun List<{{Class}}DetailRowModel>.toReportRows(): List<ReportRow> =
+    map { ReportRow(it.label, it.value, it.detail) }

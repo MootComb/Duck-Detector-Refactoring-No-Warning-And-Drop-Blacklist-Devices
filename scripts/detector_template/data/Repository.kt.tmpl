@@ -1,0 +1,31 @@
+package {{package}}.data.repository
+
+import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.evidence.FailureName
+import {{package}}.domain.{{Class}}Report
+import {{package}}.domain.{{Class}}Stage
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/** Collects {{title}} evidence off the main thread; a probe that throws becomes a FAILED report. */
+class {{Class}}Repository : DetectorScanner<{{Class}}Report> {
+
+    override suspend fun scan(): {{Class}}Report = withContext(Dispatchers.IO) {
+        try {
+            collect()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (failure: Exception) {
+            {{Class}}Report.failed(FailureName.describe(failure))
+        }
+    }
+
+    // Until a probe observes the device, the report says nothing was observed, not that nothing was found.
+    private fun collect(): {{Class}}Report = {{Class}}Report(
+        stage = {{Class}}Stage.READY,
+        signals = emptyList(),
+        probed = false,
+        unavailableReason = "No probe is implemented yet.",
+    )
+}
