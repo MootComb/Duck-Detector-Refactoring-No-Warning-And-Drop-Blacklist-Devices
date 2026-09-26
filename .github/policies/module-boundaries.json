@@ -134,7 +134,6 @@
       "kind": "android-application",
       "ui": true,
       "allowed_project_dependencies": [
-        ":capability:*:*",
         ":core:*",
         ":feature:*:*",
         ":sdk:*"

@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.buildlogic.detectorModules
 plugins {
     id("duckdetector.android.library")
     id("duckdetector.public-api")
+    id("duckdetector.contract-values")
 }
 
 android {
@@ -32,11 +33,13 @@ kotlin {
 
 dependencies {
     implementation(project(":capability:earlypreload:data"))
+    implementation(project(":capability:packageinventory:data"))
+    implementation(project(":capability:packageinventory:domain"))
     implementation(project(":capability:selinuxpolicy:data"))
+    implementation(project(":core:evidence"))
     api(project(":core:detector"))
     api(project(":core:report"))
     // Every detector unit, discovered from its directory, so the catalog and the AAR can hold all of them.
     detectorModules(DETECTOR_LAYER).forEach { implementation(project(it)) }
     api(libs.kotlinx.coroutines.core)
-    testImplementation(project(":core:evidence"))
 }

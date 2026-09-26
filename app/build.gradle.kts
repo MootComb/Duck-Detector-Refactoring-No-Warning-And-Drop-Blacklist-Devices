@@ -34,8 +34,6 @@ android {
 generateDetectorCards(packageName = "com.eltavine.duckdetector.ui")
 
 dependencies {
-    implementation(project(":capability:packageinventory:data"))
-    implementation(project(":capability:packageinventory:domain"))
     implementation(project(":core:detector"))
     implementation(project(":core:evidence"))
     implementation(project(":core:scan"))

@@ -39,11 +39,10 @@ import com.eltavine.duckdetector.BuildConfig
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissions
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationConsentStore
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
-import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageInventoryResult
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.packagevisibility.preferences.PackageVisibilityReviewPrefs
 import com.eltavine.duckdetector.packagevisibility.preferences.PackageVisibilityReviewStore
+import com.eltavine.duckdetector.sdk.DuckDetector
+import com.eltavine.duckdetector.sdk.PackageVisibility
 import com.eltavine.duckdetector.startup.legal.AgreementAcceptancePrefs
 import com.eltavine.duckdetector.startup.legal.AgreementAcceptanceStore
 import com.eltavine.duckdetector.startup.legal.AgreementScreen
@@ -55,14 +54,11 @@ import com.eltavine.duckdetector.core.ui.components.ScreenshotWatermarkOverlay
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeDialog
 import com.eltavine.duckdetector.ui.shell.ScreenCaptureNoticeEffect
-import com.eltavine.duckdetector.ui.shell.StartupPackageVisibilityState
 import com.eltavine.duckdetector.ui.shell.StartupPolicyScreen
 import com.eltavine.duckdetector.ui.shell.combineConsentDecisions
 import com.eltavine.duckdetector.ui.shell.resolveStartupGateState
 import com.eltavine.duckdetector.ui.shell.shouldCreateDetectorViewModels
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun DuckDetectorApp() {
@@ -136,7 +132,7 @@ fun DuckDetectorApp() {
             value = currentPrefs
         }
     }
-    val packageVisibilityState by produceState<StartupPackageVisibilityState?>(
+    val packageVisibilityState by produceState<PackageVisibility?>(
         initialValue = null,
         key1 = appContext,
         key2 = agreementAccepted,
@@ -145,16 +141,7 @@ fun DuckDetectorApp() {
             value = null
             return@produceState
         }
-        value = withContext(Dispatchers.IO) {
-            val inventoryResult = InstalledPackageVisibilityChecker.inspect(appContext)
-            val inventory = (inventoryResult as? InstalledPackageInventoryResult.Available)
-                ?.inventory
-            StartupPackageVisibilityState(
-                visibility = inventory?.visibility ?: InstalledPackageVisibility.UNKNOWN,
-                visiblePackageCount = inventory?.visiblePackageCount ?: 0,
-                suspiciouslyLowInventory = inventory?.suspiciouslyLowInventory ?: false,
-            )
-        }
+        value = DuckDetector.packageVisibility(appContext)
     }
     var notificationPermissionState by remember {
         mutableStateOf(ScanNotificationPermissions.read(appContext))
@@ -172,8 +159,8 @@ fun DuckDetectorApp() {
             notificationPermissionState = notificationPermissionState,
             packageVisibilityLoaded = packageVisibilityState != null &&
                     packageVisibilityReviewPrefs != null,
-            packageVisibility = packageVisibilityState?.visibility
-                ?: InstalledPackageVisibility.UNKNOWN,
+            packageVisibility = packageVisibilityState?.scope
+                ?: PackageVisibility.Scope.UNKNOWN,
             packageVisibilityReviewAcknowledged =
                 packageVisibilityReviewPrefs?.restrictedInventoryAcknowledged == true,
         )

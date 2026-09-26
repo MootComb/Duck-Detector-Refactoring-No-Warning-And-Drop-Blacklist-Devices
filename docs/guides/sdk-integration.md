@@ -128,6 +128,8 @@ The SDK declares no permissions, so the host decides what its process may observ
 | `USE_BIOMETRIC`, `USE_FINGERPRINT` | TEE's biometric and SOTER environment checks, which call `BiometricManager.canAuthenticate` | That call requires `USE_BIOMETRIC` |
 | `INTERNET`, `ACCESS_NETWORK_STATE` | TEE's online refresh of Google's attestation revocation list | TEE cannot refresh the list online |
 
+`DuckDetector.packageVisibility(context)` reports whether this process sees the full package list, a filtered one or an unreadable one, with the number of visible packages, so a host can tell before it reads the package-based results whether filtering bounds them.
+
 The SDK's only visibility declaration is TEE's `<queries>` entry for `com.tencent.soter.soterserver`, which the manifest merger adds to the host. The SOTER environment check needs it to tell a missing service from one that package visibility filtering hides.
 
 The online revocation refresh also needs the user's consent, which the SDK never asks for itself. Every detector lists the choices it needs in `consents`; today only TEE declares one, `TeeRevocationNetworkConsent`. Read the current answer from `decisions(context)`, record the user's with `decide(context, granted)`, and scan again. Until the user allows it, TEE checks revocation against the bundled snapshot and says so in its report.

@@ -25,11 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.eltavine.duckdetector.R
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.detector.ConsentDecision
 import com.eltavine.duckdetector.core.ui.detector.ConsentPrompt
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.sdk.PackageVisibility
 
 @Composable
 internal fun notificationPolicyCard(
@@ -192,12 +192,12 @@ internal fun consentPolicyCard(
 
 @Composable
 internal fun packageManagerPolicyCard(
-    packageVisibilityState: StartupPackageVisibilityState,
+    packageVisibilityState: PackageVisibility,
     packageVisibilityReviewAcknowledged: Boolean,
     onAcknowledgePackageVisibility: () -> Unit,
 ): StartupPolicyCardUi {
     return when {
-        packageVisibilityState.visibility == InstalledPackageVisibility.RESTRICTED &&
+        packageVisibilityState.scope == PackageVisibility.Scope.RESTRICTED &&
                 !packageVisibilityReviewAcknowledged -> StartupPolicyCardUi(
             icon = Icons.Rounded.Inventory2,
             title = stringResource(R.string.startup_package_manager_title),
@@ -213,7 +213,7 @@ internal fun packageManagerPolicyCard(
             onPrimaryAction = onAcknowledgePackageVisibility,
         )
 
-        packageVisibilityState.visibility == InstalledPackageVisibility.RESTRICTED -> StartupPolicyCardUi(
+        packageVisibilityState.scope == PackageVisibility.Scope.RESTRICTED -> StartupPolicyCardUi(
             icon = Icons.Rounded.Inventory2,
             title = stringResource(R.string.startup_package_manager_title),
             statusLabel = stringResource(R.string.startup_status_acknowledged),
@@ -226,7 +226,7 @@ internal fun packageManagerPolicyCard(
             requiresAction = false,
         )
 
-        packageVisibilityState.visibility == InstalledPackageVisibility.UNKNOWN -> StartupPolicyCardUi(
+        packageVisibilityState.scope == PackageVisibility.Scope.UNKNOWN -> StartupPolicyCardUi(
             icon = Icons.Rounded.Inventory2,
             title = stringResource(R.string.startup_package_manager_title),
             statusLabel = stringResource(R.string.startup_status_unsupported),
@@ -236,7 +236,7 @@ internal fun packageManagerPolicyCard(
             requiresAction = false,
         )
 
-        packageVisibilityState.suspiciouslyLowInventory -> StartupPolicyCardUi(
+        packageVisibilityState.suspiciouslyLow -> StartupPolicyCardUi(
             icon = Icons.Rounded.Inventory2,
             title = stringResource(R.string.startup_package_manager_title),
             statusLabel = stringResource(R.string.startup_status_review_later),

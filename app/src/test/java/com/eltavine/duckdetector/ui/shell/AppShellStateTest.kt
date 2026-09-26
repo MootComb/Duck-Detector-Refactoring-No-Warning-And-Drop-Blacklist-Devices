@@ -16,9 +16,9 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.sdk.PackageVisibility
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,7 +37,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = false,
-            packageVisibility = InstalledPackageVisibility.UNKNOWN,
+            packageVisibility = PackageVisibility.Scope.UNKNOWN,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -59,7 +59,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -81,7 +81,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = false,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -103,7 +103,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -125,7 +125,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.RESTRICTED,
+            packageVisibility = PackageVisibility.Scope.RESTRICTED,
             packageVisibilityReviewAcknowledged = false,
         )
 
@@ -147,7 +147,7 @@ class AppShellStateTest {
                 liveUpdatesGranted = true,
             ),
             packageVisibilityLoaded = true,
-            packageVisibility = InstalledPackageVisibility.FULL,
+            packageVisibility = PackageVisibility.Scope.FULL,
             packageVisibilityReviewAcknowledged = true,
         )
 

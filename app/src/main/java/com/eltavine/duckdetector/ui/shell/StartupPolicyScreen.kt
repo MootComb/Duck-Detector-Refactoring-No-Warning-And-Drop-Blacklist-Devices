@@ -44,19 +44,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.core.detector.ConsentDecision
 import com.eltavine.duckdetector.core.detector.ConsentId
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
-
-data class StartupPackageVisibilityState(
-    val visibility: InstalledPackageVisibility,
-    val visiblePackageCount: Int,
-    val suspiciouslyLowInventory: Boolean,
-)
+import com.eltavine.duckdetector.sdk.PackageVisibility
 
 @Composable
 internal fun StartupPolicyScreen(
@@ -65,7 +59,7 @@ internal fun StartupPolicyScreen(
     notificationPermissionState: ScanNotificationPermissionState,
     consentCards: List<DetectorConsentCard>,
     consentDecisions: Map<ConsentId, ConsentDecision>?,
-    packageVisibilityState: StartupPackageVisibilityState?,
+    packageVisibilityState: PackageVisibility?,
     packageVisibilityReviewAcknowledged: Boolean,
     onAllowNotifications: () -> Unit,
     onSkipNotifications: () -> Unit,

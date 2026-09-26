@@ -23,15 +23,18 @@ import android.view.View
 import android.webkit.WebView
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
+import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
 import com.eltavine.duckdetector.core.detector.Detector
 import com.eltavine.duckdetector.core.detector.run
 import com.eltavine.duckdetector.core.report.DetectorResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Runs Duck Detector's detectors without any UI.
@@ -60,6 +63,11 @@ public object DuckDetector {
     public fun results(context: Context): Flow<DetectorResult> = channelFlow {
         val application = context.applicationContext
         detectors.forEach { detector -> launch { send(detector.run(application)) } }
+    }
+
+    /** Reads how much of the installed package list this process sees, off the calling dispatcher. */
+    public suspend fun packageVisibility(context: Context): PackageVisibility = withContext(Dispatchers.IO) {
+        InstalledPackageVisibilityChecker.inspect(context.applicationContext).toPackageVisibility()
     }
 
     /**

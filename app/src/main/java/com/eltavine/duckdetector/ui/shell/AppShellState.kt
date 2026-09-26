@@ -16,9 +16,9 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPackageVisibility
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.sdk.PackageVisibility
 
 enum class AppDestination {
     MAIN,
@@ -37,7 +37,7 @@ fun resolveStartupGateState(
     notificationPrefs: ScanNotificationPrefs?,
     notificationPermissionState: ScanNotificationPermissionState,
     packageVisibilityLoaded: Boolean,
-    packageVisibility: InstalledPackageVisibility,
+    packageVisibility: PackageVisibility.Scope,
     packageVisibilityReviewAcknowledged: Boolean,
 ): StartupGateState {
     return when {
@@ -54,7 +54,7 @@ fun resolveStartupGateState(
                 !notificationPrefs.liveUpdatesPrompted ->
             StartupGateState.REQUIRES_POLICY_REVIEW
 
-        packageVisibility == InstalledPackageVisibility.RESTRICTED &&
+        packageVisibility == PackageVisibility.Scope.RESTRICTED &&
                 !packageVisibilityReviewAcknowledged ->
             StartupGateState.REQUIRES_POLICY_REVIEW
 
