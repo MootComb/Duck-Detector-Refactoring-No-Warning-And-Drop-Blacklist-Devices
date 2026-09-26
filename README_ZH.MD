@@ -49,7 +49,7 @@
 
 DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用于发现启动状态变化、Root 与 SU 痕迹、运行时注入或 Hook、挂载命名空间异常、系统属性篡改、可疑应用、KeyStore 与证明链异常，以及虚拟化迹象。
 
-应用由 Jetpack Compose 界面、按功能组织的 Kotlin 代码和 C++/汇编原生库组成。检测结果是用于诊断的信号，不代表对设备“安全”或“已受损”的权威认证。
+应用由 Jetpack Compose 界面、按功能拆分的 Gradle 模块和 C++/汇编原生库组成；同一套检测器也以不含 UI 的 SDK AAR 形式发布，可以嵌入其他应用。检测结果是用于诊断的信号，不代表对设备“安全”或“已受损”的权威认证。
 
 # 检测范围
 
@@ -59,14 +59,14 @@ DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用�
 
 其中，`Play Integrity Fix` 检测的是与完整性伪装修改相关的本地迹象，并不会返回 Google Play Integrity API 的官方判定。TEE 模块检查 Android KeyStore 与设备证明证据，包括证书链、安全级别、吊销数据，以及设备支持时的部分 KeyMint、StrongBox 和 Soter 行为。
 
-项目还包含仪表盘、设备信息、设置、更新检查、通知、开源许可和通用 UI 等辅助功能包。
+项目还包含仪表盘、设备信息、设置、更新检查、通知、开源许可和通用 UI 等辅助模块。
 
 # 工作方式
 
-- **按功能组织：** 每个检测域就近维护采集逻辑、领域模型、报告映射和界面代码。
+- **按功能拆分模块：** 每个检测器在自己的 Gradle 模块中维护采集、判定规则、报告投影与界面，多个检测器共用的采集代码放在 capability 模块中。
 - **启动早期采集：** 透明的 `NativeActivity` 在 `MainActivity` 之前运行，记录早期挂载与虚拟化证据。
 - **原生探针：** 共享原生库负责直接系统调用、`/proc` 检查、计时测量、链接器与运行时可见性检查，以及特定架构的汇编路径。
-- **进程隔离：** 部分 Zygisk、虚拟化、SELinux 和 TEE 检查运行在独立进程或隔离服务中，用于对照不同进程边界下的证据。
+- **进程隔离：** 部分 Zygisk、Mount、Native Root、虚拟化、SELinux、LSPosed 和 TEE 检查运行在独立进程或隔离服务中，用于对照不同进程边界下的证据。
 - **证据关联：** 仪表盘分别展示检测项与覆盖状态，不将单个启发式信号视为确定结论。
 
 # 兼容性
@@ -84,15 +84,16 @@ DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用�
 ```text
 Duck-Detector-Refactoring/
 ├─ app/                   # UI 组合根：Activity、仪表盘卡片、通知
-├─ sdk/runtime/           # Headless 组合根：检测器目录、扫描 API、原生库注册表
+├─ sdk/runtime/           # Headless 组合根：检测器目录、扫描 API、进程钩子、原生库注册表
 ├─ sdk/aar/               # 可分发的 SDK：把所有 headless 模块融合成一个 AAR
-├─ core/                  # 契约：证据、原生载荷、报告、扫描生命周期、检测器、UI
+├─ core/                  # 契约与共享基础设施：证据、原生载荷、平台访问、报告、扫描生命周期、检测器、UI
 ├─ capability/            # 多个检测器共享的证据采集
 ├─ feature/               # 每个目录一个检测器或辅助功能，按层拆分
 ├─ samples/sdk-consumer/  # 只依赖已发布 AAR 构建的独立示例应用
 ├─ build-logic/           # 约定插件、模块边界与依赖校验、生成资源任务
 ├─ docs/                  # 架构概览、指南与后续事项
-├─ .github/policies/      # 模块、原生、检测器接触点与反射策略
+├─ .github/policies/      # 模块、原生、检测器接触点、反射与文本协议策略
+├─ .github/scripts/       # 仓库守卫脚本及其自测
 ├─ gradle/                # 版本目录与 Gradle Wrapper 文件
 ├─ scripts/               # 检测器脚手架与仓库维护脚本
 ├─ build.gradle.kts
@@ -105,13 +106,13 @@ Duck-Detector-Refactoring/
 - `data`：探针、解析器、Repository、JNI 桥接和 Android 服务访问
 - `presentation`：卡片模型、从领域报告到卡片的映射与报告投影（纯 JVM）
 - `detector`：唯一的 headless `<Name>Detector` 对象，把其余各层绑定给 SDK 与应用
-- `ui`：Compose 卡片，以及检测器接入仪表盘的入口
+- `ui`：Compose 卡片、检测器 consent 的提示，以及检测器接入仪表盘的入口
 
 依赖方向为 `:app` 指向 SDK，二者指向 feature，feature 指向 capability，capability 指向 core；feature 之间互不依赖，每个模块只声明自己实际使用的依赖。构建与 CI 会校验这些规则，详见[架构概览](./docs/architecture/README.md)。
 
 原生源码按单元组织：每个单元位于其所属模块的 `src/main/cpp/<unit>/`，编译为独立的 object library 并链接进 `libduckdetector.so`；Kotlin 代码通过同一模块中的 JNI 桥接读取原生结果。
 
-新增检测器只改动它自己的目录，以及 `DetectorCatalog` 中的一行；应用会根据各 ui 模块自动生成仪表盘卡片列表。一条命令即可生成全部代码；生成结果可以直接构建，在探针写好之前显示“Not evaluated”：
+新增检测器只改动它自己的目录，以及 `DetectorCatalog` 中的一行；带 native unit 时再加一行注册和一条策略。应用会根据各 ui 模块自动生成仪表盘卡片列表。一条命令即可生成全部代码；生成结果可以直接构建，在探针写好之前显示“Not evaluated”：
 
 ```bash
 python3 scripts/new_detector.py <name> --description "检测什么，以及为什么它构成证据"
@@ -144,6 +145,7 @@ gradlew.bat :app:assembleDebug
 
 ```bash
 ./gradlew unitTest :app:assembleDebug :app:lintDebug buildHealth
+for s in .github/scripts/check-*.py; do python3 "$s"; done
 ```
 
 同一次构建还会产出不含任何 UI 的 headless SDK，打包为一个 AAR 并发布到 `sdk/aar/build/repository`（见 [Using the SDK](./docs/guides/sdk-integration.md)）：

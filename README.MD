@@ -49,7 +49,7 @@
 
 DuckDetector collects and correlates security-relevant evidence on an Android device. It looks for boot-state changes, root and SU artifacts, runtime injection or hooking, mount namespace anomalies, modified system properties, suspicious applications, KeyStore and attestation inconsistencies, and signs of virtualization.
 
-The app combines a Jetpack Compose interface, feature-oriented Kotlin packages, and a native C++/assembly library. Results are diagnostic signals, not an authoritative statement that a device is secure or compromised.
+The app combines a Jetpack Compose interface, feature-oriented Gradle modules, and a native C++/assembly library. The same detectors are also published as a UI-free SDK AAR that other applications can embed. Results are diagnostic signals, not an authoritative statement that a device is secure or compromised.
 
 # Detector coverage
 
@@ -66,7 +66,7 @@ Supporting modules provide the dashboard, device information, settings, update c
 - **Feature modules:** each detector owns its collection, judgement rules, report projection, and UI in its own Gradle modules, while collection code that several detectors share lives in capability modules.
 - **Early native capture:** a transparent `NativeActivity` runs before `MainActivity` and records early mount and virtualization evidence.
 - **Native probes:** the shared native library performs checks that require direct system calls, `/proc` inspection, timing measurements, linker/runtime visibility, or architecture-specific assembly.
-- **Process separation:** selected Zygisk, virtualization, SELinux, and TEE checks run in dedicated or isolated services so evidence can be compared across process boundaries.
+- **Process separation:** selected Zygisk, Mount, Native Root, virtualization, SELinux, LSPosed, and TEE checks run in dedicated or isolated services so evidence can be compared across process boundaries.
 - **Evidence correlation:** the dashboard reports individual findings and coverage states instead of treating one heuristic as conclusive.
 
 # Compatibility
@@ -84,15 +84,16 @@ Supporting modules provide the dashboard, device information, settings, update c
 ```text
 Duck-Detector-Refactoring/
 ├─ app/                   # UI composition root: activities, dashboard cards, notifications
-├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, native library registry
+├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, process hooks, native library registry
 ├─ sdk/aar/               # The distributable SDK: every headless module fused into one AAR
-├─ core/                  # Contracts: evidence, native payloads, reports, scan lifecycle, detector, UI
+├─ core/                  # Contracts and shared infrastructure: evidence, native payloads, platform access, reports, scan lifecycle, detector, UI
 ├─ capability/            # Evidence collection shared by several detectors
 ├─ feature/               # One detector or supporting feature per directory, split into layers
 ├─ samples/sdk-consumer/  # A separate application built from the published AAR alone
 ├─ build-logic/           # Convention plugins, module boundary and dependency validation, generated assets
 ├─ docs/                  # Architecture overview, guides, and follow-ups
-├─ .github/policies/      # Module, native, detector touch point, and reflection policies
+├─ .github/policies/      # Module, native, detector touch point, reflection, and text protocol policies
+├─ .github/scripts/       # Repository guards and their self-tests
 ├─ gradle/                # Version catalog and Gradle wrapper files
 ├─ scripts/               # Detector scaffold and repository maintenance scripts
 ├─ build.gradle.kts
@@ -105,11 +106,11 @@ Each detector is a set of Gradle modules under `feature/<name>/`:
 - `data`: probes, parsers, repositories, JNI bridges, and Android service access
 - `presentation`: the card model, its mapping from the domain report, and the report projection (pure JVM)
 - `detector`: the one headless `<Name>Detector` object that binds the other layers for the SDK and the app
-- `ui`: the Compose card and the detector's integration with the dashboard
+- `ui`: the Compose card, the prompts for the detector's consents, and its integration with the dashboard
 
 Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md).
 
-A new detector touches only its own directory and its one line in `DetectorCatalog`; the app generates its dashboard cards from the ui modules. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
+A new detector touches only its own directory and its one line in `DetectorCatalog`, plus one registry line and one policy entry when it has a native unit; the app generates its dashboard cards from the ui modules. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
 
 ```bash
 python3 scripts/new_detector.py <name> --description "what it looks for and why that is evidence"
@@ -144,6 +145,7 @@ For the standard local validation path:
 
 ```bash
 ./gradlew unitTest :app:assembleDebug :app:lintDebug buildHealth
+for s in .github/scripts/check-*.py; do python3 "$s"; done
 ```
 
 The same build also produces the headless SDK as one AAR, without any UI, published to `sdk/aar/build/repository` (see [Using the SDK](./docs/guides/sdk-integration.md)):
