@@ -161,6 +161,21 @@
       "unit": "preload",
       "header": "virtualization/snapshot_builder.h",
       "reason": "The startup virtualization preload runs the same collect_snapshot probe as the runtime virtualization bridge so both snapshots come from one implementation, then reads its mount keys and each finding's typed group and early signal. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_file.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_format.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_parser.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
     }
   ]
 }

@@ -107,6 +107,7 @@ Native code is split into units. Each unit lives in the module that owns it, as 
 | `selinuxpolicy` | `:capability:selinuxpolicy:data` | `common` |
 | `packageinventory`, `systemproperties` | the capability of the same name | `common` |
 | `zygotenext` (`mount/zygotenext`) | `:feature:mount:data` | `common` |
+| `customrom` | `:feature:customrom:data` | `common`, plus the `systemproperties` property area parser (`prop_area_file.h`, `prop_area_format.h`, `prop_area_parser.h`) by recorded exception |
 | every other directory | `:feature:<directory>:data` | `common` |
 
 ## Extension rules

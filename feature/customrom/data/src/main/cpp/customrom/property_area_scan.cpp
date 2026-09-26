@@ -16,6 +16,11 @@
 
 #include "customrom/property_integrity_probe.h"
 #include "customrom/property_integrity_internal.h"
+
+#include "systemproperties/prop_area_file.h"
+#include "systemproperties/prop_area_format.h"
+#include "systemproperties/prop_area_parser.h"
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -40,57 +45,77 @@
 
 namespace customrom::detail {
 
+    namespace {
+
+        void collect_detect_property(
+                const systemproperties::PropAreaParser &area,
+                const uint32_t offset,
+                const systemproperties::DiskPropInfo &prop,
+                const std::string_view name,
+                const std::string &context,
+                std::vector<ParsedProperty> *properties
+        ) {
+            const std::string property_name(name);
+
+            if (is_detect_property(property_name)) {
+                ParsedProperty entry;
+                entry.context = context;
+                entry.name = property_name;
+                entry.serial = prop.serial;
+                entry.is_long = (prop.serial & systemproperties::kLongFlag) != 0;
+
+                if (entry.is_long) {
+                    const uint32_t relative_offset = prop.long_property.offset;
+                    if (relative_offset >= sizeof(systemproperties::DiskPropInfo)) {
+                        const uint32_t long_value_offset = offset + relative_offset;
+                        const auto value_length = area.bounded_c_string_length(long_value_offset);
+                        if (value_length.has_value()) {
+                            const auto copy_length = std::min(
+                                    *value_length,
+                                    static_cast<size_t>(PROP_VALUE_MAX - 1)
+                            );
+                            std::memcpy(
+                                    entry.value.data(),
+                                    area.data() + long_value_offset,
+                                    copy_length
+                            );
+                            entry.value[copy_length] = '\0';
+                        }
+                    }
+                } else {
+                    std::memcpy(entry.value.data(), prop.value, entry.value.size());
+                }
+
+                properties->push_back(std::move(entry));
+            }
+        }
+
+    }  // namespace
+
     std::optional<AreaScanResult> scan_area(
             const std::string &path,
             const std::string &context,
             bool mark_dirty_backup
     ) {
-        const int fd = open(path.c_str(), kOpenReadFlags);
-        if (fd < 0) {
-            return std::nullopt;
-        }
-
-        struct stat stat_buffer {};
-        if (fstat(fd, &stat_buffer) != 0 || !S_ISREG(stat_buffer.st_mode)) {
-            close(fd);
-            return std::nullopt;
-        }
-
-        if (static_cast<size_t>(stat_buffer.st_size) < sizeof(DiskPropAreaHeader)) {
-            close(fd);
-            return std::nullopt;
-        }
-
-        void *mapping = mmap(nullptr, static_cast<size_t>(stat_buffer.st_size), PROT_READ,
-                             MAP_PRIVATE, fd, 0);
-        close(fd);
-        if (mapping == MAP_FAILED) {
-            return std::nullopt;
-        }
-
-        const auto *header = reinterpret_cast<const DiskPropAreaHeader *>(mapping);
-        const size_t data_size =
-                static_cast<size_t>(stat_buffer.st_size) - sizeof(DiskPropAreaHeader);
-        const size_t minimum_bytes_used = sizeof(DiskPropTrieNode) +
-                                          (mark_dirty_backup ? kDirtyBackupAreaSize : 0);
-        if (header->magic != kPropAreaMagic ||
-            header->version != kPropAreaVersion ||
-            header->bytes_used > data_size ||
-            header->bytes_used < minimum_bytes_used) {
-            munmap(mapping, static_cast<size_t>(stat_buffer.st_size));
-            return std::nullopt;
-        }
-
         AreaScanResult result;
-        PropAreaParser parser(
-                header->data,
-                header->bytes_used,
-                context,
-                mark_dirty_backup
+        auto holes = systemproperties::scan_prop_area_file(
+                path,
+                mark_dirty_backup,
+                [&context, &result](
+                        const systemproperties::PropAreaParser &area,
+                        const uint32_t offset,
+                        const systemproperties::DiskPropInfo &prop,
+                        const std::string_view name
+                ) {
+                    collect_detect_property(area, offset, prop, name, context, &result.properties);
+                }
         );
-        result.parsed = parser.parse(&result.holes, &result.properties);
-        munmap(mapping, static_cast<size_t>(stat_buffer.st_size));
-        return result.parsed ? std::optional<AreaScanResult>(std::move(result)) : std::nullopt;
+        if (!holes.has_value()) {
+            return std::nullopt;
+        }
+        result.parsed = true;
+        result.holes = std::move(*holes);
+        return result;
     }
 
     void add_area_anomaly(
@@ -131,7 +156,7 @@ namespace customrom::detail {
             PropertyIntegritySnapshot &snapshot,
             const ParsedProperty &property
     ) {
-        if ((property.serial & kLongFlag) == 0 &&
+        if ((property.serial & systemproperties::kLongFlag) == 0 &&
             (property.serial & kSerialResidueMask) != 0) {
             add_property_anomaly(
                     snapshot,

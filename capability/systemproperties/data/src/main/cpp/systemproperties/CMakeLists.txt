@@ -1,6 +1,8 @@
 duckdetector_native_unit(duckdetector_systemproperties
     property_utils.cpp
     boot_param_utils.cpp
+    prop_area_file.cpp
+    prop_area_parser.cpp
     prop_area_probe.cpp
     readonly_handle_probe.cpp
     native_bridge.cpp

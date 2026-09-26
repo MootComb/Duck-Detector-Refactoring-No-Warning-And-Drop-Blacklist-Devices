@@ -16,6 +16,9 @@
 
 #include "customrom/property_integrity_probe.h"
 #include "customrom/property_integrity_internal.h"
+
+#include "systemproperties/prop_area_file.h"
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -39,20 +42,6 @@
 #include <vector>
 
 namespace customrom::detail {
-
-    size_t align_up(size_t value) {
-        return (value + (kByteAlignment - 1)) & ~(kByteAlignment - 1);
-    }
-
-    bool is_skipped_entry(const char *name) {
-        if (name == nullptr) {
-            return true;
-        }
-        return std::strcmp(name, ".") == 0 ||
-               std::strcmp(name, "..") == 0 ||
-               kSerialFilename == name ||
-               kPropertyInfoFilename == name;
-    }
 
     bool starts_with_ro(const std::string &name) {
         return name.rfind("ro.", 0) == 0;
@@ -164,19 +153,19 @@ namespace customrom {
     PropertyIntegritySnapshot scan_property_integrity() {
         PropertyIntegritySnapshot snapshot;
 
-        DIR *directory = opendir(kPropDir);
+        DIR *directory = opendir(systemproperties::kPropDir);
         if (directory == nullptr) {
             return snapshot;
         }
 
         const bool mark_dirty_backup = android_sdk_level() >= 30;
         while (dirent *entry = readdir(directory)) {
-            if (is_skipped_entry(entry->d_name)) {
+            if (systemproperties::is_skipped_entry(entry->d_name)) {
                 continue;
             }
 
             const std::string context(entry->d_name);
-            const std::string path = std::string(kPropDir) + "/" + context;
+            const std::string path = std::string(systemproperties::kPropDir) + "/" + context;
             const auto area_perm_finding = check_area_permissions(path, context);
             const auto area = scan_area(path, context, mark_dirty_backup);
             if (!area.has_value()) {
