@@ -18,15 +18,12 @@ package com.eltavine.duckdetector.features.tee.data.verification.crl
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
 import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefsStore
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkState
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
-import java.net.URL
 import java.net.UnknownHostException
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLException
@@ -35,20 +32,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
-
-fun interface CrlNetworkStatusProvider {
-    fun isNetworkAvailable(): Boolean
-}
-
-fun interface CrlFeedFetcher {
-    @Throws(Exception::class)
-    fun fetch(): String
-}
-
-fun interface CrlEmbeddedStatusProvider {
-    @Throws(Exception::class)
-    fun load(): String
-}
 
 class CrlStatusService(
     private val consentStore: TeeNetworkPrefsStore,
@@ -403,129 +386,3 @@ class CrlStatusService(
         private const val DUCK_SOURCE_REMOTE = "REMOTE"
     }
 }
-
-internal class AndroidCrlNetworkStatusProvider(
-    private val context: Context,
-) : CrlNetworkStatusProvider {
-
-    override fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            context.getSystemService(ConnectivityManager::class.java) ?: return false
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
-}
-
-internal class HttpCrlFeedFetcher : CrlFeedFetcher {
-
-    override fun fetch(): String {
-        val connection = URL(STATUS_URL).openConnection() as HttpURLConnection
-        return try {
-            connection.requestMethod = "GET"
-            connection.connectTimeout = NETWORK_TIMEOUT_MS
-            connection.readTimeout = NETWORK_TIMEOUT_MS
-            connection.instanceFollowRedirects = true
-            connection.setRequestProperty("Accept", "application/json")
-
-            val statusCode = connection.responseCode
-            val body =
-                (if (statusCode in 200..299) connection.inputStream else connection.errorStream)
-                    ?.bufferedReader()
-                    ?.use { reader -> reader.readText() }
-                    .orEmpty()
-
-            if (statusCode !in 200..299) {
-                throw HttpStatusException(
-                    statusCode = statusCode,
-                    statusMessage = connection.responseMessage,
-                    responseSnippet = body.take(200).takeIf { it.isNotBlank() },
-                )
-            }
-
-            body
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private companion object {
-        private const val STATUS_URL = "https://android.googleapis.com/attestation/status"
-        private const val NETWORK_TIMEOUT_MS = 5_000
-    }
-}
-
-data class CrlStatusResult(
-    val networkState: TeeNetworkState,
-    val revokedCertificates: List<RevokedCertificate> = emptyList(),
-)
-
-data class RevokedCertificate(
-    val serial: String,
-    val reason: String,
-    val evidenceKind: RevokedCertificateEvidenceKind = RevokedCertificateEvidenceKind.STANDARD_REVOCATION,
-)
-
-enum class RevokedCertificateEvidenceKind {
-    STANDARD_REVOCATION,
-    LOCAL_MASS_ABUSE,
-}
-
-internal class AssetsCrlEmbeddedStatusProvider(
-    private val context: Context,
-) : CrlEmbeddedStatusProvider {
-
-    override fun load(): String {
-        val assetManager = context.assets
-        val assetName = if (assetManager.list("").orEmpty().contains(GENERATED_ASSET_FILE_NAME)) {
-            GENERATED_ASSET_FILE_NAME
-        } else {
-            FALLBACK_ASSET_FILE_NAME
-        }
-        return assetManager.open(assetName).bufferedReader(Charsets.UTF_8).use { reader ->
-            reader.readText()
-        }
-    }
-
-    private companion object {
-        private const val GENERATED_ASSET_FILE_NAME = "tee_attestation_status.generated.json"
-        private const val FALLBACK_ASSET_FILE_NAME = "tee_attestation_status.json"
-    }
-}
-
-private sealed interface CrlSnapshotResult {
-    data class Success(val entries: Map<String, CrlEntry>) : CrlSnapshotResult
-
-    data class Failure(val failure: CrlFailure) : CrlSnapshotResult
-}
-
-private data class CrlFailure(
-    val summary: String,
-    val detail: String? = null,
-) {
-    fun withPreflightDetail(preflightDetail: String?): CrlFailure {
-        if (preflightDetail.isNullOrBlank()) {
-            return this
-        }
-        return copy(
-            detail = listOf(preflightDetail, detail).filterNotNull().joinToString(separator = " ")
-        )
-    }
-}
-
-private data class CrlEntry(
-    val status: String,
-    val reason: String?,
-    val source: CrlEntrySource,
-)
-
-private enum class CrlEntrySource {
-    EMBEDDED,
-    ONLINE,
-}
-
-private class HttpStatusException(
-    val statusCode: Int,
-    val statusMessage: String?,
-    val responseSnippet: String?,
-) : IOException("HTTP $statusCode ${statusMessage.orEmpty()}".trim())

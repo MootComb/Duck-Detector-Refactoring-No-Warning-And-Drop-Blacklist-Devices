@@ -336,3 +336,29 @@ internal fun supplementaryAttestationInfoValue(artifacts: TeeScanArtifacts): Str
             "Unavailable. ${result.detail}"
     }
 }
+
+internal fun pureCertificateValue(artifacts: TeeScanArtifacts): String {
+    return if (!artifacts.pureCertificate.executed) {
+        notRunValue(artifacts.pureCertificate.probeError)
+    } else if (artifacts.pureCertificate.pureCertificateReturnsNullKey) {
+        "Null key as expected"
+    } else {
+        "Returned a key object"
+    }
+}
+
+internal fun pureCertificateTopLevelSecurityValue(artifacts: TeeScanArtifacts): String {
+    return when {
+        !artifacts.pureCertificateSecurityLevel.executed -> "Skipped"
+        artifacts.pureCertificateSecurityLevel.securityLevelPresent -> "Security level exposed"
+        else -> "No security level exposed"
+    }
+}
+
+internal fun pureCertificateMetadataSecurityValue(artifacts: TeeScanArtifacts): String {
+    return when {
+        !artifacts.pureCertificateSecurityLevel.executed -> "Skipped"
+        artifacts.pureCertificateSecurityLevel.metadataSecurityLevelPresent -> "Metadata security level exposed"
+        else -> "No metadata security level exposed"
+    }
+}
