@@ -76,10 +76,10 @@ Declare the need on the detector; both composition roots apply it without naming
 ```bash
 ./gradlew :feature:<name>:domain:test :feature:<name>:presentation:test   # the fast loop
 ./gradlew unitTest :app:assembleDebug buildHealth                       # before a pull request
-python3 .github/scripts/check-detector-touch-points.py
+for s in .github/scripts/check-*.py; do python3 "$s"; done              # every repository guard
 ```
 
-Also run `check-evidence-records.py` and `check-text-protocols.py`. With a native unit, run `check-jni-contracts.py` and `check-native-boundaries.py` as well. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
+The guards take seconds and cover the touch points, the evidence record, JNI contracts, native boundaries, reflection, text protocols and file length. When `buildHealth` fails, its report names the exact dependency to add, remove or change between `api` and `implementation`.
 
 JVM tests prove the rules, not the probe. Validate the probe on clean, modified and unsupported devices, as AGENTS.md §23 requires.
 

@@ -66,7 +66,7 @@ Results are diagnostic evidence, not a verdict on the device. Read the status as
 
 ## Process hooks
 
-Some evidence can only be captured at points of the process lifecycle that belong to the host. Without these hooks, every detector still runs, and the evidence that needs them is reported as unavailable or failed, never as clean.
+Some evidence can only be captured at particular points of the process lifecycle. The AAR's manifest wires the app zygote preload itself; the launch capture and the mount-view sampler need a step from the host. Without these hooks, every detector still runs, and the evidence that needs them is reported as unavailable or failed, never as clean.
 
 ### App zygote preload
 
