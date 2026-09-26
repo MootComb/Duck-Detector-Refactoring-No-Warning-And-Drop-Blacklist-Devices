@@ -20,7 +20,7 @@ inside one capability unit:  data -> domain
 :core:ui -> :core:evidence + :core:report + :core:scan
 ```
 
-Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, pure JVM modules depend neither on Android modules nor on Android artifacts, and only UI modules may use Compose. [`module-boundaries.json`](../../.github/policies/module-boundaries.json) states each layer's rule once as a template and lists only the core modules and `:app` individually. Settings include every module by discovering its directory, so a new unit needs no central entry ([ADR 0001](../adr/0001-gradle-module-boundaries.md), [ADR 0007](../adr/0007-derived-module-classification.md)).
+Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, pure JVM modules depend neither on Android modules nor on Android artifacts, and only UI modules may use Compose. [`module-boundaries.json`](../../.github/policies/module-boundaries.json) states each layer's rule once as a template and lists only the core modules and `:app` individually. Settings include every module by discovering its directory, so a new unit needs no central entry.
 
 | Module | Responsibility | Forbidden knowledge |
 |---|---|---|
@@ -55,7 +55,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `selinuxpolicy` | SELinux context validity carriers, proc attr and policyload seqno probes, dirty policy preload queries | lsposed, selinux |
 | `systemproperties` | Multi-source system property reads and native property snapshots | bootloader, systemproperties |
 
-A capability collects; each consumer interprets. A capability exists only because at least two features consume the same evidence ([ADR 0004](../adr/0004-shared-evidence-capabilities.md)).
+A capability collects; each consumer interprets. A capability exists only because at least two features consume the same evidence.
 
 ## Enforcement
 
@@ -66,9 +66,9 @@ A capability collects; each consumer interprets. A capability exists only becaus
 | `check-detector-touch-points.py` with `detector-touch-points.json` | Outside `feature/<name>/`, a detector is named only by `DetectorCatalog`, which must name every detector, by tooling indexes, and by reviewed exceptions that state a reason | `test-detector-touch-points.py` |
 | `check-jni-contracts.py` | Every Kotlin `external` declaration has exactly one C++ definition with C linkage and `JNIEXPORT`, and vice versa | `test-jni-contracts.py` |
 | `check-source-file-length.py` | No source file reaches 600 lines | `test-source-file-length.py` |
-| `check-text-protocols.py` with `text-protocols.json` | Presentation, ui, core, SDK, app and native code decide from typed values, never by comparing, searching or stripping text another layer or unit wrote; reviewed files that read text by nature state a reason ([ADR 0014](../adr/0014-no-text-protocols-across-layers.md)) | `test-text-protocols.py`; `scripts/test_new_detector.py` runs it on a scaffolded detector |
+| `check-text-protocols.py` with `text-protocols.json` | Presentation, ui, core, SDK, app and native code decide from typed values, never by comparing, searching or stripping text another layer or unit wrote; reviewed files that read text by nature state a reason | `test-text-protocols.py`; `scripts/test_new_detector.py` runs it on a scaffolded detector |
 | `check-evidence-records.py` | Every detector and capability keeps an `EVIDENCE.md` whose signal entries fill every AGENTS.md §12 field, cite a primary source or declare `Discovery only:`, and are not drafts | `test-evidence-records.py`; `scripts/test_new_detector.py` checks the scaffold writes a draft CI rejects |
-| `./gradlew buildHealth` (`DuckDetectorDependencyAnalysisPlugin`) | Every module declares exactly the modules and libraries its code uses: nothing unused, nothing reached only transitively, and `api` only for types in its public API. The plugin records its two reviewed exceptions ([ADR 0010](../adr/0010-exact-dependency-declarations.md)) | Upstream Dependency Analysis Gradle Plugin |
+| `./gradlew buildHealth` (`DuckDetectorDependencyAnalysisPlugin`) | Every module declares exactly the modules and libraries its code uses: nothing unused, nothing reached only transitively, and `api` only for types in its public API. The plugin records its two reviewed exceptions | Upstream Dependency Analysis Gradle Plugin |
 | `:sdk:aar:verifySdkAar` | The SDK AAR fuses every project module it needs and reaches no UI library, directly or through an external dependency | Runs on the Fused Library report |
 | `checkPublicApi` (`DuckDetectorPublicApiPlugin`) | The public API of the SDK contract modules, `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence`, matches the dump committed in each module's `api/`; `updatePublicApi` records an intended change | `PublicApiListingTest` |
 | `scripts/new_detector.py` | A generated detector builds and passes every guard, and changes nothing outside `feature/<name>/` except its registrations | `scripts/test_new_detector.py`; CI also scaffolds a native detector and builds it |
@@ -78,13 +78,13 @@ The CI `contracts` job runs the Python checkers and their self-tests. The `verif
 
 ## Composition invariants
 
-`DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` orders the dashboard cards by the catalog. The cards come from `detectorCards`, which `GenerateDetectorCardsTask` writes from the `detectorFeature` every `feature/<name>/ui` module exports, so listing the cards names no detector. A unit test fails when a detector has no card or a card has no detector ([ADR 0011](../adr/0011-generated-dashboard-cards.md)). The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text ([ADR 0002](../adr/0002-typed-detector-and-report-contracts.md), [ADR 0008](../adr/0008-headless-detectors-and-sdk.md)).
+`DetectorCatalog` in `:sdk:runtime` is the one list of detectors and fixes the order their scans start. `DetectorFeatures` in `:app` orders the dashboard cards by the catalog. The cards come from `detectorCards`, which `GenerateDetectorCardsTask` writes from the `detectorFeature` every `feature/<name>/ui` module exports, so listing the cards names no detector. A unit test fails when a detector has no card or a card has no detector. The shell starts one session per card in that order, and the scan coordinator, dashboard and export list the sessions by detector id. Dashboard, export and notification code receive `DetectorSession` lists and typed models. They never enumerate detectors, reflect over detector types, or match presentation text.
 
-Consents follow the same path ([ADR 0013](../adr/0013-detector-consents.md)). A detector lists the user decisions it needs in `Detector.consents`, and its ui module describes each one in `DetectorFeature.consentCards`. The startup policy screen shows one card per consent, and settings shows one switch per consent. A change calls `decide` and rescans the session of the detector that owns the consent, so neither screen names a detector.
+Consents follow the same path. A detector lists the user decisions it needs in `Detector.consents`, and its ui module describes each one in `DetectorFeature.consentCards`. The startup policy screen shows one card per consent, and settings shows one switch per consent. A change calls `decide` and rescans the session of the detector that owns the consent, so neither screen names a detector.
 
-Process hooks need no entry either. A detector with app zygote work overrides `Detector.appZygotePreload`, which `DuckDetectorZygotePreload` runs in catalog order ([ADR 0012](../adr/0012-detector-app-zygote-preload.md)). The SDK's manifest names that preload, and each module's manifest declares the services and intent filters its probes need, so neither the app nor an SDK host declares anything for a detector ([ADR 0015](../adr/0015-sdk-manifest-process-hooks.md)).
+Process hooks need no entry either. A detector with app zygote work overrides `Detector.appZygotePreload`, which `DuckDetectorZygotePreload` runs in catalog order. The SDK's manifest names that preload, and each module's manifest declares the services and intent filters its probes need, so neither the app nor an SDK host declares anything for a detector.
 
-Scan lifecycle is owned explicitly ([ADR 0003](../adr/0003-scan-lifecycle-ownership.md)):
+Scan lifecycle is owned explicitly:
 
 ```text
 rescan request -> publish loading state -> wait for the previous scan of the same detector
@@ -95,7 +95,7 @@ rescan request -> publish loading state -> wait for the previous scan of the sam
 
 ## Native units
 
-Native code is split into units ([ADR 0005](../adr/0005-native-unit-boundaries.md)). Each unit lives in the module that owns it, as `<module>/src/main/cpp/<unit>/`, with a `CMakeLists.txt` listing its sources, so a detector's C++ sits next to its Kotlin JNI bridge ([ADR 0009](../adr/0009-native-units-in-their-modules.md)). The `DUCKDETECTOR_NATIVE_UNITS` registry in `sdk/runtime/src/main/cpp/CMakeLists.txt` names every unit with its owner, in link order, and links each `duckdetector_<unit>` object library into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
+Native code is split into units. Each unit lives in the module that owns it, as `<module>/src/main/cpp/<unit>/`, with a `CMakeLists.txt` listing its sources, so a detector's C++ sits next to its Kotlin JNI bridge. The `DUCKDETECTOR_NATIVE_UNITS` registry in `sdk/runtime/src/main/cpp/CMakeLists.txt` names every unit with its owner, in link order, and links each `duckdetector_<unit>` object library into `libduckdetector.so`. `mount/zygotenext` is the exception: it builds the standalone `libmain.so` that `zygote_next` loads without ART.
 
 | Unit | Owner | May include |
 |---|---|---|
@@ -114,9 +114,9 @@ Native code is split into units ([ADR 0005](../adr/0005-native-unit-boundaries.m
 2. Put judgement rules in the feature's domain layer and keep them pure JVM; the data layer collects and the presentation layer projects.
 3. Share evidence acquisition only through a capability used by at least two features. The capability must not interpret the evidence for any of them.
 4. Never add a dependency between two feature units or two capability units. If they need the same evidence, extract a capability; if they need the same contract, it belongs in `:core`.
-5. Decide from typed values. A layer or native unit never compares, searches or strips text another one wrote; carry an enum, id or flag from where the evidence is produced ([ADR 0014](../adr/0014-no-text-protocols-across-layers.md)). Export and dashboard output change only through a feature's own `DetectorReport` projection. Update the golden fixtures deliberately, never to silence a diff. A new detector does not have to join them; regenerating them records every catalogued detector.
+5. Decide from typed values. A layer or native unit never compares, searches or strips text another one wrote; carry an enum, id or flag from where the evidence is produced. A data layer may read the platform's text, such as an error message, and turns it into types there. Export and dashboard output change only through a feature's own `DetectorReport` projection. Update the golden fixtures deliberately, never to silence a diff. A new detector does not have to join them; regenerating them records every catalogued detector.
 6. Add native code as `src/main/cpp/<unit>/` in the module that owns it, with a `CMakeLists.txt` that declares its `duckdetector_native_unit` target, one line in the `DUCKDETECTOR_NATIVE_UNITS` registry and a `native-boundaries.json` entry. Cross-unit includes need a header-level exception with a reason.
 7. Keep JNI bridges inside the module that owns the native unit. Kotlin `external` functions must be public or private members of a class or object other than a companion object, and must not be overloaded.
 8. Keep `:app` a composition root. It may wire adapters and platform entry points but must not acquire detection rules or per-detector branching. Manifest entries a probe needs belong in the manifest of the module that owns the probe.
-9. Split any file that approaches 600 lines along semantic ownership ([ADR 0006](../adr/0006-source-file-length-limit.md)); there is no baseline to hide in.
-10. Record every deliberate boundary exception in [follow-ups](./follow-ups.md) or an ADR, together with the reason it is still needed.
+9. Split any file that approaches 600 lines along semantic ownership; there is no baseline to hide in.
+10. Record every deliberate boundary exception in [follow-ups](./follow-ups.md), together with the reason it is still needed.

@@ -59,7 +59,7 @@ The generated detector builds and passes every guard. Until its probe observes t
 
 State what was observed and what it implies, never that a device is secure or compromised (AGENTS.md §19). Build user-facing text in the mapper from typed values. Do not assemble text in the data layer, and never derive wording from class names.
 
-Decide from typed values too. When the card or the export has to choose a row, an icon or a status, carry an enum, id or flag from where the evidence is produced, and let enums own their labels. Never compare, search or strip the words another layer wrote; `check-text-protocols.py` rejects it ([ADR 0014](../adr/0014-no-text-protocols-across-layers.md)).
+Decide from typed values too. When the card or the export has to choose a row, an icon or a status, carry an enum, id or flag from where the evidence is produced, and let enums own their labels. Never compare, search or strip the words another layer wrote; `check-text-protocols.py` rejects it.
 
 ### When the detector needs the process or the user
 
@@ -67,9 +67,9 @@ Declare the need on the detector; both composition roots apply it without naming
 
 | Need | Declare it in | Applied by |
 |---|---|---|
-| Work in the app zygote, before any isolated process forks | `appZygotePreload` on the `Detector` ([ADR 0012](../adr/0012-detector-app-zygote-preload.md)) | `DuckDetectorZygotePreload`, which the SDK's manifest names |
-| A decision only the user can make | `consents` on the `Detector`, with the prompt and setting in the ui module's `consentCards` ([ADR 0013](../adr/0013-detector-consents.md)) | The app's startup policy screen and settings; an SDK host reads and records them itself |
-| A service, an intent filter or a package query | The data module's `AndroidManifest.xml`, on the component that uses it ([ADR 0015](../adr/0015-sdk-manifest-process-hooks.md)) | The manifest merger, for the app and every SDK host |
+| Work in the app zygote, before any isolated process forks | `appZygotePreload` on the `Detector` | `DuckDetectorZygotePreload`, which the SDK's manifest names |
+| A decision only the user can make | `consents` on the `Detector`, with the prompt and setting in the ui module's `consentCards` | The app's startup policy screen and settings; an SDK host reads and records them itself |
+| A service, an intent filter or a package query | The data module's `AndroidManifest.xml`, on the component that uses it | The manifest merger, for the app and every SDK host |
 
 ## 4. Verify
 
@@ -103,7 +103,7 @@ The change stays inside `feature/<name>/`, and a changed signal changes its entr
 
 ## Sharing evidence
 
-When a second detector needs the same evidence, move its collection into a capability, `capability/<unit>/{domain,data}`. The capability collects, and each detector interprets ([ADR 0004](../adr/0004-shared-evidence-capabilities.md)). A feature never depends on another feature.
+When a second detector needs the same evidence, move its collection into a capability, `capability/<unit>/{domain,data}`. The capability collects, and each detector interprets ([architecture overview](../architecture/README.md#capabilities-and-their-consumers)). A feature never depends on another feature.
 
 ## Removing a detector
 

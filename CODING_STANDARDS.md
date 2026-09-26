@@ -167,7 +167,7 @@
 - 修改 verdict 影响规则
 - 修改证据层级定义
 - 修改 release / CI / Telegram 推送行为
-- 修改模块边界、capability 或 native unit：同步更新 `docs/architecture/README.md`，新的架构决策写成 `docs/adr/` 下的 ADR
+- 修改模块边界、capability 或 native unit：同步更新 `docs/architecture/README.md`；有意保留的边界例外和尚未解决的问题记入 `docs/architecture/follow-ups.md`，并写明原因
 
 涉及 TEE、native root、virtualization 这类检测口径变化时，应同步更新对应根目录文档或 README。
 

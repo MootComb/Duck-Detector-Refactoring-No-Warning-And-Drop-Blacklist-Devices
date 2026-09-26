@@ -91,7 +91,7 @@ Duck-Detector-Refactoring/
 ├─ feature/               # One detector or supporting feature per directory, split into layers
 ├─ samples/sdk-consumer/  # A separate application built from the published AAR alone
 ├─ build-logic/           # Convention plugins, module boundary and dependency validation, generated assets
-├─ docs/                  # Architecture overview, guides, ADRs, and follow-ups
+├─ docs/                  # Architecture overview, guides, and follow-ups
 ├─ .github/policies/      # Module, native, detector touch point, and reflection policies
 ├─ gradle/                # Version catalog and Gradle wrapper files
 ├─ scripts/               # Detector scaffold and repository maintenance scripts
@@ -107,7 +107,7 @@ Each detector is a set of Gradle modules under `feature/<name>/`:
 - `detector`: the one headless `<Name>Detector` object that binds the other layers for the SDK and the app
 - `ui`: the Compose card and the detector's integration with the dashboard
 
-Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md) and the [architecture decision records](./docs/adr/).
+Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md).
 
 A new detector touches only its own directory and its one line in `DetectorCatalog`; the app generates its dashboard cards from the ui modules. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
 

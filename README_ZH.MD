@@ -91,7 +91,7 @@ Duck-Detector-Refactoring/
 ├─ feature/               # 每个目录一个检测器或辅助功能，按层拆分
 ├─ samples/sdk-consumer/  # 只依赖已发布 AAR 构建的独立示例应用
 ├─ build-logic/           # 约定插件、模块边界与依赖校验、生成资源任务
-├─ docs/                  # 架构概览、指南、ADR 与后续事项
+├─ docs/                  # 架构概览、指南与后续事项
 ├─ .github/policies/      # 模块、原生、检测器接触点与反射策略
 ├─ gradle/                # 版本目录与 Gradle Wrapper 文件
 ├─ scripts/               # 检测器脚手架与仓库维护脚本
@@ -107,7 +107,7 @@ Duck-Detector-Refactoring/
 - `detector`：唯一的 headless `<Name>Detector` 对象，把其余各层绑定给 SDK 与应用
 - `ui`：Compose 卡片，以及检测器接入仪表盘的入口
 
-依赖方向为 `:app` 指向 SDK，二者指向 feature，feature 指向 capability，capability 指向 core；feature 之间互不依赖，每个模块只声明自己实际使用的依赖。构建与 CI 会校验这些规则，详见[架构概览](./docs/architecture/README.md)与[架构决策记录](./docs/adr/)。
+依赖方向为 `:app` 指向 SDK，二者指向 feature，feature 指向 capability，capability 指向 core；feature 之间互不依赖，每个模块只声明自己实际使用的依赖。构建与 CI 会校验这些规则，详见[架构概览](./docs/architecture/README.md)。
 
 原生源码按单元组织：每个单元位于其所属模块的 `src/main/cpp/<unit>/`，编译为独立的 object library 并链接进 `libduckdetector.so`；Kotlin 代码通过同一模块中的 JNI 桥接读取原生结果。
 
