@@ -31,7 +31,7 @@
       "reason": "Lays out the text it renders: it skips a detail equal to its headline and puts a short single-line detail beside its value. The choices change layout, not meaning."
     },
     {
-      "path": "feature/settings/ui/src/main/kotlin/com/eltavine/duckdetector/features/settings/ui/components/AuthorCard.kt",
+      "path": "feature/settings/ui/src/main/kotlin/com/eltavine/duckdetector/features/settings/ui/components/ContributorSnapshots.kt",
       "reason": "Maps the summary and contribution keys of the bundled contributors asset to string resources and roles; the keys are identifiers the asset defines."
     }
   ]
