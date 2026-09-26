@@ -54,7 +54,7 @@ val result: DetectorResult = su.run(context)
 
 `DuckDetector.detectors` lists every detector in the order `scan` starts them. A `DetectorResult` carries the detector's `id`, its `status` and the structured `report` that the app exports for the same evidence. Each detector moves its own collection off the calling dispatcher.
 
-The contract you compile against is recorded: the public API of `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence` is committed under each module's `api/` directory. CI fails when it changes without the dump being updated, so any change to it is a reviewed diff. Each detector's own typed object, such as `SuDetector` with its report and card model, belongs to that detector and is not part of this contract. It is marked `@DetectorSpecificApi`, so using it needs `@OptIn(DetectorSpecificApi::class)`, as the sample does, and an acknowledgement that it may change in any release.
+[Compatibility](#compatibility) describes which of these types stay stable across releases.
 
 Results are diagnostic evidence, not a verdict on the device. Read the status as follows:
 
@@ -64,6 +64,16 @@ Results are diagnostic evidence, not a verdict on the device. Read the status as
 | `ALL_CLEAR` | The probes observed the device and found none of the evidence they look for. This does not prove the device is unmodified |
 | `INFO` with `InfoKind.SUPPORT` | A probe was unsupported or unavailable here, so the absence of findings says nothing |
 | `INFO` with `InfoKind.ERROR` | The scan failed; the report says why |
+
+## Compatibility
+
+The SDK follows Kotlin's [backward compatibility guidelines for library authors](https://kotlinlang.org/docs/api-guidelines-backward-compatibility.html), and splits its API into two parts with different guarantees.
+
+The stable contract is the public API of `:sdk:runtime`, `:core:detector`, `:core:report` and `:core:evidence`. Kotlin's ABI tools record it in a dump committed under each module's `api/` directory, and CI fails when the API changes without the dump, so every change to the contract is a reviewed diff. Its value types, such as `DetectorResult`, `DetectorReport` and `PackageVisibility`, are `@ContractValue` classes rather than data classes. They compare, hash and print like data classes but have no `copy` or `componentN`, so a new property does not break a host compiled against an earlier release. Construct them with their constructors and read their properties by name.
+
+The opt-in API is each detector's own typed object, such as `SuDetector` with its report and card model. It belongs to that detector and is not part of the stable contract. It is marked `@DetectorSpecificApi`, an error-level opt-in, so using it needs `@OptIn(DetectorSpecificApi::class)`, as the sample does, and an acknowledgement that it may change in any release.
+
+Nothing in the stable contract is removed or changed incompatibly in one step. The old declaration is first marked `@Deprecated` with a message that names its replacement and, where one exists, a `ReplaceWith`. In later releases the deprecation level moves from `WARNING` to `ERROR` to `HIDDEN`, and only then is the declaration removed. Adding declarations is compatible and needs no cycle.
 
 ## Process hooks
 
