@@ -25,7 +25,26 @@ data class TeeEvidenceItem(
     val hiddenCopyText: String? = null,
     /** Set on the items that report a grant probe. */
     val grant: TeeGrantEvidence? = null,
+    /** What the item is about, for the items the card gives an icon of their own. */
+    val topic: TeeEvidenceTopic? = null,
 )
+
+/** The subjects of the evidence items the card gives an icon of their own. */
+enum class TeeEvidenceTopic {
+    TRUST_ROOT,
+    RKP,
+    CRL,
+    VERIFIED_BOOT,
+    BOOT_CONSISTENCY,
+    DEVICE_IDS,
+    USER_AUTH,
+    APPLICATION,
+    INDICATORS,
+    TIMING,
+    STRONGBOX,
+    NATIVE,
+    SOTER,
+}
 
 /** The grant probes whose failures the dashboard names. */
 enum class TeeGrantProbe {
@@ -44,7 +63,16 @@ data class TeeGrantEvidence(
     val namesMissingKey: Boolean,
 )
 
+/** The sections of TEE evidence, in the order the card shows them; [title] heads each one. */
+enum class TeeEvidenceSectionKind(val title: String) {
+    TRUST("Trust"),
+    ATTESTATION("Attestation"),
+    CHECKS("Checks"),
+}
+
 data class TeeEvidenceSection(
-    val title: String,
+    val kind: TeeEvidenceSectionKind,
     val items: List<TeeEvidenceItem>,
-)
+) {
+    val title: String get() = kind.title
+}

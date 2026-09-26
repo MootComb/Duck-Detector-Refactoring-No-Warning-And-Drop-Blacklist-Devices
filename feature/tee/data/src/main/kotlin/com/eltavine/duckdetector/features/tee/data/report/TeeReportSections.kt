@@ -18,6 +18,8 @@ package com.eltavine.duckdetector.features.tee.data.report
 
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSectionKind
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceTopic
 import com.eltavine.duckdetector.features.tee.domain.TeePatchState
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 
@@ -30,7 +32,7 @@ internal fun buildSections(
 ): List<TeeEvidenceSection> {
     return listOf(
         TeeEvidenceSection(
-            title = "Trust",
+            kind = TeeEvidenceSectionKind.TRUST,
             items = buildList {
                 add(
                     fact(
@@ -43,7 +45,8 @@ internal fun buildSections(
                     fact(
                         "Trust root",
                         trustRootLabel(artifacts.trust.trustRoot),
-                        trustLevel(artifacts)
+                        trustLevel(artifacts),
+                        topic = TeeEvidenceTopic.TRUST_ROOT,
                     )
                 )
                 add(
@@ -53,8 +56,8 @@ internal fun buildSections(
                         chainLayoutLevel(artifacts)
                     )
                 )
-                add(fact("RKP", rkpValue(artifacts), rkpDisplayLevel(artifacts)))
-                add(fact("CRL", crlValue(artifacts), crlSignalLevel(artifacts)))
+                add(fact("RKP", rkpValue(artifacts), rkpDisplayLevel(artifacts), topic = TeeEvidenceTopic.RKP))
+                add(fact("CRL", crlValue(artifacts), crlSignalLevel(artifacts), topic = TeeEvidenceTopic.CRL))
                 add(
                     fact(
                         "Root fingerprint",
@@ -65,7 +68,7 @@ internal fun buildSections(
             },
         ),
         TeeEvidenceSection(
-            title = "Attestation",
+            kind = TeeEvidenceSectionKind.ATTESTATION,
             items = buildList {
                 add(
                     fact(
@@ -86,21 +89,24 @@ internal fun buildSections(
                     fact(
                         "Verified boot",
                         verifiedBootValue(artifacts.snapshot),
-                        verifiedBootLevel(artifacts.snapshot)
+                        verifiedBootLevel(artifacts.snapshot),
+                        topic = TeeEvidenceTopic.VERIFIED_BOOT,
                     )
                 )
                 add(
                     fact(
                         "Boot consistency",
                         bootConsistencyValue(artifacts),
-                        bootSignalLevel(artifacts)
+                        bootSignalLevel(artifacts),
+                        topic = TeeEvidenceTopic.BOOT_CONSISTENCY,
                     )
                 )
                 add(
                     fact(
                         "Device IDs",
                         deviceInfoValue(artifacts.snapshot),
-                        deviceInfoLevel(artifacts.snapshot)
+                        deviceInfoLevel(artifacts.snapshot),
+                        topic = TeeEvidenceTopic.DEVICE_IDS,
                     )
                 )
                 add(
@@ -110,18 +116,19 @@ internal fun buildSections(
                         TeeSignalLevel.INFO
                     )
                 )
-                add(fact("User auth", authStateValue(artifacts.snapshot), TeeSignalLevel.INFO))
+                add(fact("User auth", authStateValue(artifacts.snapshot), TeeSignalLevel.INFO, topic = TeeEvidenceTopic.USER_AUTH))
                 add(
                     fact(
                         "Application",
                         applicationInfoValue(artifacts.snapshot),
-                        TeeSignalLevel.INFO
+                        TeeSignalLevel.INFO,
+                        topic = TeeEvidenceTopic.APPLICATION,
                     )
                 )
             },
         ),
         TeeEvidenceSection(
-            title = "Checks",
+            kind = TeeEvidenceSectionKind.CHECKS,
             items = buildList {
                 add(
                     fact(
@@ -136,6 +143,7 @@ internal fun buildSections(
                             policySoftIndicators = policySoftIndicators,
                             supplementaryIndicators = supplementaryIndicators,
                         ),
+                        topic = TeeEvidenceTopic.INDICATORS,
                     )
                 )
                 add(
@@ -165,7 +173,8 @@ internal fun buildSections(
                     fact(
                         "Timing",
                         timingValue(artifacts),
-                        if (artifacts.timing.suspicious) TeeSignalLevel.WARN else TeeSignalLevel.INFO
+                        if (artifacts.timing.suspicious) TeeSignalLevel.WARN else TeeSignalLevel.INFO,
+                        topic = TeeEvidenceTopic.TIMING,
                     )
                 )
                 add(
@@ -405,9 +414,9 @@ internal fun buildSections(
                         if (artifacts.idAttestation.mismatches.isNotEmpty()) TeeSignalLevel.WARN else TeeSignalLevel.INFO
                     )
                 )
-                add(fact("StrongBox", strongBoxValue(artifacts), strongBoxLevel(artifacts)))
-                add(fact("Native", nativeValue(artifacts), nativeSignalLevel(artifacts)))
-                add(fact("Soter", artifacts.soter.summary, soterLevel(artifacts)))
+                add(fact("StrongBox", strongBoxValue(artifacts), strongBoxLevel(artifacts), topic = TeeEvidenceTopic.STRONGBOX))
+                add(fact("Native", nativeValue(artifacts), nativeSignalLevel(artifacts), topic = TeeEvidenceTopic.NATIVE))
+                add(fact("Soter", artifacts.soter.summary, soterLevel(artifacts), topic = TeeEvidenceTopic.SOTER))
             },
         ),
     )

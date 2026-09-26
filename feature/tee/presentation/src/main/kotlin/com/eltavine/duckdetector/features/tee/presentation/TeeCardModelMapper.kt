@@ -19,6 +19,8 @@ package com.eltavine.duckdetector.features.tee.presentation
 import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSectionKind
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceTopic
 import com.eltavine.duckdetector.features.tee.domain.TeeGrantProbe
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
@@ -66,7 +68,7 @@ class TeeCardModelMapper {
                     title = section.title,
                     rows = section.items.map { item ->
                         TeeFactRowModel(
-                            icon = iconFor(section.title, item.title),
+                            icon = iconFor(section.kind, item.topic),
                             label = item.title,
                             value = item.body,
                             status = item.level.toDetectorStatus(),
@@ -191,39 +193,34 @@ class TeeCardModelMapper {
     }
 
     private fun iconFor(
-        sectionTitle: String,
-        itemTitle: String,
+        section: TeeEvidenceSectionKind,
+        topic: TeeEvidenceTopic?,
     ): TeeFactIcon {
-        return when (sectionTitle) {
-            "Trust" -> when (itemTitle) {
-                "Trust root" -> TeeFactIcon.TRUST
-                "RKP" -> TeeFactIcon.RKP
-                "CRL" -> TeeFactIcon.NETWORK
-                "Root fingerprint" -> TeeFactIcon.CERTIFICATE
+        return when (section) {
+            TeeEvidenceSectionKind.TRUST -> when (topic) {
+                TeeEvidenceTopic.TRUST_ROOT -> TeeFactIcon.TRUST
+                TeeEvidenceTopic.RKP -> TeeFactIcon.RKP
+                TeeEvidenceTopic.CRL -> TeeFactIcon.NETWORK
                 else -> TeeFactIcon.CERTIFICATE
             }
 
-            "Attestation" -> when (itemTitle) {
-                "Verified boot" -> TeeFactIcon.BOOT
-                "Boot consistency" -> TeeFactIcon.BOOT
-                "Patch levels" -> TeeFactIcon.PATCH
-                "Device IDs" -> TeeFactIcon.DEVICE
-                "Key properties" -> TeeFactIcon.KEY
-                "User auth" -> TeeFactIcon.AUTH
-                "Application" -> TeeFactIcon.APP
+            TeeEvidenceSectionKind.ATTESTATION -> when (topic) {
+                TeeEvidenceTopic.VERIFIED_BOOT,
+                TeeEvidenceTopic.BOOT_CONSISTENCY -> TeeFactIcon.BOOT
+                TeeEvidenceTopic.DEVICE_IDS -> TeeFactIcon.DEVICE
+                TeeEvidenceTopic.USER_AUTH -> TeeFactIcon.AUTH
+                TeeEvidenceTopic.APPLICATION -> TeeFactIcon.APP
                 else -> TeeFactIcon.KEY
             }
 
-            "Checks" -> when (itemTitle) {
-                "Timing" -> TeeFactIcon.TIMING
-                "StrongBox" -> TeeFactIcon.STRONGBOX
-                "Native" -> TeeFactIcon.NATIVE
-                "Soter" -> TeeFactIcon.SOTER
-                "Indicators" -> TeeFactIcon.WARNING
+            TeeEvidenceSectionKind.CHECKS -> when (topic) {
+                TeeEvidenceTopic.TIMING -> TeeFactIcon.TIMING
+                TeeEvidenceTopic.STRONGBOX -> TeeFactIcon.STRONGBOX
+                TeeEvidenceTopic.NATIVE -> TeeFactIcon.NATIVE
+                TeeEvidenceTopic.SOTER -> TeeFactIcon.SOTER
+                TeeEvidenceTopic.INDICATORS -> TeeFactIcon.WARNING
                 else -> TeeFactIcon.KEYSTORE
             }
-
-            else -> TeeFactIcon.WARNING
         }
     }
 

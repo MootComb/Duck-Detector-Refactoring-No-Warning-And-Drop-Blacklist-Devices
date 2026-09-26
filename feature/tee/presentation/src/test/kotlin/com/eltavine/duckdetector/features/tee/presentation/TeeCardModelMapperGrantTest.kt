@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSectionKind
 import com.eltavine.duckdetector.features.tee.domain.TeeGrantEvidence
 import com.eltavine.duckdetector.features.tee.domain.TeeGrantProbe
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
@@ -61,7 +62,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant isolated-domain",
@@ -106,7 +107,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant isolated-domain",
@@ -147,7 +148,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant caller binding",
@@ -196,7 +197,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant isolated-domain",
@@ -254,7 +255,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant self-domain",
@@ -304,7 +305,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Grant self-domain",
@@ -348,7 +349,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Update persistence",
@@ -391,7 +392,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Soter",
@@ -439,7 +440,7 @@ class TeeCardModelMapperGrantTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Trust",
+                        kind = TeeEvidenceSectionKind.TRUST,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Chain layout",
@@ -449,7 +450,7 @@ class TeeCardModelMapperGrantTest {
                         ),
                     ),
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Update persistence",

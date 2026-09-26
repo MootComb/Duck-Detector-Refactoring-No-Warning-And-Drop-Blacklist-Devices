@@ -22,6 +22,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSectionKind
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkMode
 import com.eltavine.duckdetector.features.tee.domain.TeeNetworkState
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
@@ -61,7 +62,7 @@ class TeeCardModelMapperHeaderTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem("Keystore2", "Java-style reply", TeeSignalLevel.FAIL),
                         ),
@@ -194,7 +195,7 @@ class TeeCardModelMapperHeaderTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Keystore2",

@@ -79,7 +79,7 @@ data class TeeReport(
             signals = emptyList(),
             sections = listOf(
                 TeeEvidenceSection(
-                    title = "Checks",
+                    kind = TeeEvidenceSectionKind.CHECKS,
                     items = listOf(
                         TeeEvidenceItem(
                             title = "Collection failure",

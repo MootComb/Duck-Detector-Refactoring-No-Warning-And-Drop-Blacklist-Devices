@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.features.tee.data.report
 
 import android.os.Build
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceTopic
 import com.eltavine.duckdetector.features.tee.domain.TeeGrantEvidence
 import com.eltavine.duckdetector.features.tee.domain.TeePatchGrade
 import com.eltavine.duckdetector.features.tee.domain.TeePatchState
@@ -161,10 +162,12 @@ internal fun fact(
     level: TeeSignalLevel,
     hiddenCopyText: String? = null,
     grant: TeeGrantEvidence? = null,
+    topic: TeeEvidenceTopic? = null,
 ): TeeEvidenceItem = TeeEvidenceItem(
     title = title,
     body = body,
     level = level,
     hiddenCopyText = hiddenCopyText,
     grant = grant,
+    topic = topic,
 )

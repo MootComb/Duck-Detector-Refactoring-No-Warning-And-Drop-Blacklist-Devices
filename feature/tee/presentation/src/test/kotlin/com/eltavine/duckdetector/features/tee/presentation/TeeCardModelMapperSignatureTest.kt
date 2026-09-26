@@ -21,6 +21,7 @@ import com.eltavine.duckdetector.capability.attestation.domain.TeeTrustRoot
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSection
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceSectionKind
 import com.eltavine.duckdetector.features.tee.domain.TeeReport
 import com.eltavine.duckdetector.features.tee.domain.TeeScanStage
 import com.eltavine.duckdetector.features.tee.domain.TeeSignal
@@ -58,7 +59,7 @@ class TeeCardModelMapperSignatureTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Timing side-channel",
@@ -101,7 +102,7 @@ class TeeCardModelMapperSignatureTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "Timing side-channel",
@@ -144,7 +145,7 @@ class TeeCardModelMapperSignatureTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "TEE Simulator generate-mode fingerprint",
@@ -192,7 +193,7 @@ class TeeCardModelMapperSignatureTest {
                 ),
                 sections = listOf(
                     TeeEvidenceSection(
-                        title = "Checks",
+                        kind = TeeEvidenceSectionKind.CHECKS,
                         items = listOf(
                             TeeEvidenceItem(
                                 "ImportKey narrative",
