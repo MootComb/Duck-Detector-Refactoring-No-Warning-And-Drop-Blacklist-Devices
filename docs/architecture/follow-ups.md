@@ -12,6 +12,10 @@ One presentation layer goes further and reads meaning back out of report text. `
 
 The SELinux card's policy and audit notes are typed, but each kind keeps the status the old keyword search gave its text, including three that look wrong. "No permissive domains detected" is a warning, because its text contains "permissive". "Security classes look complete" is informational, because its text contains none of the searched words. And the note for audit probes that exposed tampering is informational for the same reason, although its state is the strongest audit finding. Correcting them changes what the card shows, so each needs a deliberate decision.
 
+## SELinux context validity merges two failures
+
+The context validity oracle is untrusted either because its controls failed or because its repeated writes disagreed, and the repository reports both as one self-test failure. The card has separate verdicts for the two ("untrusted" and "unstable context oracle"), but its reading sets `repeatabilityFailed` for every self-test failure, as the old text match on "repeatability failed" did. The probe result keeps `oracleControlsPassed` and `ksuResultsStable`, so the reading could tell the causes apart. Doing so changes the card's and the export's verdict for devices whose controls fail, so it needs a deliberate change.
+
 ## Early virtualization preload matches finding labels
 
 `preload/virtualization_early_detector.cpp` derives its early flags by comparing the finding labels and groups produced by `virtualization::collect_snapshot`, such as `"ro.kernel.qemu"`, `"Emulator device node"` and `"TRANSLATION"`. This is the reason for the one include exception in `native-boundaries.json`. The include itself is legitimate, because both captures must come from one probe implementation, but the label matching is a text protocol between two native units. Give `virtualization::SnapshotFinding` a typed kind and match on it.

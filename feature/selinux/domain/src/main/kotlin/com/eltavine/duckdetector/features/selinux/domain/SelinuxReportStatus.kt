@@ -31,14 +31,14 @@ fun SelinuxReport.toDetectorStatus(): DetectorStatus {
         SelinuxStage.READY -> when (mode) {
             SelinuxMode.ENFORCING -> when {
                 auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> DetectorStatus.danger()
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.KSU_PRESENT -> DetectorStatus.danger()
                 policyloadSeqno?.isSecure == false -> DetectorStatus.danger()
                 procAttrCurrent?.isSecure == false -> DetectorStatus.danger()
                 dirtyPolicyHit != null -> DetectorStatus.warning()
                 appZygoteCarrierState == AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
                 appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.SELF_TEST_FAILED -> DetectorStatus.warning()
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.AMBIGUOUS -> DetectorStatus.warning()
                 policyAnalysis?.weakness == SelinuxPolicyWeakness.SEVERE ||
                         policyAnalysis?.weakness == SelinuxPolicyWeakness.MODERATE ||
                         auditIntegrity?.state == SelinuxAuditIntegrityState.EXPOSED ||
@@ -54,44 +54,34 @@ fun SelinuxReport.toDetectorStatus(): DetectorStatus {
 }
 
 fun contextValidityResult(report: SelinuxReport): SelinuxCheckResult? {
-    return report.methods.firstOrNull { it.method == SelinuxContextValidityLabels.METHOD_LABEL }
+    return report.methods.firstOrNull { it.oracle == SelinuxOracle.CONTEXT_VALIDITY }
 }
 
 fun procAttrCurrentResult(report: SelinuxReport): SelinuxCheckResult? {
-    return report.methods.firstOrNull { it.method == SelinuxProcAttrCurrentLabels.METHOD_LABEL }
+    return report.methods.firstOrNull { it.oracle == SelinuxOracle.PROC_ATTR_CURRENT_WRITE }
 }
 
 fun policyloadSeqnoResult(report: SelinuxReport): SelinuxCheckResult? {
-    return report.methods.firstOrNull { it.method == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL }
+    return report.methods.firstOrNull { it.oracle == SelinuxOracle.POLICYLOAD_SEQNO }
 }
 
 fun firstTrustedPolicyRuleHit(report: SelinuxReport): SelinuxCheckResult? {
     return report.methods.firstOrNull {
-        isPolicyRuleMethod(it.method) &&
-            it.status == "Allowed" &&
+        val rule = it.policyRule
+        rule != null &&
+            rule.set != SelinuxPolicyRuleSet.POLICY_OBSERVATION &&
+            rule.verdict == SelinuxRuleVerdict.ALLOWED &&
             it.isSecure == false &&
             it.dirtyPolicyTrusted
     }
 }
 
-fun isPolicyRuleMethod(method: String): Boolean {
-    return method.startsWith("Dirty sepolicy rule: ") ||
-        method.startsWith("Droidspaces checker: ") ||
-        method.startsWith("MSD checker: ")
-}
-
 fun contextValiditySupportState(result: SelinuxCheckResult?): AppZygoteCarrierSupportState {
-    if (result?.method != SelinuxContextValidityLabels.METHOD_LABEL ||
-        result.status != SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED
-    ) {
-        return AppZygoteCarrierSupportState.AVAILABLE
-    }
-    return when {
-        result.details.orEmpty().contains("Carrier state=untrusted") ->
-            AppZygoteCarrierSupportState.UNTRUSTED
-        result.details.orEmpty().contains("Carrier state=failed") ->
-            AppZygoteCarrierSupportState.FAILED
-        else -> AppZygoteCarrierSupportState.AVAILABLE
+    val reading = result?.contextValidity
+    return if (reading?.verdict == SelinuxContextValidityVerdict.UNSUPPORTED) {
+        reading.carrier
+    } else {
+        AppZygoteCarrierSupportState.AVAILABLE
     }
 }
 

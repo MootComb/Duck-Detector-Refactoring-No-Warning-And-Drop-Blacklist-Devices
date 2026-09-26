@@ -22,7 +22,10 @@ import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.data.repository.buildDirtyPolicyMethods
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRule
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRuleSet
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxRuleVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import com.eltavine.duckdetector.features.selinux.presentation.SelinuxCardModelMapper
 import org.junit.Assert.assertEquals
@@ -44,6 +47,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DIRTY_SEPOLICY, "system_server execmem", SelinuxRuleVerdict.ALLOWED),
                 ),
                 SelinuxCheckResult(
                     method = "Dirty sepolicy rule: untrusted_app -> ksu_file read",
@@ -51,6 +55,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     isSecure = true,
                     permissionDenied = false,
                     details = "Observed edge: untrusted_app -> ksu_file:file read. This should stay denied on stock policy because ordinary apps should not read KernelSU-labeled files. The access oracle reported this edge as denied.",
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DIRTY_SEPOLICY, "untrusted_app -> ksu_file read", SelinuxRuleVerdict.DENIED),
                 ),
                 SelinuxCheckResult(
                     method = "Dirty sepolicy rule: shell -> su transition",
@@ -58,6 +63,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     isSecure = null,
                     permissionDenied = false,
                     details = "Observed edge: shell -> su:process transition. This is only evaluated for confirmed user builds because stock user builds should not expose an AOSP su transition path. The access oracle could not produce a verdict for this edge. | Reason: Dirty policy oracle self-test failed.",
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DIRTY_SEPOLICY, "shell -> su transition", SelinuxRuleVerdict.UNAVAILABLE),
                 ),
             ),
         )
@@ -105,6 +111,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DIRTY_SEPOLICY, "system_server execmem", SelinuxRuleVerdict.ALLOWED),
                 ),
             ),
         )
@@ -126,6 +133,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence. The access oracle reported this edge as allowed. | Reason: Dirty policy oracle self-test failed.",
                     dirtyPolicyTrusted = false,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DIRTY_SEPOLICY, "system_server execmem", SelinuxRuleVerdict.ALLOWED),
                 ),
             ),
         )
@@ -147,6 +155,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: msd_app -> msd_daemon:unix_stream_socket connectto. MSD relies on this dedicated app/domain socket path to talk to its daemon. The dedicated access oracles reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.MSD, "msd_app -> msd_daemon connectto", SelinuxRuleVerdict.ALLOWED),
                 ),
                 SelinuxCheckResult(
                     method = "MSD checker: msd_daemon -> msd_daemon connectto",
@@ -154,6 +163,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     isSecure = true,
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: msd_daemon -> msd_daemon:unix_stream_socket connectto. MSD explicitly denies self-connect as a sanity check for its loaded policy shape. The dedicated access oracles reported this edge as denied.",
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.MSD, "msd_daemon -> msd_daemon connectto", SelinuxRuleVerdict.DENIED),
                 ),
             ),
         )
@@ -185,6 +195,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: magisk -> droidspacesd:process dyntransition. Droidspaces seeds this transition from its module policy so Magisk-rooted execution can move into the dedicated droidspacesd domain. The dedicated access oracles reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DROIDSPACES, "magisk -> droidspacesd dyntransition", SelinuxRuleVerdict.ALLOWED),
                 ),
                 SelinuxCheckResult(
                     method = "Droidspaces checker: su -> droidspacesd dyntransition",
@@ -193,6 +204,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: su -> droidspacesd:process dyntransition. Droidspaces exposes this transition so an su-rooted process can enter the dedicated droidspacesd domain. The dedicated access oracles reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DROIDSPACES, "su -> droidspacesd dyntransition", SelinuxRuleVerdict.ALLOWED),
                 ),
                 SelinuxCheckResult(
                     method = "Droidspaces checker: system_server -> droidspacesd binder",
@@ -201,6 +213,7 @@ class SelinuxCardModelMapperDirtyPolicyRulesTest {
                     permissionDenied = false,
                     details = "Evidence source=dedicated app_zygote carrier | Observed edge: system_server -> droidspacesd:binder call. Droidspaces allows system_server to talk to the dedicated droidspacesd service over binder. The dedicated access oracles reported this edge as allowed.",
                     dirtyPolicyTrusted = true,
+                    policyRule = SelinuxPolicyRule(SelinuxPolicyRuleSet.DROIDSPACES, "system_server -> droidspacesd binder", SelinuxRuleVerdict.ALLOWED),
                 ),
             ),
         )

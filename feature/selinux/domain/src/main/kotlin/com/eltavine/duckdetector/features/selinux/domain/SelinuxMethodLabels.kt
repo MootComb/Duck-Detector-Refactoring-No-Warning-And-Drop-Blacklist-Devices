@@ -16,25 +16,65 @@
 
 package com.eltavine.duckdetector.features.selinux.domain
 
-object SelinuxContextValidityLabels {
-    const val METHOD_LABEL = "Context validity oracle"
-    const val BITPAIR_CLEAN = "00"
-    const val BITPAIR_KSU_PRESENT = "11"
-    const val BITPAIR_AMBIGUOUS = "01/10"
-    const val BITPAIR_SELF_TEST_FAILED = "Self-test failed"
-    const val BITPAIR_UNSUPPORTED = "Unsupported"
+/** The app zygote oracles whose results the report reads beyond their text; [label] is the method each is listed under. */
+enum class SelinuxOracle(val label: String) {
+    CONTEXT_VALIDITY("Context validity oracle"),
+    PROC_ATTR_CURRENT_WRITE("app_zygote attr/current write"),
+    POLICYLOAD_SEQNO("App-zygote seqno oracle"),
 }
 
+/** The context validity oracle's reading of the two KSU-specific contexts; [label] is the status it is shown with. */
+enum class SelinuxContextValidityVerdict(val label: String) {
+    CLEAN("00"),
+    KSU_PRESENT("11"),
+    AMBIGUOUS("01/10"),
+    SELF_TEST_FAILED("Self-test failed"),
+    UNSUPPORTED("Unsupported"),
+}
+
+/** The context validity oracle's verdict and the state of the app zygote carrier it ran in. */
+data class SelinuxContextValidityReading(
+    val verdict: SelinuxContextValidityVerdict,
+    val carrier: AppZygoteCarrierSupportState,
+    /**
+     * Whether the oracle's repeated writes may have disagreed. The oracle reports a failed self-test
+     * and unstable repeats as one untrusted state, so every self-test failure sets this.
+     */
+    val repeatabilityFailed: Boolean = false,
+)
+
 object SelinuxProcAttrCurrentLabels {
-    const val METHOD_LABEL = "app_zygote attr/current write"
     const val STATUS_CLEAN = "Normal EINVAL"
     const val STATUS_UNSUPPORTED = "Unsupported"
 }
 
 object SelinuxPolicyloadSeqnoLabels {
-    const val METHOD_LABEL = "App-zygote seqno oracle"
     const val STATUS_CLEAN = "Clean"
     const val STATUS_SUSPICIOUS = "Seqno split"
     const val STATUS_INCONCLUSIVE = "Info"
     const val STATUS_UNAVAILABLE = "Unavailable"
+}
+
+/** The checkers whose SELinux policy rule queries the report lists; [prefix] starts each query's method. */
+enum class SelinuxPolicyRuleSet(val prefix: String) {
+    DIRTY_SEPOLICY("Dirty sepolicy rule: "),
+    POLICY_OBSERVATION("SELinux policy observation: "),
+    DROIDSPACES("Droidspaces checker: "),
+    MSD("MSD checker: "),
+}
+
+/** Live policy's answer to a rule query; [label] is the status it is shown with. */
+enum class SelinuxRuleVerdict(val label: String) {
+    ALLOWED("Allowed"),
+    DENIED("Denied"),
+    UNAVAILABLE("Unavailable"),
+}
+
+/** One policy rule query: the checker that asked, the queried edge and live policy's answer. */
+data class SelinuxPolicyRule(
+    val set: SelinuxPolicyRuleSet,
+    val edge: String,
+    val verdict: SelinuxRuleVerdict,
+) {
+    val method: String get() = set.prefix + edge
 }

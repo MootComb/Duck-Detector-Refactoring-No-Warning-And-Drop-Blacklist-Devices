@@ -18,11 +18,13 @@ package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityReading
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import org.junit.Assert.assertEquals
@@ -38,11 +40,12 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
                     status = "",
                     isSecure = true,
                     permissionDenied = false,
                     details = "Root contexts were not found by live policy.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
                 ),
             ),
         )
@@ -52,7 +55,7 @@ class SelinuxCardModelMapperContextValidityTest {
         assertEquals("7 local checks", model.subtitle)
         assertTrue(
             model.methodRows.any {
-                it.label == SelinuxContextValidityLabels.METHOD_LABEL && it.value.isBlank()
+                it.label == SelinuxOracle.CONTEXT_VALIDITY.label && it.value.isBlank()
             },
         )
     }
@@ -62,11 +65,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.KSU_PRESENT.label,
                     isSecure = false,
                     permissionDenied = false,
                     details = "Both KSU-specific contexts were found by live policy.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.KSU_PRESENT, AppZygoteCarrierSupportState.AVAILABLE),
                 ),
             ),
         )
@@ -87,18 +92,21 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.KSU_PRESENT.label,
                     isSecure = false,
                     permissionDenied = false,
                     details = "Both KSU-specific contexts were found by live policy.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.KSU_PRESENT, AppZygoteCarrierSupportState.AVAILABLE),
                 ),
                 SelinuxCheckResult(
-                    method = SelinuxPolicyloadSeqnoLabels.METHOD_LABEL,
+                    method = SelinuxOracle.POLICYLOAD_SEQNO.label,
                     status = SelinuxPolicyloadSeqnoLabels.STATUS_CLEAN,
                     isSecure = true,
                     permissionDenied = false,
                     details = "status.policyload=9 | access.avd.seqno=9",
+                    oracle = SelinuxOracle.POLICYLOAD_SEQNO,
                 ),
             ),
         )
@@ -108,7 +116,7 @@ class SelinuxCardModelMapperContextValidityTest {
         assertTrue(model.summary.contains("accepted both KSU-specific contexts"))
         assertTrue(
             model.methodRows.any {
-                it.label == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL &&
+                it.label == SelinuxOracle.POLICYLOAD_SEQNO.label &&
                     it.status == DetectorStatus.allClear()
             },
         )
@@ -119,11 +127,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.SELF_TEST_FAILED.label,
                     isSecure = null,
                     permissionDenied = false,
                     details = "Context validity oracle failed its self-test.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.SELF_TEST_FAILED, AppZygoteCarrierSupportState.AVAILABLE),
                 ),
             ),
         )
@@ -143,11 +153,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.UNSUPPORTED.label,
                     isSecure = null,
                     permissionDenied = false,
                     details = "Carrier=<unreadable> | Carrier state=failed | Evidence source=dedicated app_zygote carrier | Unavailable: u:r:app_zygote:s0 errno=Permission denied",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.UNSUPPORTED, AppZygoteCarrierSupportState.FAILED),
                 ),
             ),
         )
@@ -167,11 +179,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.UNSUPPORTED.label,
                     isSecure = null,
                     permissionDenied = false,
                     details = "Carrier=<unreadable> | Carrier state=failed | Evidence source=dedicated app_zygote carrier | No preloaded data available. Check AppZygotePreload status.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.UNSUPPORTED, AppZygoteCarrierSupportState.FAILED),
                 ),
             ),
         )
@@ -186,7 +200,7 @@ class SelinuxCardModelMapperContextValidityTest {
         )
         assertTrue(
             model.methodRows.any {
-                it.label == SelinuxContextValidityLabels.METHOD_LABEL &&
+                it.label == SelinuxOracle.CONTEXT_VALIDITY.label &&
                     it.detail?.contains("Evidence source=dedicated app_zygote carrier") == true
             },
         )
@@ -197,11 +211,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.UNSUPPORTED.label,
                     isSecure = null,
                     permissionDenied = false,
                     details = "Carrier=u:r:untrusted_app:s0:c1,c2 | Carrier state=untrusted | Evidence source=dedicated app_zygote carrier | The dedicated app_zygote carrier was reachable but did not land in the expected app_zygote context.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.UNSUPPORTED, AppZygoteCarrierSupportState.UNTRUSTED),
                 ),
             ),
         )
@@ -216,11 +232,13 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.SELF_TEST_FAILED.label,
                     isSecure = null,
                     permissionDenied = false,
                     details = "Context validity oracle repeatability failed.",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.SELF_TEST_FAILED, AppZygoteCarrierSupportState.AVAILABLE, repeatabilityFailed = true),
                 ),
             ),
         )
@@ -240,11 +258,12 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxPolicyloadSeqnoLabels.METHOD_LABEL,
+                    method = SelinuxOracle.POLICYLOAD_SEQNO.label,
                     status = SelinuxPolicyloadSeqnoLabels.STATUS_UNAVAILABLE,
                     isSecure = null,
                     permissionDenied = false,
                     details = "zygotePreloadName required=yes | Probe attempted=no",
+                    oracle = SelinuxOracle.POLICYLOAD_SEQNO,
                 ),
             ),
         )
@@ -253,7 +272,7 @@ class SelinuxCardModelMapperContextValidityTest {
         assertEquals("Enforcing", model.verdict)
         assertTrue(
             model.methodRows.any {
-                it.label == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL &&
+                it.label == SelinuxOracle.POLICYLOAD_SEQNO.label &&
                     it.status == DetectorStatus.info(InfoKind.SUPPORT)
             },
         )
@@ -270,11 +289,12 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxPolicyloadSeqnoLabels.METHOD_LABEL,
+                    method = SelinuxOracle.POLICYLOAD_SEQNO.label,
                     status = SelinuxPolicyloadSeqnoLabels.STATUS_SUSPICIOUS,
                     isSecure = false,
                     permissionDenied = false,
                     details = "status.policyload=0 | access.avd.seqno=9",
+                    oracle = SelinuxOracle.POLICYLOAD_SEQNO,
                 ),
             ),
         )
@@ -284,7 +304,7 @@ class SelinuxCardModelMapperContextValidityTest {
         assertTrue(model.summary.contains("policyload/access seqno split"))
         assertTrue(
             model.methodRows.any {
-                it.label == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL &&
+                it.label == SelinuxOracle.POLICYLOAD_SEQNO.label &&
                     it.status == DetectorStatus.danger()
             },
         )
@@ -295,18 +315,21 @@ class SelinuxCardModelMapperContextValidityTest {
         val model = mapper.map(
             baseReport(
                 SelinuxCheckResult(
-                    method = SelinuxContextValidityLabels.METHOD_LABEL,
-                    status = SelinuxContextValidityLabels.BITPAIR_CLEAN,
+                    method = SelinuxOracle.CONTEXT_VALIDITY.label,
+                    status = SelinuxContextValidityVerdict.CLEAN.label,
                     isSecure = true,
                     permissionDenied = false,
                     details = "Pair 00",
+                    oracle = SelinuxOracle.CONTEXT_VALIDITY,
+                    contextValidity = SelinuxContextValidityReading(SelinuxContextValidityVerdict.CLEAN, AppZygoteCarrierSupportState.AVAILABLE),
                 ),
                 SelinuxCheckResult(
-                    method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+                    method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
                     status = "Detected: Magisk, LSPosed file",
                     isSecure = false,
                     permissionDenied = false,
                     details = "Magisk=DETECTED_NON_EINVAL | LSPosed file=SUCCESS",
+                    oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
                 ),
             ),
         )

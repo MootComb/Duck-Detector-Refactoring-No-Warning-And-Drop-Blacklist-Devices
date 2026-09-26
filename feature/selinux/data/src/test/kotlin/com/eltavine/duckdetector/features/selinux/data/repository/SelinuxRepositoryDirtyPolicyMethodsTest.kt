@@ -78,6 +78,11 @@ class SelinuxRepositoryDirtyPolicyMethodsTest {
         )
 
         assertEquals(17, methods.size)
+        methods.forEach { method ->
+            val rule = requireNotNull(method.policyRule) { method.method }
+            assertEquals(method.method, rule.method)
+            assertEquals(method.status, rule.verdict.label)
+        }
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: system_server execmem" && it.status == "Allowed" && it.isSecure == false })
         assertTrue(methods.any { it.method == "Dirty sepolicy rule: system_server execmem" && it.dirtyPolicyTrusted })
         assertTrue(methods.any { it.method == "SELinux policy observation: fsck_untrusted sys_admin" && it.status == "Denied" && it.isSecure == null })

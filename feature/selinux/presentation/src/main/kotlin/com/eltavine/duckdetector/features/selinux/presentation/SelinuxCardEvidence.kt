@@ -17,29 +17,15 @@
 package com.eltavine.duckdetector.features.selinux.presentation
 
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
-internal fun isMsdPolicyRuleMethod(method: String): Boolean {
-    return method.startsWith("MSD checker: ")
-}
-
-internal fun isDroidspacesPolicyRuleMethod(method: String): Boolean {
-    return method.startsWith("Droidspaces checker: ")
-}
-
-private fun policyRuleDisplayName(method: String): String {
-    return when {
-        method.startsWith("Dirty sepolicy rule: ") -> method.removePrefix("Dirty sepolicy rule: ")
-        method.startsWith("Droidspaces checker: ") -> "Droidspaces: ${method.removePrefix("Droidspaces checker: ")}"
-        method.startsWith("MSD checker: ") -> "MSD: ${method.removePrefix("MSD checker: ")}"
-        else -> method
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRuleSet
+private fun policyRuleDisplayName(result: SelinuxCheckResult): String {
+    val rule = result.policyRule ?: return result.method
+    return when (rule.set) {
+        SelinuxPolicyRuleSet.DIRTY_SEPOLICY -> rule.edge
+        SelinuxPolicyRuleSet.DROIDSPACES -> "Droidspaces: ${rule.edge}"
+        SelinuxPolicyRuleSet.MSD -> "MSD: ${rule.edge}"
+        SelinuxPolicyRuleSet.POLICY_OBSERVATION -> result.method
     }
-}
-
-internal fun msdPolicyRuleName(method: String): String {
-    return method.removePrefix("MSD checker: ")
-}
-
-internal fun droidspacesPolicyRuleName(method: String): String {
-    return method.removePrefix("Droidspaces checker: ")
 }
 
 internal fun trustedPolicyRuleVerdict(): String {
@@ -47,9 +33,9 @@ internal fun trustedPolicyRuleVerdict(): String {
 }
 
 internal fun trustedPolicyRuleSummary(result: SelinuxCheckResult): String {
-    return "A trusted DirtySepolicy-style access query reported ${policyRuleDisplayName(result.method)} as allowed."
+    return "A trusted DirtySepolicy-style access query reported ${policyRuleDisplayName(result)} as allowed."
 }
 
 internal fun trustedPolicyRuleImpact(result: SelinuxCheckResult): String {
-    return "A trusted DirtySepolicy-style access rule was allowed: ${policyRuleDisplayName(result.method)}."
+    return "A trusted DirtySepolicy-style access rule was allowed: ${policyRuleDisplayName(result)}."
 }

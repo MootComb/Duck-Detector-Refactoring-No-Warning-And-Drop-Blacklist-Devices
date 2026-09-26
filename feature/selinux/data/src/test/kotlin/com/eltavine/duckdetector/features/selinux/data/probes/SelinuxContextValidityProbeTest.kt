@@ -20,7 +20,7 @@ import com.eltavine.duckdetector.capability.selinuxpolicy.data.DedicatedCarrierS
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityBridge
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -50,7 +50,7 @@ class SelinuxContextValidityProbeTest {
                     queryMethod = "raw selinuxfs write",
                     ksuDomainValid = false,
                     ksuFileValid = false,
-                    bitPair = SelinuxContextValidityLabels.BITPAIR_CLEAN,
+                    bitPair = SelinuxContextValidityVerdict.CLEAN.label,
                     procAttrCurrentProbeAttempted = true,
                     procAttrCurrentResults = listOf(
                         SelinuxProcAttrCurrentResult(
@@ -66,7 +66,7 @@ class SelinuxContextValidityProbeTest {
         ).inspectLocal()
 
         assertEquals(SelinuxContextValidityState.CLEAN, result.state)
-        assertEquals(SelinuxContextValidityLabels.BITPAIR_CLEAN, result.bitPair)
+        assertEquals(SelinuxContextValidityVerdict.CLEAN.label, result.bitPair)
         assertEquals(true, result.selinuxEnabled)
         assertEquals(true, result.selinuxEnforced)
         assertEquals(true, result.procAttrCurrentProbeAttempted)
@@ -92,14 +92,14 @@ class SelinuxContextValidityProbeTest {
                     queryMethod = "raw selinuxfs write",
                     ksuDomainValid = true,
                     ksuFileValid = true,
-                    bitPair = SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT,
+                    bitPair = SelinuxContextValidityVerdict.KSU_PRESENT.label,
                     notes = listOf("Carrier context: u:r:app_zygote:s0:c1,c2"),
                 ),
             ),
         ).inspectLocal()
 
         assertEquals(SelinuxContextValidityState.KSU_PRESENT, result.state)
-        assertEquals(SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT, result.bitPair)
+        assertEquals(SelinuxContextValidityVerdict.KSU_PRESENT.label, result.bitPair)
         assertTrue(result.notes.any { it.contains("Bit pair 11") })
     }
 

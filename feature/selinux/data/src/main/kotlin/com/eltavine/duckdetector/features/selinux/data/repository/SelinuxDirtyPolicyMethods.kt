@@ -18,6 +18,9 @@ package com.eltavine.duckdetector.features.selinux.data.repository
 
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRule
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRuleSet
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxRuleVerdict
 
 fun buildDirtyPolicyMethods(
     snapshot: SelinuxContextValiditySnapshot,
@@ -26,7 +29,8 @@ fun buildDirtyPolicyMethods(
     val javaTrack = dirtyPolicyTrack(snapshot, DirtyPolicyTrackSource.JAVA)
     return listOf(
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: system_server execmem",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "system_server execmem",
             nativeAllowed = nativeTrack.systemServerExecmemAllowed,
             javaAllowed = javaTrack.systemServerExecmemAllowed,
             detail = "Observed edge: system_server -> system_server:process execmem. This should stay denied on stock policy because executable system_server memory is supporting dirty-policy evidence.",
@@ -38,7 +42,8 @@ fun buildDirtyPolicyMethods(
         // AOSP Android 14: https://android.googlesource.com/platform/system/sepolicy/+/refs/tags/android-14.0.0_r1/public/fsck_untrusted.te
         // ROM exception: https://github.com/LineageOS/android_system_sepolicy/commit/85839045447fee9db99258f66f9fa2c65473b10d
         aggregateDirtyPolicyRuleMethod(
-            label = "SELinux policy observation: fsck_untrusted sys_admin",
+            set = SelinuxPolicyRuleSet.POLICY_OBSERVATION,
+            edge = "fsck_untrusted sys_admin",
             nativeAllowed = nativeTrack.fsckSysAdminAllowed,
             javaAllowed = javaTrack.fsckSysAdminAllowed,
             detail = "Observed edge: fsck_untrusted -> fsck_untrusted:capability sys_admin. Informational only: AOSP Android 14 forbids this permission, but device or ROM policies may differ. An allowed result alone does not establish root or policy tampering and does not contribute to the dirty-policy warning.",
@@ -46,7 +51,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ).copy(isSecure = null),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: shell -> su transition",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "shell -> su transition",
             nativeAllowed = nativeTrack.shellSuTransitionAllowed,
             javaAllowed = javaTrack.shellSuTransitionAllowed,
             detail = "Observed edge: shell -> su:process transition. This is only evaluated for confirmed user builds because stock user builds should not expose an AOSP su transition path.",
@@ -54,7 +60,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: adbd -> adbroot binder",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "adbd -> adbroot binder",
             nativeAllowed = nativeTrack.adbdAdbrootBinderCallAllowed,
             javaAllowed = javaTrack.adbdAdbrootBinderCallAllowed,
             detail = "Observed edge: adbd -> adbroot:binder call. This should stay denied on stock policy because it is supporting adb-root dirty-policy evidence.",
@@ -62,7 +69,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: untrusted_app -> magisk binder",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "untrusted_app -> magisk binder",
             nativeAllowed = nativeTrack.magiskBinderCallAllowed,
             javaAllowed = javaTrack.magiskBinderCallAllowed,
             detail = "Observed edge: untrusted_app -> magisk:binder call. This should stay denied on stock policy because ordinary apps should not talk to a Magisk domain over binder.",
@@ -70,7 +78,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: untrusted_app -> ksu_file read",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "untrusted_app -> ksu_file read",
             nativeAllowed = nativeTrack.ksuFileReadAllowed,
             javaAllowed = javaTrack.ksuFileReadAllowed,
             detail = "Observed edge: untrusted_app -> ksu_file:file read. This should stay denied on stock policy because ordinary apps should not read KernelSU-labeled files.",
@@ -78,7 +87,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: untrusted_app -> lsposed_file read",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "untrusted_app -> lsposed_file read",
             nativeAllowed = nativeTrack.lsposedFileReadAllowed,
             javaAllowed = javaTrack.lsposedFileReadAllowed,
             detail = "Observed edge: untrusted_app -> lsposed_file:file read. This should stay denied on stock policy because ordinary apps should not read LSPosed-labeled files.",
@@ -86,7 +96,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Droidspaces checker: magisk -> droidspacesd dyntransition",
+            set = SelinuxPolicyRuleSet.DROIDSPACES,
+            edge = "magisk -> droidspacesd dyntransition",
             nativeAllowed = nativeTrack.magiskDroidspacesdTransitionAllowed,
             javaAllowed = javaTrack.magiskDroidspacesdTransitionAllowed,
             detail = "Observed edge: magisk -> droidspacesd:process dyntransition. Droidspaces seeds this transition from its module policy so Magisk-rooted execution can move into the dedicated droidspacesd domain.",
@@ -94,7 +105,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Droidspaces checker: su -> droidspacesd dyntransition",
+            set = SelinuxPolicyRuleSet.DROIDSPACES,
+            edge = "su -> droidspacesd dyntransition",
             nativeAllowed = nativeTrack.suDroidspacesdTransitionAllowed,
             javaAllowed = javaTrack.suDroidspacesdTransitionAllowed,
             detail = "Observed edge: su -> droidspacesd:process dyntransition. Droidspaces exposes this transition so an su-rooted process can enter the dedicated droidspacesd domain.",
@@ -102,7 +114,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Droidspaces checker: system_server -> droidspacesd binder",
+            set = SelinuxPolicyRuleSet.DROIDSPACES,
+            edge = "system_server -> droidspacesd binder",
             nativeAllowed = nativeTrack.systemServerDroidspacesdBinderCallAllowed,
             javaAllowed = javaTrack.systemServerDroidspacesdBinderCallAllowed,
             detail = "Observed edge: system_server -> droidspacesd:binder call. Droidspaces allows system_server to talk to the dedicated droidspacesd service over binder.",
@@ -110,7 +123,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "MSD checker: msd_app -> msd_daemon connectto",
+            set = SelinuxPolicyRuleSet.MSD,
+            edge = "msd_app -> msd_daemon connectto",
             nativeAllowed = nativeTrack.msdAppDaemonConnectAllowed,
             javaAllowed = javaTrack.msdAppDaemonConnectAllowed,
             detail = "Observed edge: msd_app -> msd_daemon:unix_stream_socket connectto. MSD relies on this dedicated app/domain socket path to talk to its daemon.",
@@ -118,7 +132,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "MSD checker: msd_daemon -> msd_daemon connectto",
+            set = SelinuxPolicyRuleSet.MSD,
+            edge = "msd_daemon -> msd_daemon connectto",
             nativeAllowed = nativeTrack.msdDaemonSelfConnectAllowed,
             javaAllowed = javaTrack.msdDaemonSelfConnectAllowed,
             detail = "Observed edge: msd_daemon -> msd_daemon:unix_stream_socket connectto. MSD explicitly denies self-connect as a sanity check for its loaded policy shape.",
@@ -126,7 +141,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "MSD checker: msd_daemon -> selinuxfs read",
+            set = SelinuxPolicyRuleSet.MSD,
+            edge = "msd_daemon -> selinuxfs read",
             nativeAllowed = nativeTrack.msdDaemonSelinuxfsReadAllowed,
             javaAllowed = javaTrack.msdDaemonSelinuxfsReadAllowed,
             detail = "Observed edge: msd_daemon -> selinuxfs:file read. MSD's daemon uses this to verify enforcing SELinux state before accepting clients.",
@@ -134,7 +150,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "MSD checker: msd_daemon -> configfs dir search",
+            set = SelinuxPolicyRuleSet.MSD,
+            edge = "msd_daemon -> configfs dir search",
             nativeAllowed = nativeTrack.msdDaemonConfigfsDirSearchAllowed,
             javaAllowed = javaTrack.msdDaemonConfigfsDirSearchAllowed,
             detail = "Observed edge: msd_daemon -> configfs:dir search. MSD's daemon needs this to traverse USB gadget configfs state.",
@@ -142,7 +159,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "MSD checker: msd_daemon -> configfs file write",
+            set = SelinuxPolicyRuleSet.MSD,
+            edge = "msd_daemon -> configfs file write",
             nativeAllowed = nativeTrack.msdDaemonConfigfsFileWriteAllowed,
             javaAllowed = javaTrack.msdDaemonConfigfsFileWriteAllowed,
             detail = "Observed edge: msd_daemon -> configfs:file write. MSD's daemon needs this to configure USB gadget mass-storage state.",
@@ -150,7 +168,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: untrusted_app -> xposed_data read",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "untrusted_app -> xposed_data read",
             nativeAllowed = nativeTrack.xposedDataFileReadAllowed,
             javaAllowed = javaTrack.xposedDataFileReadAllowed,
             detail = "Observed edge: untrusted_app -> xposed_data:file read. This should stay denied on stock policy because ordinary apps should not read Xposed data directly.",
@@ -158,7 +177,8 @@ fun buildDirtyPolicyMethods(
             javaTrack = javaTrack,
         ),
         aggregateDirtyPolicyRuleMethod(
-            label = "Dirty sepolicy rule: zygote -> adb_data_file search",
+            set = SelinuxPolicyRuleSet.DIRTY_SEPOLICY,
+            edge = "zygote -> adb_data_file search",
             nativeAllowed = nativeTrack.zygoteAdbDataSearchAllowed,
             javaAllowed = javaTrack.zygoteAdbDataSearchAllowed,
             detail = "Observed edge: zygote -> adb_data_file:dir search. This should stay denied on stock policy because zygote should not traverse adb data directories.",
@@ -169,7 +189,8 @@ fun buildDirtyPolicyMethods(
 }
 
 private fun aggregateDirtyPolicyRuleMethod(
-    label: String,
+    set: SelinuxPolicyRuleSet,
+    edge: String,
     nativeAllowed: Boolean?,
     javaAllowed: Boolean?,
     detail: String,
@@ -188,14 +209,18 @@ private fun aggregateDirtyPolicyRuleMethod(
         nativeTrack.trusted && effectiveNativeAllowed == true ||
             javaTrack.trusted && effectiveJavaAllowed == true
         )
-    val status = when (allowed) {
-        true -> "Allowed"
-        false -> "Denied"
-        null -> "Unavailable"
-    }
+    val rule = SelinuxPolicyRule(
+        set = set,
+        edge = edge,
+        verdict = when (allowed) {
+            true -> SelinuxRuleVerdict.ALLOWED
+            false -> SelinuxRuleVerdict.DENIED
+            null -> SelinuxRuleVerdict.UNAVAILABLE
+        },
+    )
     return SelinuxCheckResult(
-        method = label,
-        status = status,
+        method = rule.method,
+        status = rule.verdict.label,
         isSecure = when (allowed) {
             true -> false
             false -> true
@@ -218,6 +243,7 @@ private fun aggregateDirtyPolicyRuleMethod(
             add("Java dedicated=${javaTrack.describe(javaAllowed)}")
         }.joinToString(" | "),
         dirtyPolicyTrusted = trusted,
+        policyRule = rule,
     )
 }
 

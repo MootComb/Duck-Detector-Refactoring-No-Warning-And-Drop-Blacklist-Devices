@@ -36,6 +36,12 @@ data class SelinuxCheckResult(
     val permissionDenied: Boolean,
     val details: String? = null,
     val dirtyPolicyTrusted: Boolean = false,
+    /** The oracle that produced this result, for the ones the report reads beyond their text. */
+    val oracle: SelinuxOracle? = null,
+    /** The context validity oracle's reading; set only on that oracle's result. */
+    val contextValidity: SelinuxContextValidityReading? = null,
+    /** The policy rule this result answers; set only on policy rule queries. */
+    val policyRule: SelinuxPolicyRule? = null,
 )
 
 /** What a policy analysis note says about the loaded policy. */

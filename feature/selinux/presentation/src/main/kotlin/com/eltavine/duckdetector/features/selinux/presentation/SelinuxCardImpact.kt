@@ -20,7 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
@@ -37,8 +37,7 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
     val procAttrCurrent = procAttrCurrentResult(report)
     val policyloadSeqno = policyloadSeqnoResult(report)
     val dirtyPolicyHit = firstTrustedPolicyRuleHit(report)
-    val repeatabilityFailed =
-        contextValidity?.details?.contains("repeatability failed", ignoreCase = true) == true
+    val repeatabilityFailed = contextValidity?.contextValidity?.repeatabilityFailed == true
     val appZygoteCarrierState = contextValiditySupportState(contextValidity)
     if (report.stage != SelinuxStage.READY) {
         return when (report.stage) {
@@ -145,18 +144,18 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
         }
     }
 
-    when (contextValidity?.status) {
-        SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> items += SelinuxImpactItemModel(
+    when (contextValidity?.contextValidity?.verdict) {
+        SelinuxContextValidityVerdict.KSU_PRESENT -> items += SelinuxImpactItemModel(
             "The app_zygote carrier validated both KSU-specific contexts in live policy.",
             DetectorStatus.danger(),
         )
 
-        SelinuxContextValidityLabels.BITPAIR_CLEAN -> items += SelinuxImpactItemModel(
+        SelinuxContextValidityVerdict.CLEAN -> items += SelinuxImpactItemModel(
             "The app_zygote carrier rejected both KSU-specific contexts.",
             DetectorStatus.allClear(),
         )
 
-        SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> items += SelinuxImpactItemModel(
+        SelinuxContextValidityVerdict.SELF_TEST_FAILED -> items += SelinuxImpactItemModel(
             if (repeatabilityFailed) {
                 "The context validity oracle repeated inconsistently, so its KSU verdict was not trusted."
             } else {
@@ -165,12 +164,12 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
             DetectorStatus.warning(),
         )
 
-        SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> items += SelinuxImpactItemModel(
+        SelinuxContextValidityVerdict.AMBIGUOUS -> items += SelinuxImpactItemModel(
             "The context validity oracle split across the two KSU-specific contexts.",
             DetectorStatus.warning(),
         )
 
-        SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED -> items += SelinuxImpactItemModel(
+        SelinuxContextValidityVerdict.UNSUPPORTED -> items += SelinuxImpactItemModel(
             contextValidity.details ?: "The context validity oracle stayed unavailable.",
             when (appZygoteCarrierState) {
                 AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()

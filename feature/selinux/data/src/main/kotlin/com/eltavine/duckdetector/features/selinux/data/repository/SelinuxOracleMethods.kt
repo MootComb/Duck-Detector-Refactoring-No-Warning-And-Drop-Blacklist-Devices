@@ -21,8 +21,11 @@ import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyload
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbeResult
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityState
+import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityReading
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
 import java.io.File
@@ -30,19 +33,17 @@ import java.io.File
 internal fun buildContextValidityMethod(
     result: SelinuxContextValidityProbeResult,
 ): SelinuxCheckResult {
-    val status = when (result.state) {
-        SelinuxContextValidityState.UNAVAILABLE ->
-            SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED
-
-        SelinuxContextValidityState.CLEAN -> SelinuxContextValidityLabels.BITPAIR_CLEAN
-        SelinuxContextValidityState.KSU_PRESENT ->
-            SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT
-
-        SelinuxContextValidityState.AMBIGUOUS ->
-            SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS
-
-        SelinuxContextValidityState.INCONSISTENT ->
-            SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED
+    val verdict = when (result.state) {
+        SelinuxContextValidityState.UNAVAILABLE -> SelinuxContextValidityVerdict.UNSUPPORTED
+        SelinuxContextValidityState.CLEAN -> SelinuxContextValidityVerdict.CLEAN
+        SelinuxContextValidityState.KSU_PRESENT -> SelinuxContextValidityVerdict.KSU_PRESENT
+        SelinuxContextValidityState.AMBIGUOUS -> SelinuxContextValidityVerdict.AMBIGUOUS
+        SelinuxContextValidityState.INCONSISTENT -> SelinuxContextValidityVerdict.SELF_TEST_FAILED
+    }
+    val carrier = when (result.carrierState) {
+        DedicatedCarrierState.OK -> AppZygoteCarrierSupportState.AVAILABLE
+        DedicatedCarrierState.FAILED -> AppZygoteCarrierSupportState.FAILED
+        DedicatedCarrierState.UNTRUSTED -> AppZygoteCarrierSupportState.UNTRUSTED
     }
 
     val detail = buildList {
@@ -111,8 +112,8 @@ internal fun buildContextValidityMethod(
     }.joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxContextValidityLabels.METHOD_LABEL,
-        status = status,
+        method = SelinuxOracle.CONTEXT_VALIDITY.label,
+        status = verdict.label,
         isSecure = when (result.state) {
             SelinuxContextValidityState.UNAVAILABLE -> null
             SelinuxContextValidityState.CLEAN -> true
@@ -122,6 +123,12 @@ internal fun buildContextValidityMethod(
         },
         permissionDenied = false,
         details = detail,
+        oracle = SelinuxOracle.CONTEXT_VALIDITY,
+        contextValidity = SelinuxContextValidityReading(
+            verdict = verdict,
+            carrier = carrier,
+            repeatabilityFailed = result.state == SelinuxContextValidityState.INCONSISTENT,
+        ),
     )
 }
 
@@ -152,7 +159,7 @@ internal fun buildPolicyloadSeqnoMethod(
     }.joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxPolicyloadSeqnoLabels.METHOD_LABEL,
+        method = SelinuxOracle.POLICYLOAD_SEQNO.label,
         status = status,
         isSecure = when (state) {
             SelinuxPolicyloadSeqnoState.CLEAN -> true
@@ -162,6 +169,7 @@ internal fun buildPolicyloadSeqnoMethod(
         },
         permissionDenied = false,
         details = detail,
+        oracle = SelinuxOracle.POLICYLOAD_SEQNO,
     )
 }
 
@@ -172,7 +180,8 @@ internal fun buildProcAttrCurrentMethod(
     val outcomes = result.procAttrCurrentResults
     if (!result.procAttrCurrentProbeAttempted) {
         return SelinuxCheckResult(
-            method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+            method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
+            oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
             status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
             isSecure = null,
             permissionDenied = false,
@@ -184,7 +193,8 @@ internal fun buildProcAttrCurrentMethod(
     }
     if (outcomes.isEmpty()) {
         return SelinuxCheckResult(
-            method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+            method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
+            oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
             status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
             isSecure = null,
             permissionDenied = false,
@@ -212,7 +222,8 @@ internal fun buildProcAttrCurrentMethod(
     ).joinToString(" | ")
 
     return SelinuxCheckResult(
-        method = SelinuxProcAttrCurrentLabels.METHOD_LABEL,
+        method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
+        oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
         status = status,
         isSecure = when {
             detected.isNotEmpty() -> false

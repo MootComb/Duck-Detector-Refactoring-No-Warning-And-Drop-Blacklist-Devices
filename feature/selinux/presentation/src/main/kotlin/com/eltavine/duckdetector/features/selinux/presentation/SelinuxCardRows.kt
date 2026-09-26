@@ -20,14 +20,15 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyAnalysis
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyNoteKind
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRuleSet
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxRuleVerdict
 import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxDetailRowModel
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxImpactItemModel
@@ -92,24 +93,24 @@ internal fun buildStateRows(report: SelinuxReport): List<SelinuxDetailRowModel> 
 }
 
 internal fun buildMethodRows(report: SelinuxReport): List<SelinuxDetailRowModel> {
-    val msdRows = report.methods.filter { isMsdPolicyRuleMethod(it.method) }
-    val droidspacesRows = report.methods.filter { isDroidspacesPolicyRuleMethod(it.method) }
+    val msdRows = report.methods.filter { it.policyRule?.set == SelinuxPolicyRuleSet.MSD }
+    val droidspacesRows = report.methods.filter { it.policyRule?.set == SelinuxPolicyRuleSet.DROIDSPACES }
     var msdInserted = false
     var droidspacesInserted = false
     return buildList {
         report.methods.forEach { result ->
-            if (isMsdPolicyRuleMethod(result.method)) {
-                if (!msdInserted) {
+            when (result.policyRule?.set) {
+                SelinuxPolicyRuleSet.MSD -> if (!msdInserted) {
                     buildAggregatedMsdMethodRow(msdRows)?.let(::add)
                     msdInserted = true
                 }
-            } else if (isDroidspacesPolicyRuleMethod(result.method)) {
-                if (!droidspacesInserted) {
+
+                SelinuxPolicyRuleSet.DROIDSPACES -> if (!droidspacesInserted) {
                     buildAggregatedDroidspacesMethodRow(droidspacesRows)?.let(::add)
                     droidspacesInserted = true
                 }
-            } else {
-                add(methodRow(result))
+
+                else -> add(methodRow(result))
             }
         }
     }
@@ -128,15 +129,15 @@ private fun buildAggregatedMsdMethodRow(results: List<SelinuxCheckResult>): Seli
     if (results.isEmpty()) {
         return null
     }
-    val allowed = results.filter { it.status == "Allowed" }.map { msdPolicyRuleName(it.method) }
-    val denied = results.filter { it.status == "Denied" }.map { msdPolicyRuleName(it.method) }
-    val unavailable = results.filter { it.status == "Unavailable" }.map { msdPolicyRuleName(it.method) }
+    val allowed = results.ruleEdges(SelinuxRuleVerdict.ALLOWED)
+    val denied = results.ruleEdges(SelinuxRuleVerdict.DENIED)
+    val unavailable = results.ruleEdges(SelinuxRuleVerdict.UNAVAILABLE)
     val aggregateResult = SelinuxCheckResult(
         method = "Dirty sepolicy rule: MSD",
         status = when {
-            allowed.isNotEmpty() -> "Allowed"
-            unavailable.isNotEmpty() -> "Unavailable"
-            else -> "Denied"
+            allowed.isNotEmpty() -> SelinuxRuleVerdict.ALLOWED.label
+            unavailable.isNotEmpty() -> SelinuxRuleVerdict.UNAVAILABLE.label
+            else -> SelinuxRuleVerdict.DENIED.label
         },
         isSecure = when {
             allowed.isNotEmpty() -> false
@@ -179,15 +180,15 @@ private fun buildAggregatedDroidspacesMethodRow(results: List<SelinuxCheckResult
     if (results.isEmpty()) {
         return null
     }
-    val allowed = results.filter { it.status == "Allowed" }.map { droidspacesPolicyRuleName(it.method) }
-    val denied = results.filter { it.status == "Denied" }.map { droidspacesPolicyRuleName(it.method) }
-    val unavailable = results.filter { it.status == "Unavailable" }.map { droidspacesPolicyRuleName(it.method) }
+    val allowed = results.ruleEdges(SelinuxRuleVerdict.ALLOWED)
+    val denied = results.ruleEdges(SelinuxRuleVerdict.DENIED)
+    val unavailable = results.ruleEdges(SelinuxRuleVerdict.UNAVAILABLE)
     val aggregateResult = SelinuxCheckResult(
         method = "Dirty sepolicy rule: Droidspaces",
         status = when {
-            allowed.isNotEmpty() -> "Allowed"
-            unavailable.isNotEmpty() -> "Unavailable"
-            else -> "Denied"
+            allowed.isNotEmpty() -> SelinuxRuleVerdict.ALLOWED.label
+            unavailable.isNotEmpty() -> SelinuxRuleVerdict.UNAVAILABLE.label
+            else -> SelinuxRuleVerdict.DENIED.label
         },
         isSecure = when {
             allowed.isNotEmpty() -> false
@@ -226,28 +227,32 @@ private fun buildAggregatedDroidspacesMethodRow(results: List<SelinuxCheckResult
     )
 }
 
+private fun List<SelinuxCheckResult>.ruleEdges(verdict: SelinuxRuleVerdict): List<String> =
+    mapNotNull { it.policyRule }.filter { it.verdict == verdict }.map { it.edge }
+
 private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
-    if (result.method == SelinuxContextValidityLabels.METHOD_LABEL) {
-        return when (result.status) {
-            SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT -> DetectorStatus.danger()
-            SelinuxContextValidityLabels.BITPAIR_CLEAN -> DetectorStatus.allClear()
-            SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS -> DetectorStatus.warning()
-            SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED -> DetectorStatus.warning()
-            else -> when (contextValiditySupportState(result)) {
+    if (result.oracle == SelinuxOracle.CONTEXT_VALIDITY) {
+        return when (result.contextValidity?.verdict) {
+            SelinuxContextValidityVerdict.KSU_PRESENT -> DetectorStatus.danger()
+            SelinuxContextValidityVerdict.CLEAN -> DetectorStatus.allClear()
+            SelinuxContextValidityVerdict.AMBIGUOUS -> DetectorStatus.warning()
+            SelinuxContextValidityVerdict.SELF_TEST_FAILED -> DetectorStatus.warning()
+            SelinuxContextValidityVerdict.UNSUPPORTED,
+            null -> when (contextValiditySupportState(result)) {
                 AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
                 AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
                 AppZygoteCarrierSupportState.AVAILABLE -> DetectorStatus.info(InfoKind.SUPPORT)
             }
         }
     }
-    if (result.method == SelinuxProcAttrCurrentLabels.METHOD_LABEL) {
+    if (result.oracle == SelinuxOracle.PROC_ATTR_CURRENT_WRITE) {
         return when {
             result.isSecure == false -> DetectorStatus.danger()
             result.isSecure == true -> DetectorStatus.allClear()
             else -> DetectorStatus.info(InfoKind.SUPPORT)
         }
     }
-    if (result.method == SelinuxPolicyloadSeqnoLabels.METHOD_LABEL) {
+    if (result.oracle == SelinuxOracle.POLICYLOAD_SEQNO) {
         return when {
             result.isSecure == false -> DetectorStatus.danger()
             result.isSecure == true -> DetectorStatus.allClear()

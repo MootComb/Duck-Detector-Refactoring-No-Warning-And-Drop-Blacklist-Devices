@@ -20,7 +20,7 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
@@ -54,8 +54,7 @@ internal fun buildVerdict(report: SelinuxReport): String {
     val procAttrCurrent = procAttrCurrentResult(report)
     val policyloadSeqno = policyloadSeqnoResult(report)
     val dirtyPolicyHit = firstTrustedPolicyRuleHit(report)
-    val repeatabilityFailed =
-        contextValidity?.details?.contains("repeatability failed", ignoreCase = true) == true
+    val repeatabilityFailed = contextValidity?.contextValidity?.repeatabilityFailed == true
     val appZygoteCarrierState = contextValiditySupportState(contextValidity)
     return when (report.stage) {
         SelinuxStage.LOADING -> "Scanning SELinux state"
@@ -63,7 +62,7 @@ internal fun buildVerdict(report: SelinuxReport): String {
         SelinuxStage.READY -> when (report.mode) {
             SelinuxMode.ENFORCING -> when {
                 report.auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> "Enforcing with audit rewrite"
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT ->
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.KSU_PRESENT ->
                     "Enforcing with KSU context materialized"
                 policyloadSeqno?.isSecure == false -> "Enforcing with app_zygote seqno split"
                 procAttrCurrent?.isSecure == false -> "Enforcing with app_zygote attr-write anomaly"
@@ -73,14 +72,14 @@ internal fun buildVerdict(report: SelinuxReport): String {
                 appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED ->
                     "Enforcing with reduced app_zygote coverage"
 
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED ->
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.SELF_TEST_FAILED ->
                     if (repeatabilityFailed) {
                         "Enforcing with unstable context oracle"
                     } else {
                         "Enforcing with untrusted context oracle"
                     }
 
-                contextValidity?.status == SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS ->
+                contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.AMBIGUOUS ->
                     "Enforcing with context split"
 
                 report.auditIntegrity?.state == SelinuxAuditIntegrityState.EXPOSED -> "Enforcing with audit exposure"
@@ -103,8 +102,7 @@ internal fun buildSummary(report: SelinuxReport): String {
     val procAttrCurrent = procAttrCurrentResult(report)
     val policyloadSeqno = policyloadSeqnoResult(report)
     val dirtyPolicyHit = firstTrustedPolicyRuleHit(report)
-    val repeatabilityFailed =
-        contextValidity?.details?.contains("repeatability failed", ignoreCase = true) == true
+    val repeatabilityFailed = contextValidity?.contextValidity?.repeatabilityFailed == true
     val appZygoteCarrierState = contextValiditySupportState(contextValidity)
     return when (report.stage) {
         SelinuxStage.LOADING ->
@@ -162,24 +160,24 @@ internal fun buildSummary(report: SelinuxReport): String {
                         SelinuxAuditIntegrityState.CLEAR, null -> Unit
                     }
                 }
-                val contextNote = when (contextValidity?.status) {
-                    SelinuxContextValidityLabels.BITPAIR_KSU_PRESENT ->
+                val contextNote = when (contextValidity?.contextValidity?.verdict) {
+                    SelinuxContextValidityVerdict.KSU_PRESENT ->
                         "The context validity oracle accepted both KSU-specific contexts from the current carrier."
 
-                    SelinuxContextValidityLabels.BITPAIR_CLEAN ->
+                    SelinuxContextValidityVerdict.CLEAN ->
                         "The context validity oracle rejected both KSU-specific contexts in live policy."
 
-                    SelinuxContextValidityLabels.BITPAIR_SELF_TEST_FAILED ->
+                    SelinuxContextValidityVerdict.SELF_TEST_FAILED ->
                         if (repeatabilityFailed) {
                             "The context validity oracle repeated inconsistently, so its KSU verdict was not trusted."
                         } else {
                             "The context validity oracle failed its self-test, so its KSU verdict was not trusted."
                         }
 
-                    SelinuxContextValidityLabels.BITPAIR_AMBIGUOUS ->
+                    SelinuxContextValidityVerdict.AMBIGUOUS ->
                         "The context validity oracle split across the two KSU-specific contexts."
 
-                    SelinuxContextValidityLabels.BITPAIR_UNSUPPORTED ->
+                    SelinuxContextValidityVerdict.UNSUPPORTED ->
                         when (appZygoteCarrierState) {
                             AppZygoteCarrierSupportState.UNTRUSTED ->
                                 buildString {
