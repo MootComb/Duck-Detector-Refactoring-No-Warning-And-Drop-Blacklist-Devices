@@ -87,24 +87,6 @@ namespace ducktee::trickystore::detail {
         return ducktee::common::invoke_ioctl(backend, fd, request, arg);
     }
 
-    std::string format_backend_observation(const IoctlBackendObservation &observation) {
-        std::ostringstream builder;
-        builder << ducktee::common::backend_label(observation.backend)
-                << "(ret=" << observation.result
-                << ", errno=" << observation.error_number
-                << ", version=" << observation.protocol_version << ")";
-        return builder.str();
-    }
-
-    bool backend_samples_aligned(
-            const IoctlBackendObservation &reference,
-            const IoctlBackendObservation &candidate
-    ) {
-        return reference.result == candidate.result &&
-               reference.error_number == candidate.error_number &&
-               reference.protocol_version == candidate.protocol_version;
-    }
-
     void prepare_honeypot_payload(
             std::uint8_t *write_buffer,
             binder_write_read *bwr,

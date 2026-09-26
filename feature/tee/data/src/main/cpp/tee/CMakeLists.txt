@@ -6,6 +6,7 @@ duckdetector_native_unit(duckdetector_tee
     common/timing_stats.cpp
     keystore/environment_probe.cpp
     trickystore/trickystore_honeypot.cpp
+    trickystore/trickystore_backend_mismatch.cpp
     trickystore/trickystore_hooks.cpp
     trickystore/trickystore_maps.cpp
     trickystore/trickystore_probe.cpp
