@@ -56,6 +56,7 @@ jobs:
           python3 .github/scripts/test-native-boundaries.py
           python3 .github/scripts/test-reflection-boundaries.py
           python3 .github/scripts/test-source-file-length.py
+          python3 .github/scripts/test-text-protocols.py
           python3 scripts/test_new_detector.py
 
       - name: Verify every detector stays inside its own directory
@@ -75,6 +76,9 @@ jobs:
 
       - name: Verify source file length
         run: python3 .github/scripts/check-source-file-length.py
+
+      - name: Verify no layer or unit branches on another's text
+        run: python3 .github/scripts/check-text-protocols.py
 
   verify:
     name: Unit tests, lint, and native build
@@ -177,6 +181,7 @@ jobs:
           python3 .github/scripts/check-jni-contracts.py
           python3 .github/scripts/check-native-boundaries.py
           python3 .github/scripts/check-source-file-length.py
+          python3 .github/scripts/check-text-protocols.py
           # The scaffold's evidence record is a draft, which must fail until research is recorded.
           if python3 .github/scripts/check-evidence-records.py 2> /tmp/evidence-errors; then
             echo "the scaffolded draft evidence record was accepted" >&2

@@ -2,9 +2,9 @@
 
 These are known, deliberate gaps left by the module refactor. Each one was kept because fixing it would change detector semantics, shipped binaries or component identity, which the refactor was not allowed to do. Remove an entry in the same change that resolves it.
 
-## Text protocols inside features
+## Text that data layers still read
 
-Some features still branch on method labels that their own data layer produces. For example, `KernelCheckMethods.kt` in `:feature:kernelcheck:data` emits the label `"cvePatchCheck"`, and `KernelCheckCardStatus.kt` and `KernelCheckCardRows.kt` in `:feature:kernelcheck:presentation` compare against it. The protocol never crosses a feature boundary, but renaming the label silently changes the card. Replace such labels with typed method or reason identifiers in each feature's domain layer, one feature per change, with the card and export golden tests proving the output is unchanged.
+`check-text-protocols.py` covers presentation, ui, core, SDK, app and native code, but not data layers, which interpret the platform's text by nature. Some of what they read is DuckDetector's own. The Mount repository filters the early preload capability's findings by splitting their `type|message` strings, although the capability has a typed accessor for the messages. The Native Root cgroup probe compares its own rule labels. The SELinux attr/current results carry their outcome as string constants the capability defines. Each stays inside the unit that wrote or received the text; typing them would let the checker cover data layers too.
 
 ## SELinux note statuses
 

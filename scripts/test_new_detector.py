@@ -35,6 +35,7 @@ REPO = os.path.dirname(SCRIPTS)
 SCAFFOLD = os.path.join(SCRIPTS, "new_detector.py")
 JNI_CHECKER = os.path.join(REPO, ".github", "scripts", "check-jni-contracts.py")
 EVIDENCE_CHECKER = os.path.join(REPO, ".github", "scripts", "check-evidence-records.py")
+TEXT_CHECKER = os.path.join(REPO, ".github", "scripts", "check-text-protocols.py")
 CATALOG = "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt"
 FEATURES = "app/src/main/java/com/eltavine/duckdetector/ui/DetectorFeatures.kt"
 NATIVE_CMAKE = "sdk/runtime/src/main/cpp/CMakeLists.txt"
@@ -154,6 +155,18 @@ class NewDetectorTest(unittest.TestCase):
             self.assertNotIn("{{", text, path)
             if path.endswith((".kt", ".kts", ".cpp")):
                 self.assertTrue(text.startswith("/*\n * Copyright "), path)
+
+    def test_generated_code_branches_on_no_text(self) -> None:
+        self.assertEqual(self.scaffold("demo", "--native").returncode, 0)
+        with open(os.path.join(REPO, ".github", "policies", "text-protocols.json"), encoding="utf-8") as handle:
+            scope = json.load(handle)
+        policy = os.path.join(self.root, "text-protocols.json")
+        with open(policy, "w", encoding="utf-8") as handle:
+            json.dump({**scope, "allowed": []}, handle)
+
+        result = subprocess.run([sys.executable, TEXT_CHECKER, "--repo-root", self.root, "--policy", policy],
+                                capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_writes_a_draft_evidence_record_that_ci_rejects_until_researched(self) -> None:
         self.assertEqual(self.scaffold("demo").returncode, 0)
