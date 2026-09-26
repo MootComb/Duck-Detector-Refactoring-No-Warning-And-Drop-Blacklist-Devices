@@ -37,12 +37,7 @@ internal fun buildStateRows(report: SelinuxReport): List<SelinuxDetailRowModel> 
     val detectionPath = when {
         report.mode == SelinuxMode.UNKNOWN -> "Not resolved"
         report.paradoxDetected -> "Paradox logic"
-        report.methods.any {
-            it.status.equals(
-                "Enforcing",
-                ignoreCase = true
-            )
-        } -> "Direct confirmation"
+        report.methods.any { it.readsEnforcing } -> "Direct confirmation"
 
         else -> "Fallback inference"
     }

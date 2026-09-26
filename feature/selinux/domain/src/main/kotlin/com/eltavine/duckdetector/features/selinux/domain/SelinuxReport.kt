@@ -44,6 +44,8 @@ data class SelinuxCheckResult(
     val policyRule: SelinuxPolicyRule? = null,
     /** The targets whose attr/current writes behaved anomalously; set only on that oracle's result. */
     val attrCurrentDetections: List<String> = emptyList(),
+    /** True when this probe read the enforcing mode directly, from sysfs or getenforce. */
+    val readsEnforcing: Boolean = false,
 )
 
 /** What a policy analysis note says about the loaded policy. */

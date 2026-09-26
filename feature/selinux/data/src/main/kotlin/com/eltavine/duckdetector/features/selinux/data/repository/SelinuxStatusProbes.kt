@@ -91,6 +91,7 @@ internal fun checkViaSysfs(): SelinuxCheckResult {
                         isSecure = true,
                         permissionDenied = false,
                         details = "/sys/fs/selinux/enforce = 1",
+                        readsEnforcing = true,
                     )
 
                     "0" -> SelinuxCheckResult(
@@ -184,6 +185,7 @@ internal fun checkViaGetenforce(): SelinuxCheckResult {
                 isSecure = true,
                 permissionDenied = false,
                 details = "Command returned Enforcing",
+                readsEnforcing = true,
             )
 
             stdout.equals(SELINUX_PERMISSIVE, ignoreCase = true) -> SelinuxCheckResult(
@@ -358,7 +360,7 @@ internal fun determineStatusWithParadoxLogic(
         }
     }
 
-    if (results.any { it.status == SELINUX_ENFORCING }) {
+    if (results.any { it.readsEnforcing }) {
         return StatusResolution(
             SelinuxMode.ENFORCING,
             SELINUX_ENFORCING,
