@@ -19,7 +19,6 @@ package com.eltavine.duckdetector.features.selinux.data.repository
 import com.eltavine.duckdetector.core.platform.PathState
 import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -259,157 +258,45 @@ internal fun checkViaGetenforce(): SelinuxCheckResult {
     }
 }
 
-internal fun checkViaProcAttr(): SelinuxCheckResult {
-    return try {
-        val procAttrFile = File(PROC_ATTR_PATH)
-        if (procAttrFile.exists() && procAttrFile.canRead()) {
-            classifyProcAttrContext(procAttrFile.readText())
-        } else {
-            SelinuxCheckResult(
-                method = METHOD_PROC_ATTR,
-                status = "Not readable",
-                isSecure = null,
-                permissionDenied = procAttrFile.exists(),
-                details = if (procAttrFile.exists()) "Access denied" else "File not found",
-            )
-        }
-    } catch (securityException: SecurityException) {
-        SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = "Blocked",
-            isSecure = null,
-            permissionDenied = true,
-            details = securityException.message ?: "SecurityException",
-        )
-    } catch (throwable: Throwable) {
-        SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = "Error",
-            isSecure = null,
-            permissionDenied = false,
-            details = throwable.message ?: "proc attr check failed",
-        )
-    }
-}
-
-/**
- * The domain this process runs in. The kernel reports a task's context whether or not the policy
- * is enforced (selinux_getprocattr in security/selinux/hooks.c), so a labelled context shows that
- * SELinux is enabled, never whether it enforces.
- */
-internal fun classifyProcAttrContext(raw: String): SelinuxCheckResult {
-    val context = raw.trim().replace("\u0000", "")
-    val type = context.split(":").getOrNull(2)
-    return when {
-        context.isBlank() -> SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = "Empty",
-            isSecure = null,
-            permissionDenied = false,
-            details = "Context file empty",
-        )
-
-        type == null -> SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = "Unknown context",
-            isSecure = null,
-            permissionDenied = false,
-            details = "Raw: $context",
-        )
-
-        // Zygote moves every app process into its seapp_contexts domain before app code runs.
-        type == "kernel" || type == "init" -> SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = "Unexpected context",
-            isSecure = false,
-            permissionDenied = false,
-            details = "Context: $context. An app process never keeps the $type domain.",
-        )
-
-        else -> SelinuxCheckResult(
-            method = METHOD_PROC_ATTR,
-            status = PROC_ATTR_LABELED,
-            isSecure = null,
-            permissionDenied = false,
-            details = "Context: $context. A labelled context shows SELinux is enabled, not whether it enforces.",
-        )
-    }
-}
-
-internal fun determineStatusWithParadoxLogic(
-    results: List<SelinuxCheckResult>,
-): StatusResolution {
-    val filesystemActive = results.any {
-        it.method == METHOD_FILESYSTEM && (it.status == FILESYSTEM_ACTIVE || it.status == FILESYSTEM_MOUNTED)
-    }
-
-    results.forEach { result ->
-        if (result.status == SELINUX_PERMISSIVE) {
-            return StatusResolution(
-                SelinuxMode.PERMISSIVE,
-                SELINUX_PERMISSIVE,
-                paradoxDetected = false
-            )
-        }
-        if (result.status == SELINUX_DISABLED || result.status == FILESYSTEM_NOT_MOUNTED) {
-            return StatusResolution(
-                SelinuxMode.DISABLED,
-                SELINUX_DISABLED,
-                paradoxDetected = false
-            )
-        }
-    }
-
-    if (results.any { it.readsEnforcing }) {
-        return StatusResolution(
-            SelinuxMode.ENFORCING,
-            SELINUX_ENFORCING,
-            paradoxDetected = false
-        )
-    }
-
-    // Only a denied read of the enforce node proves enforcing mode: every UID may read it (S_IRUGO
-    // in security/selinux/selinuxfs.c), and in permissive mode avc_denied() grants instead of
-    // returning -EACCES (security/selinux/avc.c).
-    val enforceReadDenied = results.any { it.permissionDenied && it.method in ENFORCE_NODE_METHODS }
-    if (enforceReadDenied && filesystemActive) {
-        return StatusResolution(
-            SelinuxMode.ENFORCING,
-            "Enforcing (paradox)",
-            paradoxDetected = true
-        )
-    }
-
-    return StatusResolution(SelinuxMode.UNKNOWN, "Unknown", paradoxDetected = false)
-}
-
 private fun String?.isPermissionDenied(): Boolean {
     return this?.contains("Permission denied", ignoreCase = true) == true ||
             this?.contains("EACCES", ignoreCase = true) == true
 }
 
-internal data class StatusResolution(
-    val mode: SelinuxMode,
-    val label: String,
-    val paradoxDetected: Boolean,
-)
-
 private const val PROCESS_TIMEOUT_SECONDS = 5L
-private const val SELINUX_ENFORCING = "Enforcing"
-private const val SELINUX_PERMISSIVE = "Permissive"
+
+internal const val SELINUX_ENFORCING = "Enforcing"
+
+internal const val SELINUX_PERMISSIVE = "Permissive"
+
 internal const val SELINUX_DISABLED = "Disabled"
+
 private const val BLOCKED_ENFORCING = "Blocked (Enforcing)"
+
 internal const val METHOD_FILESYSTEM = "filesystem"
+
 private const val METHOD_SYSFS = "sysfs"
+
 private const val METHOD_GETENFORCE = "getenforce"
-private const val METHOD_PROC_ATTR = "proc/self/attr"
-private val ENFORCE_NODE_METHODS = setOf(METHOD_SYSFS, METHOD_GETENFORCE)
+
+internal const val METHOD_PROC_ATTR = "proc/self/attr"
+
+internal val ENFORCE_NODE_METHODS = setOf(METHOD_SYSFS, METHOD_GETENFORCE)
+
 internal const val PROC_ATTR_LABELED = "Labeled"
+
 internal const val FILESYSTEM_NOT_MOUNTED = "Not mounted"
+
 internal const val FILESYSTEM_NOT_OBSERVABLE = "Not observable"
+
 internal const val FILESYSTEM_ACTIVE = "Active"
+
 internal const val FILESYSTEM_MOUNTED = "Mounted"
+
 private const val SELINUX_STATUS_PATH = "/sys/fs/selinux/enforce"
+
 private const val SELINUX_MOUNT_PATH = "/sys/fs/selinux"
+
 private const val SELINUX_POLICY_PATH = "/sys/fs/selinux/policy"
+
 internal const val PROC_ATTR_PATH = "/proc/self/attr/current"
