@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.selinux.presentation
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityAnalysis
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditNoteKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxDetailRowModel
@@ -167,22 +168,26 @@ internal fun buildAuditRows(analysis: SelinuxAuditIntegrityAnalysis?): List<Seli
 
 internal fun buildAuditNotes(analysis: SelinuxAuditIntegrityAnalysis?): List<SelinuxImpactItemModel> {
     return analysis?.notes?.map { note ->
-        SelinuxImpactItemModel(
-            text = note,
-            status = when {
-                note.contains("rewrite markers", ignoreCase = true) -> DetectorStatus.danger()
-                note.contains("side-channel", ignoreCase = true) -> DetectorStatus.warning()
-                note.contains("su-related actor", ignoreCase = true) -> DetectorStatus.warning()
-                note.contains(
-                    "Readable auditpatch residue",
-                    ignoreCase = true
-                ) -> DetectorStatus.warning()
-
-                note.contains("did not expose", ignoreCase = true) -> DetectorStatus.allClear()
-                else -> DetectorStatus.info(InfoKind.SUPPORT)
-            },
-        )
+        SelinuxImpactItemModel(text = note.text, status = note.kind.status())
     }.orEmpty()
+}
+
+private fun SelinuxAuditNoteKind.status(): DetectorStatus = when (this) {
+    SelinuxAuditNoteKind.SIDE_CHANNEL_LEAK,
+    SelinuxAuditNoteKind.SU_ACTOR_REFERENCED,
+    SelinuxAuditNoteKind.RESIDUE_FOUND -> DetectorStatus.warning()
+
+    SelinuxAuditNoteKind.DIRECT_PROBE_NOT_LEAKED -> DetectorStatus.allClear()
+
+    // Keeps the status a keyword match gave this note; see "SELinux note statuses" in the follow-ups.
+    SelinuxAuditNoteKind.PROBES_EXPOSED_TAMPERING -> DetectorStatus.info(InfoKind.SUPPORT)
+
+    SelinuxAuditNoteKind.EVENT_BUFFER_CLEAN,
+    SelinuxAuditNoteKind.EVENTS_NOT_GUARANTEED,
+    SelinuxAuditNoteKind.EVENT_LOGS_UNAVAILABLE,
+    SelinuxAuditNoteKind.NO_RESIDUE,
+    SelinuxAuditNoteKind.RESIDUE_UNCHECKED,
+    SelinuxAuditNoteKind.ABSENCE_NOT_PROOF -> DetectorStatus.info(InfoKind.SUPPORT)
 }
 
 internal fun auditIntegrityLabel(analysis: SelinuxAuditIntegrityAnalysis?): String {

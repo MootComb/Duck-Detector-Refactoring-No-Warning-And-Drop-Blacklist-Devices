@@ -6,7 +6,11 @@ These are known, deliberate gaps left by the module refactor. Each one was kept 
 
 Some features still branch on method labels that their own data layer produces. For example, `KernelCheckMethods.kt` in `:feature:kernelcheck:data` emits the label `"cvePatchCheck"`, and `KernelCheckCardStatus.kt` and `KernelCheckCardRows.kt` in `:feature:kernelcheck:presentation` compare against it. The protocol never crosses a feature boundary, but renaming the label silently changes the card. Replace such labels with typed method or reason identifiers in each feature's domain layer, one feature per change, with the card and export golden tests proving the output is unchanged.
 
-Two presentation layers go further and read meaning back out of report text. `TeeCardModelMapper` picks the dashboard's top finding by searching the TEE summary and item bodies for "Grant self-domain", "key visibility" and "KEY_NOT_FOUND". `buildPolicyNotes` in `SelinuxCardRows.kt` sets each policy note's severity by searching its text for "below minimum", "dangerous" or "permissive". Give the TEE report a typed grant finding and the SELinux policy analysis typed notes, each with the text beside its kind.
+One presentation layer goes further and reads meaning back out of report text. `TeeCardModelMapper` picks the dashboard's top finding by searching the TEE summary and item bodies for "Grant self-domain", "key visibility" and "KEY_NOT_FOUND". Give the TEE report a typed grant finding, with the text beside its kind, as the SELinux policy and audit notes now have.
+
+## SELinux note statuses
+
+The SELinux card's policy and audit notes are typed, but each kind keeps the status the old keyword search gave its text, including three that look wrong. "No permissive domains detected" is a warning, because its text contains "permissive". "Security classes look complete" is informational, because its text contains none of the searched words. And the note for audit probes that exposed tampering is informational for the same reason, although its state is the strongest audit finding. Correcting them changes what the card shows, so each needs a deliberate decision.
 
 ## Early virtualization preload matches finding labels
 

@@ -26,6 +26,8 @@ import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxAuditRuntim
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditEvidence
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityAnalysis
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditNote
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditNoteKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
@@ -125,47 +127,78 @@ class SelinuxRepository(
         }
         val residueHits = findAuditResidueHits()
         val runtimeProbe = auditRuntimeProbe.inspect()
-        val notes = mutableListOf<String>()
+        val notes = mutableListOf<SelinuxAuditNote>()
 
         when {
             runtimeProbe.hits.isNotEmpty() -> {
-                notes += "Controlled SELinux audit probes exposed policy or log-surface behavior that should not occur on a stock app path."
+                notes += SelinuxAuditNote(
+                    SelinuxAuditNoteKind.PROBES_EXPOSED_TAMPERING,
+                    "Controlled SELinux audit probes exposed policy or log-surface behavior that should not occur on a stock app path.",
+                )
             }
 
             runtimeProbe.sideChannelHits.isNotEmpty() -> {
-                notes += if (runtimeProbe.directProbeUsed) {
-                    "A direct libselinux callback probe and app-visible auditd event logs both observed the same nonce-tagged AVC denial. Treat this as audit side-channel leakage, not direct root-process proof."
-                } else {
-                    "Readable auditd event logs exposed the controlled AVC denial probe. Treat this as audit side-channel leakage, not direct root-process proof."
-                }
+                notes += SelinuxAuditNote(
+                    SelinuxAuditNoteKind.SIDE_CHANNEL_LEAK,
+                    if (runtimeProbe.directProbeUsed) {
+                        "A direct libselinux callback probe and app-visible auditd event logs both observed the same nonce-tagged AVC denial. Treat this as audit side-channel leakage, not direct root-process proof."
+                    } else {
+                        "Readable auditd event logs exposed the controlled AVC denial probe. Treat this as audit side-channel leakage, not direct root-process proof."
+                    },
+                )
             }
 
             runtimeProbe.logcatChecked -> {
                 notes += if (runtimeProbe.directProbeUsed) {
-                    "A direct libselinux callback probe ran in-process, but readable auditd event logs did not expose the same nonce-tagged AVC denial or rewrite marker."
+                    SelinuxAuditNote(
+                        SelinuxAuditNoteKind.DIRECT_PROBE_NOT_LEAKED,
+                        "A direct libselinux callback probe ran in-process, but readable auditd event logs did not expose the same nonce-tagged AVC denial or rewrite marker.",
+                    )
                 } else {
-                    "The auditd event buffer was readable, but no canonical audit rewrite marker or AVC leak surfaced."
+                    SelinuxAuditNote(
+                        SelinuxAuditNoteKind.EVENT_BUFFER_CLEAN,
+                        "The auditd event buffer was readable, but no canonical audit rewrite marker or AVC leak surfaced.",
+                    )
                 }
-                notes += "AOSP does not guarantee that every device emits or exposes matching audit events to app-visible log readers, so this remains non-proving."
+                notes += SelinuxAuditNote(
+                    SelinuxAuditNoteKind.EVENTS_NOT_GUARANTEED,
+                    "AOSP does not guarantee that every device emits or exposes matching audit events to app-visible log readers, so this remains non-proving.",
+                )
             }
 
             else -> {
-                notes += runtimeProbe.failureReason
-                    ?: "Recent auditd event logs were unavailable from the current app context."
+                notes += SelinuxAuditNote(
+                    SelinuxAuditNoteKind.EVENT_LOGS_UNAVAILABLE,
+                    runtimeProbe.failureReason ?: "Recent auditd event logs were unavailable from the current app context.",
+                )
             }
         }
 
         if (runtimeProbe.suspiciousActorHits.isNotEmpty()) {
-            notes += "Readable AVC denials also referenced su-related actor strings such as comm/exe/path tokens. Treat this as supporting visibility evidence, not direct proof of a live root daemon."
+            notes += SelinuxAuditNote(
+                SelinuxAuditNoteKind.SU_ACTOR_REFERENCED,
+                "Readable AVC denials also referenced su-related actor strings such as comm/exe/path tokens. Treat this as supporting visibility evidence, not direct proof of a live root daemon.",
+            )
         }
 
         notes += when {
-            residueHits.isNotEmpty() ->
-                "Readable auditpatch residue suggests logd audit output may be rewritten before apps inspect it."
-            residueObservable -> "No auditpatch residue exists under common module locations."
-            else -> "Common auditpatch module locations could not be checked from this app."
+            residueHits.isNotEmpty() -> SelinuxAuditNote(
+                SelinuxAuditNoteKind.RESIDUE_FOUND,
+                "Readable auditpatch residue suggests logd audit output may be rewritten before apps inspect it.",
+            )
+            residueObservable -> SelinuxAuditNote(
+                SelinuxAuditNoteKind.NO_RESIDUE,
+                "No auditpatch residue exists under common module locations.",
+            )
+            else -> SelinuxAuditNote(
+                SelinuxAuditNoteKind.RESIDUE_UNCHECKED,
+                "Common auditpatch module locations could not be checked from this app.",
+            )
         }
-        notes += "Absence of residue is not proof of absence because ordinary apps often cannot traverse /data/adb."
+        notes += SelinuxAuditNote(
+            SelinuxAuditNoteKind.ABSENCE_NOT_PROOF,
+            "Absence of residue is not proof of absence because ordinary apps often cannot traverse /data/adb.",
+        )
 
         val state = when {
             runtimeProbe.hits.isNotEmpty() -> SelinuxAuditIntegrityState.TAMPERED

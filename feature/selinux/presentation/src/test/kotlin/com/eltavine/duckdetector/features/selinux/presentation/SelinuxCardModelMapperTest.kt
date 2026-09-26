@@ -21,6 +21,8 @@ import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditEvidence
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityAnalysis
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegrityState
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditNote
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditNoteKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
@@ -67,7 +69,10 @@ class SelinuxCardModelMapperTest {
                     logcatChecked = true,
                     directProbeUsed = true,
                     notes = listOf(
-                        "A direct libselinux callback probe and app-visible auditd event logs both observed the same nonce-tagged AVC denial. Treat this as audit side-channel leakage, not direct root-process proof.",
+                        SelinuxAuditNote(
+                            SelinuxAuditNoteKind.SIDE_CHANNEL_LEAK,
+                            "A direct libselinux callback probe and app-visible auditd event logs both observed the same nonce-tagged AVC denial. Treat this as audit side-channel leakage, not direct root-process proof.",
+                        ),
                     ),
                 ),
                 androidVersion = "15",
@@ -136,7 +141,12 @@ class SelinuxCardModelMapperTest {
                     suspiciousActorHits = emptyList(),
                     logcatChecked = true,
                     directProbeUsed = true,
-                    notes = listOf("AOSP does not guarantee that every device emits or exposes matching audit events to app-visible log readers, so this remains non-proving."),
+                    notes = listOf(
+                        SelinuxAuditNote(
+                            SelinuxAuditNoteKind.EVENTS_NOT_GUARANTEED,
+                            "AOSP does not guarantee that every device emits or exposes matching audit events to app-visible log readers, so this remains non-proving.",
+                        ),
+                    ),
                 ),
                 androidVersion = "16",
                 apiLevel = 36,

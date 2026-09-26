@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxCheckResult
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyAnalysis
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyNoteKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
@@ -312,20 +313,27 @@ internal fun buildPolicyRows(policy: SelinuxPolicyAnalysis?): List<SelinuxDetail
 }
 
 internal fun buildPolicyNotes(policy: SelinuxPolicyAnalysis?): List<SelinuxImpactItemModel> {
-    return policy?.details?.map { detail ->
-        SelinuxImpactItemModel(
-            text = detail,
-            status = when {
-                detail.contains("below minimum", ignoreCase = true) -> DetectorStatus.warning()
-                detail.contains("missing", ignoreCase = true) -> DetectorStatus.warning()
-                detail.contains("dangerous", ignoreCase = true) -> DetectorStatus.danger()
-                detail.contains("permissive", ignoreCase = true) -> DetectorStatus.warning()
-                detail.contains("normal", ignoreCase = true) -> DetectorStatus.allClear()
-                detail.contains("meets minimum", ignoreCase = true) -> DetectorStatus.allClear()
-                else -> DetectorStatus.info(InfoKind.SUPPORT)
-            },
-        )
+    return policy?.notes?.map { note ->
+        SelinuxImpactItemModel(text = note.text, status = note.kind.status())
     }.orEmpty()
+}
+
+private fun SelinuxPolicyNoteKind.status(): DetectorStatus = when (this) {
+    SelinuxPolicyNoteKind.VERSION_MEETS_MINIMUM,
+    SelinuxPolicyNoteKind.CONTEXT_TYPE_NORMAL -> DetectorStatus.allClear()
+
+    SelinuxPolicyNoteKind.VERSION_BELOW_MINIMUM,
+    SelinuxPolicyNoteKind.CLASSES_MISSING,
+    SelinuxPolicyNoteKind.PERMISSIVE_DOMAINS_FOUND -> DetectorStatus.warning()
+
+    // Keeps the status a keyword match gave these notes; see "SELinux note statuses" in the follow-ups.
+    SelinuxPolicyNoteKind.NO_PERMISSIVE_DOMAINS -> DetectorStatus.warning()
+
+    SelinuxPolicyNoteKind.DANGEROUS_CONTEXT_TYPES -> DetectorStatus.danger()
+
+    SelinuxPolicyNoteKind.VERSION_UNREADABLE,
+    SelinuxPolicyNoteKind.CLASSES_COMPLETE,
+    SelinuxPolicyNoteKind.CLASSES_UNREADABLE -> DetectorStatus.info(InfoKind.SUPPORT)
 }
 
 internal fun policyWeaknessLabel(weakness: SelinuxPolicyWeakness?): String {

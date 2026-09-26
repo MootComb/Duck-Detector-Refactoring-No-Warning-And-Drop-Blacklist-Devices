@@ -17,24 +17,26 @@
 package com.eltavine.duckdetector.features.selinux.data.repository
 
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyAnalysis
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyNote
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyNoteKind
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import java.io.File
 
 internal fun analyzePolicy(processContext: String?): SelinuxPolicyAnalysis {
-    val details = mutableListOf<String>()
+    val notes = mutableListOf<SelinuxPolicyNote>()
     var weaknessScore = 0
 
     val policyVersion = readPolicyVersion()
     val policyVersionOk = policyVersion != null && policyVersion >= MIN_EXPECTED_POLICY_VERSION
     if (policyVersion != null) {
         if (policyVersionOk) {
-            details += "Policy version $policyVersion meets minimum $MIN_EXPECTED_POLICY_VERSION"
+            notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.VERSION_MEETS_MINIMUM, "Policy version $policyVersion meets minimum $MIN_EXPECTED_POLICY_VERSION")
         } else {
-            details += "Policy version $policyVersion is below minimum $MIN_EXPECTED_POLICY_VERSION"
+            notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.VERSION_BELOW_MINIMUM, "Policy version $policyVersion is below minimum $MIN_EXPECTED_POLICY_VERSION")
             weaknessScore += 2
         }
     } else {
-        details += "Policy version unreadable"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.VERSION_UNREADABLE, "Policy version unreadable")
     }
 
     val (classCount, foundClasses) = countSecurityClasses()
@@ -44,13 +46,13 @@ internal fun analyzePolicy(processContext: String?): SelinuxPolicyAnalysis {
     val classCountOk = classCount >= EXPECTED_CLASSES.size && missingClasses.isEmpty()
     if (classCount > 0) {
         if (classCountOk) {
-            details += "Security classes look complete ($classCount)"
+            notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.CLASSES_COMPLETE, "Security classes look complete ($classCount)")
         } else {
-            details += "Security classes missing: ${missingClasses.joinToString()}"
+            notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.CLASSES_MISSING, "Security classes missing: ${missingClasses.joinToString()}")
             weaknessScore += missingClasses.size
         }
     } else {
-        details += "Security classes unreadable"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.CLASSES_UNREADABLE, "Security classes unreadable")
     }
 
     val contextType = processContext?.split(":")?.getOrNull(2)
@@ -59,17 +61,17 @@ internal fun analyzePolicy(processContext: String?): SelinuxPolicyAnalysis {
     }
     if (dangerousTypesFound.isNotEmpty()) {
         weaknessScore += dangerousTypesFound.size * 3
-        details += "Dangerous context types: ${dangerousTypesFound.joinToString()}"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.DANGEROUS_CONTEXT_TYPES, "Dangerous context types: ${dangerousTypesFound.joinToString()}")
     } else if (contextType != null) {
-        details += "Context type '$contextType' looks normal"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.CONTEXT_TYPE_NORMAL, "Context type '$contextType' looks normal")
     }
 
     val permissiveDomains = checkPermissiveDomains(processContext)
     if (permissiveDomains.isNotEmpty()) {
         weaknessScore += permissiveDomains.size * 2
-        details += "Permissive domains found: ${permissiveDomains.joinToString()}"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.PERMISSIVE_DOMAINS_FOUND, "Permissive domains found: ${permissiveDomains.joinToString()}")
     } else {
-        details += "No permissive domains detected"
+        notes += SelinuxPolicyNote(SelinuxPolicyNoteKind.NO_PERMISSIVE_DOMAINS, "No permissive domains detected")
     }
 
     val weakness = when {
@@ -91,7 +93,7 @@ internal fun analyzePolicy(processContext: String?): SelinuxPolicyAnalysis {
         processContext = processContext,
         contextType = contextType,
         weakness = weakness,
-        details = details,
+        notes = notes,
     )
 }
 

@@ -38,6 +38,25 @@ data class SelinuxCheckResult(
     val dirtyPolicyTrusted: Boolean = false,
 )
 
+/** What a policy analysis note says about the loaded policy. */
+enum class SelinuxPolicyNoteKind {
+    VERSION_MEETS_MINIMUM,
+    VERSION_BELOW_MINIMUM,
+    VERSION_UNREADABLE,
+    CLASSES_COMPLETE,
+    CLASSES_MISSING,
+    CLASSES_UNREADABLE,
+    DANGEROUS_CONTEXT_TYPES,
+    CONTEXT_TYPE_NORMAL,
+    PERMISSIVE_DOMAINS_FOUND,
+    NO_PERMISSIVE_DOMAINS,
+}
+
+data class SelinuxPolicyNote(
+    val kind: SelinuxPolicyNoteKind,
+    val text: String,
+)
+
 data class SelinuxPolicyAnalysis(
     val policyVersion: Int?,
     val policyVersionOk: Boolean,
@@ -50,7 +69,7 @@ data class SelinuxPolicyAnalysis(
     val processContext: String?,
     val contextType: String?,
     val weakness: SelinuxPolicyWeakness,
-    val details: List<String>,
+    val notes: List<SelinuxPolicyNote>,
 )
 
 data class SelinuxReport(
