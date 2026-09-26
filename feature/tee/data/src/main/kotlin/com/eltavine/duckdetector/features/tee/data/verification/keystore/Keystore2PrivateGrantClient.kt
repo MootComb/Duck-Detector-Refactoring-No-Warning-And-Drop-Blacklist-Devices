@@ -23,8 +23,6 @@ import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystor
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.extractServiceSpecificErrorCode
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.findRootCause
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.loadClass
-import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.readByteArrayField
-import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.readFieldValue
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.readLongField
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.Keystore2GrantReflection.setField
 
@@ -124,115 +122,7 @@ class Keystore2PrivateGrantClient(
         }
     }
 
-    fun readOwnerChain(alias: String): Keystore2PrivateGrantChainResult {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return Keystore2PrivateGrantChainResult.unavailable(
-                phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_APP,
-                detail = "private getKeyEntry(APP) failed: Keystore2 private binder grant requires Android 12 or newer.",
-            )
-        }
-        return withService(
-            failurePhase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_APP,
-            failurePrefix = "private getKeyEntry(APP) failed",
-        ) { service, constants ->
-            readOwnerChain(service, alias, constants)
-        }
-    }
-
-    fun readOwnerChain(service: Any, alias: String): Keystore2PrivateGrantChainResult {
-        return runCatching {
-            readOwnerChain(service, alias, resolveConstants())
-        }.getOrElse { throwable ->
-            grantFailureResult(
-                phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_APP,
-                detail = "private getKeyEntry(APP) failed: ${describeThrowable(throwable)}",
-                errorKind = classifyFailure(throwable),
-                throwable = throwable,
-            )
-        }
-    }
-
-    fun readGrantChain(grantId: Long): Keystore2PrivateGrantChainResult {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return Keystore2PrivateGrantChainResult.unavailable(
-                phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_GRANT,
-                detail = "private getKeyEntry(GRANT) failed: Keystore2 private binder grant requires Android 12 or newer.",
-            )
-        }
-        return withService(
-            failurePhase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_GRANT,
-            failurePrefix = "private getKeyEntry(GRANT) failed",
-        ) { service, constants ->
-            readGrantChain(service, grantId, constants)
-        }
-    }
-
-    fun readGrantChain(service: Any, grantId: Long): Keystore2PrivateGrantChainResult {
-        return runCatching {
-            readGrantChain(service, grantId, resolveConstants())
-        }.getOrElse { throwable ->
-            grantFailureResult(
-                phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_GRANT,
-                detail = "private getKeyEntry(GRANT) failed: ${describeThrowable(throwable)}",
-                errorKind = classifyFailure(throwable),
-                throwable = throwable,
-            )
-        }
-    }
-
-    fun readGrantEntry(service: Any, grantId: Long): Keystore2PrivateGrantResult {
-        return runCatching {
-            val constants = resolveConstants()
-            val descriptor = createDescriptor(grantId, constants.domainGrant)
-            service.javaClass
-                .getMethod("getKeyEntry", descriptor.javaClass)
-                .also { it.isAccessible = true }
-                .invoke(service, descriptor)
-                ?: return@runCatching Keystore2PrivateGrantResult.unavailable(
-                    phase = Keystore2PrivateGrantPhase.PRIVATE_OWNER_REPLAY_GRANT,
-                    detail = "private owner replay getKeyEntry(GRANT) returned no KeyEntryResponse.",
-                )
-            Keystore2PrivateGrantResult(
-                available = true,
-                phase = Keystore2PrivateGrantPhase.PRIVATE_OWNER_REPLAY_GRANT,
-                detail = "private owner replay getKeyEntry(GRANT) returned a response.",
-            )
-        }.getOrElse { throwable ->
-            Keystore2PrivateGrantResult.unavailable(
-                phase = Keystore2PrivateGrantPhase.PRIVATE_OWNER_REPLAY_GRANT,
-                errorKind = classifyFailure(throwable),
-                detail = "private owner replay getKeyEntry(GRANT) failed: ${describeThrowable(throwable)}",
-                throwable = throwable,
-            )
-        }
-    }
-
-    fun readGrantChain(
-        binder: IBinder,
-        grantId: Long,
-    ): Keystore2PrivateGrantChainResult {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            return Keystore2PrivateGrantChainResult.unavailable(
-                phase = Keystore2PrivateGrantPhase.ISOLATED_BINDER_READBACK,
-                detail = "isolated binder call blocked: Keystore2 private binder grant requires Android 12 or newer.",
-            )
-        }
-        return withService(
-            binder = binder,
-            failurePhase = Keystore2PrivateGrantPhase.ISOLATED_BINDER_READBACK,
-            failurePrefix = "isolated binder call blocked",
-        ) { service, constants ->
-            readChainFromDescriptor(
-                service = service,
-                descriptor = createDescriptor(grantId, constants.domainGrant),
-                phase = Keystore2PrivateGrantPhase.ISOLATED_BINDER_READBACK,
-                emptyDetail = "isolated binder call blocked: Domain.GRANT certificate chain was empty.",
-                successDetailPrefix = "isolated private getKeyEntry(GRANT)",
-            )
-        }
-    }
-
-    private fun <T> withService(
+    internal fun <T> withService(
         failurePhase: Keystore2PrivateGrantPhase,
         failurePrefix: String,
         block: (Any, Keystore2PrivateGrantConstants) -> T,
@@ -253,7 +143,7 @@ class Keystore2PrivateGrantClient(
         }
     }
 
-    private fun <T> withService(
+    internal fun <T> withService(
         binder: IBinder,
         failurePhase: Keystore2PrivateGrantPhase,
         failurePrefix: String,
@@ -274,36 +164,6 @@ class Keystore2PrivateGrantClient(
                 throwable = throwable,
             )
         }
-    }
-
-    private fun readChainFromDescriptor(
-        service: Any,
-        descriptor: Any,
-        phase: Keystore2PrivateGrantPhase,
-        emptyDetail: String,
-        successDetailPrefix: String,
-    ): Keystore2PrivateGrantChainResult {
-        val response = service.javaClass
-            .getMethod("getKeyEntry", descriptor.javaClass)
-            .also { it.isAccessible = true }
-            .invoke(service, descriptor)
-            ?: return Keystore2PrivateGrantChainResult.unavailable(
-                phase = phase,
-                detail = "$successDetailPrefix returned no KeyEntryResponse.",
-            )
-        val chain = chainFromKeyEntryResponse(response)
-        if (chain.certificates.isEmpty()) {
-            return Keystore2PrivateGrantChainResult.unavailable(
-                phase = phase,
-                detail = emptyDetail,
-            )
-        }
-        return Keystore2PrivateGrantChainResult(
-            available = true,
-            phase = phase,
-            chain = chain,
-            detail = "$successDetailPrefix chainLength=${chain.certificates.size}",
-        )
     }
 
     private fun grantAliasToUid(
@@ -383,35 +243,7 @@ class Keystore2PrivateGrantClient(
         )
     }
 
-    private fun readOwnerChain(
-        service: Any,
-        alias: String,
-        constants: Keystore2PrivateGrantConstants,
-    ): Keystore2PrivateGrantChainResult {
-        return readChainFromDescriptor(
-            service = service,
-            descriptor = createDescriptor(alias, constants.domainApp),
-            phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_APP,
-            emptyDetail = "private getKeyEntry(APP) returned an empty certificate chain.",
-            successDetailPrefix = "private getKeyEntry(APP)",
-        )
-    }
-
-    private fun readGrantChain(
-        service: Any,
-        grantId: Long,
-        constants: Keystore2PrivateGrantConstants,
-    ): Keystore2PrivateGrantChainResult {
-        return readChainFromDescriptor(
-            service = service,
-            descriptor = createDescriptor(grantId, constants.domainGrant),
-            phase = Keystore2PrivateGrantPhase.PRIVATE_GET_KEY_ENTRY_GRANT,
-            emptyDetail = "private getKeyEntry(GRANT) returned an empty certificate chain.",
-            successDetailPrefix = "private getKeyEntry(GRANT)",
-        )
-    }
-
-    private fun createDescriptor(alias: String, domain: Int): Any {
+    internal fun createDescriptor(alias: String, domain: Int): Any {
         val descriptorClass = loadClass(CLASS_KEY_DESCRIPTOR)
         val descriptor = descriptorClass.getDeclaredConstructor().newInstance()
         setField(descriptor, "domain", domain)
@@ -421,7 +253,7 @@ class Keystore2PrivateGrantClient(
         return descriptor
     }
 
-    private fun createDescriptor(nspace: Long, domain: Int): Any {
+    internal fun createDescriptor(nspace: Long, domain: Int): Any {
         val descriptorClass = loadClass(CLASS_KEY_DESCRIPTOR)
         val descriptor = descriptorClass.getDeclaredConstructor().newInstance()
         setField(descriptor, "domain", domain)
@@ -439,7 +271,7 @@ class Keystore2PrivateGrantClient(
         }.getOrNull()
     }
 
-    private fun resolveConstants(): Keystore2PrivateGrantConstants {
+    internal fun resolveConstants(): Keystore2PrivateGrantConstants {
         return Keystore2PrivateGrantConstants(
             domainApp = resolveStaticInt(CLASS_DOMAIN, "APP", DOMAIN_APP_FALLBACK),
             domainGrant = resolveStaticInt(CLASS_DOMAIN, "GRANT", DOMAIN_GRANT_FALLBACK),
@@ -472,15 +304,7 @@ class Keystore2PrivateGrantClient(
         }.getOrDefault(fallback)
     }
 
-    private fun chainFromKeyEntryResponse(response: Any): GrantDomainCertificateChain {
-        val leaf = readByteArrayField(response, "certificate")
-            ?: readByteArrayField(readFieldValue(response, "metadata"), "certificate")
-        val remaining = readByteArrayField(response, "certificateChain")
-            ?: readByteArrayField(readFieldValue(response, "metadata"), "certificateChain")
-        return chainFromCertificateBlobs(leaf, remaining)
-    }
-
-    private fun classifyFailure(throwable: Throwable): Keystore2PrivateGrantErrorKind {
+    internal fun classifyFailure(throwable: Throwable): Keystore2PrivateGrantErrorKind {
         val errorCode = extractServiceSpecificErrorCode(throwable)
         return classifyKeystore2PrivateGrantFailure(
             family = grantFailureFamilyOf(findRootCause(throwable)),
@@ -490,7 +314,7 @@ class Keystore2PrivateGrantClient(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> grantFailureResult(
+    internal fun <T> grantFailureResult(
         phase: Keystore2PrivateGrantPhase,
         detail: String,
         errorKind: Keystore2PrivateGrantErrorKind = Keystore2PrivateGrantErrorKind.SERVICE_UNAVAILABLE,
