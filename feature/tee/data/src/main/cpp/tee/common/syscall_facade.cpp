@@ -21,7 +21,6 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -284,33 +283,6 @@ namespace ducktee::common {
         return invoke_syscall6(backend, number, arg0, arg1, arg2, 0, 0, 0);
     }
 
-    SyscallCallResult invoke_open_readonly(SyscallBackend backend, const char *path) {
-        switch (backend) {
-            case SyscallBackend::Libc: {
-                errno = 0;
-                const int fd = open(path, O_RDONLY | O_CLOEXEC);
-                return from_errno_result(fd, errno);
-            }
-            case SyscallBackend::Syscall:
-            case SyscallBackend::Asm:
-#if defined(__NR_openat)
-                return invoke_syscall6(
-                        backend,
-                        __NR_openat,
-                        AT_FDCWD,
-                        reinterpret_cast<long>(path),
-                        O_RDONLY | O_CLOEXEC,
-                        0,
-                        0,
-                        0
-                );
-#else
-                return make_unavailable_result();
-#endif
-        }
-        return make_unavailable_result();
-    }
-
     SyscallCallResult invoke_ioctl(
             SyscallBackend backend,
             int fd,
@@ -500,41 +472,6 @@ namespace ducktee::common {
 #endif
         }
         return false;
-    }
-
-    long raw_syscall3(long number, long arg0, long arg1, long arg2) {
-        const SyscallCallResult result = invoke_syscall3(
-                backend_available(SyscallBackend::Asm) ? SyscallBackend::Asm
-                                                       : SyscallBackend::Syscall,
-                number,
-                arg0,
-                arg1,
-                arg2
-        );
-        errno = result.error_number;
-        return result.value;
-    }
-
-    int raw_open_readonly(const char *path) {
-        const SyscallCallResult result = invoke_open_readonly(
-                backend_available(SyscallBackend::Asm) ? SyscallBackend::Asm
-                                                       : SyscallBackend::Syscall,
-                path
-        );
-        errno = result.error_number;
-        return static_cast<int>(result.value);
-    }
-
-    long raw_ioctl(int fd, unsigned long request, void *arg) {
-        const SyscallCallResult result = invoke_ioctl(
-                backend_available(SyscallBackend::Asm) ? SyscallBackend::Asm
-                                                       : SyscallBackend::Syscall,
-                fd,
-                request,
-                arg
-        );
-        errno = result.error_number;
-        return result.value;
     }
 
     bool bytes_equal(const void *lhs, const void *rhs, std::size_t length) {

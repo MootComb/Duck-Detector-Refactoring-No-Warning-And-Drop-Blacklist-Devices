@@ -70,8 +70,6 @@ namespace ducktee::common {
             long arg5
     );
 
-    SyscallCallResult invoke_open_readonly(SyscallBackend backend, const char *path);
-
     SyscallCallResult invoke_ioctl(
             SyscallBackend backend,
             int fd,
@@ -95,12 +93,6 @@ namespace ducktee::common {
     );
 
     bool local_timer_now_ns(const LocalTimerSelection &timer, std::uint64_t *out_ns);
-
-    long raw_syscall3(long number, long arg0, long arg1, long arg2);
-
-    int raw_open_readonly(const char *path);
-
-    long raw_ioctl(int fd, unsigned long request, void *arg);
 
     bool bytes_equal(const void *lhs, const void *rhs, std::size_t length);
 
