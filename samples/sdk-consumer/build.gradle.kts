@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-// The SDK is compiled with Kotlin 2.4, whose metadata the Kotlin that AGP bundles cannot read, so the
-// consumer puts the same Kotlin Gradle plugin on its classpath.
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath(libs.kotlin.gradle.plugin)
-    }
-}
-
 plugins {
     alias(libs.plugins.android.application)
 }

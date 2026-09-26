@@ -16,7 +16,7 @@ This publishes `com.eltavine.duckdetector:duckdetector-sdk:0.0.0-SNAPSHOT` to `s
 |---|---|
 | `minSdk` | 29 |
 | `compileSdk` | 37 or later, the AAR's `minCompileSdk` |
-| Kotlin | 2.4 or later. The SDK's Kotlin metadata is 2.4, which the Kotlin bundled with the Android Gradle plugin cannot read, so apply the Kotlin Gradle plugin 2.4 |
+| Kotlin | 2.2 or later, such as the Kotlin that AGP 9 bundles. The SDK compiles with Kotlin language and API version 2.3 and requires the 2.3 standard library, and a Kotlin compiler reads metadata one version ahead |
 | ABIs | `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
 | Repositories | The SDK repository, `google()`, `mavenCentral()`, and `https://jitpack.io` for Tencent's `soter-core` |
 

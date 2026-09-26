@@ -20,6 +20,7 @@ import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 class DuckDetectorAndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -41,6 +42,10 @@ class DuckDetectorAndroidLibraryConventionPlugin : Plugin<Project> {
                         withSourcesJar()
                     }
                 }
+            }
+
+            extensions.configure<KotlinAndroidProjectExtension> {
+                compileForSdkHosts(this, compilerOptions)
             }
 
             dependencies.add("testImplementation", libs.findBundle("test-unit").get())
