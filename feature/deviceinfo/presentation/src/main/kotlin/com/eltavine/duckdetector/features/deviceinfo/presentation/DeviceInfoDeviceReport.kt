@@ -21,13 +21,14 @@ import com.eltavine.duckdetector.core.report.ReportBlock
 import com.eltavine.duckdetector.core.report.ReportDeviceIdentity
 import com.eltavine.duckdetector.core.report.ReportFact
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFact
 
 fun DeviceInfoCardModel.toDeviceReport(): DeviceReport = DeviceReport(
     identity = ReportDeviceIdentity(
-        brand = headerFactValue("brand"),
-        model = headerFactValue("model"),
-        androidRelease = headerFactValue("android"),
-        sdk = headerFactValue("sdk"),
+        brand = headerFactValue(DeviceInfoHeaderFact.BRAND),
+        model = headerFactValue(DeviceInfoHeaderFact.MODEL),
+        androidRelease = headerFactValue(DeviceInfoHeaderFact.ANDROID),
+        sdk = headerFactValue(DeviceInfoHeaderFact.SDK),
     ),
     quickFacts = headerFacts.map { ReportFact(it.label, it.value) },
     sections = sections.map { section ->
@@ -40,7 +41,5 @@ fun DeviceInfoCardModel.toDeviceReport(): DeviceReport = DeviceReport(
     },
 )
 
-// The header facts are labelled by DeviceInfoCardModelMapper in this feature; the lookup stays here
-// so no other module has to know those labels.
-private fun DeviceInfoCardModel.headerFactValue(label: String): String? =
-    headerFacts.firstOrNull { it.label.equals(label, ignoreCase = true) }?.value
+private fun DeviceInfoCardModel.headerFactValue(fact: DeviceInfoHeaderFact): String? =
+    headerFacts.firstOrNull { it.fact == fact }?.value

@@ -21,9 +21,11 @@ import android.hardware.display.DisplayManager
 import android.os.Build
 import android.view.Display
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoEntry
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoKey
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoScanner
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSection
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSectionKind
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoStage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -60,18 +62,18 @@ class DeviceInfoRepository(
 
         val sections = listOf(
             DeviceInfoSection(
-                title = "Identity",
+                kind = DeviceInfoSectionKind.IDENTITY,
                 entries = listOf(
-                    DeviceInfoEntry("Brand", Build.BRAND.orUnavailable()),
+                    DeviceInfoEntry("Brand", Build.BRAND.orUnavailable(), key = DeviceInfoKey.BRAND),
                     DeviceInfoEntry("Manufacturer", Build.MANUFACTURER.orUnavailable()),
-                    DeviceInfoEntry("Model", Build.MODEL.orUnavailable()),
+                    DeviceInfoEntry("Model", Build.MODEL.orUnavailable(), key = DeviceInfoKey.MODEL),
                     DeviceInfoEntry("Device", Build.DEVICE.orUnavailable()),
                     DeviceInfoEntry("Product", Build.PRODUCT.orUnavailable()),
                     DeviceInfoEntry("Board", Build.BOARD.orUnavailable()),
                 ),
             ),
             DeviceInfoSection(
-                title = "Build",
+                kind = DeviceInfoSectionKind.BUILD,
                 entries = listOf(
                     DeviceInfoEntry("Hardware", Build.HARDWARE.orUnavailable()),
                     DeviceInfoEntry("Bootloader", Build.BOOTLOADER.orUnavailable()),
@@ -86,18 +88,18 @@ class DeviceInfoRepository(
                 ),
             ),
             DeviceInfoSection(
-                title = "Android",
+                kind = DeviceInfoSectionKind.ANDROID,
                 entries = listOf(
                     DeviceInfoEntry("Tags", Build.TAGS.orUnavailable()),
                     DeviceInfoEntry("Build user", Build.USER.orUnavailable()),
                     DeviceInfoEntry("Build host", Build.HOST.orUnavailable()),
-                    DeviceInfoEntry("SDK", Build.VERSION.SDK_INT.toString()),
-                    DeviceInfoEntry("Release", Build.VERSION.RELEASE.orUnavailable()),
+                    DeviceInfoEntry("SDK", Build.VERSION.SDK_INT.toString(), key = DeviceInfoKey.SDK),
+                    DeviceInfoEntry("Release", Build.VERSION.RELEASE.orUnavailable(), key = DeviceInfoKey.ANDROID_RELEASE),
                     DeviceInfoEntry("Codename", Build.VERSION.CODENAME.orUnavailable()),
                 ),
             ),
             DeviceInfoSection(
-                title = "Runtime",
+                kind = DeviceInfoSectionKind.RUNTIME,
                 entries = listOf(
                     DeviceInfoEntry("Security patch", Build.VERSION.SECURITY_PATCH.orUnavailable()),
                     DeviceInfoEntry("Preview SDK", Build.VERSION.PREVIEW_SDK_INT.toString()),
@@ -123,7 +125,7 @@ class DeviceInfoRepository(
                 ),
             ),
             DeviceInfoSection(
-                title = "Context",
+                kind = DeviceInfoSectionKind.CONTEXT,
                 entries = listOf(
                     DeviceInfoEntry("Kernel", kernelVersion, detailMonospace = true),
                     DeviceInfoEntry("Locale", locale.toLanguageTag().orUnavailable()),

@@ -28,6 +28,7 @@ import com.eltavine.duckdetector.features.dashboard.presentation.export.ExportHe
 import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardFindings
 import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardOverview
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFact
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.toDeviceReport
 
@@ -44,8 +45,17 @@ internal class ExportScenario(
         .map { detector -> CardFixtures(seed, minListSize, stream = detector.id.value).export(detector) }
     private val device = CardFixtures(seed, minListSize, stream = "device").create(DeviceInfoCardModel::class.java).let { generated ->
         val identity = when (seed % 3) {
-            1 -> listOf(fact("Brand", "Duck"), fact("Model", "Pond 7"), fact("Android", "17"), fact("SDK", "37"))
-            2 -> listOf(fact("brand", "Duck"), fact("MODEL", "Pond 7"), fact("Android", "17"))
+            1 -> listOf(
+                fact(DeviceInfoHeaderFact.BRAND, "Duck"),
+                fact(DeviceInfoHeaderFact.MODEL, "Pond 7"),
+                fact(DeviceInfoHeaderFact.ANDROID, "17"),
+                fact(DeviceInfoHeaderFact.SDK, "37"),
+            )
+            2 -> listOf(
+                fact(DeviceInfoHeaderFact.BRAND, "Duck"),
+                fact(DeviceInfoHeaderFact.MODEL, "Pond 7"),
+                fact(DeviceInfoHeaderFact.ANDROID, "17"),
+            )
             else -> emptyList()
         }
         generated.copy(headerFacts = identity + generated.headerFacts)
@@ -75,5 +85,5 @@ internal class ExportScenario(
         device = device.toDeviceReport(),
     )
 
-    private fun fact(label: String, value: String) = DeviceInfoHeaderFactModel(label, value)
+    private fun fact(fact: DeviceInfoHeaderFact, value: String) = DeviceInfoHeaderFactModel(fact, value)
 }

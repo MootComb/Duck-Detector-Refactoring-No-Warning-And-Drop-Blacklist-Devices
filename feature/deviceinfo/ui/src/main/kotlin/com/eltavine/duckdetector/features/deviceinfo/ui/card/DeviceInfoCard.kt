@@ -44,6 +44,7 @@ import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSectionKind
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoRowModel
@@ -152,7 +153,7 @@ private fun DeviceInfoSection(
 ) {
     DetectorSectionFrame(
         title = model.title,
-        icon = sectionIcon(model.title),
+        icon = sectionIcon(model.kind),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
             model.rows.forEachIndexed { index, row ->
@@ -202,14 +203,14 @@ private fun DeviceInfoRow(
 }
 
 private fun sectionIcon(
-    title: String,
+    kind: DeviceInfoSectionKind?,
 ): ImageVector {
-    return when (title) {
-        "Identity" -> Icons.Rounded.Badge
-        "Build" -> Icons.Rounded.Dns
-        "Android" -> Icons.Rounded.Android
-        "Runtime" -> Icons.Rounded.Memory
-        "Context" -> Icons.Rounded.SettingsEthernet
-        else -> Icons.Rounded.Info
+    return when (kind) {
+        DeviceInfoSectionKind.IDENTITY -> Icons.Rounded.Badge
+        DeviceInfoSectionKind.BUILD -> Icons.Rounded.Dns
+        DeviceInfoSectionKind.ANDROID -> Icons.Rounded.Android
+        DeviceInfoSectionKind.RUNTIME -> Icons.Rounded.Memory
+        DeviceInfoSectionKind.CONTEXT -> Icons.Rounded.SettingsEthernet
+        null -> Icons.Rounded.Info
     }
 }

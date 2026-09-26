@@ -18,9 +18,12 @@ package com.eltavine.duckdetector.features.deviceinfo.presentation
 
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoKey
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoReport
+import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSectionKind
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoStage
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
+import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFact
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoRowModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoSectionModel
@@ -68,10 +71,10 @@ class DeviceInfoCardModelMapper {
     }
 
     private fun buildHeaderFacts(report: DeviceInfoReport): List<DeviceInfoHeaderFactModel> {
-        fun valueOf(section: String, label: String): String {
-            return report.sections.firstOrNull { it.title == section }
-                ?.entries
-                ?.firstOrNull { it.label == label }
+        fun valueOf(key: DeviceInfoKey): String {
+            return report.sections.asSequence()
+                .flatMap { it.entries }
+                .firstOrNull { it.key == key }
                 ?.value
                 ?: when (report.stage) {
                     DeviceInfoStage.LOADING -> "Pending"
@@ -81,22 +84,16 @@ class DeviceInfoCardModelMapper {
         }
 
         return listOf(
-            DeviceInfoHeaderFactModel("Brand", valueOf("Identity", "Brand")),
-            DeviceInfoHeaderFactModel("Model", valueOf("Identity", "Model")),
-            DeviceInfoHeaderFactModel("Android", valueOf("Android", "Release")),
-            DeviceInfoHeaderFactModel("SDK", valueOf("Android", "SDK")),
+            DeviceInfoHeaderFactModel(DeviceInfoHeaderFact.BRAND, valueOf(DeviceInfoKey.BRAND)),
+            DeviceInfoHeaderFactModel(DeviceInfoHeaderFact.MODEL, valueOf(DeviceInfoKey.MODEL)),
+            DeviceInfoHeaderFactModel(DeviceInfoHeaderFact.ANDROID, valueOf(DeviceInfoKey.ANDROID_RELEASE)),
+            DeviceInfoHeaderFactModel(DeviceInfoHeaderFact.SDK, valueOf(DeviceInfoKey.SDK)),
         )
     }
 
     private fun buildSections(report: DeviceInfoReport): List<DeviceInfoSectionModel> {
         return when (report.stage) {
-            DeviceInfoStage.LOADING -> listOf(
-                placeholderSection("Identity"),
-                placeholderSection("Build"),
-                placeholderSection("Android"),
-                placeholderSection("Runtime"),
-                placeholderSection("Context"),
-            )
+            DeviceInfoStage.LOADING -> DeviceInfoSectionKind.entries.map(::placeholderSection)
 
             DeviceInfoStage.FAILED -> listOf(
                 DeviceInfoSectionModel(
@@ -113,6 +110,7 @@ class DeviceInfoCardModelMapper {
             DeviceInfoStage.READY -> report.sections.map { section ->
                 DeviceInfoSectionModel(
                     title = section.title,
+                    kind = section.kind,
                     rows = section.entries.map { entry ->
                         DeviceInfoRowModel(
                             label = entry.label,
@@ -125,9 +123,10 @@ class DeviceInfoCardModelMapper {
         }
     }
 
-    private fun placeholderSection(title: String): DeviceInfoSectionModel {
+    private fun placeholderSection(kind: DeviceInfoSectionKind): DeviceInfoSectionModel {
         return DeviceInfoSectionModel(
-            title = title,
+            title = kind.title,
+            kind = kind,
             rows = listOf(
                 DeviceInfoRowModel("Loading", "Pending"),
             ),

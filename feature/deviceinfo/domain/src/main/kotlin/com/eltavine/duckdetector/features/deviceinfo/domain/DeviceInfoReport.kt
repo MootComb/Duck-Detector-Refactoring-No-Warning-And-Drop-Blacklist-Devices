@@ -22,16 +22,36 @@ enum class DeviceInfoStage {
     FAILED,
 }
 
+/** The sections of the device profile, in the order it lists them. */
+enum class DeviceInfoSectionKind(val title: String) {
+    IDENTITY("Identity"),
+    BUILD("Build"),
+    ANDROID("Android"),
+    RUNTIME("Runtime"),
+    CONTEXT("Context"),
+}
+
+/** The entries the profile's header summarises. */
+enum class DeviceInfoKey {
+    BRAND,
+    MODEL,
+    ANDROID_RELEASE,
+    SDK,
+}
+
 data class DeviceInfoEntry(
     val label: String,
     val value: String,
     val detailMonospace: Boolean = false,
+    val key: DeviceInfoKey? = null,
 )
 
 data class DeviceInfoSection(
-    val title: String,
+    val kind: DeviceInfoSectionKind,
     val entries: List<DeviceInfoEntry>,
-)
+) {
+    val title: String get() = kind.title
+}
 
 data class DeviceInfoReport(
     val stage: DeviceInfoStage,
