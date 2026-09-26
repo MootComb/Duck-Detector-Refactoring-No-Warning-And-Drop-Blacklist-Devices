@@ -18,14 +18,7 @@
       "reason": "Test fixture generator that fills every constructor of every card model, so the export golden test covers every field without a hand-written builder per model."
     },
     {
-      "path": "build-logic/src/main/kotlin/com/eltavine/duckdetector/buildlogic/GenerateGithubContributorsAssetTask.kt",
-      "uses": [
-        "class_identity"
-      ],
-      "reason": "Build tooling on the host JVM that names a failure in a Gradle warning; it is never shipped or minified."
-    },
-    {
-      "path": "build-logic/src/main/kotlin/com/eltavine/duckdetector/buildlogic/GenerateTeeCrlAssetTask.kt",
+      "path": "build-logic/src/main/kotlin/com/eltavine/duckdetector/buildlogic/assets/FetchAttempts.kt",
       "uses": [
         "class_identity"
       ],
