@@ -53,9 +53,27 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `helperprocess` | Isolated and helper process services, remote snapshots, dex path and UID identity collectors | mount, nativeroot, virtualization |
 | `packageinventory` | Installed package inventory and visibility checks | customrom, dangerousapps, lsposed, nativeroot, virtualization |
 | `selinuxpolicy` | SELinux context validity carriers, proc attr and policyload seqno probes, dirty policy preload queries | lsposed, selinux |
-| `systemproperties` | Multi-source system property reads and native property snapshots | bootloader, systemproperties |
+| `systemproperties` | Multi-source system property reads, native property snapshots, and the native parser of bionic's property areas | bootloader, systemproperties; customrom's native unit uses the property area parser |
 
 A capability collects; each consumer interprets. A capability exists only because at least two features consume the same evidence.
+
+## Build logic
+
+Convention plugins in `build-logic` configure every module, so a module's build file names its layer's plugin and its dependencies and nothing more.
+
+| Plugin | Configures |
+|---|---|
+| `duckdetector.jvm.library`, `duckdetector.android.library` | Java 17 bytecode, the module boundary policy, dependency analysis, and Kotlin language and API version 2.3 with the 2.3 standard library (`duckdetector.kotlin.sdkStdlib`), so the fused SDK compiles in hosts on Kotlin 2.2 or later |
+| `duckdetector.android.application` | The app, with the generated dashboard cards and the committed assets: the GitHub contributor list and TEE's revocation list snapshot, whose refresh tasks share one `java.net.http` client and retry policy |
+| `duckdetector.android.compose` | Compose, for ui modules |
+| `duckdetector.android.apk-artifacts` | APK file names that carry the build's commit |
+| `duckdetector.contract-values` | Poko, which generates `equals`, `hashCode` and `toString` for the `@ContractValue` classes of the SDK contract modules |
+| `duckdetector.public-api` | `checkPublicApi` and `updatePublicApi`, over Kotlin's ABI tools |
+| `duckdetector.dependency-analysis` | `buildHealth`, from the Dependency Analysis Gradle Plugin |
+| `duckdetector.module-boundaries` | The module boundary policy, checked while the build configures |
+| `duckdetector.sdk.distribution` | The fused SDK AAR, its Maven publication and `verifySdkAar` |
+
+The Android conventions opt the modules that compose detectors, the detector and ui layers, `:sdk:runtime` and `:app`, in to `DetectorSpecificApi`. In any other module, the compiler rejects the use of a detector's typed object.
 
 ## Enforcement
 
