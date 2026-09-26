@@ -7,6 +7,7 @@ duckdetector_native_unit(duckdetector_tee
     keystore/environment_probe.cpp
     trickystore/trickystore_honeypot.cpp
     trickystore/trickystore_hooks.cpp
+    trickystore/trickystore_maps.cpp
     trickystore/trickystore_probe.cpp
     der/der_probe.cpp
 )
