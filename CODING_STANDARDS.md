@@ -180,7 +180,7 @@ TEE 的证据较多，在 data 层另有 `TeeReportReducer` 负责汇总。
 - 修改模块边界、capability 或 native unit：同步更新 `docs/architecture/README.md`；有意保留的边界例外和尚未解决的问题记入 `docs/architecture/follow-ups.md`，并写明原因
 - 修改 SDK 的公开 API、宿主步骤或 manifest：同步更新 `docs/guides/sdk-integration.md`
 
-涉及 TEE、native root、virtualization 这类检测口径变化时，先更新对应的 `EVIDENCE.md`；用户能感知的变化再同步到 `README.MD` 与 `README_ZH.MD`。
+涉及 TEE、native root、virtualization 这类检测口径变化时，先更新对应的 `EVIDENCE.md`；用户能感知的变化再同步到 `README.md` 与 `README_ZH.md`。
 
 ## 8. Commit 规范
 

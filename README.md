@@ -2,36 +2,23 @@
   <img src="app/src/main/ic_launcher-playstore.png" alt="DuckDetector logo" width="128">
 </p>
 
+<h1 align="center">DuckDetector</h1>
+
+<p align="center"><strong>On-device Android environment integrity diagnostics backed by Kotlin and native probes.</strong></p>
+
 <p align="center">
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/stargazers"><img src="https://img.shields.io/github/stars/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub stars"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/network/members"><img src="https://img.shields.io/github/forks/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub forks"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly"><img src="https://img.shields.io/badge/release-nightly-2F81F7?style=flat-square&logo=github" alt="Nightly release"></a>
-  <!-- Replace this placeholder with a dynamic release badge after the first stable release. -->
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/badge/stable-not%20yet%20released-lightgrey?style=flat-square" alt="Stable release: not yet released"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/github/downloads/eltavine/Duck-Detector-Refactoring/total?style=flat-square" alt="Release downloads"></a>
-  <a href="https://t.me/duck_detector"><img src="https://img.shields.io/badge/Telegram-Channel-2CA5E0?logo=telegram&logoColor=white&style=flat-square" alt="Telegram channel"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/blob/main/LICENSE"><img src="https://img.shields.io/github/license/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="License"></a>
+  <strong>
+    <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly">Download Nightly</a> ·
+    <a href="#quick-start">Documentation</a> ·
+    <a href="docs/guides/sdk-integration.md">SDK Integration</a>
+  </strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/build.yml?branch=main&amp;style=flat-square&amp;label=build&amp;logo=githubactions&amp;logoColor=white" alt="Main branch build workflow status"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/ci.yml?query=event%3Apull_request"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/ci.yml?event=pull_request&amp;style=flat-square&amp;label=PR%20checks&amp;logo=githubactions&amp;logoColor=white" alt="Pull request CI: unit tests, lint, and native build"></a>
   <a href="#compatibility"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 10 or later"></a>
-  <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="Built with Kotlin"></a>
-  <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose UI"></a>
-  <a href="sdk/runtime/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK native probes"></a>
-</p>
-
-<p align="center">
-  <a href="#compatibility"><img src="https://img.shields.io/badge/ABI-arm64--v8a%20%7C%20armeabi--v7a%20%7C%20x86%20%7C%20x86__64-555555?style=flat-square" alt="Supported ABIs: arm64-v8a, armeabi-v7a, x86, x86_64; some probes require arm64-v8a"></a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/issues"><img src="https://img.shields.io/github/issues/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="Open issues"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/pulls"><img src="https://img.shields.io/github/issues-pr/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="Open pull requests"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/graphs/contributors"><img src="https://img.shields.io/github/contributors/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="Contributors"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/commits/main"><img src="https://img.shields.io/github/last-commit/eltavine/Duck-Detector-Refactoring/main?style=flat-square" alt="Last commit on main"></a>
-  <a href="CODING_STANDARDS.md"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square" alt="Contributions welcome: read the coding standards"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/blob/main/LICENSE"><img src="https://img.shields.io/github/license/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="License"></a>
+  <a href="https://t.me/duck_detector"><img src="https://img.shields.io/badge/Telegram-Channel-2CA5E0?logo=telegram&logoColor=white&style=flat-square" alt="Telegram channel"></a>
 </p>
 
 <p align="center">
@@ -40,10 +27,8 @@
 </p>
 
 <p align="center">
-  <strong><a href="README.MD">English</a></strong> &nbsp; <strong><a href="README_ZH.MD">简体中文</a></strong>
+  <a href="README.md">English</a> &nbsp; <a href="README_ZH.md">简体中文</a>
 </p>
-
-<p align="center"><strong>On-device Android environment integrity diagnostics backed by Kotlin and native probes.</strong></p>
 
 # Overview
 
@@ -51,11 +36,31 @@ DuckDetector collects and correlates security-relevant evidence on an Android de
 
 The app combines a Jetpack Compose interface, feature-oriented Gradle modules, and a native C++/assembly library. The same detectors are also published as a UI-free SDK AAR that other applications can embed. Results are diagnostic signals, not an authoritative statement that a device is secure or compromised.
 
+# Quick start
+
+1. **Download** the APK from the [Nightly release](https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly). Nightly builds are published from `main` and are also posted to the [Telegram channel](https://t.me/duck_detector); there is no stable release yet.
+2. **Install** it on a device running Android 10 or later. Root access is not required.
+3. **Scan.** The first launch asks you to accept the user agreement and to settle a few startup choices: notifications, Live Update, the online revocation refresh used by the TEE check, and package visibility. Scanning then starts by itself, and each card fills in when its detector finishes.
+4. **Read the results** as described below. To report a result or ask for help, [open an issue](https://github.com/eltavine/Duck-Detector-Refactoring/issues) and attach the file saved by **Export Report** at the top of the dashboard; a screenshot of the summary alone is not enough.
+
+## Reading the results
+
+Each card shows one of these statuses:
+
+| Status | Meaning |
+| :--- | :--- |
+| **Danger**, **Warning** | The detector observed evidence; the card lists what it saw. |
+| **All Clear** | The probes ran and found none of the evidence they look for. This does not prove that the device is unmodified. |
+| **Info** (Support) | A probe was unsupported or unavailable on this device, so the absence of findings says nothing. |
+| **Info** (Error) | The check failed; the card says why. |
+
+To see what a detector looks for and why that counts as evidence, open its evidence record from [Detector coverage](#detector-coverage).
+
 # Detector coverage
 
-Current feature areas:
+Current feature areas, each linked to its evidence record, which explains what the detector looks for, why that counts as evidence, and what it cannot see:
 
-`Bootloader` · `Custom ROM` · `Dangerous Apps` · `Kernel Check` · `LSPosed` · `Memory` · `Mount` · `Native Root` · `Play Integrity Fix` · `SELinux` · `SU` · `System Properties` · `TEE` · `Virtualization` · `Zygisk`
+[`Bootloader`](./feature/bootloader/EVIDENCE.md) · [`Custom ROM`](./feature/customrom/EVIDENCE.md) · [`Dangerous Apps`](./feature/dangerousapps/EVIDENCE.md) · [`Kernel Check`](./feature/kernelcheck/EVIDENCE.md) · [`LSPosed`](./feature/lsposed/EVIDENCE.md) · [`Memory`](./feature/memory/EVIDENCE.md) · [`Mount`](./feature/mount/EVIDENCE.md) · [`Native Root`](./feature/nativeroot/EVIDENCE.md) · [`Play Integrity Fix`](./feature/playintegrityfix/EVIDENCE.md) · [`SELinux`](./feature/selinux/EVIDENCE.md) · [`SU`](./feature/su/EVIDENCE.md) · [`System Properties`](./feature/systemproperties/EVIDENCE.md) · [`TEE`](./feature/tee/EVIDENCE.md) · [`Virtualization`](./feature/virtualization/EVIDENCE.md) · [`Zygisk`](./feature/zygisk/EVIDENCE.md)
 
 `Play Integrity Fix` refers to local indicators associated with integrity-spoofing modifications; DuckDetector does not return an official Google Play Integrity API verdict. The TEE area evaluates Android KeyStore and attestation evidence, including certificate chains, security levels, revocation data, and selected KeyMint, StrongBox, and Soter behavior where supported.
 

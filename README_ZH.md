@@ -2,36 +2,23 @@
   <img src="app/src/main/ic_launcher-playstore.png" alt="DuckDetector 标志" width="128">
 </p>
 
+<h1 align="center">DuckDetector</h1>
+
+<p align="center"><strong>基于 Kotlin 与原生探针的 Android 设备侧环境完整性诊断工具。</strong></p>
+
 <p align="center">
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/stargazers"><img src="https://img.shields.io/github/stars/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub Stars"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/network/members"><img src="https://img.shields.io/github/forks/eltavine/Duck-Detector-Refactoring?style=social" alt="GitHub Forks"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly"><img src="https://img.shields.io/badge/release-nightly-2F81F7?style=flat-square&logo=github" alt="Nightly 版本"></a>
-  <!-- 首个正式版本发布后，将此占位徽章替换为动态版本徽章。 -->
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/badge/stable-not%20yet%20released-lightgrey?style=flat-square" alt="正式版本尚未发布"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases"><img src="https://img.shields.io/github/downloads/eltavine/Duck-Detector-Refactoring/total?style=flat-square" alt="版本下载量"></a>
-  <a href="https://t.me/duck_detector"><img src="https://img.shields.io/badge/Telegram-Channel-2CA5E0?logo=telegram&logoColor=white&style=flat-square" alt="Telegram 频道"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/blob/main/LICENSE"><img src="https://img.shields.io/github/license/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="开源协议"></a>
+  <strong>
+    <a href="https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly">下载 Nightly</a> ·
+    <a href="#快速上手">文档</a> ·
+    <a href="docs/guides/sdk-integration.md">SDK 集成</a>
+  </strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/build.yml?branch=main&amp;style=flat-square&amp;label=build&amp;logo=githubactions&amp;logoColor=white" alt="主分支构建工作流状态"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/actions/workflows/ci.yml?query=event%3Apull_request"><img src="https://img.shields.io/github/actions/workflow/status/eltavine/Duck-Detector-Refactoring/ci.yml?event=pull_request&amp;style=flat-square&amp;label=PR%20checks&amp;logo=githubactions&amp;logoColor=white" alt="拉取请求 CI：单元测试、Lint 与原生构建"></a>
   <a href="#兼容性"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="支持 Android 10 及以上版本"></a>
-  <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="使用 Kotlin 构建"></a>
-  <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose 界面"></a>
-  <a href="sdk/runtime/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK 原生探针"></a>
-</p>
-
-<p align="center">
-  <a href="#兼容性"><img src="https://img.shields.io/badge/ABI-arm64--v8a%20%7C%20armeabi--v7a%20%7C%20x86%20%7C%20x86__64-555555?style=flat-square" alt="支持 ABI：arm64-v8a、armeabi-v7a、x86、x86_64；部分探针仅支持 arm64-v8a"></a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/issues"><img src="https://img.shields.io/github/issues/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="待处理 Issues"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/pulls"><img src="https://img.shields.io/github/issues-pr/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="待合并 Pull Requests"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/graphs/contributors"><img src="https://img.shields.io/github/contributors/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="贡献者数量"></a>
-  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/commits/main"><img src="https://img.shields.io/github/last-commit/eltavine/Duck-Detector-Refactoring/main?style=flat-square" alt="主分支最近提交时间"></a>
-  <a href="CODING_STANDARDS.md"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square" alt="欢迎贡献：阅读编码规范"></a>
+  <a href="https://github.com/eltavine/Duck-Detector-Refactoring/blob/main/LICENSE"><img src="https://img.shields.io/github/license/eltavine/Duck-Detector-Refactoring?style=flat-square" alt="开源协议"></a>
+  <a href="https://t.me/duck_detector"><img src="https://img.shields.io/badge/Telegram-Channel-2CA5E0?logo=telegram&logoColor=white&style=flat-square" alt="Telegram 频道"></a>
 </p>
 
 <p align="center">
@@ -40,10 +27,8 @@
 </p>
 
 <p align="center">
-  <strong><a href="README.MD">English</a></strong> &nbsp; <strong><a href="README_ZH.MD">简体中文</a></strong>
+  <a href="README.md">English</a> &nbsp; <a href="README_ZH.md">简体中文</a>
 </p>
-
-<p align="center"><strong>基于 Kotlin 与原生探针的 Android 设备侧环境完整性诊断工具。</strong></p>
 
 # 项目概述
 
@@ -51,11 +36,31 @@ DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用�
 
 应用由 Jetpack Compose 界面、按功能拆分的 Gradle 模块和 C++/汇编原生库组成；同一套检测器也以不含 UI 的 SDK AAR 形式发布，可以嵌入其他应用。检测结果是用于诊断的信号，不代表对设备“安全”或“已受损”的权威认证。
 
+# 快速上手
+
+1. **下载：** 从 [Nightly 版本](https://github.com/eltavine/Duck-Detector-Refactoring/releases/tag/nightly)下载 APK。Nightly 构建从 `main` 分支发布，并同步推送到 [Telegram 频道](https://t.me/duck_detector)；目前尚无正式版本。
+2. **安装：** 安装到 Android 10 及以上版本的设备，无需 Root 权限。
+3. **扫描：** 首次启动时需要同意用户协议，并完成几项启动选项：通知、Live Update、TEE 检查所用的在线吊销数据刷新，以及包可见性。之后扫描会自动开始，每个检测器完成后，对应卡片随即显示结果。
+4. **解读结果：** 参照下文说明。报告结果或寻求帮助时，请[提交 Issue](https://github.com/eltavine/Duck-Detector-Refactoring/issues)，并附上用仪表盘顶部 **Export Report** 保存的报告文件；只有摘要截图是不够的。
+
+## 如何解读结果
+
+每张卡片显示以下状态之一：
+
+| 状态 | 含义 |
+| :--- | :--- |
+| **Danger**、**Warning** | 检测器观察到了证据，卡片会列出具体发现。 |
+| **All Clear** | 探针已运行，未发现其检查的任何证据；这并不能证明设备未被修改。 |
+| **Info**（Support） | 探针在此设备上不受支持或不可用，此时没有发现不代表不存在。 |
+| **Info**（Error） | 检查执行失败，卡片会说明原因。 |
+
+想了解某个检测器检查什么、为什么构成证据，可从[检测范围](#检测范围)打开它的证据记录。
+
 # 检测范围
 
-当前覆盖以下功能域：
+当前覆盖以下功能域，每项都链接到对应的证据记录（英文），说明检测器检查什么、为什么构成证据，以及哪些情况它观察不到：
 
-`Bootloader` · `Custom ROM` · `Dangerous Apps` · `Kernel Check` · `LSPosed` · `Memory` · `Mount` · `Native Root` · `Play Integrity Fix` · `SELinux` · `SU` · `System Properties` · `TEE` · `Virtualization` · `Zygisk`
+[`Bootloader`](./feature/bootloader/EVIDENCE.md) · [`Custom ROM`](./feature/customrom/EVIDENCE.md) · [`Dangerous Apps`](./feature/dangerousapps/EVIDENCE.md) · [`Kernel Check`](./feature/kernelcheck/EVIDENCE.md) · [`LSPosed`](./feature/lsposed/EVIDENCE.md) · [`Memory`](./feature/memory/EVIDENCE.md) · [`Mount`](./feature/mount/EVIDENCE.md) · [`Native Root`](./feature/nativeroot/EVIDENCE.md) · [`Play Integrity Fix`](./feature/playintegrityfix/EVIDENCE.md) · [`SELinux`](./feature/selinux/EVIDENCE.md) · [`SU`](./feature/su/EVIDENCE.md) · [`System Properties`](./feature/systemproperties/EVIDENCE.md) · [`TEE`](./feature/tee/EVIDENCE.md) · [`Virtualization`](./feature/virtualization/EVIDENCE.md) · [`Zygisk`](./feature/zygisk/EVIDENCE.md)
 
 其中，`Play Integrity Fix` 检测的是与完整性伪装修改相关的本地迹象，并不会返回 Google Play Integrity API 的官方判定。TEE 模块检查 Android KeyStore 与设备证明证据，包括证书链、安全级别、吊销数据，以及设备支持时的部分 KeyMint、StrongBox 和 Soter 行为。
 
