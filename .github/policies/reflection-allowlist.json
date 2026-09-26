@@ -191,6 +191,21 @@
       "reason": "Issues hidden Keystore2 grant calls and reads hidden response fields."
     },
     {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateGrantReads.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Reads grant entries through the hidden Keystore2 getKeyEntry call."
+    },
+    {
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2PrivateOperations.kt",
+      "uses": [
+        "operations",
+        "class_identity"
+      ],
+      "reason": "Creates, updates and finishes hidden Keystore2 operations reflectively; the security level or operation binder class named when a hidden method is missing is evidence of which keystore implementation answered."
+    },
+    {
       "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/Keystore2Reflection.kt",
       "uses": [
         "operations"
@@ -212,11 +227,11 @@
       "reason": "Installs a dynamic proxy on the hidden Keystore2 binder to capture raw transactions, which needs HiddenApiBypass, hidden fields and proxies."
     },
     {
-      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/RawRsaOaepMgf1Checks.kt",
+      "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/RawRsaOaepKey.kt",
       "uses": [
         "class_identity"
       ],
-      "reason": "Reports the runtime classes of the Keystore2 service, security level and operation binders, which identify a replaced keystore implementation."
+      "reason": "Reports the runtime classes of the Keystore2 service, security level and operation descriptor, which identify a replaced keystore implementation."
     },
     {
       "path": "feature/tee/data/src/main/kotlin/com/eltavine/duckdetector/features/tee/data/verification/keystore/SupplementaryAttestationInfoProbe.kt",
