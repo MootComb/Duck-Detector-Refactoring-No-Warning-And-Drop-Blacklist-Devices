@@ -26,9 +26,9 @@ Lint's `MissingTranslation` check compares a string only against the locales pre
 
 Each detector still collects its own platform evidence during its scan, even when several detectors read the same source, such as the package inventory or system properties. A scan session that captures such evidence once and hands the same snapshot to every consumer would make cross-detector correlation exact, but it changes probe timing and ordering, so it needs its own design and on-device validation.
 
-## Public API dumps come from javap
+## Public API dumps bypass KGP's abiValidation
 
-`DuckDetectorPublicApiPlugin` records the SDK contract modules' public API with javap, because Kotlin's ABI validation fails on libraries built with AGP's built-in Kotlin: its dump task has no class files to read. javap cannot tell Kotlin `internal` declarations from public ones, which is safe only while the contract modules declare nothing internal. When Kotlin's ABI validation supports these libraries, switch to it and regenerate the dumps in one change.
+The Kotlin Gradle plugin's `abiValidation` fails on Android libraries built with AGP's built-in Kotlin: in KGP 2.4.20, the input that supplies their class files has no value. `DuckDetectorPublicApiPlugin` therefore hands AGP's release classes to `org.jetbrains.kotlin:abi-tools`, the engine `abiValidation` runs, and writes the same dump format. When `abiValidation` supports these libraries, replace the plugin with `kotlin { abiValidation() }` in the four contract modules; the committed dumps should not change.
 
 ## TEE probes that classify keystore errors by message
 

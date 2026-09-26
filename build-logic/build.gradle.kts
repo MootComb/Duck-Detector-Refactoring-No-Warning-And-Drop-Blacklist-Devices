@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.json)
     implementation(libs.kotlin.gradle.plugin)
     implementation(libs.dependency.analysis.gradle.plugin)
+    compileOnly(libs.kotlin.abi.tools.api)
     testImplementation(libs.junit)
 }
 

@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.buildlogic.api
 import com.android.build.api.artifact.ScopedArtifact
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.api.variant.ScopedArtifacts
+import com.eltavine.duckdetector.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -31,18 +32,23 @@ import org.gradle.kotlin.dsl.register
  * fail when the compiled API differs, so a change to what SDK consumers compile against is always a
  * reviewed diff.
  *
- * Kotlin's own ABI validation cannot yet read libraries built with AGP's built-in Kotlin, so the dump
- * is javap's listing of the public and protected members of the module's release classes. javap
- * cannot tell Kotlin `internal` declarations from public ones; the contract modules use explicit API
- * mode and declare nothing internal.
+ * The dump comes from Kotlin's ABI tools, the engine of the Kotlin Gradle plugin's `abiValidation`,
+ * in the same format. `abiValidation` itself cannot yet read Android libraries built with AGP's
+ * built-in Kotlin, so this plugin hands the tools the module's release classes from AGP instead.
  */
 class DuckDetectorPublicApiPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             val dumpFile = "${project.name}.api"
             val updateTaskPath = "${project.path}:updatePublicApi"
+            val abiToolsClasspath = configurations.register("publicApiAbiTools") {
+                isCanBeConsumed = false
+                isCanBeResolved = true
+                dependencies.addLater(libs.findLibrary("kotlin-abi-tools").get())
+            }
             val dumpPublicApi = tasks.register<DumpPublicApiTask>("dumpPublicApi") {
                 dump.set(layout.buildDirectory.file("public-api/$dumpFile"))
+                abiTools.from(abiToolsClasspath)
             }
             pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
                 val main = extensions.getByType<SourceSetContainer>().named("main")
@@ -60,6 +66,7 @@ class DuckDetectorPublicApiPlugin : Plugin<Project> {
                 actual.set(dumpPublicApi.flatMap { it.dump })
                 reference.from(layout.projectDirectory.file("api/$dumpFile"))
                 updateTask.set(updateTaskPath)
+                abiTools.from(abiToolsClasspath)
             }
             tasks.register<Copy>("updatePublicApi") {
                 from(dumpPublicApi.flatMap { it.dump })

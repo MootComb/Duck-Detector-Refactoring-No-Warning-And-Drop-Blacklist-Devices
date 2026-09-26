@@ -1,18 +1,19 @@
-public final class com.eltavine.duckdetector.sdk.DetectorCatalog {
-  public static final com.eltavine.duckdetector.sdk.DetectorCatalog INSTANCE;
-  public final java.util.List<com.eltavine.duckdetector.core.detector.Detector<?, ?>> getAll();
+public final class com/eltavine/duckdetector/sdk/DetectorCatalog {
+	public static final field INSTANCE Lcom/eltavine/duckdetector/sdk/DetectorCatalog;
+	public final fun getAll ()Ljava/util/List;
 }
 
-public final class com.eltavine.duckdetector.sdk.DuckDetector {
-  public static final com.eltavine.duckdetector.sdk.DuckDetector INSTANCE;
-  public final java.util.List<com.eltavine.duckdetector.core.detector.Detector<?, ?>> getDetectors();
-  public final java.lang.Object scan(android.content.Context, kotlin.coroutines.Continuation<? super java.util.List<com.eltavine.duckdetector.core.report.DetectorResult>>);
-  public final kotlinx.coroutines.flow.Flow<com.eltavine.duckdetector.core.report.DetectorResult> results(android.content.Context);
-  public final void captureLaunchEvidence(android.content.Intent);
-  public final android.webkit.WebView createProcMountSampler(android.content.Context);
+public final class com/eltavine/duckdetector/sdk/DuckDetector {
+	public static final field INSTANCE Lcom/eltavine/duckdetector/sdk/DuckDetector;
+	public final fun captureLaunchEvidence (Landroid/content/Intent;)V
+	public final fun createProcMountSampler (Landroid/content/Context;)Landroid/webkit/WebView;
+	public final fun getDetectors ()Ljava/util/List;
+	public final fun results (Landroid/content/Context;)Lkotlinx/coroutines/flow/Flow;
+	public final fun scan (Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload implements android.app.ZygotePreload {
-  public com.eltavine.duckdetector.sdk.DuckDetectorZygotePreload();
-  public void doPreload(android.content.pm.ApplicationInfo);
+public final class com/eltavine/duckdetector/sdk/DuckDetectorZygotePreload : android/app/ZygotePreload {
+	public fun <init> ()V
+	public fun doPreload (Landroid/content/pm/ApplicationInfo;)V
 }
+
