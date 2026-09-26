@@ -19,15 +19,12 @@ package com.eltavine.duckdetector.features.tee.data.verification.keystore
 import android.content.Context
 import android.os.Build
 import com.eltavine.duckdetector.capability.attestation.data.AndroidKeyStoreTools
-import java.security.MessageDigest
-import java.security.cert.X509Certificate
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 class GrantDomainFullChainSplitProbe(
     context: Context,
-    private val granteeManager: TeeGrantDomainGranteeManager = TeeGrantDomainGranteeManager(context),
-    private val privateGrantClient: Keystore2PrivateGrantClient = Keystore2PrivateGrantClient(),
+    internal val granteeManager: TeeGrantDomainGranteeManager = TeeGrantDomainGranteeManager(context),
+    internal val privateGrantClient: Keystore2PrivateGrantClient = Keystore2PrivateGrantClient(),
 ) {
 
     private val appContext = context.applicationContext
@@ -221,137 +218,6 @@ class GrantDomainFullChainSplitProbe(
         }
     }
 
-    private suspend fun inspectPrivateBinder(
-        alias: String,
-        diagnostics: GrantDetectionDiagnosticLog,
-    ): GrantDomainFullChainSplitResult {
-        val ownerResult = privateGrantClient.readOwnerChain(alias)
-        ownerResult.throwable?.let { diagnostics.addThrowable("private-owner-chain", it) }
-        if (!ownerResult.available) {
-            return GrantDomainFullChainSplitResult(
-                detail = ownerResult.detail,
-            )
-        }
-        val ownerChain = ownerResult.chain
-        if (ownerChain.certificates.isEmpty()) {
-            return GrantDomainFullChainSplitResult(
-                detail = "private getKeyEntry(APP) returned an empty certificate chain.",
-            )
-        }
-        val sessionResult = granteeManager.openSession()
-        if (!sessionResult.available || sessionResult.session == null) {
-            diagnostics.add("private-session", sessionResult.detail)
-            return GrantDomainFullChainSplitResult(
-                ownerChainLength = ownerChain.certificates.size,
-                detail = "Private: isolated grantee unavailable.",
-            )
-        }
-        var grantCreated = false
-        return sessionResult.session.use { session ->
-            var stageResult = GrantDomainFullChainSplitResult(
-                detail = "Private: grant did not complete.",
-            )
-            try {
-                // Owner creates the grant, but isolated readback must use the owner-passed Keystore2
-                // binder. That keeps the test focused on cross-domain GRANT visibility, not service lookup.
-                // grant 由 owner 创建，但 isolated 回读必须使用 owner 传入的 Keystore2 binder；这样检测聚焦跨域 GRANT 可见性，而非服务查找差异。
-                val grantResult = privateGrantClient.grantAliasToUid(alias, session.uid)
-                grantResult.throwable?.let { diagnostics.addThrowable("private-grant", it) }
-                val grantId = grantResult.grantId
-                if (!grantResult.available || grantId == null) {
-                    val anomalyKind = if (grantResult.errorKind == Keystore2PrivateGrantErrorKind.KEY_NOT_FOUND) {
-                        GrantDomainAnomalyKind.ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN
-                    } else {
-                        GrantDomainAnomalyKind.UNAVAILABLE
-                    }
-                    return@use GrantDomainFullChainSplitResult(
-                        executed = anomalyKind == GrantDomainAnomalyKind.ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN,
-                        ownerChainLength = ownerChain.certificates.size,
-                        granteeUid = session.uid,
-                        anomalyKind = anomalyKind,
-                        detail = grantResult.detail,
-                    )
-                }
-                grantCreated = true
-                val keystore2Binder = privateGrantClient.lookupBinder()
-                if (keystore2Binder == null) {
-                    stageResult = GrantDomainFullChainSplitResult(
-                        ownerChainLength = ownerChain.certificates.size,
-                        granteeUid = session.uid,
-                        detail = "isolated binder call blocked: owner keystore2 binder unavailable.",
-                    )
-                } else {
-                    val granteeResult = session.readGrantedCertificateChain(grantId, keystore2Binder)
-                    granteeResult.diagnosticCopyText.takeIf { it.isNotBlank() }?.let(diagnostics::addRaw)
-                    if (!granteeResult.available) {
-                        val stackPayload = diagnostics.text()
-                        val crashDetected = matchesPrivateIsolatedCrashSignature(stackPayload)
-                        stageResult = GrantDomainFullChainSplitResult(
-                            executed = crashDetected,
-                            ownerChainLength = ownerChain.certificates.size,
-                            granteeUid = session.uid,
-                            anomalyKind = if (crashDetected) {
-                                GrantDomainAnomalyKind.ISOLATED_PRIVATE_READBACK_CRASH
-                            } else {
-                                GrantDomainAnomalyKind.UNAVAILABLE
-                            },
-                            detail = if (crashDetected) {
-                                "Private: isolated readback crashed after grant succeeded."
-                            } else {
-                                "Private: readback failed (${visibleGrantDetail(granteeResult.detail)})."
-                            },
-                            diagnosticCopyText = if (crashDetected) stackPayload else granteeResult.diagnosticCopyText,
-                        )
-                    } else if (granteeResult.chain.certificates.isEmpty()) {
-                        stageResult = GrantDomainFullChainSplitResult(
-                            ownerChainLength = ownerChain.certificates.size,
-                            granteeChainLength = 0,
-                            granteeUid = session.uid,
-                            detail = "Private: Domain.GRANT certificate chain empty.",
-                        )
-                    } else {
-                        val granteeChain = granteeResult.chain
-                        val comparison = compareChains(ownerChain, granteeChain)
-                        stageResult = GrantDomainFullChainSplitResult(
-                            executed = true,
-                            available = true,
-                            splitDetected = comparison.splitDetected,
-                            ownerChainLength = ownerChain.certificates.size,
-                            granteeChainLength = granteeChain.certificates.size,
-                            mismatchIndex = comparison.mismatchIndex,
-                            granteeUid = session.uid,
-                            anomalyKind = if (comparison.splitDetected) {
-                                GrantDomainAnomalyKind.ISOLATED_CHAIN_SPLIT
-                            } else {
-                                GrantDomainAnomalyKind.NONE
-                            },
-                            detail = if (comparison.splitDetected) {
-                                "Private: matched ${comparison.detail}"
-                            } else {
-                                "Private: clean (${comparison.detail})"
-                            },
-                        )
-                    }
-                }
-            } finally {
-                if (grantCreated) {
-                    // Cleanup is part of the probe contract. If it fails, keep the detection result but
-                    // append a short visible note and leave the stack trace in hidden diagnostics.
-                    // cleanup 是检测契约的一部分；失败时保留检测结果，只追加短可见说明，完整堆栈留在隐藏诊断中。
-                    val ungrantResult = privateGrantClient.revokeAliasGrant(alias, session.uid)
-                    ungrantResult.throwable?.let { diagnostics.addThrowable("private-revoke", it) }
-                    if (!ungrantResult.available) {
-                        diagnostics.add("private-revoke", ungrantResult.detail)
-                        stageResult = stageResult.copy(
-                            detail = appendDetail(stageResult.detail, ungrantResult.detail),
-                        )
-                    }
-                }
-            }
-            stageResult
-        }
-    }
-
     companion object {
         internal fun matchesPrivateIsolatedCrashSignature(
             stackPayload: String,
@@ -444,66 +310,4 @@ class GrantDomainFullChainSplitProbe(
 private fun GrantDomainFullChainSplitResult.isDanger(): Boolean {
     return anomalyKind == GrantDomainAnomalyKind.ISOLATED_CHAIN_SPLIT ||
         anomalyKind == GrantDomainAnomalyKind.ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN
-}
-
-data class GrantDomainFullChainSplitResult(
-    val executed: Boolean = false,
-    val available: Boolean = false,
-    val splitDetected: Boolean = false,
-    val ownerChainLength: Int = 0,
-    val granteeChainLength: Int = 0,
-    val mismatchIndex: Int? = null,
-    val granteeUid: Int? = null,
-    val anomalyKind: GrantDomainAnomalyKind = GrantDomainAnomalyKind.UNAVAILABLE,
-    val detail: String = "",
-    val diagnosticCopyText: String = "",
-)
-
-enum class GrantDomainAnomalyKind {
-    NONE,
-    ISOLATED_CHAIN_SPLIT,
-    ISOLATED_GRANT_KEY_NOT_FOUND_AFTER_OWNER_CHAIN,
-    ISOLATED_PRIVATE_READBACK_CRASH,
-    UNAVAILABLE,
-}
-
-data class GrantDomainFullChainComparison(
-    val splitDetected: Boolean,
-    val mismatchIndex: Int? = null,
-    val detail: String,
-)
-
-data class GrantDomainCertificateChain(
-    val certificates: List<GrantDomainCertificateFingerprint> = emptyList(),
-) {
-    companion object {
-        fun fromCertificates(certificates: List<X509Certificate>): GrantDomainCertificateChain {
-            return GrantDomainCertificateChain(
-                certificates = certificates.map { certificate ->
-                    GrantDomainCertificateFingerprint.fromDer(certificate.encoded)
-                },
-            )
-        }
-    }
-}
-
-data class GrantDomainCertificateFingerprint(
-    val derLength: Int,
-    val sha256: String,
-) {
-    fun summary(): String {
-        return "len=$derLength sha256=${sha256.take(16)}"
-    }
-
-    companion object {
-        fun fromDer(der: ByteArray): GrantDomainCertificateFingerprint {
-            val digest = MessageDigest.getInstance("SHA-256").digest(der)
-            return GrantDomainCertificateFingerprint(
-                derLength = der.size,
-                sha256 = digest.joinToString(separator = "") { byte ->
-                    "%02x".format(Locale.US, byte.toInt() and 0xff)
-                },
-            )
-        }
-    }
 }
