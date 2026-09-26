@@ -1,6 +1,6 @@
 # Architecture follow-ups
 
-These are known, deliberate gaps left by the module refactor. Each one was kept because fixing it would change detector semantics, shipped binaries or component identity, which the refactor was not allowed to do. Remove an entry in the same change that resolves it.
+These are the known gaps and pending checks the module refactor left. Each gap was kept because fixing it would change detector semantics, shipped binaries or component identity, which the refactor was not allowed to do; each check needs a device the refactor did not have. Remove an entry in the same change that resolves it.
 
 ## Text that data layers still read
 
