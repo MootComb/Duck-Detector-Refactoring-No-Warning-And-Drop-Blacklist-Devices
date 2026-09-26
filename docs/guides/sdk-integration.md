@@ -41,7 +41,7 @@ dependencies {
 }
 ```
 
-The AAR's manifest brings in the SDK's services and its app zygote preload, and `soter-core` brings the SOTER keystore permission, library and package query. The SDK itself declares no permissions; see [Permissions](#permissions).
+The AAR's manifest brings in the SDK's services, the MIME group Native Root's throne-hunt stimulus flips, and the app zygote preload; `soter-core` brings the SOTER keystore permission, library and package query. The SDK itself declares no permissions; see [Permissions](#permissions).
 
 ## Scan
 
@@ -90,18 +90,6 @@ class HostZygotePreload : ZygotePreload {
 ```
 
 The preload runs each detector's app zygote work, such as Native Root's throne-hunt watch, and then captures the SELinux context validity evidence, before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
-
-### Throne-hunt anchor
-
-Native Root's throne-hunt stimulus flips a MIME group, and `setMimeGroup` accepts only a group that the calling package declares. Declare it on any activity; the intent filter itself is inert:
-
-```xml
-<intent-filter>
-    <action android:name="com.eltavine.duckdetector.action.THRONE_HUNT_ANCHOR" />
-    <category android:name="android.intent.category.DEFAULT" />
-    <data android:mimeGroup="duckdetector-throne-hunt" />
-</intent-filter>
-```
 
 ### Early launch capture
 

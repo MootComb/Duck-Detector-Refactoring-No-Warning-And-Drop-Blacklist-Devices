@@ -54,6 +54,12 @@ Most method rows say "Clean" when a probe ran and saw nothing, and several say "
 
 `SoterCapabilityProbe` wraps the environment inspector in `runCatching` and falls back to an empty snapshot. `BiometricManager.canAuthenticate` needs `USE_BIOMETRIC`, so a host without it gets an "abnormal environment" result of false instead of "not evaluated". Carry the inspector's failure into `TeeSoterState` and show the environment check as unavailable.
 
+## Device validation of the manifest hooks
+
+These moved from the host's manifest into the modules that own them. They were checked against AOSP sources and the merged manifests, not on a device:
+
+- Native Root declares the throne-hunt MIME group on its carrier service instead of the app's `MainActivity`. From Android 11 through main, a package declares the MIME groups of every component's intent filters, and `setMimeGroup` updates services like activities before it rewrites packages.list. Check that `dumpsys package` lists the group and that the stimulus applies.
+
 ## Device validation of the evidence review
 
 The evidence review changed what several probes report. These changes were verified with JVM tests and native builds for all four ABIs, not on devices:

@@ -57,18 +57,7 @@ limitations under the License.
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-            <!-- Declares the MIME group the throne hunt stimulus flips. setMimeGroup only accepts a
-                 group that the calling package has declared, and the platform rejects the call
-                 otherwise, so this anchor is required even though the intent-filter itself is inert. -->
-            <intent-filter>
-                <action android:name="com.eltavine.duckdetector.action.THRONE_HUNT_ANCHOR" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeGroup="duckdetector-throne-hunt" />
-            </intent-filter>
-        </activity>
+            android:exported="true" />
 
     </application>
 

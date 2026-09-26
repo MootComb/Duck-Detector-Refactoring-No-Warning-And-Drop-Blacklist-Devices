@@ -73,8 +73,9 @@ class ThroneHuntStimulus(
     }
 
     companion object {
-        // Must match the android:mimeGroup declared by the manifest intent-filter, otherwise
-        // setMimeGroup throws IllegalArgumentException("Unknown MIME group ... for package ...").
+        // Must match the android:mimeGroup that this module's manifest declares on the carrier
+        // service, otherwise setMimeGroup throws
+        // IllegalArgumentException("Unknown MIME group ... for package ...").
         const val MIME_GROUP = "duckdetector-throne-hunt"
 
         // WRITE_SETTINGS_DELAY in PackageManagerService is 10 s, and scheduleWriteSettings() guards
