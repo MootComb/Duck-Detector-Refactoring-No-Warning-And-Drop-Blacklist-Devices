@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "rules": {
+    "composition_root": ":app",
+    "dependency_direction": [
+      ":app",
+      ":sdk",
+      ":feature",
+      ":capability",
+      ":core"
+    ],
+    "isolated_groups": [
+      ":feature",
+      ":capability"
+    ],
+    "group_layers": {
+      ":feature": {
+        "domain": {
+          "kind": "jvm",
+          "ui": false,
+          "may_depend_on": [],
+          "may_use": [
+            ":core:evidence",
+            ":capability:*:domain"
+          ]
+        },
+        "data": {
+          "kind": "android-library",
+          "ui": false,
+          "may_depend_on": [
+            "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:native",
+            ":core:platform",
+            ":core:detector",
+            ":capability:*:domain",
+            ":capability:*:data"
+          ]
+        },
+        "presentation": {
+          "kind": "jvm",
+          "ui": false,
+          "may_depend_on": [
+            "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:scan",
+            ":capability:*:domain"
+          ]
+        },
+        "detector": {
+          "kind": "android-library",
+          "ui": false,
+          "may_depend_on": [
+            "domain",
+            "data",
+            "presentation"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:detector",
+            ":core:native",
+            ":capability:*:domain",
+            ":capability:*:data"
+          ]
+        },
+        "ui": {
+          "kind": "android-library",
+          "ui": true,
+          "may_depend_on": [
+            "domain",
+            "presentation",
+            "detector"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:report",
+            ":core:scan",
+            ":core:detector",
+            ":core:ui",
+            ":capability:*:domain"
+          ]
+        }
+      },
+      ":capability": {
+        "domain": {
+          "kind": "jvm",
+          "ui": false,
+          "may_depend_on": [],
+          "may_use": [
+            ":core:evidence",
+            ":core:native"
+          ]
+        },
+        "data": {
+          "kind": "android-library",
+          "ui": false,
+          "may_depend_on": [
+            "domain"
+          ],
+          "may_use": [
+            ":core:evidence",
+            ":core:native",
+            ":core:platform"
+          ]
+        }
+      }
+    },
+    "jvm_forbidden_dependencies": [
+      "androidx.*:*",
+      "com.android.*:*",
+      "com.google.android.*:*",
+      "org.jetbrains.compose.*:*",
+      "org.jetbrains.kotlinx:kotlinx-coroutines-android"
+    ],
+    "ui_only_dependencies": [
+      "androidx.compose:*",
+      "androidx.compose.*:*",
+      "androidx.activity:activity-compose",
+      "androidx.lifecycle:lifecycle-*-compose",
+      "androidx.browser:browser",
+      "br.com.devsrsouza.compose.icons:*",
+      "com.google.android.material:material",
+      "com.mikepenz:aboutlibraries-compose*"
+    ]
+  },
+  "members": {
+    ":app": {
+      "kind": "android-application",
+      "ui": true,
+      "allowed_project_dependencies": [
+        ":core:*",
+        ":feature:*:*",
+        ":sdk:*"
+      ]
+    },
+    ":core:detector": {
+      "kind": "android-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report"
+      ]
+    },
+    ":core:evidence": {
+      "kind": "jvm",
+      "ui": false,
+      "allowed_project_dependencies": []
+    },
+    ":core:native": {
+      "kind": "jvm",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
+    },
+    ":core:platform": {
+      "kind": "android-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
+    },
+    ":core:report": {
+      "kind": "jvm",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":core:evidence"
+      ]
+    },
+    ":core:scan": {
+      "kind": "jvm",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":core:evidence",
+        ":core:report"
+      ]
+    },
+    ":core:ui": {
+      "kind": "android-library",
+      "ui": true,
+      "allowed_project_dependencies": [
+        ":core:detector",
+        ":core:evidence",
+        ":core:report",
+        ":core:scan"
+      ]
+    },
+    ":sdk:aar": {
+      "kind": "android-fused-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":capability:*:*",
+        ":core:*",
+        ":feature:*:data",
+        ":feature:*:detector",
+        ":feature:*:domain",
+        ":feature:*:presentation",
+        ":sdk:runtime"
+      ]
+    },
+    ":sdk:runtime": {
+      "kind": "android-library",
+      "ui": false,
+      "allowed_project_dependencies": [
+        ":capability:*:data",
+        ":capability:*:domain",
+        ":core:*",
+        ":feature:*:detector"
+      ]
+    }
+  }
+}

@@ -1,0 +1,55 @@
+public final class com/eltavine/duckdetector/core/detector/ConsentDecision : java/lang/Enum {
+	public static final field DECLINED Lcom/eltavine/duckdetector/core/detector/ConsentDecision;
+	public static final field GRANTED Lcom/eltavine/duckdetector/core/detector/ConsentDecision;
+	public static final field UNDECIDED Lcom/eltavine/duckdetector/core/detector/ConsentDecision;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/eltavine/duckdetector/core/detector/ConsentDecision;
+	public static fun values ()[Lcom/eltavine/duckdetector/core/detector/ConsentDecision;
+}
+
+public final class com/eltavine/duckdetector/core/detector/ConsentId {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lcom/eltavine/duckdetector/core/detector/ConsentId;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public abstract interface class com/eltavine/duckdetector/core/detector/Detector {
+	public fun appZygotePreload (Landroid/content/pm/ApplicationInfo;)V
+	public abstract fun createScanner (Landroid/content/Context;)Lcom/eltavine/duckdetector/core/detector/DetectorScanner;
+	public abstract fun describe (Ljava/lang/Object;)Lcom/eltavine/duckdetector/core/report/DetectorHeadline;
+	public abstract fun export (Lcom/eltavine/duckdetector/core/report/DetectorHeadline;)Lcom/eltavine/duckdetector/core/report/DetectorReport;
+	public fun getConsents ()Ljava/util/List;
+	public abstract fun getId-YyyATdw ()Ljava/lang/String;
+	public abstract fun loadingReport ()Ljava/lang/Object;
+}
+
+public final class com/eltavine/duckdetector/core/detector/Detector$DefaultImpls {
+	public static fun appZygotePreload (Lcom/eltavine/duckdetector/core/detector/Detector;Landroid/content/pm/ApplicationInfo;)V
+	public static fun getConsents (Lcom/eltavine/duckdetector/core/detector/Detector;)Ljava/util/List;
+}
+
+public abstract interface class com/eltavine/duckdetector/core/detector/DetectorConsent {
+	public abstract fun decide (Landroid/content/Context;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun decisions (Landroid/content/Context;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getId-AjMgUOQ ()Ljava/lang/String;
+}
+
+public final class com/eltavine/duckdetector/core/detector/DetectorRunKt {
+	public static final fun run (Lcom/eltavine/duckdetector/core/detector/Detector;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/eltavine/duckdetector/core/detector/DetectorScanner {
+	public abstract fun scan (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class com/eltavine/duckdetector/core/detector/DetectorSpecificApi : java/lang/annotation/Annotation {
+}
+

@@ -1,0 +1,66 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="about_clipboard_build_hash_line">แฮชบิลด์: %1$s</string>
+    <string name="about_clipboard_build_time_line">เวลาบิลด์ (UTC): %1$s UTC</string>
+    <string name="about_clipboard_label">ข้อมูลบิลด์ Duck Detector</string>
+    <string name="about_clipboard_version_line">เวอร์ชัน: %1$s (%2$d)</string>
+    <string name="about_copy_build_info_summary">คัดลอกเวอร์ชัน เวลาบิลด์ และแฮชบิลด์</string>
+    <string name="about_copy_toast">คัดลอกข้อมูลบิลด์แล้ว</string>
+    <string name="about_label_build_hash">แฮชบิลด์</string>
+    <string name="about_label_build_time">เวลาบิลด์</string>
+    <string name="about_label_copy_build_info">คัดลอกข้อมูลบิลด์</string>
+    <string name="about_label_email">อีเมล</string>
+    <string name="about_label_privacy">ความเป็นส่วนตัว / การใช้ข้อมูล</string>
+    <string name="about_label_version">เวอร์ชัน</string>
+    <string name="about_label_website">เว็บไซต์</string>
+    <string name="about_privacy_summary">การตรวจสอบทำงานภายในอุปกรณ์และไม่อัปโหลดผลลัพธ์ แอปเชื่อมต่อ GitHub หนึ่งครั้งต่อ cold start เพื่อรับข้อมูล Nightly ส่วนการรีเฟรช CRL ออนไลน์ยังเป็นทางเลือก</string>
+    <string name="about_subtitle">ลิงก์โปรเจกต์และข้อมูลเมตาของบิลด์</string>
+    <string name="about_title">เกี่ยวกับ</string>
+    <string name="about_value_build_time">%1$s UTC</string>
+    <string name="about_value_version">%1$s (%2$d)</string>
+    <string name="author_boundary_toast">ปลายสุด</string>
+    <string name="author_summary_baka">TEE และ Zygisk</string>
+    <string name="author_summary_eltavine">มีส่วนร่วมด้าน UI, C++, ASM และ Kotlin</string>
+    <string name="author_summary_wxx">CI (Kotlin)</string>
+    <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
+    <string name="author_swipe_hint_paged">ปัดซ้ายหรือขวาเพื่อดูผู้เขียน %1$d/%2$d</string>
+    <string name="author_swipe_hint_single">ปัดซ้ายหรือขวาเพื่อดูผู้เขียน</string>
+    <string name="licenses_dialog_close">ปิด</string>
+    <string name="licenses_dialog_home_page">หน้าแรก</string>
+    <string name="licenses_dialog_licenses">ใบอนุญาต: %1$s</string>
+    <string name="licenses_dialog_no_license_text">ไม่มีข้อความใบอนุญาต</string>
+    <string name="licenses_dialog_open">เปิด</string>
+    <string name="licenses_dialog_source_repo">ซอร์สรีโป</string>
+    <string name="licenses_dialog_version">เวอร์ชัน %1$s</string>
+    <string name="licenses_entry_label">ความโปร่งใส</string>
+    <string name="licenses_entry_subtitle">ดูโปรเจกต์ภายนอกที่มากับบิลด์นี้และตรวจสอบประกาศใบอนุญาตของพวกมัน</string>
+    <string name="licenses_entry_title">ไลบรารีโอเพนซอร์ส</string>
+    <string name="licenses_inventory_subtitle">แตะ dependency ใดก็ได้เพื่อดูข้อความใบอนุญาตและลิงก์โปรเจกต์ต้นทาง</string>
+    <string name="licenses_inventory_title">รายการไลบรารีที่รวมมา</string>
+    <string name="licenses_screen_back">กลับ</string>
+    <string name="licenses_screen_subtitle">คอมโพเนนต์ภายนอกที่รวมมาในบิลด์นี้</string>
+    <string name="licenses_screen_title">ใบอนุญาตโอเพนซอร์ส</string>
+    <string name="settings_subtitle">การควบคุมการยืนยันออนไลน์และสถานะอัปเดต GitHub Nightly</string>
+    <string name="settings_title">การตั้งค่า</string>
+    <string name="update_settings_label">ตรวจสอบอัปเดต</string>
+    <string name="update_status_available">มี Nightly รุ่นใหม่; แตะเพื่อดูรายละเอียด</string>
+    <string name="update_status_checking">กำลังตรวจสอบ GitHub…</string>
+    <string name="update_status_current">คุณใช้ Nightly รุ่นล่าสุดแล้ว</string>
+    <string name="update_status_failed">ตรวจสอบ GitHub ไม่สำเร็จ; แตะเพื่อลองใหม่</string>
+    <string name="update_status_idle">ตรวจสอบ GitHub Main Nightly หลัง cold start; แตะเพื่อตรวจตอนนี้</string>
+</resources>

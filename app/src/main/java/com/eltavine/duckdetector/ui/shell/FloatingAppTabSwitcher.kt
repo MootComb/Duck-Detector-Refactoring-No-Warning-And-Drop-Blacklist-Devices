@@ -36,7 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.eltavine.duckdetector.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 fun FloatingAppTabSwitcher(

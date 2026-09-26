@@ -1,0 +1,32 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">我已了解，继续</string>
+    <string name="alpha_continue_waiting">我已了解（%1$d 秒）</string>
+    <string name="alpha_dismiss_ready">你现在可以关闭此警告了。</string>
+    <string name="alpha_dismiss_waiting">%1$d 秒后可关闭。</string>
+    <string name="alpha_helper">崩溃日志辅助：AppErrorsTracking 可通过 GitHub Actions 和 Telegram CI 获取。</string>
+    <string name="alpha_message">这是 Alpha 测试构建。由于其中包含涉及 C++ 和汇编的大规模重构，可能出现不稳定崩溃。</string>
+    <string name="alpha_title">ALPHA 构建</string>
+    <string name="alpha_warning_download">如果你不知道如何获取崩溃日志，请从下方链接下载 AppErrorsTracking。</string>
+    <string name="alpha_warning_report">如果遇到问题，请及时反馈。清晰的复现步骤会特别有帮助。</string>
+    <string name="alpha_warning_runtime">此分支仍可能出现意外启动失败或运行时崩溃。</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+    <string name="tee_diagnostic_copied_toast">已复制诊断详情</string>
+</resources>

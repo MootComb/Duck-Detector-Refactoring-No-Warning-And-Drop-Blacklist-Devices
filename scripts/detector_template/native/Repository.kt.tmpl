@@ -1,0 +1,41 @@
+package {{package}}.data.repository
+
+import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.core.evidence.FailureName
+import {{package}}.data.native.{{Class}}NativeBridge
+import {{package}}.domain.{{Class}}Report
+import {{package}}.domain.{{Class}}Signal
+import {{package}}.domain.{{Class}}Stage
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/** Collects {{title}} evidence off the main thread; a probe that throws becomes a FAILED report. */
+class {{Class}}Repository(
+    private val nativeBridge: {{Class}}NativeBridge = {{Class}}NativeBridge(),
+) : DetectorScanner<{{Class}}Report> {
+
+    override suspend fun scan(): {{Class}}Report = withContext(Dispatchers.IO) {
+        try {
+            collect()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (failure: Exception) {
+            {{Class}}Report.failed(FailureName.describe(failure))
+        }
+    }
+
+    private fun collect(): {{Class}}Report {
+        val snapshot = nativeBridge.collectSnapshot()
+        return {{Class}}Report(
+            stage = {{Class}}Stage.READY,
+            signals = snapshot.signals.map { detail -> {{Class}}Signal(label = "Native", detail = detail) },
+            probed = snapshot.available,
+            unavailableReason = when {
+                !snapshot.collection.isTrustworthy -> snapshot.collection.explain("Native snapshot unavailable")
+                !snapshot.available -> "The native probe did not observe the device."
+                else -> null
+            },
+        )
+    }
+}

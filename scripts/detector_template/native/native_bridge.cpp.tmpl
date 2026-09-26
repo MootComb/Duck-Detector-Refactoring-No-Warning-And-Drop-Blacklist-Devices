@@ -1,0 +1,41 @@
+#include <jni.h>
+
+#include <string>
+#include <vector>
+
+#include "common/payload_codec.h"
+
+namespace {
+
+    struct Snapshot {
+        // Stays false until the probe observes the device, so Kotlin reports "not evaluated"
+        // instead of a clean result.
+        bool available = false;
+        std::vector<std::string> signals;
+    };
+
+    Snapshot collect_snapshot() {
+        Snapshot snapshot;
+        return snapshot;
+    }
+
+    std::string encode_payload(const Snapshot &snapshot) {
+        std::string payload;
+        payload.append(snapshot.available ? "AVAILABLE=1\n" : "AVAILABLE=0\n");
+        for (const auto &signal: snapshot.signals) {
+            payload.append("SIGNAL=");
+            payload.append(duckdetector::common::escape_payload_value(signal));
+            payload.push_back('\n');
+        }
+        return payload;
+    }
+
+}  // namespace
+
+extern "C" JNIEXPORT jstring JNICALL
+{{jni}}_nativeCollectSnapshot(
+        JNIEnv *env,
+        jobject
+) {
+    return env->NewStringUTF(encode_payload(collect_snapshot()).c_str());
+}

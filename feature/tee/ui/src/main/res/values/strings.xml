@@ -1,0 +1,32 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_diagnostic_clipboard_label">TEE diagnostic detail</string>
+    <string name="tee_revocation_network_title">CRL online refresh</string>
+    <string name="tee_revocation_network_prompt_headline">Choose whether TEE revocation checks may fetch online updates.</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector always checks the built-in revocation snapshot. Allowing network lets it fetch Google\'s latest attestation revocation feed during TEE validation.</string>
+    <string name="tee_revocation_network_allow">Allow refresh</string>
+    <string name="tee_revocation_network_decline">Built-in only</string>
+    <string name="tee_revocation_network_granted_headline">Online CRL refresh is allowed.</string>
+    <string name="tee_revocation_network_granted_detail">TEE validation checks the built-in snapshot and may refresh Google\'s attestation revocation feed whenever network conditions permit.</string>
+    <string name="tee_revocation_network_declined_status">Local</string>
+    <string name="tee_revocation_network_declined_headline">TEE revocation checks use the built-in snapshot.</string>
+    <string name="tee_revocation_network_declined_detail">Duck Detector will not perform online CRL refresh until you re-enable it in Settings. Built-in revocation checks remain active.</string>
+    <string name="tee_revocation_network_setting_title">Allow online CRL refresh</string>
+    <string name="tee_revocation_network_setting_summary">TEE revocation checks always use the built-in snapshot; this only permits fetching Google\'s latest attestation revocation feed.</string>
+    <string name="tee_revocation_network_setting_footer">Changes apply immediately to online refresh behavior. Built-in TEE revocation checks remain enabled.</string>
+</resources>

@@ -41,5 +41,23 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Duck Detector"
+
+// A module is a directory with a build file at its group's depth, and its Gradle path mirrors that
+// directory, so adding a detector, capability or core module never needs an edit here.
+fun includeModules(group: String, depth: Int) {
+    var directories = listOf(rootDir.resolve(group))
+    repeat(depth) {
+        directories = directories.flatMap { directory ->
+            directory.listFiles().orEmpty().filter { it.isDirectory }.sortedBy { it.name }
+        }
+    }
+    directories
+        .filter { it.resolve("build.gradle.kts").isFile }
+        .forEach { include(":" + it.relativeTo(rootDir).invariantSeparatorsPath.replace('/', ':')) }
+}
+
 include(":app")
- 
+includeModules("sdk", depth = 1)
+includeModules("feature", depth = 2)
+includeModules("capability", depth = 2)
+includeModules("core", depth = 1)

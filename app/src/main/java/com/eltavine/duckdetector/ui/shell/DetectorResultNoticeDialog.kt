@@ -35,10 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
-import com.eltavine.duckdetector.core.ui.model.DetectionSeverity
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
+import com.eltavine.duckdetector.core.evidence.DetectionSeverity
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 import kotlinx.coroutines.delay
 
 internal const val RESULT_NOTICE_LOCK_SECONDS = 5
@@ -56,9 +58,26 @@ internal fun shouldShowDetectorResultNotice(
     }
 }
 
-internal fun attentionDetectorTitles(
-    contributions: List<DashboardDetectorContribution>,
-): Set<String> {
+/**
+ * Identifies the finding a result notice was shown for, so a dismissed notice stays dismissed
+ * until the outcome itself changes. Built from typed overview data; rewording the overview does
+ * not produce a new key.
+ */
+internal fun detectorResultNoticeKey(overview: DashboardOverviewModel): String {
+    val counts = overview.counts
+    return listOf(
+        overview.verdict.name,
+        overview.focusDetectorIds.joinToString(",") { it.value },
+        "danger=${counts.danger}",
+        "warning=${counts.warning}",
+        "ready=${counts.ready}",
+        "pending=${counts.pending}",
+    ).joinToString("|")
+}
+
+internal fun attentionDetectorIds(
+    contributions: List<DetectorSummary>,
+): Set<DetectorId> {
     return contributions
         .filter { contribution ->
             contribution.ready && when (contribution.status.severity) {
@@ -69,7 +88,7 @@ internal fun attentionDetectorTitles(
                 DetectionSeverity.ALL_CLEAR -> false
             }
         }
-        .mapTo(linkedSetOf()) { contribution -> contribution.title }
+        .mapTo(linkedSetOf()) { contribution -> contribution.id }
 }
 
 @Composable

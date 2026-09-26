@@ -8,6 +8,9 @@
 /.idea/workspace.xml
 .DS_Store
 /build
+# Every Gradle module writes its outputs to its own build directory.
+build/
+__pycache__/
 /captures
 /out
 .externalNativeBuild

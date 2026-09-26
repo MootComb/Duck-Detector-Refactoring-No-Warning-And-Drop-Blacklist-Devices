@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_revocation_network_title">Làm mới CRL trực tuyến</string>
+    <string name="tee_revocation_network_prompt_headline">Chọn xem kiểm tra thu hồi TEE có được tải cập nhật trực tuyến hay không.</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector luôn kiểm tra ảnh chụp thu hồi tích hợp. Cho phép mạng sẽ tải Google attestation revocation feed mới nhất trong quá trình xác minh TEE.</string>
+    <string name="tee_revocation_network_allow">Cho phép làm mới</string>
+    <string name="tee_revocation_network_decline">Chỉ tích hợp</string>
+    <string name="tee_revocation_network_granted_headline">Đã cho phép làm mới CRL trực tuyến.</string>
+    <string name="tee_revocation_network_granted_detail">Quá trình xác minh TEE kiểm tra ảnh chụp tích hợp và có thể làm mới Google attestation revocation feed khi điều kiện mạng cho phép.</string>
+    <string name="tee_revocation_network_declined_status">Cục bộ</string>
+    <string name="tee_revocation_network_declined_headline">Kiểm tra thu hồi TEE dùng ảnh chụp tích hợp.</string>
+    <string name="tee_revocation_network_declined_detail">Duck Detector sẽ không thực hiện làm mới CRL trực tuyến cho đến khi bạn bật lại trong Cài đặt. Kiểm tra thu hồi tích hợp vẫn luôn hoạt động.</string>
+    <string name="tee_revocation_network_setting_title">Cho phép làm mới CRL trực tuyến</string>
+    <string name="tee_revocation_network_setting_summary">Kiểm tra thu hồi TEE luôn dùng ảnh chụp tích hợp; tùy chọn này chỉ cho phép tải Google attestation revocation feed mới nhất.</string>
+    <string name="tee_revocation_network_setting_footer">Thay đổi có hiệu lực ngay với hành vi làm mới trực tuyến. Kiểm tra thu hồi TEE tích hợp vẫn luôn bật.</string>
+</resources>

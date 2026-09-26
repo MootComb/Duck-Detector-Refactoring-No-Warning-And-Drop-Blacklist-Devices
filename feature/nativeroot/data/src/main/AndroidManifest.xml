@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!-- The package directory watch is installed during app_zygote preload and inherited through
+             fork, so this carrier only drains the event stream from the isolated child. The intent
+             filter declares the MIME group the throne-hunt stimulus flips: setMimeGroup accepts only
+             a group that a component of the calling package declares, whatever the component's
+             type, and the filter is inert because the service is not exported. MIME groups exist
+             from API 30; below it the stimulus reports itself unsupported. -->
+        <service
+            android:name="com.eltavine.duckdetector.features.nativeroot.data.service.ThroneHuntCarrierService"
+            android:exported="false"
+            android:isolatedProcess="true"
+            android:useAppZygote="true">
+            <intent-filter>
+                <action android:name="com.eltavine.duckdetector.action.THRONE_HUNT_ANCHOR" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:mimeGroup="duckdetector-throne-hunt"
+                    tools:targetApi="r" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

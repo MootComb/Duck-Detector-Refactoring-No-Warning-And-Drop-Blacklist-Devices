@@ -16,10 +16,9 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.core.notifications.ScanNotificationPermissionState
-import com.eltavine.duckdetector.core.notifications.preferences.ScanNotificationPrefs
-import com.eltavine.duckdetector.core.packagevisibility.InstalledPackageVisibility
-import com.eltavine.duckdetector.features.tee.data.preferences.TeeNetworkPrefs
+import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
+import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
+import com.eltavine.duckdetector.sdk.PackageVisibility
 
 enum class AppDestination {
     MAIN,
@@ -32,16 +31,17 @@ enum class StartupGateState {
     READY,
 }
 
+/** Detector consents never block the first scan; the gate only waits for their decisions to load. */
 fun resolveStartupGateState(
-    teePrefs: TeeNetworkPrefs?,
+    consentDecisionsLoaded: Boolean,
     notificationPrefs: ScanNotificationPrefs?,
     notificationPermissionState: ScanNotificationPermissionState,
     packageVisibilityLoaded: Boolean,
-    packageVisibility: InstalledPackageVisibility,
+    packageVisibility: PackageVisibility.Scope,
     packageVisibilityReviewAcknowledged: Boolean,
 ): StartupGateState {
     return when {
-        teePrefs == null || notificationPrefs == null || !packageVisibilityLoaded ->
+        !consentDecisionsLoaded || notificationPrefs == null || !packageVisibilityLoaded ->
             StartupGateState.LOADING
 
         !notificationPrefs.notificationsPrompted &&
@@ -54,7 +54,7 @@ fun resolveStartupGateState(
                 !notificationPrefs.liveUpdatesPrompted ->
             StartupGateState.REQUIRES_POLICY_REVIEW
 
-        packageVisibility == InstalledPackageVisibility.RESTRICTED &&
+        packageVisibility == PackageVisibility.Scope.RESTRICTED &&
                 !packageVisibilityReviewAcknowledged ->
             StartupGateState.REQUIRES_POLICY_REVIEW
 

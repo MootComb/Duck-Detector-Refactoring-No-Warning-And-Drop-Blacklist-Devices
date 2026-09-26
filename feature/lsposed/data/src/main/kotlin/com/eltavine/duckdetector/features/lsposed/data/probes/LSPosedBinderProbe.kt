@@ -1,0 +1,239 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.lsposed.data.probes
+
+import android.os.DeadObjectException
+import android.os.Parcel
+import android.os.Process
+import com.eltavine.duckdetector.core.platform.HiddenServiceManager
+import com.eltavine.duckdetector.core.platform.PlatformFailureName
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedProbe
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignal
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalGroup
+import com.eltavine.duckdetector.features.lsposed.domain.LSPosedSignalSeverity
+
+data class LSPosedBinderProbeResult(
+    val signals: List<LSPosedSignal>,
+    val hitCount: Int,
+)
+
+class LSPosedBinderProbe {
+
+    fun run(): LSPosedBinderProbeResult {
+        val signals = buildList {
+            addAll(probeActivityBridge())
+            addAll(probeSerialBridge())
+        }
+        return LSPosedBinderProbeResult(
+            signals = signals,
+            hitCount = signals.size,
+        )
+    }
+
+    private fun probeActivityBridge(): List<LSPosedSignal> {
+        val binder = HiddenServiceManager.getService("activity").getOrNull() ?: return emptyList()
+
+        var data: Parcel? = null
+        var reply: Parcel? = null
+        return try {
+            data = Parcel.obtain()
+            reply = Parcel.obtain()
+            data.writeInterfaceToken(BRIDGE_SERVICE_DESCRIPTOR)
+            data.writeInt(BRIDGE_ACTION_GET_BINDER)
+            data.writeString("")
+
+            val transactResult = binder.transact(BRIDGE_TRANSACTION_CODE, data, reply, 0)
+            if (!transactResult) {
+                emptyList()
+            } else {
+                val detail = buildString {
+                    appendLine("Service: activity")
+                    appendLine("Transaction: $BRIDGE_TRANSACTION_CODE")
+                    append("Interface token: $BRIDGE_SERVICE_DESCRIPTOR")
+                }
+                reply.setDataPosition(0)
+                val replyDetail = runCatching {
+                    reply.readException()
+                    if (reply.readStrongBinder() != null) {
+                        "Binder returned"
+                    } else {
+                        "Reply accepted"
+                    }
+                }.getOrElse {
+                    "Reply anomaly: ${PlatformFailureName.of(it)}"
+                }
+                listOf(
+                    LSPosedSignal(
+                        id = "binder_activity_bridge",
+                        probe = LSPosedProbe.BINDER,
+                        label = "Activity service bridge",
+                        value = replyDetail,
+                        group = LSPosedSignalGroup.BINDER,
+                        severity = LSPosedSignalSeverity.DANGER,
+                        detail = detail,
+                        detailMonospace = true,
+                    ),
+                )
+            }
+        } catch (_: DeadObjectException) {
+            emptyList()
+        } catch (security: SecurityException) {
+            security.message
+                ?.takeIf(::containsFrameworkToken)
+                ?.let { message ->
+                    listOf(
+                        LSPosedSignal(
+                            id = "binder_activity_exception",
+                            probe = LSPosedProbe.BINDER,
+                            label = "Activity bridge exception",
+                            value = "LSPosed ref",
+                            group = LSPosedSignalGroup.BINDER,
+                            severity = LSPosedSignalSeverity.DANGER,
+                            detail = message,
+                            detailMonospace = true,
+                        ),
+                    )
+                }
+                ?: emptyList()
+        } catch (throwable: Throwable) {
+            throwable.message
+                ?.takeIf(::containsFrameworkToken)
+                ?.let { message ->
+                    listOf(
+                        LSPosedSignal(
+                            id = "binder_activity_throwable",
+                            probe = LSPosedProbe.BINDER,
+                            label = "Activity bridge throwable",
+                            value = "Review",
+                            group = LSPosedSignalGroup.BINDER,
+                            severity = LSPosedSignalSeverity.WARNING,
+                            detail = message,
+                            detailMonospace = true,
+                        ),
+                    )
+                }
+                ?: emptyList()
+        } finally {
+            data?.recycle()
+            reply?.recycle()
+        }
+    }
+
+    private fun probeSerialBridge(): List<LSPosedSignal> {
+        val binder = HiddenServiceManager.getService("serial").getOrNull() ?: return emptyList()
+
+        val signals = mutableListOf<LSPosedSignal>()
+        runCatching { binder.interfaceDescriptor }
+            .getOrNull()
+            ?.takeIf(::containsFrameworkToken)
+            ?.let { descriptor ->
+                signals += LSPosedSignal(
+                    id = "binder_serial_descriptor",
+                    probe = LSPosedProbe.BINDER,
+                    label = "Serial service descriptor",
+                    value = "Hook token",
+                    group = LSPosedSignalGroup.BINDER,
+                    severity = LSPosedSignalSeverity.DANGER,
+                    detail = descriptor,
+                    detailMonospace = true,
+                )
+            }
+
+        var data: Parcel? = null
+        var reply: Parcel? = null
+        try {
+            data = Parcel.obtain()
+            reply = Parcel.obtain()
+            data.writeInt(Process.myUid())
+            data.writeInt(Process.myPid())
+            data.writeString("duckdetector_probe")
+
+            val transactResult = binder.transact(BRIDGE_TRANSACTION_CODE, data, reply, 0)
+            if (transactResult) {
+                signals += LSPosedSignal(
+                    id = "binder_serial_bridge",
+                    probe = LSPosedProbe.BINDER,
+                    label = "Serial service bridge",
+                    value = "Responded",
+                    group = LSPosedSignalGroup.BINDER,
+                    severity = LSPosedSignalSeverity.DANGER,
+                    detail = buildString {
+                        appendLine("Service: serial")
+                        appendLine("Transaction: $BRIDGE_TRANSACTION_CODE")
+                        append("Unexpected Binder bridge response from serial service.")
+                    },
+                    detailMonospace = true,
+                )
+            }
+        } catch (_: DeadObjectException) {
+            Unit
+        } catch (security: SecurityException) {
+            security.message
+                ?.takeIf(::containsFrameworkToken)
+                ?.let { message ->
+                    signals += LSPosedSignal(
+                        id = "binder_serial_exception",
+                        probe = LSPosedProbe.BINDER,
+                        label = "Serial bridge exception",
+                        value = "LSPosed ref",
+                        group = LSPosedSignalGroup.BINDER,
+                        severity = LSPosedSignalSeverity.DANGER,
+                        detail = message,
+                        detailMonospace = true,
+                    )
+                }
+        } catch (throwable: Throwable) {
+            throwable.message
+                ?.takeIf(::containsFrameworkToken)
+                ?.let { message ->
+                    signals += LSPosedSignal(
+                        id = "binder_serial_throwable",
+                        probe = LSPosedProbe.BINDER,
+                        label = "Serial bridge throwable",
+                        value = "Review",
+                        group = LSPosedSignalGroup.BINDER,
+                        severity = LSPosedSignalSeverity.WARNING,
+                        detail = message,
+                        detailMonospace = true,
+                    )
+                }
+        } finally {
+            data?.recycle()
+            reply?.recycle()
+        }
+
+        return signals
+    }
+
+    private fun containsFrameworkToken(text: String): Boolean {
+        val lower = text.lowercase()
+        return FRAMEWORK_TOKENS.any { token -> lower.contains(token) }
+    }
+
+    private companion object {
+        private const val BRIDGE_TRANSACTION_CODE = 1598837584
+        private const val BRIDGE_SERVICE_DESCRIPTOR = "LSPosed"
+        private const val BRIDGE_ACTION_GET_BINDER = 2
+
+        private val FRAMEWORK_TOKENS = listOf(
+            "lsposed",
+            "lspd",
+            "xposed",
+            "lsplant",
+        )
+    }
+}

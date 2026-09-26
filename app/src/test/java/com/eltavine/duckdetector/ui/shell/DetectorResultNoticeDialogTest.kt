@@ -16,10 +16,15 @@
 
 package com.eltavine.duckdetector.ui.shell
 
-import com.eltavine.duckdetector.core.ui.model.DetectorStatus
-import com.eltavine.duckdetector.features.dashboard.ui.model.DashboardDetectorContribution
+import com.eltavine.duckdetector.core.evidence.DetectorId
+import com.eltavine.duckdetector.core.scan.DetectorSummary
+import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewCounts
+import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewVerdict
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -51,7 +56,7 @@ class DetectorResultNoticeDialogTest {
             shouldShowDetectorResultNotice(
                 isLoading = false,
                 overviewStatus = DetectorStatus.info(
-                    com.eltavine.duckdetector.core.ui.model.InfoKind.ERROR
+                    com.eltavine.duckdetector.core.evidence.InfoKind.ERROR
                 ),
             ),
         )
@@ -68,35 +73,35 @@ class DetectorResultNoticeDialogTest {
     }
 
     @Test
-    fun `returns titles for ready danger and warning detectors only`() {
-        val titles = attentionDetectorTitles(
+    fun `returns ids of ready danger and warning detectors only`() {
+        val ids = attentionDetectorIds(
             listOf(
-                DashboardDetectorContribution(
-                    id = "bootloader",
+                DetectorSummary(
+                    id = DetectorId("bootloader"),
                     title = "Bootloader",
                     status = DetectorStatus.danger(),
                     headline = "Danger",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "tee",
+                DetectorSummary(
+                    id = DetectorId("tee"),
                     title = "TEE",
                     status = DetectorStatus.warning(),
                     headline = "Warning",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "memory",
+                DetectorSummary(
+                    id = DetectorId("memory"),
                     title = "Memory",
                     status = DetectorStatus.allClear(),
                     headline = "OK",
                     summary = "summary",
                     ready = true,
                 ),
-                DashboardDetectorContribution(
-                    id = "virtualization",
+                DetectorSummary(
+                    id = DetectorId("virtualization"),
                     title = "Virtualization",
                     status = DetectorStatus.danger(),
                     headline = "Danger",
@@ -106,6 +111,29 @@ class DetectorResultNoticeDialogTest {
             ),
         )
 
-        assertEquals(linkedSetOf("Bootloader", "TEE"), titles)
+        assertEquals(linkedSetOf(DetectorId("bootloader"), DetectorId("tee")), ids)
     }
+    @Test
+    fun `notice key ignores wording and follows the typed outcome`() {
+        val base = noticeOverview(focus = listOf("mount", "tee"), danger = 1)
+
+        assertEquals(
+            detectorResultNoticeKey(base),
+            detectorResultNoticeKey(base.copy(headline = "Reworded", summary = "Reworded summary", title = "Reworded title")),
+        )
+        assertNotEquals(detectorResultNoticeKey(base), detectorResultNoticeKey(noticeOverview(focus = listOf("tee", "mount"), danger = 1)))
+        assertNotEquals(detectorResultNoticeKey(base), detectorResultNoticeKey(noticeOverview(focus = listOf("mount", "tee"), danger = 2)))
+    }
+
+    private fun noticeOverview(focus: List<String>, danger: Int) = DashboardOverviewModel(
+        title = "Security overview",
+        headline = "Danger",
+        summary = "Start with Mount and TEE.",
+        status = DetectorStatus.danger(),
+        metrics = emptyList(),
+        verdict = OverviewVerdict.DANGER,
+        titleDescribesCompletedScan = false,
+        focusDetectorIds = focus.map(::DetectorId),
+        counts = OverviewCounts(danger = danger, warning = 0, ready = 15, pending = 0),
+    )
 }

@@ -1,0 +1,39 @@
+package {{package}}.domain
+
+enum class {{Class}}Stage {
+    LOADING,
+    READY,
+    FAILED,
+}
+
+/** One piece of evidence a {{title}} probe observed. */
+data class {{Class}}Signal(
+    val label: String,
+    val detail: String,
+)
+
+/** What one {{title}} scan observed, before any judgement. */
+data class {{Class}}Report(
+    val stage: {{Class}}Stage,
+    val signals: List<{{Class}}Signal>,
+    /** False when no probe could observe the device, so an empty [signals] says nothing about it. */
+    val probed: Boolean,
+    /** Why no probe could observe the device, when [probed] is false. */
+    val unavailableReason: String? = null,
+    val errorMessage: String? = null,
+) {
+    companion object {
+        fun loading(): {{Class}}Report = {{Class}}Report(
+            stage = {{Class}}Stage.LOADING,
+            signals = emptyList(),
+            probed = false,
+        )
+
+        fun failed(message: String): {{Class}}Report = {{Class}}Report(
+            stage = {{Class}}Stage.FAILED,
+            signals = emptyList(),
+            probed = false,
+            errorMessage = message,
+        )
+    }
+}

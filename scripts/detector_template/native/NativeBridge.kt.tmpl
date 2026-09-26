@@ -1,0 +1,35 @@
+package {{package}}.data.native
+
+import com.eltavine.duckdetector.core.native.NativePayloadCodec
+import com.eltavine.duckdetector.core.native.NativePayloadContract
+import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
+
+/** Reads the `KEY=value` payload that native_bridge.cpp in the {{name}} native unit writes. */
+class {{Class}}NativeBridge(
+    private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
+) {
+
+    fun collectSnapshot(): {{Class}}NativeSnapshot = collector.collect(
+        readPayload = ::nativeCollectSnapshot,
+        parse = ::parse,
+        unavailable = { status -> {{Class}}NativeSnapshot(collection = status) },
+    )
+
+    internal fun parse(raw: String): {{Class}}NativeSnapshot {
+        if (raw.isBlank()) {
+            return {{Class}}NativeSnapshot()
+        }
+        NativePayloadContract.requireKeys(raw, "AVAILABLE")
+
+        val entries = raw.lineSequence()
+            .filter { '=' in it }
+            .map { it.substringBefore('=') to it.substringAfter('=') }
+            .toList()
+        return {{Class}}NativeSnapshot(
+            available = NativePayloadCodec.decodeFlag(entries.firstOrNull { it.first == "AVAILABLE" }?.second),
+            signals = entries.filter { it.first == "SIGNAL" }.map { NativePayloadCodec.decodeValue(it.second) },
+        )
+    }
+
+    private external fun nativeCollectSnapshot(): String
+}

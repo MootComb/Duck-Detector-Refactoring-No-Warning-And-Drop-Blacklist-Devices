@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="alpha_banner">ALPHA</string>
+    <string name="alpha_continue">이해했습니다. 계속</string>
+    <string name="alpha_continue_waiting">이해했습니다 (%1$d초)</string>
+    <string name="alpha_dismiss_ready">이제 이 경고를 닫을 수 있습니다.</string>
+    <string name="alpha_dismiss_waiting">%1$d초 후에 닫을 수 있습니다.</string>
+    <string name="alpha_helper">크래시 로그 도우미: AppErrorsTracking은 GitHub Actions와 Telegram CI에서 받을 수 있습니다.</string>
+    <string name="alpha_message">이 빌드는 알파 테스트 빌드입니다. C++와 어셈블리를 포함한 대규모 리팩터링이 들어 있어 불안정한 크래시가 발생할 수 있습니다.</string>
+    <string name="alpha_title">ALPHA 빌드</string>
+    <string name="alpha_warning_download">크래시 로그를 수집하는 방법을 모른다면 아래 링크 중 하나에서 AppErrorsTracking을 내려받으세요.</string>
+    <string name="alpha_warning_report">문제가 발생하면 제보해 주세요. 명확한 재현 단계가 특히 도움이 됩니다.</string>
+    <string name="alpha_warning_runtime">이 브랜치에서는 예기치 않은 시작 실패나 런타임 크래시가 여전히 발생할 수 있습니다.</string>
+    <string name="social_github">GitHub</string>
+    <string name="social_telegram">Telegram</string>
+</resources>

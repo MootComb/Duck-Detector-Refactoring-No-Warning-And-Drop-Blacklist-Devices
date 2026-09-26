@@ -1,0 +1,31 @@
+<!--
+Copyright 2026 Duck Apps Contributor
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<resources>
+    <string name="tee_revocation_network_title">CRL 線上重新整理</string>
+    <string name="tee_revocation_network_prompt_headline">請選擇是否允許 TEE 吊銷檢查取得線上更新。</string>
+    <string name="tee_revocation_network_prompt_detail">Duck Detector 始終會檢查內建吊銷快照。允許連線後，可在 TEE 驗證期間取得 Google 最新 attestation revocation feed。</string>
+    <string name="tee_revocation_network_allow">允許重新整理</string>
+    <string name="tee_revocation_network_decline">僅內建庫</string>
+    <string name="tee_revocation_network_granted_headline">已允許線上 CRL 重新整理。</string>
+    <string name="tee_revocation_network_granted_detail">TEE 驗證會檢查內建快照，並可在網路條件允許時重新整理 Google 的 attestation revocation feed。</string>
+    <string name="tee_revocation_network_declined_status">本地</string>
+    <string name="tee_revocation_network_declined_headline">TEE 吊銷檢查使用內建快照。</string>
+    <string name="tee_revocation_network_declined_detail">在您重新於設定中啟用之前，Duck Detector 不會執行線上 CRL 重新整理。內建吊銷檢查始終保持啟用。</string>
+    <string name="tee_revocation_network_setting_title">允許線上重新整理 CRL</string>
+    <string name="tee_revocation_network_setting_summary">TEE 吊銷檢查始終使用內建快照；此開關只允許取得 Google 最新 attestation revocation feed。</string>
+    <string name="tee_revocation_network_setting_footer">變更會立即套用到線上重新整理行為。內建 TEE 吊銷檢查始終保持啟用。</string>
+</resources>

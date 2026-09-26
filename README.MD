@@ -19,7 +19,7 @@
   <a href="#compatibility"><img src="https://img.shields.io/badge/Android-10%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 10 or later"></a>
   <a href="gradle/libs.versions.toml"><img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&amp;logo=kotlin&amp;logoColor=white" alt="Built with Kotlin"></a>
   <a href="app/build.gradle.kts"><img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&amp;logo=jetpackcompose&amp;logoColor=white" alt="Jetpack Compose UI"></a>
-  <a href="app/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK native probes"></a>
+  <a href="sdk/runtime/src/main/cpp/CMakeLists.txt"><img src="https://img.shields.io/badge/C%2B%2B-Android%20NDK-00599C?style=flat-square&amp;logo=cplusplus&amp;logoColor=white" alt="C++ / Android NDK native probes"></a>
 </p>
 
 <p align="center">
@@ -49,7 +49,7 @@
 
 DuckDetector collects and correlates security-relevant evidence on an Android device. It looks for boot-state changes, root and SU artifacts, runtime injection or hooking, mount namespace anomalies, modified system properties, suspicious applications, KeyStore and attestation inconsistencies, and signs of virtualization.
 
-The app combines a Jetpack Compose interface, feature-oriented Kotlin packages, and a native C++/assembly library. Results are diagnostic signals, not an authoritative statement that a device is secure or compromised.
+The app combines a Jetpack Compose interface, feature-oriented Gradle modules, and a native C++/assembly library. The same detectors are also published as a UI-free SDK AAR that other applications can embed. Results are diagnostic signals, not an authoritative statement that a device is secure or compromised.
 
 # Detector coverage
 
@@ -59,14 +59,14 @@ Current feature areas:
 
 `Play Integrity Fix` refers to local indicators associated with integrity-spoofing modifications; DuckDetector does not return an official Google Play Integrity API verdict. The TEE area evaluates Android KeyStore and attestation evidence, including certificate chains, security levels, revocation data, and selected KeyMint, StrongBox, and Soter behavior where supported.
 
-Supporting packages provide the dashboard, device information, settings, update checks, notifications, license information, and common UI infrastructure.
+Supporting modules provide the dashboard, device information, settings, update checks, notifications, license information, and common UI infrastructure.
 
 # How it works
 
-- **Feature-oriented structure:** detector areas keep collection, domain models, report mapping, and UI code close to the feature that owns them.
+- **Feature modules:** each detector owns its collection, judgement rules, report projection, and UI in its own Gradle modules, while collection code that several detectors share lives in capability modules.
 - **Early native capture:** a transparent `NativeActivity` runs before `MainActivity` and records early mount and virtualization evidence.
 - **Native probes:** the shared native library performs checks that require direct system calls, `/proc` inspection, timing measurements, linker/runtime visibility, or architecture-specific assembly.
-- **Process separation:** selected Zygisk, virtualization, SELinux, and TEE checks run in dedicated or isolated services so evidence can be compared across process boundaries.
+- **Process separation:** selected Zygisk, Mount, Native Root, virtualization, SELinux, LSPosed, and TEE checks run in dedicated or isolated services so evidence can be compared across process boundaries.
 - **Evidence correlation:** the dashboard reports individual findings and coverage states instead of treating one heuristic as conclusive.
 
 # Compatibility
@@ -83,27 +83,42 @@ Supporting packages provide the dashboard, device information, settings, update 
 
 ```text
 Duck-Detector-Refactoring/
-├─ app/
-│  ├─ src/main/java/com/eltavine/duckdetector/
-│  │  ├─ core/            # Shared platform and UI infrastructure
-│  │  ├─ features/        # Detector and supporting feature packages
-│  │  └─ ui/              # App shell, navigation, and theme
-│  └─ src/main/cpp/       # C++, JNI, and architecture-specific assembly
-├─ build-logic/           # Convention plugins and generated-asset tasks
+├─ app/                   # UI composition root: activities, dashboard cards, notifications
+├─ sdk/runtime/           # Headless composition root: detector catalog, scan API, process hooks, native library registry
+├─ sdk/aar/               # The distributable SDK: every headless module fused into one AAR
+├─ core/                  # Contracts and shared infrastructure: evidence, native payloads, platform access, reports, scan lifecycle, detector, UI
+├─ capability/            # Evidence collection shared by several detectors
+├─ feature/               # One detector or supporting feature per directory, split into layers
+├─ samples/sdk-consumer/  # A separate application built from the published AAR alone
+├─ build-logic/           # Convention plugins, module boundary and dependency validation, generated assets
+├─ docs/                  # Architecture overview, guides, and follow-ups
+├─ .github/policies/      # Module, native, detector touch point, reflection, and text protocol policies
+├─ .github/scripts/       # Repository guards and their self-tests
 ├─ gradle/                # Version catalog and Gradle wrapper files
-├─ scripts/               # Repository maintenance scripts
+├─ scripts/               # Detector scaffold and repository maintenance scripts
 ├─ build.gradle.kts
 └─ settings.gradle.kts
 ```
 
-Feature packages generally use these boundaries where they apply:
+Each detector is a set of Gradle modules under `feature/<name>/`:
 
+- `domain`: result models, report models, status definitions, and judgement rules (pure JVM)
 - `data`: probes, parsers, repositories, JNI bridges, and Android service access
-- `domain`: reports, result models, and status definitions
-- `presentation`: view models, report-to-UI mapping, and UI state
-- `ui`: Compose cards, screens, and feature-specific display models
+- `presentation`: the card model, its mapping from the domain report, and the report projection (pure JVM)
+- `detector`: the one headless `<Name>Detector` object that binds the other layers for the SDK and the app
+- `ui`: the Compose card, the prompts for the detector's consents, and its integration with the dashboard
 
-Native sources are compiled into the `libduckdetector.so` shared library. Kotlin code accesses native results through feature-specific JNI bridges.
+Dependencies point from `:app` to the SDK, from both to features, from features to capabilities, and from capabilities to core; features never depend on each other. Every module declares exactly the dependencies it uses. The build and CI enforce these rules. See the [architecture overview](./docs/architecture/README.md).
+
+A new detector touches only its own directory and its one line in `DetectorCatalog`, plus one registry line and one policy entry when it has a native unit; the app generates its dashboard cards from the ui modules. One command creates all of it, in a state that builds and reports "Not evaluated" until its probe is written:
+
+```bash
+python3 scripts/new_detector.py <name> --description "what it looks for and why that is evidence"
+```
+
+Continue with [Adding a detector](./docs/guides/adding-a-detector.md). To run the detectors inside another application, see [Using the SDK](./docs/guides/sdk-integration.md).
+
+Native sources are organized into units. Each unit lives in `src/main/cpp/<unit>/` of the module that owns it, is compiled as its own object library and is linked into `libduckdetector.so`; Kotlin code reaches native results through the JNI bridges of that same module.
 
 # Build
 
@@ -129,7 +144,14 @@ gradlew.bat :app:assembleDebug
 For the standard local validation path:
 
 ```bash
-./gradlew :app:compileDebugKotlin :app:testDebugUnitTest :app:assembleDebug
+./gradlew unitTest :app:assembleDebug :app:lintDebug buildHealth
+for s in .github/scripts/check-*.py; do python3 "$s"; done
+```
+
+The same build also produces the headless SDK as one AAR, without any UI, published to `sdk/aar/build/repository` (see [Using the SDK](./docs/guides/sdk-integration.md)):
+
+```bash
+./gradlew :sdk:aar:publish
 ```
 
 Before contributing, read [`CODING_STANDARDS.md`](./CODING_STANDARDS.md).

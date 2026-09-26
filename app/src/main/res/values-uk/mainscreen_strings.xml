@@ -15,19 +15,10 @@ limitations under the License.
 -->
 
 <resources>
-    <string name="app_name">Duck Detector</string>
-    <string name="status_info">Інформація</string>
-    <string name="status_all_clear">Все гаразд</string>
-    <string name="status_warning">Попередження</string>
-    <string name="status_danger">Небезпека</string>
-    <string name="status_info_error">Помилка</string>
-    <string name="status_info_support">Підтримка</string>
     <string name="dashboard_info_card">Інформаційна картка</string>
     <string name="dashboard_system_time">Системний час</string>
     <string name="dashboard_additional">Додатково</string>
     <string name="dashboard_detectors">Детектори</string>
-    <string name="card_expand">Розгорнути картку</string>
-    <string name="card_collapse">Згорнути картку</string>
     <string name="card_action_view_details">Переглянути деталі</string>
     <string name="card_action_review_evidence">Переглянути докази</string>
     <string name="card_action_certificate_chain">Ланцюжок сертифікатів</string>

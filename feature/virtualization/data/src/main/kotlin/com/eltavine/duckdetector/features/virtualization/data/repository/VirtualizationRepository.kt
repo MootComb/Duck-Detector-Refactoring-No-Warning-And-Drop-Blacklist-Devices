@@ -1,0 +1,273 @@
+/*
+ * Copyright 2026 Duck Apps Contributor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.eltavine.duckdetector.features.virtualization.data.repository
+
+import android.content.Context
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadResult
+import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
+import com.eltavine.duckdetector.capability.helperprocess.data.HelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.IsolatedHelperProbeManager
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeBridge
+import com.eltavine.duckdetector.capability.helperprocess.data.VirtualizationNativeFinding
+import com.eltavine.duckdetector.core.detector.DetectorScanner
+import com.eltavine.duckdetector.features.virtualization.data.probes.AsmCounterTrapProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.AsmRawSyscallTrapProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.DexPathProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.NativeSyscallParityTrapProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.NativeTimingTrapProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.UidIdentityProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationBuildProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationHostAppProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationPropertyProbe
+import com.eltavine.duckdetector.features.virtualization.data.probes.VirtualizationServiceProbe
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationReport
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignal
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalGroup
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationSignalSeverity
+import com.eltavine.duckdetector.features.virtualization.domain.VirtualizationStage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+data class VirtualizationProcessInfo(
+    val filesDir: String = "",
+    val cacheDir: String = "",
+    val codePath: String = "",
+) {
+    companion object {
+        fun fromContext(context: Context?): VirtualizationProcessInfo {
+            val appContext = context?.applicationContext ?: return VirtualizationProcessInfo()
+            return VirtualizationProcessInfo(
+                filesDir = runCatching { appContext.filesDir.absolutePath }.getOrDefault(""),
+                cacheDir = runCatching { appContext.cacheDir.absolutePath }.getOrDefault(""),
+                codePath = runCatching { appContext.applicationInfo.sourceDir }.getOrDefault(""),
+            )
+        }
+    }
+}
+
+internal data class ConsistencyComputation(
+    val crossProcessSignals: List<VirtualizationSignal> = emptyList(),
+    val isolatedSignals: List<VirtualizationSignal> = emptyList(),
+    val mountAnchorDriftCount: Int = 0,
+) {
+    val allSignals: List<VirtualizationSignal>
+        get() = crossProcessSignals + isolatedSignals
+}
+
+class VirtualizationRepository(
+    context: Context? = null,
+    private val propertyProbe: VirtualizationPropertyProbe = VirtualizationPropertyProbe(),
+    private val buildProbe: VirtualizationBuildProbe = VirtualizationBuildProbe(),
+    private val serviceProbe: VirtualizationServiceProbe = VirtualizationServiceProbe(),
+    private val dexPathProbe: DexPathProbe = DexPathProbe(context?.applicationContext),
+    private val uidIdentityProbe: UidIdentityProbe = UidIdentityProbe(context?.applicationContext),
+    private val nativeBridge: VirtualizationNativeBridge = VirtualizationNativeBridge(),
+    private val hostAppProbe: VirtualizationHostAppProbe = VirtualizationHostAppProbe(
+        context?.applicationContext,
+    ),
+    private val probeManager: HelperProbeManager = HelperProbeManager(
+        context?.applicationContext,
+    ),
+    private val isolatedProbeManager: IsolatedHelperProbeManager =
+        IsolatedHelperProbeManager(context?.applicationContext),
+    private val nativeTimingTrapProbe: NativeTimingTrapProbe = NativeTimingTrapProbe(nativeBridge),
+    private val nativeSyscallParityTrapProbe: NativeSyscallParityTrapProbe =
+        NativeSyscallParityTrapProbe(nativeBridge),
+    private val asmCounterTrapProbe: AsmCounterTrapProbe = AsmCounterTrapProbe(nativeBridge),
+    private val asmRawSyscallTrapProbe: AsmRawSyscallTrapProbe =
+        AsmRawSyscallTrapProbe(nativeBridge),
+    private val preloadResultProvider: () -> EarlyVirtualizationPreloadResult = {
+        EarlyVirtualizationPreloadStore.currentResult()
+    },
+    private val processInfoProvider: () -> VirtualizationProcessInfo = {
+        VirtualizationProcessInfo.fromContext(context?.applicationContext)
+    },
+) : DetectorScanner<VirtualizationReport> {
+    override suspend fun scan(): VirtualizationReport = withContext(Dispatchers.IO) {
+        runCatching { scanInternal() }
+            .getOrElse { throwable ->
+                VirtualizationReport.failed(throwable.message ?: "Virtualization scan failed.")
+            }
+    }
+
+    internal suspend fun scanInternal(): VirtualizationReport {
+        val propertySignals = propertyProbe.probe()
+        val buildSignals = buildProbe.probe()
+        val serviceResult = serviceProbe.probe()
+        val dexPathResult = dexPathProbe.probe()
+        val uidIdentityResult = uidIdentityProbe.probe()
+        // Only this main-process snapshot feeds eglAvailable and the Graphics renderer method.
+        val nativeSnapshot = nativeBridge.collectSnapshot(probeRenderer = true)
+        val preloadResult = preloadResultProvider()
+        val remoteSnapshot = probeManager.collect()
+        val isolatedSnapshot = isolatedProbeManager.collect()
+        val hostAppResult = hostAppProbe.probe()
+        val mainProcessInfo = processInfoProvider()
+        val nativeTimingTrap = nativeTimingTrapProbe.probe()
+        val nativeSyscallParityTrap = nativeSyscallParityTrapProbe.probe()
+        val asmCounterTrap = asmCounterTrapProbe.probe()
+        val asmRawSyscallTrap = asmRawSyscallTrapProbe.probe()
+        val syscallPackResult = probeManager.runSacrificialSyscallPack()
+
+        val nativeSignals = nativeSnapshot.findings.map(::nativeFindingToSignal)
+        val preloadSignals = buildPreloadSignals(preloadResult)
+        val consistency = buildConsistencySignals(
+            nativeSnapshot = nativeSnapshot,
+            preloadResult = preloadResult,
+            remoteSnapshot = remoteSnapshot,
+            isolatedSnapshot = isolatedSnapshot,
+            mainProcessInfo = mainProcessInfo,
+            dexPathResult = dexPathResult,
+            uidIdentityResult = uidIdentityResult,
+        )
+        val hostSignals = buildHostAppSignals(hostAppResult)
+        val honeypotSignals = buildHoneypotSignals(
+            nativeTimingTrap = nativeTimingTrap,
+            nativeSyscallParityTrap = nativeSyscallParityTrap,
+            asmCounterTrap = asmCounterTrap,
+            asmRawSyscallTrap = asmRawSyscallTrap,
+            syscallPackResult = syscallPackResult,
+        )
+
+        val signals = (
+                propertySignals +
+                        buildSignals +
+                        serviceResult.signals +
+                        dexPathResult.signals +
+                        uidIdentityResult.signals +
+                        nativeSignals +
+                        preloadSignals +
+                        consistency.allSignals +
+                        hostSignals +
+                        honeypotSignals
+                )
+            .distinctBy { it.id }
+            .sortedWith(
+                compareBy<VirtualizationSignal> { severityPriority(it.severity) }
+                    .thenBy { groupPriority(it.group) }
+                    .thenBy { it.label },
+            )
+
+        val runtimeSignals = signals.filter { it.group == VirtualizationSignalGroup.RUNTIME }
+        val graphicsSignals = runtimeSignals.filter {
+            it.label.contains("renderer", ignoreCase = true) ||
+                    it.label.contains("graphics", ignoreCase = true)
+        }
+        val translationSignals =
+            signals.filter { it.group == VirtualizationSignalGroup.TRANSLATION }
+
+        return VirtualizationReport(
+            stage = VirtualizationStage.READY,
+            nativeAvailable = nativeSnapshot.available,
+            startupPreloadAvailable = preloadResult.available,
+            startupPreloadContextValid = preloadResult.isContextValid,
+            crossProcessAvailable = remoteSnapshot.available,
+            isolatedProcessAvailable = isolatedSnapshot.available,
+            asmSupported = asmCounterTrap.supported || asmRawSyscallTrap.supported,
+            eglAvailable = nativeSnapshot.eglAvailable,
+            packageVisibility = hostAppResult.packageVisibility,
+            dexPathEntryCount = dexPathResult.entryCount,
+            dexPathHitCount = dexPathResult.hitCount,
+            uidIdentityHitCount = uidIdentityResult.hitCount,
+            environmentHitCount = countHits(signals, VirtualizationSignalGroup.ENVIRONMENT),
+            translationHitCount = countHits(signals, VirtualizationSignalGroup.TRANSLATION),
+            runtimeArtifactHitCount = countHits(signals, VirtualizationSignalGroup.RUNTIME),
+            consistencyHitCount = countHits(signals, VirtualizationSignalGroup.CONSISTENCY),
+            isolatedConsistencyHitCount = countHits(
+                consistency.isolatedSignals,
+                VirtualizationSignalGroup.CONSISTENCY,
+            ),
+            mountAnchorDriftCount = consistency.mountAnchorDriftCount,
+            mountNamespaceAvailable = nativeSnapshot.mountNamespaceInode.isNotBlank(),
+            honeypotHitCount = countHits(signals, VirtualizationSignalGroup.HONEYPOT),
+            syscallPackSupported = syscallPackResult.supported,
+            syscallPackHitCount = syscallPackResult.hitCount,
+            hostAppCorroborationCount = signals.count { it.group == VirtualizationSignalGroup.HOST_APPS },
+            mapLineCount = nativeSnapshot.mapLineCount,
+            fdCount = nativeSnapshot.fdCount,
+            mountInfoCount = nativeSnapshot.mountInfoCount,
+            signals = signals,
+            methods = buildMethods(
+                propertySignals = propertySignals + buildSignals + serviceResult.signals,
+                dexPathResult = dexPathResult,
+                uidIdentityResult = uidIdentityResult,
+                runtimeSignals = runtimeSignals.filterNot { it in graphicsSignals },
+                graphicsSignals = graphicsSignals,
+                translationSignals = translationSignals,
+                preloadSignals = preloadSignals,
+                preloadResult = preloadResult,
+                crossProcessSignals = consistency.crossProcessSignals,
+                isolatedSignals = consistency.isolatedSignals,
+                remoteSnapshot = remoteSnapshot,
+                isolatedSnapshot = isolatedSnapshot,
+                hostAppResult = hostAppResult,
+                nativeTimingTrap = nativeTimingTrap,
+                nativeSyscallParityTrap = nativeSyscallParityTrap,
+                asmCounterTrap = asmCounterTrap,
+                asmRawSyscallTrap = asmRawSyscallTrap,
+                syscallPackResult = syscallPackResult,
+                serviceResult = serviceResult,
+            ),
+            impacts = buildImpacts(signals, hostAppResult),
+        )
+    }
+
+    private fun countHits(
+        signals: List<VirtualizationSignal>,
+        group: VirtualizationSignalGroup
+    ): Int {
+        return signals.count {
+            it.group == group &&
+                    it.severity in setOf(
+                VirtualizationSignalSeverity.WARNING,
+                VirtualizationSignalSeverity.DANGER,
+            )
+        }
+    }
+
+    private fun nativeFindingToSignal(finding: VirtualizationNativeFinding): VirtualizationSignal {
+        return VirtualizationSignal(
+            id = "virt_native_${finding.group}_${finding.label}_${finding.value}",
+            label = finding.label,
+            value = finding.value,
+            group = when (finding.group.uppercase()) {
+                "ENVIRONMENT" -> VirtualizationSignalGroup.ENVIRONMENT
+                "TRANSLATION" -> VirtualizationSignalGroup.TRANSLATION
+                else -> VirtualizationSignalGroup.RUNTIME
+            },
+            severity = when (finding.severity.uppercase()) {
+                "DANGER" -> VirtualizationSignalSeverity.DANGER
+                "INFO" -> VirtualizationSignalSeverity.INFO
+                "SAFE" -> VirtualizationSignalSeverity.SAFE
+                else -> VirtualizationSignalSeverity.WARNING
+            },
+            detail = finding.detail,
+            detailMonospace = finding.detail.shouldUseMonospace(),
+        )
+    }
+
+    private fun String?.shouldUseMonospace(): Boolean {
+        val value = this.orEmpty()
+        return value.contains("/proc/") ||
+                value.contains("/data/") ||
+                value.contains("/dev/") ||
+                value.contains(".so") ||
+                value.contains("=") ||
+                value.contains(":") ||
+                value.contains("|")
+    }
+}
