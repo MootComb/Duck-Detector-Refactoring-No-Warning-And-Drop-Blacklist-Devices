@@ -32,6 +32,7 @@ namespace {
 
     constexpr std::int64_t kSecToNs = 1000000000LL;
     constexpr std::int64_t kDuplicateLaunchWindowNs = kSecToNs;
+    constexpr const char *kLaunchActivityMetaData = "com.eltavine.duckdetector.launch_activity";
 
     std::int64_t g_lastHandoffNs = 0;
 
@@ -178,7 +179,97 @@ namespace {
                          result.vendorMountKey);
     }
 
-    void start_main_activity_and_finish(JNIEnv *env, jobject activity) {
+    // Each lookup goes through the public declaration, and every failure returns at once, so no
+    // JNI call runs with an exception pending; the caller clears it.
+    jstring launch_activity_meta_data(JNIEnv *env, jobject activity) {
+        jclass activityClass = env->GetObjectClass(activity);
+        jmethodID getPackageManager = env->GetMethodID(activityClass, "getPackageManager",
+                                                       "()Landroid/content/pm/PackageManager;");
+        if (getPackageManager == nullptr) {
+            return nullptr;
+        }
+        jmethodID getComponentName = env->GetMethodID(activityClass, "getComponentName",
+                                                      "()Landroid/content/ComponentName;");
+        if (getComponentName == nullptr) {
+            return nullptr;
+        }
+        jobject packageManager = env->CallObjectMethod(activity, getPackageManager);
+        if (packageManager == nullptr) {
+            return nullptr;
+        }
+        jobject component = env->CallObjectMethod(activity, getComponentName);
+        if (component == nullptr) {
+            return nullptr;
+        }
+        jclass packageManagerClass = env->FindClass("android/content/pm/PackageManager");
+        if (packageManagerClass == nullptr) {
+            return nullptr;
+        }
+        jmethodID getActivityInfo = env->GetMethodID(
+                packageManagerClass,
+                "getActivityInfo",
+                "(Landroid/content/ComponentName;I)Landroid/content/pm/ActivityInfo;"
+        );
+        if (getActivityInfo == nullptr) {
+            return nullptr;
+        }
+        constexpr jint GET_META_DATA = 0x00000080;
+        jobject activityInfo = env->CallObjectMethod(packageManager, getActivityInfo, component,
+                                                     GET_META_DATA);
+        if (activityInfo == nullptr) {
+            return nullptr;
+        }
+        jclass itemInfoClass = env->FindClass("android/content/pm/PackageItemInfo");
+        if (itemInfoClass == nullptr) {
+            return nullptr;
+        }
+        jfieldID metaDataField = env->GetFieldID(itemInfoClass, "metaData", "Landroid/os/Bundle;");
+        if (metaDataField == nullptr) {
+            return nullptr;
+        }
+        jobject metaData = env->GetObjectField(activityInfo, metaDataField);
+        if (metaData == nullptr) {
+            return nullptr;
+        }
+        jclass bundleClass = env->FindClass("android/os/BaseBundle");
+        if (bundleClass == nullptr) {
+            return nullptr;
+        }
+        jmethodID getString = env->GetMethodID(bundleClass, "getString",
+                                               "(Ljava/lang/String;)Ljava/lang/String;");
+        if (getString == nullptr) {
+            return nullptr;
+        }
+        jstring key = env->NewStringUTF(kLaunchActivityMetaData);
+        if (key == nullptr) {
+            return nullptr;
+        }
+        return static_cast<jstring>(env->CallObjectMethod(metaData, getString, key));
+    }
+
+    // The activity the host names in this NativeActivity's <meta-data>, read from the bundle that
+    // NativeActivity reads android.app.lib_name from; empty when the entry is absent or unreadable.
+    std::string configured_launch_activity(JNIEnv *env, jobject activity) {
+        if (env->PushLocalFrame(16) != JNI_OK) {
+            env->ExceptionClear();
+            return {};
+        }
+        std::string configured;
+        jstring value = launch_activity_meta_data(env, activity);
+        if (env->ExceptionCheck()) {
+            env->ExceptionClear();
+        } else if (value != nullptr) {
+            const char *chars = env->GetStringUTFChars(value, nullptr);
+            if (chars != nullptr) {
+                configured = chars;
+                env->ReleaseStringUTFChars(value, chars);
+            }
+        }
+        env->PopLocalFrame(nullptr);
+        return configured;
+    }
+
+    void start_launch_activity_and_finish(JNIEnv *env, jobject activity) {
         const std::int64_t nowNs = monotonic_now_ns();
         if (g_lastHandoffNs != 0 && (nowNs - g_lastHandoffNs) < kDuplicateLaunchWindowNs) {
             finish_activity(env, activity);
@@ -256,10 +347,13 @@ namespace {
             return;
         }
 
+        const std::string configuredActivity = configured_launch_activity(env, activity);
+        const std::string launchActivityClassName = configuredActivity.empty()
+                                                    ? packageNameString + ".MainActivity"
+                                                    : configuredActivity;
         jobject intent = env->NewObject(intentClass, intentInit);
-        const std::string mainActivityClassName = packageNameString + ".MainActivity";
         jstring packageString = env->NewStringUTF(packageNameString.c_str());
-        jstring classString = env->NewStringUTF(mainActivityClassName.c_str());
+        jstring classString = env->NewStringUTF(launchActivityClassName.c_str());
         jobject component = env->NewObject(componentNameClass, componentInit, packageString,
                                            classString);
 
@@ -325,7 +419,7 @@ void native_activity_preload(JNIEnv *env, jobject activity) {
     if (!duckdetector::preload::virtualization::has_early_detection_run()) {
         duckdetector::preload::virtualization::run_early_detection();
     }
-    start_main_activity_and_finish(env, activity);
+    start_launch_activity_and_finish(env, activity);
 }
 
 extern "C" __attribute__((visibility("default")))
@@ -363,7 +457,7 @@ void ANativeActivity_onCreate(ANativeActivity *activity, void *savedState, size_
         return;
     }
 
-    start_main_activity_and_finish(env, activity->clazz);
+    start_launch_activity_and_finish(env, activity->clazz);
     if (attached) {
         vm->DetachCurrentThread();
     }

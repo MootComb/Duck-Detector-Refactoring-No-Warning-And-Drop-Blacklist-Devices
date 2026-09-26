@@ -93,9 +93,25 @@ The preload runs each detector's app zygote work, such as Native Root's throne-h
 
 ### Early launch capture
 
-The Mount and Virtualization detectors compare their scan with evidence captured before the first Java activity. The app's launcher is `android.app.NativeActivity` with `android.app.lib_name` set to `duckdetector`. It captures that evidence, then starts `<applicationId>.MainActivity` with the evidence as extras. Call `DuckDetector.captureLaunchEvidence(intent)` from that activity's `onCreate` and `onNewIntent`.
+The Mount and Virtualization detectors compare their scan with evidence captured before the first Java activity. Make the SDK's launcher your launch activity and name the activity it hands over to:
 
-The receiving activity's name is fixed, so reuse this launcher only if your launch activity is `<applicationId>.MainActivity`. Without the launcher, the Mount and Virtualization detectors report the early capture as unavailable.
+```xml
+<activity
+    android:name="android.app.NativeActivity"
+    android:exported="true"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar">
+    <meta-data android:name="android.app.lib_name" android:value="duckdetector" />
+    <meta-data
+        android:name="com.eltavine.duckdetector.launch_activity"
+        android:value="com.example.HomeActivity" />
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+```
+
+The launcher captures the evidence, then starts the activity that `com.eltavine.duckdetector.launch_activity` names, a fully qualified class in your package, with the evidence as extras. Without that entry it starts `<applicationId>.MainActivity`, as the app's launcher does. Call `DuckDetector.captureLaunchEvidence(intent)` from that activity's `onCreate` and `onNewIntent`. Without the launcher, the Mount and Virtualization detectors report the early capture as unavailable.
 
 ### Mount-view sampler
 

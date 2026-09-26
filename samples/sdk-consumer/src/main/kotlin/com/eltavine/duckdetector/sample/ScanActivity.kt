@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.sample
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import com.eltavine.duckdetector.core.detector.run
@@ -27,7 +28,10 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-/** Runs one detector, then every detector, through the SDK alone and lists each verdict. */
+/**
+ * Runs one detector, then every detector, through the SDK alone and lists each verdict. The SDK's
+ * launcher starts it with the early launch evidence.
+ */
 class ScanActivity : Activity() {
 
     private val scope = MainScope()
@@ -44,6 +48,12 @@ class ScanActivity : Activity() {
                 "${result.id}: ${result.status.severity} (${result.report.verdict})"
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        DuckDetector.captureLaunchEvidence(intent)
     }
 
     override fun onDestroy() {

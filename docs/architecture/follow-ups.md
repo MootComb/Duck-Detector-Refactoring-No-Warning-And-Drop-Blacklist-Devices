@@ -30,10 +30,6 @@ Each detector still collects its own platform evidence during its scan, even whe
 
 `DuckDetectorPublicApiPlugin` records the SDK contract modules' public API with javap, because Kotlin's ABI validation fails on libraries built with AGP's built-in Kotlin: its dump task has no class files to read. javap cannot tell Kotlin `internal` declarations from public ones, which is safe only while the contract modules declare nothing internal. When Kotlin's ABI validation supports these libraries, switch to it and regenerate the dumps in one change.
 
-## Early launch capture starts a fixed activity
-
-The transparent `NativeActivity` in the `preload` unit starts `<applicationId>.MainActivity` by name after its capture. An SDK host whose launch activity has another name cannot reuse the launcher, so its Mount and Virtualization detectors report the early capture as unavailable. Reading the target activity from a `<meta-data>` entry on the `NativeActivity` would lift this; the app's behaviour must stay identical.
-
 ## TEE probes that classify keystore errors by message
 
 Two TEE deep checks still read platform error text. The oversized challenge probe counts any exception as a rejection, so a busy or failing keystore reads as the expected answer. The update subcomponent probe recognises a key-not-found style failure by matching "KEY_NOT_FOUND" or "error 7" in the exception message. On Android 13 and later, `android.security.KeyStoreException.getNumericErrorCode()` gives the typed code. Classify by it where it exists, and report the probe as not completed otherwise.
@@ -56,9 +52,10 @@ Most method rows say "Clean" when a probe ran and saw nothing, and several say "
 
 ## Device validation of the manifest hooks
 
-These moved from the host's manifest into the modules that own them. They were checked against AOSP sources and the merged manifests, not on a device:
+Two process hooks changed so that SDK hosts need fewer manifest steps. They were checked against AOSP sources, native builds and the merged manifests, not on a device:
 
 - Native Root declares the throne-hunt MIME group on its carrier service instead of the app's `MainActivity`. From Android 11 through main, a package declares the MIME groups of every component's intent filters, and `setMimeGroup` updates services like activities before it rewrites packages.list. Check that `dumpsys package` lists the group and that the stimulus applies.
+- The launcher reads the activity it starts from its own `<meta-data>` through `PackageManager.getActivityInfo`, as `NativeActivity` reads `android.app.lib_name`. Check that the app, which names none, still starts `MainActivity`, and that the sample starts `ScanActivity` with the evidence.
 
 ## Device validation of the evidence review
 

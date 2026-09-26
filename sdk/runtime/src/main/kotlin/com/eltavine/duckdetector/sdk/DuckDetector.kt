@@ -66,8 +66,10 @@ public object DuckDetector {
      * Keeps the early mount and virtualization evidence that the transparent `NativeActivity`
      * captured before the first activity and passed on in [intent].
      *
-     * Call it from the receiving activity's `onCreate` and `onNewIntent`. Without that launch, the
-     * Mount and Virtualization detectors report the early capture as unavailable.
+     * The `NativeActivity` starts the activity that its `com.eltavine.duckdetector.launch_activity`
+     * meta-data names, `<applicationId>.MainActivity` when there is none. Call this from that
+     * activity's `onCreate` and `onNewIntent`. Without that launch, the Mount and Virtualization
+     * detectors report the early capture as unavailable.
      */
     public fun captureLaunchEvidence(intent: Intent?) {
         EarlyMountPreloadStore.capture(intent)

@@ -17,15 +17,28 @@ limitations under the License.
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application android:label="DuckDetector SDK consumer">
+        <!-- The SDK's launcher captures the early mount and virtualization evidence, then starts the
+             activity that launch_activity names with that evidence. -->
         <activity
-            android:name=".ScanActivity"
-            android:exported="true">
+            android:name="android.app.NativeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="duckdetector" />
+            <meta-data
+                android:name="com.eltavine.duckdetector.launch_activity"
+                android:value="com.eltavine.duckdetector.sample.ScanActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ScanActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

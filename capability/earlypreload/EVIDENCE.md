@@ -2,7 +2,7 @@
 
 Status: reviewed
 
-The early preload capability captures mount and virtualization evidence in the transparent NativeActivity before MainActivity starts, and hands it to the Mount and Virtualization detectors. Its value is timing: hiding that is applied later in the process's life has not happened yet.
+The early preload capability captures mount and virtualization evidence in the transparent NativeActivity before the activity it launches starts, and hands it to the Mount and Virtualization detectors. Its value is timing: hiding that is applied later in the process's life has not happened yet.
 
 ## Signals
 

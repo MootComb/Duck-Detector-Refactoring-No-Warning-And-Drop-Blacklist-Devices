@@ -41,7 +41,7 @@ The Mount detector asks whether this app's mount view shows systemless root moun
 
 ### Paths, startup preload and shell tmp
 
-- Observable signal: busybox and hybrid mount paths, the mount view captured by the NativeActivity before MainActivity, and whether /data/local/tmp is hidden or remapped.
+- Observable signal: busybox and hybrid mount paths, the mount view captured by the NativeActivity before the activity it launches, and whether /data/local/tmp is hidden or remapped.
 - Producing subsystem: the filesystem and the early launch capture.
 - Mechanism: hiding applied after launch leaves differences between the early and later views.
 - References: capability/earlypreload/EVIDENCE.md for the capture; system/core rootdir/init.rc for /data/local/tmp. Discovery only for busybox and hybrid mount paths.

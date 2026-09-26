@@ -49,7 +49,7 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | Capability | Shared evidence | Consumers |
 |---|---|---|
 | `attestation` | KeyStore attestation collection, extension parsing, trust roots, boot consistency | bootloader, tee |
-| `earlypreload` | Mount and virtualization evidence captured by the transparent `NativeActivity` before `MainActivity` | mount, virtualization |
+| `earlypreload` | Mount and virtualization evidence captured by the transparent `NativeActivity` before the activity it launches | mount, virtualization |
 | `helperprocess` | Isolated and helper process services, remote snapshots, dex path and UID identity collectors | mount, nativeroot, virtualization |
 | `packageinventory` | Installed package inventory and visibility checks | customrom, dangerousapps, lsposed, nativeroot, virtualization |
 | `selinuxpolicy` | SELinux context validity carriers, proc attr and policyload seqno probes, dirty policy preload queries | lsposed, selinux |
