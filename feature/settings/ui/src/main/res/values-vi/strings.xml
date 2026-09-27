@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">Người đóng góp</string>
     <string name="author_wall_hint">Kéo để di chuyển · Chụm hai ngón tay để thu phóng · Chạm để xem chi tiết</string>
+    <string name="author_wordmark_hint">Dùng hai ngón tay để phóng to và xem các ký tự từ tên người đóng góp</string>
     <string name="author_view_details">Xem chi tiết</string>
     <string name="author_view_github">Xem trên GitHub</string>
     <string name="author_details_close">Đóng</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Sao chép phiên bản, thời gian build và mã băm build</string>
     <string name="about_copy_toast">Đã sao chép thông tin build</string>
     <string name="about_label_build_hash">Mã băm build</string>
+    <string name="about_label_build_details">Chi tiết bản build</string>
     <string name="about_label_build_time">Thời gian build</string>
     <string name="about_label_copy_build_info">Sao chép thông tin build</string>
     <string name="about_label_email">Email</string>

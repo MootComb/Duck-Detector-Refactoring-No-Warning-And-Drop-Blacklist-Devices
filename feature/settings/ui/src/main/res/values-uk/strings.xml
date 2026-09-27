@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">Учасники</string>
     <string name="author_wall_hint">Перетягуйте для переміщення · Змінюйте масштаб двома пальцями · Торкніться для подробиць</string>
+    <string name="author_wordmark_hint">Збільшіть двома пальцями, щоб роздивитися літери з імен учасників</string>
     <string name="author_view_details">Переглянути подробиці</string>
     <string name="author_view_github">Переглянути на GitHub</string>
     <string name="author_details_close">Закрити</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Копіювати версію, час збірки та хеш збірки</string>
     <string name="about_copy_toast">Інформацію про збірку скопійовано</string>
     <string name="about_label_build_hash">Хеш збірки</string>
+    <string name="about_label_build_details">Деталі збірки</string>
     <string name="about_label_build_time">Час збірки</string>
     <string name="about_label_copy_build_info">Копіювати інформацію про збірку</string>
     <string name="about_label_email">Електронна пошта</string>

@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">Contributors</string>
     <string name="author_wall_hint">Drag to explore · Pinch to zoom · Tap for details</string>
+    <string name="author_wordmark_hint">Pinch to explore letters from contributor names</string>
     <string name="author_view_details">View details</string>
     <string name="author_view_github">View on GitHub</string>
     <string name="author_details_close">Close</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Copy version, build time and build hash</string>
     <string name="about_copy_toast">Build info copied</string>
     <string name="about_label_build_hash">Build Hash</string>
+    <string name="about_label_build_details">Build details</string>
     <string name="about_label_build_time">Build Time</string>
     <string name="about_label_copy_build_info">Copy Build Info</string>
     <string name="about_label_email">Email</string>

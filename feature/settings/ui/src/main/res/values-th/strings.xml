@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">ผู้ร่วมพัฒนา</string>
     <string name="author_wall_hint">ลากเพื่อเลื่อน · ใช้สองนิ้วเพื่อซูม · แตะเพื่อดูรายละเอียด</string>
+    <string name="author_wordmark_hint">กางสองนิ้วเพื่อดูตัวอักษรจากชื่อผู้ร่วมพัฒนา</string>
     <string name="author_view_details">ดูรายละเอียด</string>
     <string name="author_view_github">ดูบน GitHub</string>
     <string name="author_details_close">ปิด</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">คัดลอกเวอร์ชัน เวลาบิลด์ และแฮชบิลด์</string>
     <string name="about_copy_toast">คัดลอกข้อมูลบิลด์แล้ว</string>
     <string name="about_label_build_hash">แฮชบิลด์</string>
+    <string name="about_label_build_details">รายละเอียดบิลด์</string>
     <string name="about_label_build_time">เวลาบิลด์</string>
     <string name="about_label_copy_build_info">คัดลอกข้อมูลบิลด์</string>
     <string name="about_label_email">อีเมล</string>

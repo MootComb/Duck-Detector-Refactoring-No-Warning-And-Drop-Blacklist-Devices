@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">贡献者</string>
     <string name="author_wall_hint">拖动浏览 · 双指缩放 · 点击头像查看详情</string>
+    <string name="author_wordmark_hint">双指放大查看贡献者姓名中的字符</string>
     <string name="author_view_details">查看详情</string>
     <string name="author_view_github">在 GitHub 上查看</string>
     <string name="author_details_close">关闭</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">复制版本、构建时间和构建哈希</string>
     <string name="about_copy_toast">构建信息已复制</string>
     <string name="about_label_build_hash">构建哈希</string>
+    <string name="about_label_build_details">构建详情</string>
     <string name="about_label_build_time">构建时间</string>
     <string name="about_label_copy_build_info">复制构建信息</string>
     <string name="about_label_email">邮箱</string>

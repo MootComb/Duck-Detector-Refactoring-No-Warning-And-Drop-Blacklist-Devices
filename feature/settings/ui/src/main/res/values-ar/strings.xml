@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">المساهمون</string>
     <string name="author_wall_hint">اسحب للتنقل · استخدم إصبعين للتكبير والتصغير · انقر لعرض التفاصيل</string>
+    <string name="author_wordmark_hint">باعد بين إصبعين للتكبير واستكشاف أحرف من أسماء المساهمين</string>
     <string name="author_view_details">عرض التفاصيل</string>
     <string name="author_view_github">عرض على GitHub</string>
     <string name="author_details_close">إغلاق</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">نسخ الإصدار ووقت البناء ومُعرف البناء</string>
     <string name="about_copy_toast">تم نسخ معلومات البناء</string>
     <string name="about_label_build_hash">مُعرف البناء</string>
+    <string name="about_label_build_details">تفاصيل البناء</string>
     <string name="about_label_build_time">وقت البناء</string>
     <string name="about_label_copy_build_info">نسخ معلومات البناء</string>
     <string name="about_label_email">البريد الإلكتروني</string>

@@ -47,6 +47,7 @@ import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicense
 import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicensesScreen
 import com.eltavine.duckdetector.features.settings.ui.components.AboutCard
 import com.eltavine.duckdetector.features.settings.ui.components.AuthorCard
+import com.eltavine.duckdetector.features.settings.ui.components.ContributorNameWordmark
 import com.eltavine.duckdetector.features.settings.ui.components.ConsentSettingCard
 import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
 
@@ -114,8 +115,8 @@ fun SettingsScreen(
                 )
 
                 AuthorCard()
-
-                Spacer(modifier = Modifier.height(72.dp))
+                ContributorNameWordmark()
+                Spacer(modifier = Modifier.height(96.dp))
             }
         }
     }

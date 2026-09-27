@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">기여자</string>
     <string name="author_wall_hint">드래그하여 이동 · 두 손가락으로 확대 및 축소 · 눌러서 상세 정보 보기</string>
+    <string name="author_wordmark_hint">두 손가락으로 확대해 기여자 이름의 글자를 살펴보세요</string>
     <string name="author_view_details">상세 정보 보기</string>
     <string name="author_view_github">GitHub에서 보기</string>
     <string name="author_details_close">닫기</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">버전, 빌드 시간 및 빌드 해시 복사</string>
     <string name="about_copy_toast">빌드 정보가 복사되었습니다</string>
     <string name="about_label_build_hash">빌드 해시</string>
+    <string name="about_label_build_details">빌드 세부정보</string>
     <string name="about_label_build_time">빌드 시간</string>
     <string name="about_label_copy_build_info">빌드 정보 복사</string>
     <string name="about_label_email">이메일</string>

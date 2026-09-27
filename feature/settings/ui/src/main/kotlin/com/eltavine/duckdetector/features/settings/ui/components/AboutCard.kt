@@ -17,7 +17,6 @@
 package com.eltavine.duckdetector.features.settings.ui.components
 
 import android.content.ClipData
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,20 +30,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.features.settings.ui.R
 import com.eltavine.duckdetector.core.ui.R as CoreUiR
@@ -57,7 +63,6 @@ import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 private const val ABOUT_WEBSITE = "eltavine.com"
 private const val ABOUT_EMAIL = "me@eltavine.com"
 private const val ABOUT_GITHUB_URL = "https://github.com/eltavine/Duck-Detector-Refactoring"
-private const val ABOUT_GITHUB_REPOSITORY = "eltavine/Duck-Detector-Refactoring"
 
 @Composable
 fun AboutCard(
@@ -70,6 +75,7 @@ fun AboutCard(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    var showBuildDetails by rememberSaveable { mutableStateOf(false) }
     val clipboardLabel = stringResource(R.string.about_clipboard_label)
     val clipboardVersionLine = stringResource(R.string.about_clipboard_version_line, versionName, versionCode)
     val clipboardBuildTimeLine = stringResource(
@@ -94,8 +100,8 @@ fun AboutCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -126,19 +132,14 @@ fun AboutCard(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     WrapSafeText(
-                        text = stringResource(R.string.about_subtitle),
+                        text = stringResource(R.string.about_value_version, versionName, versionCode),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                AboutInfoRow(
-                    label = stringResource(R.string.about_label_version),
-                    value = stringResource(R.string.about_value_version, versionName, versionCode),
-                    icon = Icons.Rounded.Badge,
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 AboutInfoRow(
                     label = stringResource(R.string.update_settings_label),
                     value = updateStatusText,
@@ -148,65 +149,101 @@ fun AboutCard(
                     },
                 )
                 AboutInfoRow(
-                    label = stringResource(R.string.about_label_website),
-                    value = ABOUT_WEBSITE,
-                    icon = Icons.Rounded.Language,
-                    onClick = { openExternalUri(context, "https://$ABOUT_WEBSITE") },
-                )
-                AboutInfoRow(
-                    label = stringResource(CoreUiR.string.social_github),
-                    value = ABOUT_GITHUB_REPOSITORY,
-                    iconPainter = painterResource(CoreUiR.drawable.ic_github),
-                    onClick = { openExternalUri(context, ABOUT_GITHUB_URL) },
-                )
-                AboutInfoRow(
-                    label = stringResource(R.string.about_label_email),
-                    value = ABOUT_EMAIL,
-                    icon = Icons.Rounded.Email,
-                    onClick = { openExternalUri(context, "mailto:$ABOUT_EMAIL") },
-                )
-                AboutInfoRow(
-                    label = stringResource(R.string.about_label_build_time),
-                    value = stringResource(
-                        R.string.about_value_build_time,
-                        formatBuildTimeUtc(buildTimeUtc),
-                    ),
-                    icon = Icons.Rounded.Schedule,
-                )
-                AboutInfoRow(
-                    label = stringResource(R.string.about_label_build_hash),
-                    value = buildHash,
-                    icon = Icons.Rounded.Badge,
-                )
-                AboutInfoRow(
                     label = stringResource(R.string.about_label_privacy),
                     value = stringResource(R.string.about_privacy_summary),
                     icon = Icons.Rounded.Info,
                 )
-                AboutInfoRow(
-                    label = stringResource(R.string.about_label_copy_build_info),
-                    value = stringResource(R.string.about_copy_build_info_summary),
-                    icon = Icons.Rounded.ContentCopy,
-                    onClick = {
-                        val clipboard =
-                            context.getSystemService(android.content.ClipboardManager::class.java)
-                        clipboard?.setPrimaryClip(
-                            ClipData.newPlainText(
-                                clipboardLabel,
-                                buildClipboardText(
-                                    clipboardVersionLine = clipboardVersionLine,
-                                    clipboardBuildTimeLine = clipboardBuildTimeLine,
-                                    clipboardBuildHashLine = clipboardBuildHashLine,
+                Surface(
+                    shape = ShapeTokens.CornerLarge,
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                role = Role.Button,
+                                onClickLabel = stringResource(
+                                    if (showBuildDetails) CoreUiR.string.card_collapse
+                                    else CoreUiR.string.card_expand,
                                 ),
-                            ),
+                            ) { showBuildDetails = !showBuildDetails }
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Badge,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp),
                         )
-                        Toast.makeText(
-                            context,
-                            copyToast,
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                    },
-                )
+                        WrapSafeText(
+                            text = stringResource(R.string.about_label_build_details),
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Icon(
+                            imageVector = if (showBuildDetails) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                if (showBuildDetails) {
+                    AboutInfoRow(
+                        label = stringResource(R.string.about_label_build_time),
+                        value = stringResource(R.string.about_value_build_time, formatBuildTimeUtc(buildTimeUtc)),
+                        icon = Icons.Rounded.Schedule,
+                    )
+                    AboutInfoRow(
+                        label = stringResource(R.string.about_label_build_hash),
+                        value = buildHash,
+                        icon = Icons.Rounded.Badge,
+                    )
+                    AboutInfoRow(
+                        label = stringResource(R.string.about_label_copy_build_info),
+                        value = stringResource(R.string.about_copy_build_info_summary),
+                        icon = Icons.Rounded.ContentCopy,
+                        onClick = {
+                            val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
+                            clipboard?.setPrimaryClip(
+                                ClipData.newPlainText(
+                                    clipboardLabel,
+                                    buildClipboardText(
+                                        clipboardVersionLine = clipboardVersionLine,
+                                        clipboardBuildTimeLine = clipboardBuildTimeLine,
+                                        clipboardBuildHashLine = clipboardBuildHashLine,
+                                    ),
+                                ),
+                            )
+                            Toast.makeText(context, copyToast, Toast.LENGTH_SHORT).show()
+                        },
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                ) {
+                    OutlinedIconButton(onClick = { openExternalUri(context, "https://$ABOUT_WEBSITE") }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Language,
+                            contentDescription = stringResource(R.string.about_label_website),
+                        )
+                    }
+                    OutlinedIconButton(onClick = { openExternalUri(context, "mailto:$ABOUT_EMAIL") }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Email,
+                            contentDescription = stringResource(R.string.about_label_email),
+                        )
+                    }
+                    OutlinedIconButton(onClick = { openExternalUri(context, ABOUT_GITHUB_URL) }) {
+                        Icon(
+                            painter = painterResource(CoreUiR.drawable.ic_github),
+                            contentDescription = stringResource(CoreUiR.string.social_github),
+                        )
+                    }
+                }
             }
         }
     }
@@ -249,27 +286,6 @@ private fun AboutInfoRow(
 private fun AboutInfoRow(
     label: String,
     value: String,
-    iconPainter: Painter,
-    onClick: (() -> Unit)? = null,
-) {
-    AboutInfoRow(
-        label = label,
-        value = value,
-        onClick = onClick,
-    ) {
-        Icon(
-            painter = iconPainter,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(18.dp),
-        )
-    }
-}
-
-@Composable
-private fun AboutInfoRow(
-    label: String,
-    value: String,
     onClick: (() -> Unit)? = null,
     iconContent: @Composable () -> Unit,
 ) {
@@ -280,10 +296,8 @@ private fun AboutInfoRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(enabled = onClick != null) {
-                    onClick?.invoke()
-                }
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+                .padding(horizontal = 14.dp, vertical = 9.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

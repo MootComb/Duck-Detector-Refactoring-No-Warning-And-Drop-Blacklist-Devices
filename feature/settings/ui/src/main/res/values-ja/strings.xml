@@ -17,6 +17,7 @@ limitations under the License.
 <resources>
     <string name="author_wall_title">貢献者</string>
     <string name="author_wall_hint">ドラッグで移動 · ピンチで拡大・縮小 · タップで詳細</string>
+    <string name="author_wordmark_hint">ピンチして拡大すると貢献者名の文字を確認できます</string>
     <string name="author_view_details">詳細を表示</string>
     <string name="author_view_github">GitHub で見る</string>
     <string name="author_details_close">閉じる</string>
@@ -27,6 +28,7 @@ limitations under the License.
     <string name="about_copy_build_info_summary">バージョン、ビルド時刻、ビルドハッシュをコピー</string>
     <string name="about_copy_toast">ビルド情報をコピーしました</string>
     <string name="about_label_build_hash">ビルドハッシュ</string>
+    <string name="about_label_build_details">ビルドの詳細</string>
     <string name="about_label_build_time">ビルド時刻</string>
     <string name="about_label_copy_build_info">ビルド情報をコピー</string>
     <string name="about_label_email">メール</string>
