@@ -16,6 +16,8 @@
 
 #include "nativeroot/probes/susfs_probe.h"
 
+#include "common/seccomp_child.h"
+
 #include <cerrno>
 #include <csignal>
 #include <sstream>
@@ -56,6 +58,9 @@ namespace duckdetector::nativeroot {
         }
 
         if (pid == 0) {
+            if (!common::install_seccomp_trap_exit()) {
+                _exit(1);
+            }
             const long syscall_result = syscall(__NR_setresuid, target_uid, target_uid, target_uid);
             _exit(syscall_result == 0 ? 100 : 0);
         }
@@ -84,6 +89,12 @@ namespace duckdetector::nativeroot {
                             .severity = Severity::kDanger,
                     }
             );
+            return result;
+        }
+
+        if (common::seccomp_trapped(status)) {
+            detail << " Seccomp refused setresuid in the child, so the kernel's answer was not observed.";
+            result.extra_text = detail.str();
             return result;
         }
 

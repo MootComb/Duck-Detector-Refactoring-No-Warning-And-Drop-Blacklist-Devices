@@ -52,14 +52,14 @@ The Kernel Check detector asks whether the running kernel looks like a custom or
 
 ### ARM64 CPU identity
 
-- Observable signal: MIDR_EL1 values read through the kernel against the CPU the device reports.
-- Producing subsystem: the kernel's exposure of MIDR_EL1 to user space.
-- Mechanism: a pinned MIDR comparison exposes CPU identity rewriting.
-- References: kernel/common Documentation/arch/arm64/cpu-feature-registers.rst (MIDR_EL1 is exposed to user space); the Arm Architecture Reference Manual defines the register but was not consulted here.
+- Observable signal: MIDR_EL1 read through the kernel's EL0 MRS emulation on each logical CPU, against the identity the kernel cached for that CPU in its sysfs midr_el1 node or its /proc/cpuinfo block.
+- Producing subsystem: the kernel's per-CPU cpuinfo_arm64 record and its MRS emulation.
+- Mechanism: a read pinned to a CPU, and confirmed by getcpu() to have run there, exposes a cached identity that was rewritten. Pinning alone is not enough: moving the app to another cpuset or pausing a CPU moves the thread, and a read taken on another core of a heterogeneous SoC would disagree for that reason alone, so such reads are discarded and a value counts only when three confirmed reads agree.
+- References: kernel/common Documentation/arch/arm64/cpu-feature-registers.rst (MIDR_EL1 holds the value of the CPU it is fetched on, racy without affinity) and arch/arm64/kernel/cpufeature.c on android13-5.15 and android15-6.6 (the emulated value is read_cpuid_id()); kernel.org v6.12 arch/arm64/kernel/cpuinfo.c (sysfs midr_el1 and /proc/cpuinfo both print cpu_data[cpu].reg_midr, stored when the CPU comes online); kernel.org v5.10 and v6.12 arch/arm64/kernel/entry-common.c (the emulation runs with interrupts enabled); kernel.org v5.10 to v6.12 kernel/cgroup/cpuset.c (cpuset_attach() resets the affinity of moved tasks; 6.6 and 6.12 keep a requested mask only where it intersects the new cpuset, 6.1 does not) and kernel/sched/core.c (select_fallback_rq() moves pinned tasks off inactive CPUs); kernel.org v6.1 kernel/sys.c (getcpu() reports the CPU it runs on); kernel.org v6.12 and v6.15 arch/arm64/include/asm/el2_setup.h and arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h (what a KVM guest reads as MIDR_EL1); system/core libprocessgroup task_profiles.cpp and task_profiles.json (app threads join the top-app, foreground and background cpusets); bionic libc/SYSCALLS.TXT (bionic calls getcpu, so app seccomp allows it); the Arm Architecture Reference Manual defines the register but was not consulted here.
 - Applicability: arm64 only; other ABIs report it as unavailable.
-- Visibility limits: kernels without the register exposure cannot be compared.
-- Result states: consistent, mismatch, unavailable.
-- Interpretation: a mismatch is a warning.
+- Visibility limits: kernels without the register exposure cannot be compared, and CPUs outside the app's cpuset are not visited. KVM gives a guest the MIDR_EL1 of the physical CPU its vCPU is running on unless the VMM sets the guest's implementation ID registers, which Linux 6.15 allows and 6.12 does not, so a guest on a heterogeneous host can disagree with its own cached identity without any rewriting.
+- Result states: consistent, mismatch, partial, unavailable.
+- Interpretation: a confirmed mismatch is danger. CPUs whose reads could not be confirmed on the pinned CPU, or changed between reads, are not compared and leave the result partial.
 
 ## Known gaps
 

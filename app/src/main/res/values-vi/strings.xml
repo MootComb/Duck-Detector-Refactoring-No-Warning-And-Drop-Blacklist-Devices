@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">Hoàn thành tất cả điều kiện</string>
     <string name="agreement_acknowledgement">Khi tiếp tục, bạn xác nhận rằng mình đã đọc và đồng ý với các điều khoản này.</string>
     <string name="update_open_failed">Không có trình duyệt để mở GitHub</string>
-    <string name="screen_capture_title">Đã phát hiện chụp màn hình</string>
-    <string name="screen_capture_message">Nếu ảnh chụp màn hình không chứa thông tin chi tiết, vấn đề này sẽ không được xử lý.</string>
-    <string name="dialog_continue">Tiếp tục</string>
-    <string name="dialog_continue_waiting">Tiếp tục (%1$d giây)</string>
-    <string name="detector_result_title">Trước khi nhờ hỗ trợ</string>
-    <string name="detector_result_notice">Hãy cung cấp đầy đủ thông tin để được hỗ trợ.</string>
-    <string name="detector_result_detail">Hãy mở các thẻ nguy hiểm và cảnh báo để xem xét đầy đủ bằng chứng.</string>
     <string name="startup_review_label">Kiểm tra chính sách khởi động</string>
     <string name="startup_preparing_title">Đang chuẩn bị khởi động</string>
     <string name="startup_before_scan_title">Trước khi quét</string>

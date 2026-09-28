@@ -40,12 +40,30 @@ namespace duckdetector::kernelcheck {
         ProcCpuinfo,
     };
 
+    /** Whether the emulated MIDR_EL1 reads of one CPU produced a value that belongs to that CPU. */
+    enum class MrsReadState {
+        /** No read was made: the pin failed or the kernel offers no MRS emulation. */
+        NotAttempted,
+        /** Every read ran on the pinned CPU, as getcpu() reported around it, and they agreed. */
+        Verified,
+        /** Too few reads could be shown to run on the pinned CPU. */
+        Unattributed,
+        /** Reads that ran on the pinned CPU returned different values. */
+        Unstable,
+        /** The MRS itself failed. */
+        Faulted,
+    };
+
     struct CpuIdentityObservation {
         int cpu = -1;
         bool affinity_succeeded = false;
         CachedCpuIdentitySource cached_source = CachedCpuIdentitySource::None;
         std::optional<std::uint32_t> cached_midr;
+        /** Set only when mrs_state is Verified. */
         std::optional<std::uint32_t> mrs_midr;
+        MrsReadState mrs_state = MrsReadState::NotAttempted;
+        /** Reads discarded because getcpu() did not report the pinned CPU on both sides of them. */
+        int reads_off_cpu = 0;
     };
 
     struct CpuIdentityProbeResult {

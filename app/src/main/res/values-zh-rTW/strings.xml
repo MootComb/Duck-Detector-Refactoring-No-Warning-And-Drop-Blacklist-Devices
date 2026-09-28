@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">完成所有條件</string>
     <string name="agreement_acknowledgement">繼續即表示您已閱讀並同意這些條款。</string>
     <string name="update_open_failed">沒有可用來開啟 GitHub 的瀏覽器</string>
-    <string name="screen_capture_title">偵測到截圖</string>
-    <string name="screen_capture_message">如果截圖中不包含詳細資訊，此問題將不會被處理。</string>
-    <string name="dialog_continue">繼續</string>
-    <string name="dialog_continue_waiting">繼續（%1$d 秒）</string>
-    <string name="detector_result_title">在求助之前</string>
-    <string name="detector_result_notice">請提供完整資訊以利獲得協助。</string>
-    <string name="detector_result_detail">請展開危險與警告卡片，檢視完整證據。</string>
     <string name="startup_review_label">啟動策略檢查</string>
     <string name="startup_preparing_title">正在準備啟動</string>
     <string name="startup_before_scan_title">掃描之前</string>

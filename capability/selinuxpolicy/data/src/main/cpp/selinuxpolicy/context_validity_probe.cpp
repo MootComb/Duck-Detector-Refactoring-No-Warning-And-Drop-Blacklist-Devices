@@ -22,37 +22,85 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <dirent.h>
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <fstream>
+#include <linux/netlink.h>
 #include <optional>
 #include <string>
+#include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/system_properties.h>
 #include <utility>
 #include <unistd.h>
+#include <vector>
 
 namespace duckdetector::selinux {
 
     using namespace detail;
 
-    void close_process_local_avc() {
-        // AOSP R: https://android.googlesource.com/platform/external/selinux/+/refs/heads/android11-release/libselinux/src/avc.c
-        // avc_destroy() calls avc_netlink_close(); AOSP R：关闭 netlink FD，保留结果。
-        if (!g_selinux_access_attempted.exchange(false, std::memory_order_relaxed)) {
-            return;
+    namespace {
+
+        bool is_selinux_netlink_socket(int fd) {
+            struct stat fd_stat{};
+            if (fstat(fd, &fd_stat) != 0 || !S_ISSOCK(fd_stat.st_mode)) {
+                return false;
+            }
+            int value = 0;
+            socklen_t length = sizeof(value);
+            if (getsockopt(fd, SOL_SOCKET, SO_DOMAIN, &value, &length) != 0 ||
+                value != AF_NETLINK) {
+                return false;
+            }
+            length = sizeof(value);
+            return getsockopt(fd, SOL_SOCKET, SO_PROTOCOL, &value, &length) == 0 &&
+                   value == NETLINK_SELINUX;
         }
 
-#ifdef RTLD_NOLOAD
-        void *handle = dlopen("libselinux.so", RTLD_NOW | RTLD_NOLOAD);
-        if (handle == nullptr) {
-            return;
+        std::vector<int> selinux_netlink_sockets() {
+            std::vector<int> sockets;
+            DIR *directory = opendir("/proc/self/fd");
+            if (directory == nullptr) {
+                return sockets;
+            }
+            const int directory_fd = dirfd(directory);
+            while (const dirent *entry = readdir(directory)) {
+                char *end = nullptr;
+                const long fd = std::strtol(entry->d_name, &end, 10);
+                if (end == entry->d_name || *end != '\0' || fd < 0 || fd == directory_fd) {
+                    continue;
+                }
+                if (is_selinux_netlink_socket(static_cast<int>(fd))) {
+                    sockets.push_back(static_cast<int>(fd));
+                }
+            }
+            closedir(directory);
+            return sockets;
         }
-        const auto destroy = reinterpret_cast<AvcDestroyFn>(dlsym(handle, "avc_destroy"));
-        if (destroy != nullptr) {
-            destroy();
+
+    }  // namespace
+
+    void close_process_local_avc() {
+        // selinux_check_access() opens libselinux's AVC once per process, and with it a
+        // NETLINK_SELINUX socket that stays open (external/selinux libselinux/src/avc.c, avc_init ->
+        // avc_netlink_open). The Java SELinux.checkSELinuxAccess path opens it as well, and
+        // avc_destroy() is out of reach: libselinux is not a public library (system/core
+        // rootdir/etc/public.libraries.android.txt), so this app's linker namespace can neither
+        // dlopen nor dlsym it. The socket is therefore detached the way the
+        // zygote detaches sockets in its children (frameworks/base core/jni/fd_utils.cpp,
+        // FileDescriptorInfo::DetachSocket): /dev/null, which the fork check allows, takes over
+        // the descriptor, so libselinux keeps a valid descriptor and its later
+        // avc_netlink_check_nb() only stops seeing policy-change notices.
+        for (const int fd: selinux_netlink_sockets()) {
+            const int dev_null = open("/dev/null", O_RDWR | O_CLOEXEC);
+            if (dev_null < 0 || dup3(dev_null, fd, O_CLOEXEC) != fd) {
+                close(fd);
+            }
+            if (dev_null >= 0) {
+                close(dev_null);
+            }
         }
-        dlclose(handle);
-#endif
     }
 
     ContextValidityProbeSnapshot collect_context_validity_snapshot(JNIEnv *env) {

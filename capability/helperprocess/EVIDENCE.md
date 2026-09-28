@@ -22,8 +22,8 @@ The helper process capability runs probes in a separate helper process and in an
 - Observable signal: the results of syscall, timing and trap honeypots run in a disposable process, and the EGL vendor and renderer.
 - Producing subsystem: the kernel, the CPU and the GPU driver stack.
 - Mechanism: hypervisors and translators change trap and timing behaviour, and emulators expose software renderers.
-- References: bionic libc/SECCOMP_BLOCKLIST_APP.TXT (which syscalls an app process may make). Discovery only for the honeypot thresholds and renderer strings.
+- References: bionic libc/SECCOMP_BLOCKLIST_APP.TXT and libc/SYSCALLS.TXT (which syscalls an app process may make); system/core debuggerd/include/debuggerd/handler.h (the SIGSYS handler every process inherits writes a tombstone). Discovery only for the honeypot thresholds and renderer strings.
 - Applicability: assembly traps are ABI specific.
-- Visibility limits: seccomp kills the sacrificial process on blocked syscalls, which is why it is disposable.
+- Visibility limits: seccomp refuses syscalls the app filter lacks, such as openat2 and pidfd_open on Android 11, so the syscall pack runs in a disposable child whose SIGSYS handler exits instead of leaving a tombstone, and a refusal marks the pack blocked for the rest of the helper process.
 - Result states: collected, blocked, unavailable.
 - Interpretation: consumers treat these as corroboration.

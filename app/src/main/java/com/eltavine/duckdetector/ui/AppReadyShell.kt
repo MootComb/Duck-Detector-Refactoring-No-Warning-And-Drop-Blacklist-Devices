@@ -33,7 +33,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,10 +60,7 @@ import com.eltavine.duckdetector.notifications.ScanProgressNotificationSnapshot
 import com.eltavine.duckdetector.notifications.ScanProgressNotifier
 import com.eltavine.duckdetector.ui.scan.DetectorScanViewModel
 import com.eltavine.duckdetector.ui.shell.AppDestination
-import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.FloatingAppTabSwitcher
-import com.eltavine.duckdetector.ui.shell.detectorResultNoticeKey
-import com.eltavine.duckdetector.ui.shell.shouldShowDetectorResultNotice
 import kotlinx.coroutines.launch
 
 @Composable
@@ -73,7 +69,6 @@ internal fun AppReadyShell(
     onSelectDestination: (AppDestination) -> Unit,
     consentDecisions: Map<ConsentId, ConsentDecision>,
     notificationPermissionState: com.eltavine.duckdetector.notifications.ScanNotificationPermissionState,
-    canShowUpdateDialog: Boolean,
 ) {
     val context = LocalContext.current
     val appContext = context.applicationContext
@@ -141,21 +136,6 @@ internal fun AppReadyShell(
             },
         )
     }
-    val detectorResultNoticeKey = remember(isDashboardLoading, dashboardState.overview) {
-        if (!shouldShowDetectorResultNotice(isDashboardLoading, dashboardState.overview.status)) {
-            null
-        } else {
-            detectorResultNoticeKey(dashboardState.overview)
-        }
-    }
-    var dismissedDetectorResultNoticeKey by rememberSaveable { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(detectorResultNoticeKey) {
-        if (detectorResultNoticeKey == null) {
-            dismissedDetectorResultNoticeKey = null
-        }
-    }
-
     val notificationSnapshot = remember(
         detectorSummaries.size,
         detectorSummaries.count { it.ready },
@@ -205,20 +185,7 @@ internal fun AppReadyShell(
                 .padding(end = 20.dp, bottom = 28.dp),
         )
 
-        if (
-            detectorResultNoticeKey != null &&
-            detectorResultNoticeKey != dismissedDetectorResultNoticeKey
-        ) {
-            DetectorResultNoticeDialog(
-                onDismiss = {
-                    dismissedDetectorResultNoticeKey = detectorResultNoticeKey
-                },
-            )
-        } else if (
-            canShowUpdateDialog &&
-            updateUiState.isDialogVisible &&
-            updateUiState.availableUpdate != null
-        ) {
+        if (updateUiState.isDialogVisible && updateUiState.availableUpdate != null) {
             val availableUpdate = requireNotNull(updateUiState.availableUpdate)
             NightlyUpdateDialog(
                 currentVersionName = BuildConfig.VERSION_NAME,

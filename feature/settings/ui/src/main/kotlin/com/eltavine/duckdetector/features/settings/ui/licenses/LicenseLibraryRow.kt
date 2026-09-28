@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.settings.ui.licenses
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,117 +25,109 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
 import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.util.author
+
+private const val DESCRIPTION_MAX_LINES = 2
 
 @Composable
 internal fun LazyItemScope.LicenseLibraryRow(
     library: Library,
     onClick: () -> Unit,
 ) {
-    Surface(
+    Column(
         modifier = Modifier
             .animateItem()
             .padding(vertical = 4.dp)
             .fillMaxWidth()
             .clip(ShapeTokens.CornerLargeIncreased)
-            .clickable(onClick = onClick),
-        shape = ShapeTokens.CornerLargeIncreased,
-        color = DuckTheme.palette.groupedSurface,
+            .background(color = DuckTheme.palette.groupedSurface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    WrapSafeText(
-                        text = library.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-
-                    library.author
-                        .takeIf { it.isNotBlank() }
-                        ?.let { author ->
-                            WrapSafeText(
-                                text = author,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                }
-
-                library.artifactVersion
-                    ?.takeIf { it.isNotBlank() }
-                    ?.let { version ->
-                        Surface(
-                            modifier = Modifier.padding(start = 8.dp),
-                            shape = CircleShape,
-                            color = DuckTheme.palette.groupedInset,
-                        ) {
-                            WrapSafeText(
-                                text = version,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 0.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
+                // A library's name is a proper name: it may wrap between words but is never hyphenated.
+                Text(
+                    text = library.name,
+                    style = DuckTypography.Headline.copy(hyphens = Hyphens.None),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                library.author
+                    .takeIf { it.isNotBlank() }
+                    ?.let { author ->
+                        WrapSafeText(
+                            text = author,
+                            style = DuckTypography.Footnote,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
             }
 
-            library.description
+            library.artifactVersion
                 ?.takeIf { it.isNotBlank() }
-                ?.let { description ->
-                    WrapSafeText(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
+                ?.let { version -> LicensePill(text = version) }
+        }
 
-            if (library.licenses.isNotEmpty()) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    library.licenses.forEach { license ->
-                        Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                        ) {
-                            WrapSafeText(
-                                text = license.name,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 0.dp),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                        }
-                    }
+        library.description
+            ?.takeIf { it.isNotBlank() }
+            ?.let { description ->
+                WrapSafeText(
+                    text = description,
+                    style = DuckTypography.Footnote,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = DESCRIPTION_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+        if (library.licenses.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(top = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                library.licenses.forEach { license ->
+                    LicensePill(text = license.name)
                 }
             }
         }
     }
+}
+
+/** A short label, such as a version or a license name, in a capsule on the inset fill. */
+@Composable
+internal fun LicensePill(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    WrapSafeText(
+        text = text,
+        modifier = modifier
+            .background(color = DuckTheme.palette.groupedInset, shape = ShapeTokens.CornerFull)
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+        style = DuckTypography.Caption,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
 }

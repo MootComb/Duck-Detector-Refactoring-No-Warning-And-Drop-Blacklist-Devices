@@ -204,10 +204,6 @@ namespace duckdetector::selinux::detail {
 
     inline std::atomic<unsigned int> g_dirty_policy_probe_counter{0};
 
-    inline std::atomic<bool> g_selinux_access_attempted{false};
-
-    using AvcDestroyFn = void (*)();
-
     std::string trim(std::string value);
 
     template<typename T>

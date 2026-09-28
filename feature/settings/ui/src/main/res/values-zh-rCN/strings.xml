@@ -48,7 +48,6 @@ limitations under the License.
     <string name="author_summary_xiaotong">TEE（C++、Kotlin）</string>
     <string name="licenses_dialog_close">关闭</string>
     <string name="licenses_dialog_home_page">主页</string>
-    <string name="licenses_dialog_licenses">许可证：%1$s</string>
     <string name="licenses_dialog_no_license_text">无可用许可证文本。</string>
     <string name="licenses_dialog_open">打开</string>
     <string name="licenses_dialog_source_repo">源代码仓库</string>

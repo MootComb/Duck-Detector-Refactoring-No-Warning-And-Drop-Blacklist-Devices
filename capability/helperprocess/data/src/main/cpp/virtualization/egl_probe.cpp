@@ -24,6 +24,14 @@ namespace duckdetector::virtualization {
     RendererSnapshot collect_renderer_snapshot() {
         RendererSnapshot snapshot;
 
+        // EGL_DEFAULT_DISPLAY is a single, process-wide connection that hwui's RenderThread also
+        // uses (frameworks/base libs/hwui renderthread/EglManager.cpp calls the same
+        // eglGetDisplay(EGL_DEFAULT_DISPLAY)). This probe runs in the main app process from the
+        // startup NativeActivity, so it must treat that display as borrowed: never eglTerminate it.
+        // Terminating the shared display destroys hwui's EGLDisplay-scoped resources, and the next
+        // frame then renders against a null SkSurface and crashes RenderThread inside
+        // SkiaPipeline::renderFrame. eglInitialize is reference counted, so initializing here is
+        // safe; we only release the surface and context this probe itself created.
         EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (display == EGL_NO_DISPLAY) {
             return snapshot;
@@ -44,7 +52,6 @@ namespace duckdetector::virtualization {
         EGLint numConfigs = 0;
         if (eglChooseConfig(display, configAttributes, &config, 1, &numConfigs) != EGL_TRUE ||
             numConfigs <= 0 || config == nullptr) {
-            eglTerminate(display);
             return snapshot;
         }
 
@@ -55,7 +62,6 @@ namespace duckdetector::virtualization {
         };
         EGLSurface surface = eglCreatePbufferSurface(display, config, pbufferAttributes);
         if (surface == EGL_NO_SURFACE) {
-            eglTerminate(display);
             return snapshot;
         }
 
@@ -66,14 +72,12 @@ namespace duckdetector::virtualization {
         EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttributes);
         if (context == EGL_NO_CONTEXT) {
             eglDestroySurface(display, surface);
-            eglTerminate(display);
             return snapshot;
         }
 
         if (eglMakeCurrent(display, surface, surface, context) != EGL_TRUE) {
             eglDestroyContext(display, context);
             eglDestroySurface(display, surface);
-            eglTerminate(display);
             return snapshot;
         }
 
@@ -85,10 +89,12 @@ namespace duckdetector::virtualization {
         if (renderer != nullptr) snapshot.renderer = renderer;
         if (version != nullptr) snapshot.version = version;
 
+        // Release only what this probe created. The current binding is per-thread, so unbinding
+        // here affects only the startup thread, not hwui's RenderThread. The shared display is
+        // deliberately left initialized (no eglTerminate).
         eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         eglDestroyContext(display, context);
         eglDestroySurface(display, surface);
-        eglTerminate(display);
         return snapshot;
     }
 

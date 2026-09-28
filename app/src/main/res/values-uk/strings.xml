@@ -40,14 +40,6 @@ limitations under the License.
 
 
 
-    <string name="screen_capture_title">Виявлено знімок екрана</string>
-    <string name="screen_capture_message">Якщо знімок екрана не містить детальної інформації, це питання не буде розглянуто.</string>
-    <string name="dialog_continue">Продовжити</string>
-    <string name="dialog_continue_waiting">Продовжити (%1$ds)</string>
-    <string name="detector_result_title">Перш ніж звертатися по допомогу</string>
-    <string name="detector_result_notice">Надайте повну інформацію, щоб отримати допомогу.</string>
-    <string name="detector_result_detail">Розгорніть картки «Небезпека» та «Попередження», щоб переглянути всі докази.</string>
-
     <string name="startup_review_label">Перевірка політики запуску</string>
     <string name="startup_preparing_title">Підготовка до запуску</string>
     <string name="startup_before_scan_title">Перед скануванням</string>

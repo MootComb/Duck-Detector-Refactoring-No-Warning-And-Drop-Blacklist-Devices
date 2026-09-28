@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">Complete all conditions</string>
     <string name="agreement_acknowledgement">By continuing, you acknowledge that you have read and agree to these terms.</string>
     <string name="update_open_failed">No browser is available to open GitHub</string>
-    <string name="screen_capture_title">Screenshot detected</string>
-    <string name="screen_capture_message">If the screenshot does not contain detailed information, this issue will not be handled.</string>
-    <string name="dialog_continue">Continue</string>
-    <string name="dialog_continue_waiting">Continue (%1$ds)</string>
-    <string name="detector_result_title">Before asking for help</string>
-    <string name="detector_result_notice">Provide complete information to get help.</string>
-    <string name="detector_result_detail">Open the danger and warning cards to review their full evidence.</string>
     <string name="startup_review_label">Startup policy review</string>
     <string name="startup_preparing_title">Preparing startup</string>
     <string name="startup_before_scan_title">Before the scan</string>

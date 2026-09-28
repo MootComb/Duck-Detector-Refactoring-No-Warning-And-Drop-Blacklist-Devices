@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
 import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
@@ -42,6 +43,7 @@ import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardFindingModel
 
 private val FindingInset = 18.dp
+private const val FINDING_DETAIL_MAX_LINES = 3
 
 @Composable
 internal fun DashboardFindingsCard(
@@ -159,11 +161,14 @@ private fun DashboardFindingRow(
             style = DuckTypography.Headline,
             color = MaterialTheme.colorScheme.onSurface,
         )
+        // The full evidence stays in the detector's card; a finding only points to it.
         WrapSafeText(
             text = finding.detail,
             modifier = Modifier.fillMaxWidth(),
             style = DuckTypography.Footnote,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = FINDING_DETAIL_MAX_LINES,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

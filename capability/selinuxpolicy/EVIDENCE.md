@@ -23,7 +23,7 @@ The SELinux policy capability asks the loaded policy questions an ordinary app c
 - Producing subsystem: the loaded policy, through libselinux's selinux_check_access and selinuxfs's access node.
 - Mechanism: the oracle computes the access vector for an edge; a control edge stock policy allows and one it denies prove the oracle answers truthfully.
 - References: kernel/common security/selinux/selinuxfs.c (sel_write_access); system/sepolicy private/app_neverallows.te and the domain .te files for the expected answers.
-- Applicability: carriers that can resolve selinux_check_access.
+- Applicability: carriers that can resolve selinux_check_access. On Android 10 and 11 the app_zygote carrier detaches the AVC netlink socket libselinux opens for these checks (external/selinux libselinux/src/avc.c) once they finish, because before Android 12 that zygote aborts every fork while its preload leaves a socket other than a named AF_UNIX one open (frameworks/base core/jni/fd_utils.cpp); the answers are unaffected.
 - Visibility limits: an oracle that fails a control is untrusted; dirtyPolicyTrusted is the single rule consumers use.
 - Result states: allowed, denied, untrusted, unavailable.
 - Interpretation: consumers report trusted answers at their rule's severity and untrusted ones at lower confidence.

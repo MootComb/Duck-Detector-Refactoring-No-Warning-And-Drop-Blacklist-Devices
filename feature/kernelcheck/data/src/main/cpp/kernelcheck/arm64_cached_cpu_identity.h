@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.ui.shell
+#pragma once
 
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Test
+#include "kernelcheck/arm64_cpu_identity_probe.h"
 
-class ScreenCaptureNoticeDialogTest {
+namespace duckdetector::kernelcheck {
 
-    @Test
-    fun `screen capture callback requires api 34`() {
-        assertFalse(supportsScreenCaptureCallback(33))
-        assertTrue(supportsScreenCaptureCallback(34))
-        assertTrue(supportsScreenCaptureCallback(36))
-    }
-}
+    /**
+     * Fills the cached identity of observation->cpu: its regs/identification/midr_el1 sysfs node
+     * when readable, otherwise the MIDR fields of its /proc/cpuinfo block. Both print
+     * cpu_data[cpu].reg_midr, which arch/arm64/kernel/cpuinfo.c stores when the CPU comes online,
+     * so they are one source rather than two independent ones.
+     */
+    void collect_cached_cpu_identity(CpuIdentityObservation *observation);
+
+}  // namespace duckdetector::kernelcheck

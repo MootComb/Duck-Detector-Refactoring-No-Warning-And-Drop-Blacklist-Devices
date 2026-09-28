@@ -45,9 +45,11 @@ public class SelinuxContextValidityPreload {
         } catch (throwable: Throwable) {
             fallbackPayload(throwable.message ?: "SELinux app zygote preload failed.")
         } finally {
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S) {
-                // AOSP Q/R/S: https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android11-release/core/jni/fd_utils.cpp
-                // Restat() rejects AVC's AF_NETLINK socket; Q/R/S：该 socket 不符合 FD 检查，需清理。
+            // The access checks above leave libselinux's AVC netlink socket open. Before Android 12,
+            // AppZygoteInit does not exempt what doPreload opened, so the next fork of this app zygote
+            // would abort on it: frameworks/base core/jni/fd_utils.cpp accepts only named AF_UNIX
+            // sockets ("Unable to get socket name").
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 SelinuxContextValidityBridge.closeProcessLocalAvc()
             }
         }

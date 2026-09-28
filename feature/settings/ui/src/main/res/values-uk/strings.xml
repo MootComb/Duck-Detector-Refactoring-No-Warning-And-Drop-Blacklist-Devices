@@ -50,7 +50,6 @@ limitations under the License.
     <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
     <string name="licenses_dialog_close">Закрити</string>
     <string name="licenses_dialog_home_page">Домашня сторінка</string>
-    <string name="licenses_dialog_licenses">Ліцензії: %1$s</string>
     <string name="licenses_dialog_no_license_text">Текст ліцензії відсутній.</string>
     <string name="licenses_dialog_open">Відкрити</string>
     <string name="licenses_dialog_source_repo">Репозиторій коду</string>

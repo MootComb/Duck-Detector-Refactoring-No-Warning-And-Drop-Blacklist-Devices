@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.data.rules
 import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdentityObservation
 import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdentityProbeStatus
 import com.eltavine.duckdetector.features.kernelcheck.data.native.CachedCpuIdentitySource
+import com.eltavine.duckdetector.features.kernelcheck.data.native.MrsReadState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckMethodOutcome
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -166,12 +167,81 @@ class Arm64CpuIdentityConsistencyEvaluatorTest {
         assertEquals(KernelCheckMethodOutcome.SUPPORT, assessment.method.outcome)
     }
 
+    @Test
+    fun `a read that ran on another core is not compared with the pinned core`() {
+        // The thread was moved from a little core to a big one, so the value it read is the big
+        // core's identity and says nothing about the little core's cached identity.
+        val assessment = evaluator.evaluate(
+            status = Arm64CpuIdentityProbeStatus.COMPLETED,
+            observations = listOf(
+                observation(
+                    cpu = 0,
+                    cached = 0x410fd050,
+                    mrs = 0x410fd480,
+                    state = MrsReadState.UNATTRIBUTED,
+                    readsOffCpu = 6,
+                ),
+                observation(cpu = 7, cached = 0x410fd480, mrs = 0x410fd480),
+            ),
+        )
+
+        assertNull(assessment.finding)
+        assertEquals(KernelCheckMethodOutcome.SUPPORT, assessment.method.outcome)
+        assertEquals("Partial (1/2 CPUs)", assessment.method.summary)
+        assertTrue(assessment.method.detail.orEmpty().contains("not confirmed on this CPU (6 ran elsewhere)"))
+    }
+
+    @Test
+    fun `reads that disagree on one core are inconclusive rather than a detection`() {
+        val assessment = evaluator.evaluate(
+            status = Arm64CpuIdentityProbeStatus.COMPLETED,
+            observations = listOf(
+                observation(cpu = 0, cached = 0x410fd050, mrs = null, state = MrsReadState.UNSTABLE),
+            ),
+        )
+
+        assertNull(assessment.finding)
+        assertEquals(KernelCheckMethodOutcome.SUPPORT, assessment.method.outcome)
+        assertTrue(assessment.method.detail.orEmpty().contains("changed between reads"))
+    }
+
+    @Test
+    fun `a verified mismatch is detected even after reads were discarded`() {
+        val assessment = evaluator.evaluate(
+            status = Arm64CpuIdentityProbeStatus.COMPLETED,
+            observations = listOf(
+                observation(cpu = 0, cached = 0x410fd050, mrs = 0x410fd050),
+                observation(cpu = 7, cached = 0x411fd4f0, mrs = 0x410fd480, readsOffCpu = 2),
+            ),
+        )
+
+        assertNotNull(assessment.finding)
+        assertEquals(KernelCheckMethodOutcome.DETECTED, assessment.method.outcome)
+        assertEquals("1 core mismatch(es)", assessment.finding?.value)
+    }
+
+    @Test
+    fun `a faulted read is reported as unavailable`() {
+        val assessment = evaluator.evaluate(
+            status = Arm64CpuIdentityProbeStatus.COMPLETED,
+            observations = listOf(
+                observation(cpu = 0, cached = 0x410fd050, mrs = null, state = MrsReadState.FAULTED),
+            ),
+        )
+
+        assertNull(assessment.finding)
+        assertEquals(KernelCheckMethodOutcome.SUPPORT, assessment.method.outcome)
+        assertTrue(assessment.method.detail.orEmpty().contains("MRS MIDR_EL1 unavailable"))
+    }
+
     private fun observation(
         cpu: Int,
         cached: Long?,
         mrs: Long?,
         source: CachedCpuIdentitySource = CachedCpuIdentitySource.SYSFS,
         affinitySucceeded: Boolean = true,
+        state: MrsReadState = if (mrs != null) MrsReadState.VERIFIED else MrsReadState.NOT_ATTEMPTED,
+        readsOffCpu: Int = 0,
     ): Arm64CpuIdentityObservation {
         return Arm64CpuIdentityObservation(
             cpu = cpu,
@@ -179,6 +249,8 @@ class Arm64CpuIdentityConsistencyEvaluatorTest {
             cachedSource = source,
             cachedMidr = cached,
             mrsMidr = mrs,
+            mrsReadState = state,
+            readsOffCpu = readsOffCpu,
         )
     }
 }

@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">ทำเงื่อนไขให้ครบ</string>
     <string name="agreement_acknowledgement">การดำเนินการต่อหมายความว่าคุณได้รับทราบและยอมรับเงื่อนไขเหล่านี้แล้ว</string>
     <string name="update_open_failed">ไม่มีเบราว์เซอร์สำหรับเปิด GitHub</string>
-    <string name="screen_capture_title">ตรวจพบการจับภาพหน้าจอ</string>
-    <string name="screen_capture_message">หากภาพหน้าจอไม่มีข้อมูลรายละเอียด ปัญหานี้จะไม่ได้รับการดำเนินการ</string>
-    <string name="dialog_continue">ดำเนินการต่อ</string>
-    <string name="dialog_continue_waiting">ดำเนินการต่อ (%1$d วินาที)</string>
-    <string name="detector_result_title">ก่อนขอความช่วยเหลือ</string>
-    <string name="detector_result_notice">โปรดให้ข้อมูลให้ครบเพื่อรับความช่วยเหลือ</string>
-    <string name="detector_result_detail">โปรดเปิดการ์ดระดับอันตรายและคำเตือนเพื่อตรวจดูหลักฐานทั้งหมด</string>
     <string name="startup_review_label">ตรวจสอบนโยบายการเริ่มต้น</string>
     <string name="startup_preparing_title">กำลังเตรียมการเริ่มต้น</string>
     <string name="startup_before_scan_title">ก่อนสแกน</string>

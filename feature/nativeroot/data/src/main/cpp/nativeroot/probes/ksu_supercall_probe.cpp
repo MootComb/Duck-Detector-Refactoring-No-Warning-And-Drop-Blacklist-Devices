@@ -16,6 +16,8 @@
 
 #include "nativeroot/probes/ksu_supercall_probe.h"
 
+#include "common/seccomp_child.h"
+
 #include <cerrno>
 #include <csignal>
 #include <cstdint>
@@ -59,11 +61,6 @@ namespace duckdetector::nativeroot {
 
         constexpr unsigned long kKsuIoctlGetInfo = _IOC(_IOC_READ, 'K', 2, 0);
         constexpr unsigned long kKsuIoctlCheckSafemode = _IOC(_IOC_READ, 'K', 5, 0);
-        constexpr int kSeccompBlockedExitCode = 125;
-
-        void handle_seccomp_sigsys(int, siginfo_t *, void *) {
-            _exit(kSeccompBlockedExitCode);
-        }
 
         bool collect_child_packet(
                 KsuSupercallPacket &packet,
@@ -90,13 +87,7 @@ namespace duckdetector::nativeroot {
                 close(pipe_fds[0]);
 
                 KsuSupercallPacket child_packet{};
-                // Convert SIGSYS into a child status for the parent.
-                // 将 SIGSYS 转为子进程状态，由父进程读取。
-                struct sigaction sigsys_action{};
-                sigsys_action.sa_sigaction = handle_seccomp_sigsys;
-                sigsys_action.sa_flags = SA_SIGINFO;
-                sigemptyset(&sigsys_action.sa_mask);
-                if (sigaction(SIGSYS, &sigsys_action, nullptr) != 0) {
+                if (!common::install_seccomp_trap_exit()) {
                     _exit(126);
                 }
 
@@ -151,12 +142,7 @@ namespace duckdetector::nativeroot {
             const ssize_t bytes_read = read(pipe_fds[0], &packet, sizeof(packet));
             close(pipe_fds[0]);
 
-            if (WIFEXITED(status) && WEXITSTATUS(status) == kSeccompBlockedExitCode) {
-                blocked_by_seccomp = true;
-                return false;
-            }
-
-            if (WIFSIGNALED(status) && WTERMSIG(status) == SIGSYS) {
+            if (common::seccomp_trapped(status)) {
                 blocked_by_seccomp = true;
                 return false;
             }

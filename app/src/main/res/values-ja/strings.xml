@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">すべての条件を完了</string>
     <string name="agreement_acknowledgement">続行すると、これらの条件を読み同意したものとみなされます。</string>
     <string name="update_open_failed">GitHub を開けるブラウザがありません</string>
-    <string name="screen_capture_title">スクリーンショットを検出</string>
-    <string name="screen_capture_message">スクリーンショットに詳細情報が含まれていない場合、この問題は対応されません。</string>
-    <string name="dialog_continue">続行</string>
-    <string name="dialog_continue_waiting">続行 (%1$d 秒)</string>
-    <string name="detector_result_title">サポートを求める前に</string>
-    <string name="detector_result_notice">サポートを受けるには、十分な情報を提供してください。</string>
-    <string name="detector_result_detail">危険および警告カードを開いて、証拠をすべて確認してください。</string>
     <string name="startup_review_label">起動ポリシー確認</string>
     <string name="startup_preparing_title">起動を準備中</string>
     <string name="startup_before_scan_title">スキャン前</string>

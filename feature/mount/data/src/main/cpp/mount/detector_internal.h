@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "common/seccomp_child.h"
 #include "mount/detector_core.h"
 #include <android/log.h>
 #include <fcntl.h>
@@ -117,6 +118,9 @@ namespace duckdetector::mount::detail {
         if (pid < 0) {
             LOGI("statx support probe fork failed: %s", strerror(errno));
         } else if (pid == 0) {
+            if (!common::install_seccomp_trap_exit()) {
+                _exit(1);
+            }
             struct statx stx{};
             errno = 0;
             const long result = syscall(
@@ -134,7 +138,7 @@ namespace duckdetector::mount::detail {
             int status = 0;
             if (waitpid(pid, &status, 0) < 0) {
                 LOGI("statx support probe waitpid failed: %s", strerror(errno));
-            } else if (WIFSIGNALED(status) && WTERMSIG(status) == SIGSYS) {
+            } else if (common::seccomp_trapped(status)) {
                 LOGI("statx support probe blocked by seccomp; disabling statx probes");
             } else if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
                 resolved = StatxAvailability::Supported;

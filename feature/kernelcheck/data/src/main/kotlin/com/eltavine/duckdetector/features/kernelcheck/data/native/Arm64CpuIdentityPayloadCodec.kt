@@ -35,12 +35,30 @@ enum class CachedCpuIdentitySource {
     NONE,
 }
 
+/**
+ * Whether the native probe could attribute its MIDR_EL1 reads to the CPU it pinned the thread to.
+ * Only [VERIFIED] reads are compared: the others mean the thread was moved off the CPU, reads on
+ * the CPU disagreed, or no value was read, none of which says anything about the kernel's cached
+ * identity.
+ */
+enum class MrsReadState {
+    VERIFIED,
+    NOT_ATTEMPTED,
+    UNATTRIBUTED,
+    UNSTABLE,
+    FAULTED,
+    UNKNOWN,
+}
+
 data class Arm64CpuIdentityObservation(
     val cpu: Int,
     val affinitySucceeded: Boolean,
     val cachedSource: CachedCpuIdentitySource,
     val cachedMidr: Long?,
     val mrsMidr: Long?,
+    val mrsReadState: MrsReadState,
+    /** Reads the probe discarded because getcpu() did not report the pinned CPU around them. */
+    val readsOffCpu: Int,
 )
 
 internal object Arm64CpuIdentityPayloadCodec {
@@ -74,6 +92,10 @@ internal object Arm64CpuIdentityPayloadCodec {
         if (mrsMidr == null && fields[4] != "NA") {
             return null
         }
+        val mrsReadState = runCatching {
+            MrsReadState.valueOf(fields[5])
+        }.getOrDefault(MrsReadState.UNKNOWN)
+        val readsOffCpu = fields[6].toIntOrNull()?.takeIf { it >= 0 } ?: return null
 
         return Arm64CpuIdentityObservation(
             cpu = cpu,
@@ -81,6 +103,8 @@ internal object Arm64CpuIdentityPayloadCodec {
             cachedSource = source,
             cachedMidr = cachedMidr,
             mrsMidr = mrsMidr,
+            mrsReadState = mrsReadState,
+            readsOffCpu = readsOffCpu,
         )
     }
 
@@ -91,6 +115,6 @@ internal object Arm64CpuIdentityPayloadCodec {
         return toLongOrNull(radix = 16)?.takeIf { it in 0..UINT32_MAX }
     }
 
-    private const val FIELD_COUNT = 5
+    private const val FIELD_COUNT = 7
     private const val UINT32_MAX = 0xffff_ffffL
 }

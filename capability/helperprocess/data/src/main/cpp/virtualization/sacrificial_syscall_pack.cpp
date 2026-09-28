@@ -17,6 +17,7 @@
 #include "virtualization/honeypot_traps.h"
 #include "virtualization/honeypot_traps_internal.h"
 #include "common/payload_codec.h"
+#include "common/seccomp_child.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/memfd.h>
@@ -50,7 +51,7 @@ namespace duckdetector::virtualization {
                     true,
                     false,
                     true,
-                    "Sacrificial syscall pack was disabled after a previous SIGSYS in this helper process."
+                    "Sacrificial syscall pack was disabled after seccomp refused one of its syscalls in this helper process."
             );
         }
 
@@ -68,6 +69,12 @@ namespace duckdetector::virtualization {
 
         if (child == 0) {
             close(pipefd[0]);
+            // Android 11's app filter allows neither openat2 nor pidfd_open (bionic lists them in
+            // neither libc/SYSCALLS.TXT nor its seccomp allowlists), so there the first item is
+            // refused.
+            if (!common::install_seccomp_trap_exit()) {
+                _exit(1);
+            }
 
             auto call_via_syscall = [](long number,
                                        long arg0,
@@ -354,13 +361,13 @@ namespace duckdetector::virtualization {
         }
         close(pipefd[0]);
 
-        if (WIFSIGNALED(status) && WTERMSIG(status) == SIGSYS) {
+        if (common::seccomp_trapped(status)) {
             g_sacrificialSyscallPackDisabled = true;
             return encode_basic_pack(
                     true,
                     false,
                     true,
-                    "Sacrificial syscall child died with SIGSYS. The helper process will not run this pack again."
+                    "Seccomp refused a syscall in the sacrificial child. The helper process will not run this pack again."
             );
         }
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0 || payload.empty()) {

@@ -19,6 +19,7 @@ package com.eltavine.duckdetector.features.kernelcheck.data.rules
 import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdentityObservation
 import com.eltavine.duckdetector.features.kernelcheck.data.native.Arm64CpuIdentityProbeStatus
 import com.eltavine.duckdetector.features.kernelcheck.data.native.CachedCpuIdentitySource
+import com.eltavine.duckdetector.features.kernelcheck.data.native.MrsReadState
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFinding
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingKind
 import com.eltavine.duckdetector.features.kernelcheck.domain.KernelCheckFindingSeverity
@@ -37,9 +38,12 @@ class Arm64CpuIdentityConsistencyEvaluator {
         status: Arm64CpuIdentityProbeStatus,
         observations: List<Arm64CpuIdentityObservation>,
     ): Arm64CpuIdentityAssessment {
+        // A read the probe could not attribute to the pinned CPU belongs to some other core, and
+        // on a heterogeneous SoC comparing it would report a mismatch the kernel never made.
         val comparable = observations.filter { observation ->
             observation.affinitySucceeded &&
                     observation.cachedMidr != null &&
+                    observation.mrsReadState == MrsReadState.VERIFIED &&
                     observation.mrsMidr != null
         }
         val mismatches = comparable.filter { observation ->
@@ -111,7 +115,7 @@ class Arm64CpuIdentityConsistencyEvaluator {
             else -> supportMethod(
                 summary = "Unavailable",
                 detail = detail.ifBlank {
-                    "No logical CPU yielded both a cached MIDR and a safely emulated MIDR_EL1 read."
+                    "No logical CPU yielded both a cached MIDR and an emulated MIDR_EL1 read confirmed on that CPU."
                 },
             )
         }
@@ -134,7 +138,15 @@ class Arm64CpuIdentityConsistencyEvaluator {
         val state = when {
             !observation.affinitySucceeded -> "affinity failed"
             observation.cachedMidr == null -> "cached MIDR unavailable"
-            observation.mrsMidr == null -> "MRS MIDR_EL1 unavailable"
+            observation.mrsReadState == MrsReadState.UNATTRIBUTED ->
+                "MRS read not confirmed on this CPU (${observation.readsOffCpu} ran elsewhere)"
+
+            observation.mrsReadState == MrsReadState.UNSTABLE ->
+                "MIDR_EL1 changed between reads on this CPU"
+
+            observation.mrsReadState != MrsReadState.VERIFIED ||
+                    observation.mrsMidr == null -> "MRS MIDR_EL1 unavailable"
+
             normalizeMidr(observation.cachedMidr, observation.cachedSource) ==
                     normalizeMidr(observation.mrsMidr, observation.cachedSource) -> "consistent"
             else -> "mismatch"

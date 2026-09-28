@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">أكمل جميع الشروط</string>
     <string name="agreement_acknowledgement">بمتابعتك، فإنك تقر بأنك قرأت هذه الشروط ووافقت عليها.</string>
     <string name="update_open_failed">لا يتوفر متصفح لفتح GitHub</string>
-    <string name="screen_capture_title">تم اكتشاف لقطة شاشة</string>
-    <string name="screen_capture_message">إذا كانت لقطة الشاشة لا تحتوي على معلومات مفصلة، فلن تتم معالجة هذه المشكلة.</string>
-    <string name="dialog_continue">متابعة</string>
-    <string name="dialog_continue_waiting">متابعة (%1$d ثانية)</string>
-    <string name="detector_result_title">قبل طلب المساعدة</string>
-    <string name="detector_result_notice">قدّم معلومات كاملة للحصول على المساعدة.</string>
-    <string name="detector_result_detail">افتح بطاقات الخطر والتحذير لمراجعة الأدلة كاملة.</string>
     <string name="startup_review_label">مراجعة سياسة بدء التشغيل</string>
     <string name="startup_preparing_title">جارٍ تجهيز بدء التشغيل</string>
     <string name="startup_before_scan_title">قبل الفحص</string>

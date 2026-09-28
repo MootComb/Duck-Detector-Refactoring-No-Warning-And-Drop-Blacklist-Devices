@@ -60,7 +60,6 @@ limitations under the License.
     <string name="author_summary_zg089">Arabic translation</string>
     <string name="licenses_dialog_close">Close</string>
     <string name="licenses_dialog_home_page">Home page</string>
-    <string name="licenses_dialog_licenses">Licenses: %1$s</string>
     <string name="licenses_dialog_no_license_text">No license text available.</string>
     <string name="licenses_dialog_open">Open</string>
     <string name="licenses_dialog_source_repo">Source repo</string>

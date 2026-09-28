@@ -25,30 +25,55 @@ class Arm64CpuIdentityPayloadCodecTest {
     @Test
     fun `parse observation keeps per cpu identity sources separate`() {
         val observation = Arm64CpuIdentityPayloadCodec.parseObservation(
-            "7\t1\tSYSFS\t410fd4d0\t410fd4d0",
+            "7\t1\tSYSFS\t410fd4d0\t410fd4d0\tVERIFIED\t0",
         )
 
         assertEquals(7, observation?.cpu)
         assertEquals(CachedCpuIdentitySource.SYSFS, observation?.cachedSource)
         assertEquals(0x410fd4d0L, observation?.cachedMidr)
         assertEquals(0x410fd4d0L, observation?.mrsMidr)
+        assertEquals(MrsReadState.VERIFIED, observation?.mrsReadState)
+        assertEquals(0, observation?.readsOffCpu)
     }
 
     @Test
     fun `parse observation preserves unavailable values`() {
         val observation = Arm64CpuIdentityPayloadCodec.parseObservation(
-            "2\t1\tNONE\tNA\tNA",
+            "2\t1\tNONE\tNA\tNA\tNOT_ATTEMPTED\t0",
         )
 
         assertEquals(2, observation?.cpu)
         assertNull(observation?.cachedMidr)
         assertNull(observation?.mrsMidr)
+        assertEquals(MrsReadState.NOT_ATTEMPTED, observation?.mrsReadState)
+    }
+
+    @Test
+    fun `parse observation keeps reads the probe could not attribute to the cpu`() {
+        val observation = Arm64CpuIdentityPayloadCodec.parseObservation(
+            "4\t1\tPROC_CPUINFO\t410fd4d0\tNA\tUNATTRIBUTED\t6",
+        )
+
+        assertEquals(MrsReadState.UNATTRIBUTED, observation?.mrsReadState)
+        assertEquals(6, observation?.readsOffCpu)
+        assertNull(observation?.mrsMidr)
+    }
+
+    @Test
+    fun `a read state this build does not know becomes unknown rather than failing`() {
+        val observation = Arm64CpuIdentityPayloadCodec.parseObservation(
+            "0\t1\tSYSFS\t410fd050\tNA\tSOME_FUTURE_STATE\t0",
+        )
+
+        assertEquals(MrsReadState.UNKNOWN, observation?.mrsReadState)
     }
 
     @Test
     fun `malformed observation is ignored`() {
-        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\t1\tSYSFS\tinvalid\t410fd4d0"))
-        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\tmaybe\tNONE\tNA\tNA"))
+        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\t1\tSYSFS\tinvalid\t410fd4d0\tVERIFIED\t0"))
+        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\tmaybe\tNONE\tNA\tNA\tNOT_ATTEMPTED\t0"))
+        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\t1\tSYSFS\t410fd050\t410fd050\tVERIFIED\t-1"))
+        assertNull(Arm64CpuIdentityPayloadCodec.parseObservation("0\t1\tSYSFS\t410fd050\t410fd050"))
     }
 
     @Test

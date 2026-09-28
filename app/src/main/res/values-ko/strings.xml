@@ -36,13 +36,6 @@ limitations under the License.
     <string name="complete_all_conditions">모든 조건 완료</string>
     <string name="agreement_acknowledgement">계속하면 이 약관을 읽고 동의했음을 인정하는 것입니다.</string>
     <string name="update_open_failed">GitHub를 열 수 있는 브라우저가 없습니다</string>
-    <string name="screen_capture_title">스크린샷 감지됨</string>
-    <string name="screen_capture_message">스크린샷에 상세 정보가 없으면 이 문제는 처리되지 않습니다.</string>
-    <string name="dialog_continue">계속</string>
-    <string name="dialog_continue_waiting">계속 (%1$d초)</string>
-    <string name="detector_result_title">도움을 요청하기 전에</string>
-    <string name="detector_result_notice">도움을 받으려면 충분한 정보를 제공해 주세요.</string>
-    <string name="detector_result_detail">위험 및 경고 카드를 펼쳐 전체 증거를 검토하세요.</string>
     <string name="startup_review_label">시작 정책 검토</string>
     <string name="startup_preparing_title">시작 준비 중</string>
     <string name="startup_before_scan_title">스캔 전</string>

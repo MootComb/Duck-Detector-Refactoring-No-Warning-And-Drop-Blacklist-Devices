@@ -45,7 +45,6 @@ limitations under the License.
     <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
     <string name="licenses_dialog_close">닫기</string>
     <string name="licenses_dialog_home_page">홈페이지</string>
-    <string name="licenses_dialog_licenses">라이선스: %1$s</string>
     <string name="licenses_dialog_no_license_text">사용 가능한 라이선스 전문이 없습니다.</string>
     <string name="licenses_dialog_open">열기</string>
     <string name="licenses_dialog_source_repo">소스 저장소</string>

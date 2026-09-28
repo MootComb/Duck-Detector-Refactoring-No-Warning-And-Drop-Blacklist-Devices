@@ -39,7 +39,7 @@ class KernelCheckNativeBridgeTest {
             CMDLINE=0
             KPTR=0
             CPU_IDENTITY_STATUS=COMPLETED
-            CPU_IDENTITY=0${'\t'}1${'\t'}SYSFS${'\t'}410fd050${'\t'}410fd050
+            CPU_IDENTITY=0${'\t'}1${'\t'}SYSFS${'\t'}410fd050${'\t'}410fd050${'\t'}VERIFIED${'\t'}0
             FINDING=CMDLINE|GOOD|verifiedbootstate=green (verified)
             """.trimIndent(),
         )

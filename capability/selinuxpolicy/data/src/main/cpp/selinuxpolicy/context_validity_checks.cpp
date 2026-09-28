@@ -105,7 +105,6 @@ namespace duckdetector::selinux::detail {
             const char *permission,
             void *auditdata) {
         if (symbols.check_access != nullptr) {
-            g_selinux_access_attempted.store(true, std::memory_order_relaxed);
             errno = 0;
             const int result = symbols.check_access(source, target, target_class, permission, auditdata);
             const int call_errno = errno;
