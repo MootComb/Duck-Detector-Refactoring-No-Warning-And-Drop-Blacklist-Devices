@@ -16,32 +16,30 @@
 
 package com.eltavine.duckdetector.features.settings.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.settings.ui.R
 
 @Composable
-fun AuthorCard(
+internal fun ContributorsSection(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -60,46 +58,28 @@ fun AuthorCard(
 
     var selectedLogin by rememberSaveable { mutableStateOf<String?>(null) }
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = ShapeTokens.CornerExtraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    SettingsSection(
+        title = stringResource(R.string.author_wall_title),
+        badge = authors.size.toString(),
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                WrapSafeText(
-                    text = stringResource(R.string.author_wall_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f).semantics { heading() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = DuckTheme.palette.groupedSurface,
+                    shape = ShapeTokens.CornerExtraLargeIncreased,
                 )
-                Surface(
-                    shape = ShapeTokens.CornerFull,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                ) {
-                    WrapSafeText(
-                        text = authors.size.toString(),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-            }
-
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
             ContributorWallCanvas(
                 authors = authors,
                 onSelect = { selectedLogin = it.login },
             )
-
             WrapSafeText(
                 text = stringResource(R.string.author_wall_hint),
-                style = MaterialTheme.typography.bodySmall,
+                style = DuckTypography.Footnote,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

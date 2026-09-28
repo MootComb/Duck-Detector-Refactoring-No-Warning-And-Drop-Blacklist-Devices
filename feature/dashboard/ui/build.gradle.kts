@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:evidence"))
     implementation(project(":core:report"))
     api(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     api(project(":feature:dashboard:presentation"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material.icons.extended)

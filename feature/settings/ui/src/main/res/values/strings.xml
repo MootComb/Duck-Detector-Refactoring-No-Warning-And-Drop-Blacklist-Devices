@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Copy version, build time and build hash</string>
     <string name="about_copy_toast">Build info copied</string>
     <string name="about_label_build_hash">Build Hash</string>
-    <string name="about_label_build_details">Build details</string>
     <string name="about_label_build_time">Build Time</string>
     <string name="about_label_copy_build_info">Copy Build Info</string>
     <string name="about_label_email">Email</string>
@@ -66,7 +65,6 @@ limitations under the License.
     <string name="licenses_dialog_open">Open</string>
     <string name="licenses_dialog_source_repo">Source repo</string>
     <string name="licenses_dialog_version">Version %1$s</string>
-    <string name="licenses_entry_label">Transparency</string>
     <string name="licenses_entry_subtitle">Browse bundled third-party projects and inspect their license notices.</string>
     <string name="licenses_entry_title">Open-source libraries</string>
     <string name="licenses_inventory_subtitle">Tap any dependency to inspect license text and upstream project links.</string>
@@ -74,7 +72,7 @@ limitations under the License.
     <string name="licenses_screen_back">Back</string>
     <string name="licenses_screen_subtitle">Third-party components bundled in this build.</string>
     <string name="licenses_screen_title">Open-source licenses</string>
-    <string name="settings_subtitle">Runtime controls and GitHub Nightly update status.</string>
+    <string name="settings_section_detection">Detection options</string>
     <string name="settings_title">Settings</string>
     <string name="update_settings_label">Check for updates</string>
     <string name="update_status_available">A newer Nightly build is available; tap for details</string>

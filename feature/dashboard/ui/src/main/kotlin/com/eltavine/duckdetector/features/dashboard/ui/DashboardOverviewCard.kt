@@ -20,9 +20,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -30,16 +32,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
+import com.eltavine.duckdetector.core.ui.components.DetectorHairline
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewMetricModel
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 
@@ -48,188 +52,143 @@ internal fun DashboardOverviewCard(
     model: DashboardOverviewModel,
 ) {
     val appearance = rememberStatusAppearance(model.status)
-    Surface(
-        shape = ShapeTokens.CornerExtraLargeIncreased,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            if (model.title.contains('\n')) {
-                val titleLines = model.title.lines()
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        if (model.showTitleIcon) {
-                            Icon(
-                                imageVector = Icons.Outlined.Timer,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(14.dp),
-                            )
-                            Spacer(modifier = Modifier.size(6.dp))
-                        }
-                        WrapSafeText(
-                            text = titleLines[0],
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    if (titleLines.size > 1 && titleLines[1].isNotBlank()) {
-                        WrapSafeText(
-                            text = titleLines[1],
-                            modifier = Modifier.fillMaxWidth(),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = appearance.icon,
-                        contentDescription = null,
-                        tint = appearance.iconTint,
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    if (!model.title.contains('\n')) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        ) {
-                            if (model.showTitleIcon) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Timer,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                            }
-                            WrapSafeText(
-                                text = model.title,
-                                modifier = Modifier.weight(1f),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    WrapSafeText(
-                        text = model.headline,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    WrapSafeText(
-                        text = model.summary,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            DashboardMetricGrid(metrics = model.metrics)
-        }
-    }
-}
-
-@Composable
-private fun DashboardMetricGrid(
-    metrics: List<DashboardOverviewMetricModel>,
-) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = DuckTheme.palette.groupedSurface,
+                shape = ShapeTokens.CornerExtraLargeIncreased,
+            )
+            .padding(horizontal = 20.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        metrics.chunked(2).forEach { rowMetrics ->
-            Row(
-                modifier = Modifier.fillMaxWidth(0.94f),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                rowMetrics.forEach { metric ->
-                    DashboardMetricChip(
-                        metric = metric,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                if (rowMetrics.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
+        OverviewTitle(model = model)
 
-@Composable
-private fun DashboardMetricChip(
-    metric: DashboardOverviewMetricModel,
-    modifier: Modifier = Modifier,
-) {
-    val appearance = rememberStatusAppearance(metric.status)
-    Surface(
-        modifier = modifier,
-        shape = ShapeTokens.CornerLargeIncreased,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(color = appearance.tintWash, shape = CircleShape),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = appearance.icon,
                     contentDescription = null,
                     tint = appearance.iconTint,
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(32.dp),
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                WrapSafeText(
+                    text = model.headline,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = DuckTypography.LargeTitle,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 WrapSafeText(
-                    text = metric.label,
-                    style = MaterialTheme.typography.labelSmall,
+                    text = model.summary,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = DuckTypography.Callout,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+
+        DetectorHairline()
+        OverviewMetrics(metrics = model.metrics)
+    }
+}
+
+/** The title is one line, or the scan's completion time over its duration. */
+@Composable
+private fun OverviewTitle(model: DashboardOverviewModel) {
+    val lines = model.title.lines().filter { it.isNotBlank() }
+    Row(
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (model.showTitleIcon) {
+            Icon(
+                imageVector = Icons.Outlined.Timer,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .size(14.dp),
+            )
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+            lines.forEach { line ->
+                WrapSafeText(
+                    text = line,
+                    style = DuckTypography.Footnote,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OverviewMetrics(
+    metrics: List<DashboardOverviewMetricModel>,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+    ) {
+        metrics.forEachIndexed { index, metric ->
+            if (index > 0) {
+                VerticalDivider(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(vertical = 4.dp),
+                    thickness = Dp.Hairline,
+                    color = DuckTheme.palette.separator,
+                )
+            }
+            OverviewMetric(metric = metric, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun OverviewMetric(
+    metric: DashboardOverviewMetricModel,
+    modifier: Modifier = Modifier,
+) {
+    val appearance = rememberStatusAppearance(metric.status)
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        WrapSafeText(
+            text = metric.value,
+            style = DuckTypography.Numeral,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(7.dp)
+                    .background(color = appearance.iconTint, shape = CircleShape),
+            )
             WrapSafeText(
-                text = metric.value,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
+                text = metric.label,
+                style = DuckTypography.Caption,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

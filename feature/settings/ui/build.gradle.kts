@@ -25,6 +25,7 @@ android {
 
 dependencies {
     api(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     api(project(":feature:settings:presentation"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material.icons.extended)

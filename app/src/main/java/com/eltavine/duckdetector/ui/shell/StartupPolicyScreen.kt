@@ -16,41 +16,51 @@
 
 package com.eltavine.duckdetector.ui.shell
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
+import com.eltavine.duckdetector.core.designsystem.components.StatusBarProtection
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.detector.ConsentDecision
 import com.eltavine.duckdetector.core.detector.ConsentId
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.notifications.ScanNotificationPermissionState
 import com.eltavine.duckdetector.notifications.preferences.ScanNotificationPrefs
 import com.eltavine.duckdetector.sdk.PackageVisibility
+import com.eltavine.duckdetector.startup.StartupHeroGlyph
 
 @Composable
 internal fun StartupPolicyScreen(
@@ -111,32 +121,40 @@ internal fun StartupPolicyScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(DuckTheme.palette.groupedBackground),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(horizontal = 20.dp, vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            StartupPolicyHero(
-                gateState = gateState,
-                resolvedCount = resolvedCount,
-                totalCount = totalCount,
-                progress = progress,
-            )
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 560.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                StartupPolicyHero(
+                    gateState = gateState,
+                    resolvedCount = resolvedCount,
+                    totalCount = totalCount,
+                    progress = progress,
+                )
 
-            if (gateState == StartupGateState.LOADING) {
-                LoadingPolicyCard()
-            } else {
-                cards.forEach { card ->
-                    StartupPolicyCard(card = card)
+                if (gateState == StartupGateState.LOADING) {
+                    LoadingPolicyCard()
+                } else {
+                    cards.forEach { card ->
+                        StartupPolicyCard(card = card)
+                    }
                 }
             }
         }
+
+        StatusBarProtection(modifier = Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -147,122 +165,116 @@ private fun StartupPolicyHero(
     totalCount: Int,
     progress: Float,
 ) {
-    Surface(
-        shape = ShapeTokens.CornerExtraLargeIncreased,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    val loading = gateState == StartupGateState.LOADING
+    val colorScheme = MaterialTheme.colorScheme
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, bottom = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(
+        StartupHeroGlyph(icon = Icons.Rounded.VerifiedUser)
+
+        WrapSafeText(
+            text = stringResource(R.string.startup_review_label),
+            modifier = Modifier.padding(top = 8.dp),
+            style = DuckTypography.FootnoteEmphasized,
+            color = colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        WrapSafeText(
+            text = stringResource(
+                if (loading) R.string.startup_preparing_title else R.string.startup_before_scan_title,
+            ),
+            modifier = Modifier.semantics { heading() },
+            style = DuckTypography.LargeTitle,
+            color = colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        WrapSafeText(
+            text = stringResource(
+                if (loading) R.string.startup_loading_detail else R.string.startup_intro_detail,
+            ),
+            style = DuckTypography.Callout,
+            color = colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+
+        ResolutionProgress(
+            progress = progress,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = CircleShape,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.VerifiedUser,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    WrapSafeText(
-                        text = stringResource(R.string.startup_review_label),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    WrapSafeText(
-                        text = if (gateState == StartupGateState.LOADING) {
-                            stringResource(R.string.startup_preparing_title)
-                        } else {
-                            stringResource(R.string.startup_before_scan_title)
-                        },
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-
-            WrapSafeText(
-                text = if (gateState == StartupGateState.LOADING) {
-                    stringResource(R.string.startup_loading_detail)
-                } else {
-                    stringResource(R.string.startup_intro_detail)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            WrapSafeText(
-                text = if (gateState == StartupGateState.LOADING) {
-                    stringResource(R.string.startup_loading_state)
-                } else {
-                    stringResource(
-                        R.string.startup_progress_resolved,
-                        resolvedCount,
-                        totalCount,
-                    )
-                },
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+                .padding(top = 10.dp)
+                .widthIn(max = 280.dp)
+                .fillMaxWidth(),
+        )
+        WrapSafeText(
+            text = if (loading) {
+                stringResource(R.string.startup_loading_state)
+            } else {
+                stringResource(R.string.startup_progress_resolved, resolvedCount, totalCount)
+            },
+            style = DuckTypography.Footnote,
+            color = colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
+}
+
+/** A thin bar that fills as startup cards are resolved. */
+@Composable
+private fun ResolutionProgress(
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val fraction by animateFloatAsState(
+        targetValue = progress.coerceIn(0f, 1f),
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "startupProgress",
+    )
+    LinearProgressIndicator(
+        progress = { fraction },
+        modifier = modifier.height(6.dp),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = DuckTheme.palette.separator,
+        strokeCap = StrokeCap.Round,
+        gapSize = 0.dp,
+        drawStopIndicator = {},
+    )
 }
 
 @Composable
 private fun LoadingPolicyCard() {
-    Surface(
-        shape = ShapeTokens.CornerExtraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(28.dp),
-                strokeWidth = 3.dp,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = DuckTheme.palette.groupedSurface,
+                shape = ShapeTokens.CornerExtraLargeIncreased,
             )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                WrapSafeText(
-                    text = stringResource(R.string.startup_loading_dependencies_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                WrapSafeText(
-                    text = stringResource(R.string.startup_loading_dependencies_detail),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            .padding(horizontal = 18.dp, vertical = 18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(24.dp),
+            strokeWidth = 2.5.dp,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            WrapSafeText(
+                text = stringResource(R.string.startup_loading_dependencies_title),
+                style = DuckTypography.Headline,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            WrapSafeText(
+                text = stringResource(R.string.startup_loading_dependencies_detail),
+                style = DuckTypography.Footnote,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Sao chép phiên bản, thời gian build và mã băm build</string>
     <string name="about_copy_toast">Đã sao chép thông tin build</string>
     <string name="about_label_build_hash">Mã băm build</string>
-    <string name="about_label_build_details">Chi tiết bản build</string>
     <string name="about_label_build_time">Thời gian build</string>
     <string name="about_label_copy_build_info">Sao chép thông tin build</string>
     <string name="about_label_email">Email</string>
@@ -51,7 +50,6 @@ limitations under the License.
     <string name="licenses_dialog_open">Mở</string>
     <string name="licenses_dialog_source_repo">Kho mã nguồn</string>
     <string name="licenses_dialog_version">Phiên bản %1$s</string>
-    <string name="licenses_entry_label">Minh bạch</string>
     <string name="licenses_entry_subtitle">Xem các dự án bên thứ ba đi kèm trong bản build này và kiểm tra thông báo giấy phép của chúng.</string>
     <string name="licenses_entry_title">Thư viện mã nguồn mở</string>
     <string name="licenses_inventory_subtitle">Chạm vào bất kỳ dependency nào để xem văn bản giấy phép và liên kết dự án nguồn.</string>
@@ -59,7 +57,7 @@ limitations under the License.
     <string name="licenses_screen_back">Quay lại</string>
     <string name="licenses_screen_subtitle">Các thành phần bên thứ ba được đóng gói trong bản build này.</string>
     <string name="licenses_screen_title">Giấy phép mã nguồn mở</string>
-    <string name="settings_subtitle">Điều khiển xác minh trực tuyến và trạng thái cập nhật GitHub Nightly.</string>
+    <string name="settings_section_detection">Tùy chọn phát hiện</string>
     <string name="settings_title">Cài đặt</string>
     <string name="update_settings_label">Kiểm tra cập nhật</string>
     <string name="update_status_available">Có bản Nightly mới; chạm để xem chi tiết</string>

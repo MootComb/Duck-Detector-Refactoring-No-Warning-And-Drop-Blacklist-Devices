@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
@@ -29,10 +28,8 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,10 +37,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
+import com.eltavine.duckdetector.core.ui.components.DetectorFact
+import com.eltavine.duckdetector.core.ui.components.DetectorFactPair
+import com.eltavine.duckdetector.core.ui.components.DetectorHairline
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.su.presentation.model.SuCardModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuDetailRowModel
 import com.eltavine.duckdetector.features.su.presentation.model.SuHeaderFact
@@ -142,56 +141,15 @@ private fun SuFactPairCard(
     secondary: SuHeaderFactModel,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    DetectorFactPair(
+        primary = primary.asDetectorFact(),
+        secondary = secondary.asDetectorFact(),
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerExtraLarge,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            SuFactPairRow(fact = primary)
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.32f),
-                thickness = 1.dp,
-            )
-            SuFactPairRow(fact = secondary)
-        }
-    }
+    )
 }
 
-@Composable
-private fun SuFactPairRow(
-    fact: SuHeaderFactModel,
-) {
-    val appearance = rememberStatusAppearance(fact.status)
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(15.dp),
-            )
-            WrapSafeText(
-                text = fact.label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        WrapSafeText(
-            text = fact.value,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-}
+private fun SuHeaderFactModel.asDetectorFact() =
+    DetectorFact(label = label, value = value, status = status)
 
 @Composable
 private fun SuDetailSection(
@@ -207,10 +165,7 @@ private fun SuDetailSection(
             rows.forEachIndexed { index, row ->
                 SuDetailRow(row = row)
                 if (index < rows.lastIndex) {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.18f),
-                        thickness = 1.dp,
-                    )
+                    DetectorHairline()
                 }
             }
         }

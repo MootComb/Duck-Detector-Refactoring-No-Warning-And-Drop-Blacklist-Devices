@@ -26,7 +26,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,9 +45,6 @@ import com.eltavine.duckdetector.BuildConfig
 import com.eltavine.duckdetector.R
 import com.eltavine.duckdetector.core.detector.ConsentDecision
 import com.eltavine.duckdetector.core.detector.ConsentId
-import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.ui.components.DetectorAutoExpansionDirective
-import com.eltavine.duckdetector.core.ui.components.LocalDetectorAutoExpansionDirective
 import com.eltavine.duckdetector.core.ui.openExternalUri
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardUiState
 import com.eltavine.duckdetector.features.dashboard.presentation.model.buildDashboardFindings
@@ -67,7 +63,6 @@ import com.eltavine.duckdetector.ui.scan.DetectorScanViewModel
 import com.eltavine.duckdetector.ui.shell.AppDestination
 import com.eltavine.duckdetector.ui.shell.DetectorResultNoticeDialog
 import com.eltavine.duckdetector.ui.shell.FloatingAppTabSwitcher
-import com.eltavine.duckdetector.ui.shell.attentionDetectorIds
 import com.eltavine.duckdetector.ui.shell.detectorResultNoticeKey
 import com.eltavine.duckdetector.ui.shell.shouldShowDetectorResultNotice
 import kotlinx.coroutines.launch
@@ -154,17 +149,10 @@ internal fun AppReadyShell(
         }
     }
     var dismissedDetectorResultNoticeKey by rememberSaveable { mutableStateOf<String?>(null) }
-    val detectorsNeedingAttention = remember(detectorSummaries) {
-        attentionDetectorIds(detectorSummaries)
-    }
-    var pendingAttentionExpansionIds by rememberSaveable { mutableStateOf(emptyList<String>()) }
 
-    LaunchedEffect(detectorResultNoticeKey, detectorsNeedingAttention) {
+    LaunchedEffect(detectorResultNoticeKey) {
         if (detectorResultNoticeKey == null) {
             dismissedDetectorResultNoticeKey = null
-            pendingAttentionExpansionIds = emptyList()
-        } else {
-            pendingAttentionExpansionIds = detectorsNeedingAttention.map { it.value }
         }
     }
 
@@ -192,21 +180,11 @@ internal fun AppReadyShell(
     Box(modifier = Modifier.fillMaxSize()) {
         when (destination) {
             AppDestination.MAIN -> {
-                CompositionLocalProvider(
-                    LocalDetectorAutoExpansionDirective provides DetectorAutoExpansionDirective(
-                        detectorIds = pendingAttentionExpansionIds.mapTo(linkedSetOf(), ::DetectorId),
-                        onConsumed = { detectorId ->
-                            pendingAttentionExpansionIds =
-                                pendingAttentionExpansionIds.filterNot { it == detectorId.value }
-                        },
-                    ),
-                ) {
-                    DashboardScreen(
-                        uiState = dashboardState,
-                        detectors = detectors,
-                        deviceProfile = deviceProfile,
-                    )
-                }
+                DashboardScreen(
+                    uiState = dashboardState,
+                    detectors = detectors,
+                    deviceProfile = deviceProfile,
+                )
             }
 
             AppDestination.SETTINGS -> {

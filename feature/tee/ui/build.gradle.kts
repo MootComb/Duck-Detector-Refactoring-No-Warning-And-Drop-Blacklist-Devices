@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:report"))
     api(project(":core:scan"))
     api(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":feature:tee:detector"))
     api(project(":feature:tee:domain"))
     api(project(":feature:tee:presentation"))

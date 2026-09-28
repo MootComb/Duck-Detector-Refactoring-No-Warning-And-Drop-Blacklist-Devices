@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.ui.theme
+package com.eltavine.duckdetector.core.designsystem.theme
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -48,5 +48,24 @@ public object MotionTokens {
     public val FadeInOut: TweenSpec<Float> = tween<Float>(
         durationMillis = Duration.Short4,
         easing = LinearOutSlowInEasing,
+    )
+
+    // Critically damped, roughly 0.4 s: content settles without overshoot, as Apple's smooth
+    // spring does.
+    public const val SmoothStiffness: Float = 250f
+    public const val SmoothDamping: Float = 1f
+
+    /** A spring for sizes and offsets that open, close or slide. */
+    public fun <T> smoothSpring(visibilityThreshold: T? = null): SpringSpec<T> = spring(
+        dampingRatio = SmoothDamping,
+        stiffness = SmoothStiffness,
+        visibilityThreshold = visibilityThreshold,
+    )
+
+    /** How far a pressed container shrinks, and the quick spring it shrinks and recovers with. */
+    public const val PressedScale: Float = 0.97f
+    public val PressScale: SpringSpec<Float> = spring(
+        dampingRatio = 0.7f,
+        stiffness = 700f,
     )
 }

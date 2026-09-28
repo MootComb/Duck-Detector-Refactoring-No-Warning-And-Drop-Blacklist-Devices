@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":core:evidence"))
     implementation(project(":core:scan"))
     implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":feature:dashboard:presentation"))
     implementation(project(":feature:dashboard:ui"))
     implementation(project(":feature:deviceinfo:data"))

@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.nativeroot.data.service
 
 import android.content.pm.ApplicationInfo
+import android.os.Build
 import com.eltavine.duckdetector.features.nativeroot.data.native.ThroneHuntWatchNativeBridge
 
 // Owns the app_zygote side of the throne hunt oracle. It is intentionally framework-thin so both
@@ -29,10 +30,33 @@ object ThroneHuntWatchInstaller {
     @Volatile
     private var preloadedState: String? = null
 
-    fun install(appInfo: ApplicationInfo, bridge: ThroneHuntWatchNativeBridge = ThroneHuntWatchNativeBridge()): ThroneHuntCarrierState {
+    fun install(appInfo: ApplicationInfo, bridge: ThroneHuntWatchNativeBridge = ThroneHuntWatchNativeBridge()): ThroneHuntCarrierState =
+        install(appInfo.sourceDir, Build.VERSION.SDK_INT, bridge)
+
+    internal fun install(
+        sourceDir: String?,
+        sdkInt: Int,
+        bridge: ThroneHuntWatchNativeBridge,
+    ): ThroneHuntCarrierState {
         // The installer owns only the app_zygote/child boundary; it never owns native evidence.
         // 安装器只负责 app_zygote/child 边界，绝不拥有原生证据。
-        val sourceDir = appInfo.sourceDir
+
+        // The watch is an inotify descriptor the carrier inherits through fork. Before every fork,
+        // the zygote aborts on an open descriptor that is not a socket, regular file or character
+        // device (frameworks/base core/jni/fd_utils.cpp, FileDescriptorInfo::CreateFromFd,
+        // "Unsupported st_mode"; Android 11 through main). Only from Android 12 does AppZygoteInit
+        // bracket doPreload with Zygote.markOpenedFilesBeforePreload and allowFilesOpenedByPreload,
+        // which exempt what the preload opened; on Android 11 an open watch kills app_zygote.
+        // 此 watch 是 carrier 经 fork 继承的 inotify 描述符。Android 11 的 app_zygote 不豁免
+        // preload 打开的描述符，fork 时会因 "Unsupported st_mode" 中止，所以 Android 12 起才安装。
+        if (sdkInt < Build.VERSION_CODES.S) {
+            return ThroneHuntCarrierState(
+                failureReason = "The inherited watch needs Android 12: an earlier app_zygote " +
+                    "aborts every fork while its preload keeps an inotify descriptor open.",
+                notes = listOf(PACKAGE_DIRECTORY_NOTE),
+            )
+        }
+
         if (sourceDir.isNullOrBlank()) {
             return ThroneHuntCarrierState(
                 failureReason = "ApplicationInfo.sourceDir unavailable.",

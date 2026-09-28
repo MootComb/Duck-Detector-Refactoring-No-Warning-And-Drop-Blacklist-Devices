@@ -57,7 +57,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.features.settings.ui.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

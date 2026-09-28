@@ -26,11 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,11 +33,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.ContinuousCornerShape
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
+
+private val SectionIconShape = ContinuousCornerShape(10.dp)
 
 @Composable
 internal fun AgreementSection(
@@ -51,46 +51,47 @@ internal fun AgreementSection(
     content: String,
     tone: AgreementSectionTone = AgreementSectionTone.Standard,
 ) {
-    val sectionColors = tone.colors()
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = sectionColors.container,
-        ),
-        shape = RoundedCornerShape(20.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = DuckTheme.palette.groupedSurface,
+                shape = ShapeTokens.CornerExtraLargeIncreased,
+            )
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(sectionColors.iconContainer),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp),
-                        tint = sectionColors.iconTint,
-                    )
-                }
-                Spacer(modifier = Modifier.width(14.dp))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = sectionColors.title,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(color = DuckTheme.palette.groupedInset, shape = SectionIconShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AgreementSectionContent(
-                content = content,
-                tone = tone,
+            Text(
+                text = title,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { heading() },
+                style = DuckTypography.Title3,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
+
+        AgreementSectionContent(
+            content = content,
+            tone = tone,
+        )
     }
 }
 
@@ -135,43 +136,24 @@ private fun AgreementStyledLine(
     lineStyle: AgreementLineStyle,
     tone: AgreementSectionTone,
 ) {
+    // The warning's body keeps the full text color; weight, not color, sets headings apart.
     val bodyColor = when (tone) {
         AgreementSectionTone.Warning -> MaterialTheme.colorScheme.onSurface
         AgreementSectionTone.Notice -> MaterialTheme.colorScheme.onSurfaceVariant
         AgreementSectionTone.Standard -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val headingColor = when (tone) {
-        AgreementSectionTone.Warning -> MaterialTheme.colorScheme.error
-        AgreementSectionTone.Notice -> MaterialTheme.colorScheme.primary
-        AgreementSectionTone.Standard -> MaterialTheme.colorScheme.onSurface
-    }
 
-    val (style, color, fontWeight) = when (lineStyle) {
-        AgreementLineStyle.Callout -> Triple(
-            MaterialTheme.typography.titleSmall,
-            MaterialTheme.colorScheme.error,
-            FontWeight.Bold,
-        )
-
-        AgreementLineStyle.SectionHeading -> Triple(
-            MaterialTheme.typography.titleSmall,
-            headingColor,
-            FontWeight.Bold,
-        )
-
-        AgreementLineStyle.Body -> Triple(
-            MaterialTheme.typography.bodyMedium,
-            bodyColor,
-            FontWeight.Normal,
-        )
+    val (style, color) = when (lineStyle) {
+        AgreementLineStyle.Callout,
+        AgreementLineStyle.SectionHeading -> DuckTypography.Headline to MaterialTheme.colorScheme.onSurface
+        AgreementLineStyle.Body -> DuckTypography.Callout to bodyColor
     }
 
     Text(
         text = text,
         style = style,
         color = color,
-        fontWeight = fontWeight,
-        lineHeight = style.lineHeight * 1.28,
+        lineHeight = style.lineHeight * 1.25,
     )
 }
 
@@ -187,37 +169,4 @@ private enum class AgreementLineStyle {
     Callout,
     SectionHeading,
     Body,
-}
-
-internal data class AgreementSectionColors(
-    val container: Color,
-    val iconContainer: Color,
-    val iconTint: Color,
-    val title: Color,
-)
-
-@Composable
-internal fun AgreementSectionTone.colors(): AgreementSectionColors {
-    return when (this) {
-        AgreementSectionTone.Standard -> AgreementSectionColors(
-            container = MaterialTheme.colorScheme.surfaceContainerLow,
-            iconContainer = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-            iconTint = MaterialTheme.colorScheme.primary,
-            title = MaterialTheme.colorScheme.onSurface,
-        )
-
-        AgreementSectionTone.Warning -> AgreementSectionColors(
-            container = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.42f),
-            iconContainer = MaterialTheme.colorScheme.errorContainer,
-            iconTint = MaterialTheme.colorScheme.error,
-            title = MaterialTheme.colorScheme.error,
-        )
-
-        AgreementSectionTone.Notice -> AgreementSectionColors(
-            container = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.28f),
-            iconContainer = MaterialTheme.colorScheme.secondaryContainer,
-            iconTint = MaterialTheme.colorScheme.primary,
-            title = MaterialTheme.colorScheme.onSurface,
-        )
-    }
 }

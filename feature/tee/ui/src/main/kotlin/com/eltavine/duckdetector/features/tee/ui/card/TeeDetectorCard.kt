@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.ui.card
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -30,25 +31,24 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material.icons.rounded.VerifiedUser
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
+import com.eltavine.duckdetector.core.ui.components.DetectorActionButton
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeCardModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionId
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFooterActionModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFact
-import com.eltavine.duckdetector.features.tee.presentation.model.TeeHeaderFactModel
 import com.eltavine.duckdetector.features.tee.ui.TeeCertificatesDialog
 import com.eltavine.duckdetector.features.tee.ui.TeeDetailsDialog
 
@@ -172,104 +172,58 @@ private fun TeeRkpBadge(
     modifier: Modifier = Modifier,
 ) {
     val appearance = rememberStatusAppearance(DetectorStatus.allClear())
-    Surface(
-        modifier = modifier,
-        color = appearance.iconTint.copy(alpha = 0.14f),
-        shape = ShapeTokens.CornerFull,
+    Row(
+        modifier = modifier
+            .background(color = appearance.tintWash, shape = ShapeTokens.CornerFull)
+            .padding(start = 8.dp, end = 10.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Verified,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(15.dp),
-            )
-            WrapSafeText(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = appearance.iconTint,
-            )
-        }
-    }
-}
-
-@Composable
-private fun TeeHeaderFactChip(
-    fact: TeeHeaderFactModel,
-) {
-    val appearance = rememberStatusAppearance(fact.status)
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerLarge,
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Icon(
-                    imageVector = appearance.icon,
-                    contentDescription = null,
-                    tint = appearance.iconTint,
-                    modifier = Modifier.size(16.dp),
-                )
-                WrapSafeText(
-                    text = fact.label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            WrapSafeText(
-                text = fact.value,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Icon(
+            imageVector = Icons.Rounded.Verified,
+            contentDescription = null,
+            tint = appearance.iconTint,
+            modifier = Modifier.size(14.dp),
+        )
+        WrapSafeText(
+            text = label,
+            style = DuckTypography.Caption,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
 @Composable
 private fun TeeNetworkBanner(model: TeeCardModel) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = ShapeTokens.CornerLarge,
+    val appearance = rememberStatusAppearance(model.networkState.status)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = DuckTheme.palette.groupedInset, shape = ShapeTokens.CornerLarge)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        Icon(
+            imageVector = appearance.icon,
+            contentDescription = null,
+            tint = appearance.iconTint,
+            modifier = Modifier.size(20.dp),
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            val appearance = rememberStatusAppearance(model.networkState.status)
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(18.dp),
+            WrapSafeText(
+                text = model.networkState.label,
+                style = DuckTypography.CalloutEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
             )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                WrapSafeText(
-                    text = model.networkState.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                WrapSafeText(
-                    text = model.networkState.summary,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            WrapSafeText(
+                text = model.networkState.summary,
+                style = DuckTypography.Footnote,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -279,42 +233,15 @@ private fun TeeFooterButton(
     action: TeeFooterActionModel,
     onClick: (TeeFooterActionId) -> Unit,
 ) {
-    val label = action.counter?.let { "${action.label} (${it})" } ?: action.label
-    if (action.id == TeeFooterActionId.RESCAN) {
-        FilledTonalButton(
-            onClick = { onClick(action.id) },
-            enabled = action.enabled,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Refresh,
-                contentDescription = null,
-            )
-            WrapSafeText(
-                text = label,
-                modifier = Modifier.padding(start = 8.dp),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    } else {
-        OutlinedButton(
-            onClick = { onClick(action.id) },
-            enabled = action.enabled,
-        ) {
-            Icon(
-                imageVector = when (action.id) {
-                    TeeFooterActionId.DETAILS -> Icons.Rounded.Details
-                    TeeFooterActionId.CERTIFICATES -> Icons.Rounded.VerifiedUser
-                    TeeFooterActionId.RESCAN -> Icons.Rounded.Refresh
-                },
-                contentDescription = null,
-            )
-            WrapSafeText(
-                text = label,
-                modifier = Modifier.padding(start = 8.dp),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
+    DetectorActionButton(
+        label = action.counter?.let { "${action.label} (${it})" } ?: action.label,
+        icon = when (action.id) {
+            TeeFooterActionId.DETAILS -> Icons.Rounded.Details
+            TeeFooterActionId.CERTIFICATES -> Icons.Rounded.VerifiedUser
+            TeeFooterActionId.RESCAN -> Icons.Rounded.Refresh
+        },
+        onClick = { onClick(action.id) },
+        enabled = action.enabled,
+        prominent = action.id == TeeFooterActionId.RESCAN,
+    )
 }

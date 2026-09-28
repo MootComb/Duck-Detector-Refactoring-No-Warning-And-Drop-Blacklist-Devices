@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.Badge
@@ -30,20 +29,20 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.SettingsEthernet
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
+import com.eltavine.duckdetector.core.ui.components.DetectorFact
+import com.eltavine.duckdetector.core.ui.components.DetectorFactPair
+import com.eltavine.duckdetector.core.ui.components.DetectorHairline
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.deviceinfo.domain.DeviceInfoSectionKind
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoCardModel
 import com.eltavine.duckdetector.features.deviceinfo.presentation.model.DeviceInfoHeaderFactModel
@@ -108,43 +107,11 @@ private fun DeviceInfoFactCard(
     secondary: DeviceInfoHeaderFactModel,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    DetectorFactPair(
+        primary = DetectorFact(label = primary.label, value = primary.value),
+        secondary = DetectorFact(label = secondary.label, value = secondary.value),
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerExtraLarge,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            DeviceInfoFactRow(primary)
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.32f),
-                thickness = 1.dp,
-            )
-            DeviceInfoFactRow(secondary)
-        }
-    }
-}
-
-@Composable
-private fun DeviceInfoFactRow(
-    fact: DeviceInfoHeaderFactModel,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        WrapSafeText(
-            text = fact.label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        WrapSafeText(
-            text = fact.value,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
+    )
 }
 
 @Composable
@@ -159,10 +126,7 @@ private fun DeviceInfoSection(
             model.rows.forEachIndexed { index, row ->
                 DeviceInfoRow(row)
                 if (index < model.rows.lastIndex) {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.16f),
-                        thickness = 1.dp,
-                    )
+                    DetectorHairline()
                 }
             }
         }
@@ -173,32 +137,27 @@ private fun DeviceInfoSection(
 private fun DeviceInfoRow(
     row: DeviceInfoRowModel,
 ) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            WrapSafeText(
-                text = row.label,
-                modifier = Modifier.weight(0.34f),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            WrapSafeText(
-                text = row.value,
-                modifier = Modifier.weight(0.66f),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontFamily = if (row.detailMonospace) FontFamily.Monospace else FontFamily.Default,
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        WrapSafeText(
+            text = row.label,
+            modifier = Modifier.weight(0.34f),
+            style = DuckTypography.Callout,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        WrapSafeText(
+            text = row.value,
+            modifier = Modifier.weight(0.66f),
+            style = DuckTypography.CalloutEmphasized.copy(
+                fontFamily = if (row.detailMonospace) FontFamily.Monospace else DuckTypography.Callout.fontFamily,
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 

@@ -14,23 +14,33 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.ui.theme
+package com.eltavine.duckdetector.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
-import com.eltavine.duckdetector.core.ui.R
+import com.eltavine.duckdetector.core.designsystem.R
 
-public val GoogleSansFlexFamily: FontFamily = FontFamily(
-    Font(R.font.googlesansflex_regular, FontWeight.Normal),
+// A single wght-axis variable font. Every entry sets its wght value explicitly: Font(resId, weight)
+// binds to an overload that attaches no variation settings, so each weight would render as the
+// font's default Regular instance, and never be synthesized either, since it claims that weight.
+internal val GoogleSansFlexFamily: FontFamily = FontFamily(
+    (400..900 step 100).map { weight ->
+        Font(
+            resId = R.font.googlesansflex_variable,
+            weight = FontWeight(weight),
+            variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
+        )
+    },
 )
 
-private fun wrapAwareStyle(
+internal fun wrapAwareStyle(
     style: TextStyle,
     lineBreak: LineBreak,
 ) = style.copy(
@@ -38,7 +48,7 @@ private fun wrapAwareStyle(
     hyphens = Hyphens.Auto,
 )
 
-public val Typography: Typography = Typography(
+internal val Typography: Typography = Typography(
     displayLarge = wrapAwareStyle(
         TextStyle(
             fontFamily = GoogleSansFlexFamily,

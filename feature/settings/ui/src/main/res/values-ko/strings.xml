@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">버전, 빌드 시간 및 빌드 해시 복사</string>
     <string name="about_copy_toast">빌드 정보가 복사되었습니다</string>
     <string name="about_label_build_hash">빌드 해시</string>
-    <string name="about_label_build_details">빌드 세부정보</string>
     <string name="about_label_build_time">빌드 시간</string>
     <string name="about_label_copy_build_info">빌드 정보 복사</string>
     <string name="about_label_email">이메일</string>
@@ -51,7 +50,6 @@ limitations under the License.
     <string name="licenses_dialog_open">열기</string>
     <string name="licenses_dialog_source_repo">소스 저장소</string>
     <string name="licenses_dialog_version">버전 %1$s</string>
-    <string name="licenses_entry_label">투명성</string>
     <string name="licenses_entry_subtitle">이 빌드에 포함된 서드파티 프로젝트를 살펴보고 라이선스 고지를 확인하세요.</string>
     <string name="licenses_entry_title">오픈소스 라이브러리</string>
     <string name="licenses_inventory_subtitle">아무 dependency나 눌러 라이선스 전문과 원본 프로젝트 링크를 확인하세요.</string>
@@ -59,7 +57,7 @@ limitations under the License.
     <string name="licenses_screen_back">뒤로</string>
     <string name="licenses_screen_subtitle">이 빌드에 포함된 서드파티 구성 요소입니다.</string>
     <string name="licenses_screen_title">오픈소스 라이선스</string>
-    <string name="settings_subtitle">온라인 검증 제어 및 GitHub Nightly 업데이트 상태입니다.</string>
+    <string name="settings_section_detection">탐지 옵션</string>
     <string name="settings_title">설정</string>
     <string name="update_settings_label">업데이트 확인</string>
     <string name="update_status_available">새 Nightly 빌드가 있습니다. 자세히 보려면 탭하세요</string>

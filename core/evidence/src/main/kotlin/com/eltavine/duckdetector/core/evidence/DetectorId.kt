@@ -20,7 +20,7 @@ package com.eltavine.duckdetector.core.evidence
  * Stable identity of a detector.
  *
  * Titles are presentation text and may change with wording or localisation; anything that needs
- * to recognise a detector (ordering, auto-expansion, exported sections) keys on this instead.
+ * to recognise a detector (ordering, exported sections) keys on this instead.
  */
 @JvmInline
 public value class DetectorId(public val value: String) {

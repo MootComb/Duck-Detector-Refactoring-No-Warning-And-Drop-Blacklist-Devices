@@ -17,7 +17,7 @@ inside one capability unit:  data -> domain
 
 :core:report, :core:scan -> :core:evidence
 :core:detector -> :core:evidence + :core:report
-:core:ui -> :core:evidence + :core:report + :core:scan
+:core:ui -> :core:designsystem + :core:evidence + :core:report + :core:scan
 ```
 
 Arrows point from a module to the modules it may depend on. Feature units never depend on other feature units, capability units never depend on other capability units, nothing depends on `:app`, pure JVM modules depend neither on Android modules nor on Android artifacts, and only UI modules may use Compose. [`module-boundaries.json`](../../.github/policies/module-boundaries.json) states each layer's rule once as a template and lists only the core modules and `:app` individually. Settings include every module by discovering its directory, so a new unit needs no central entry.
@@ -30,7 +30,8 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks; `DetectorHeadline`, which every card model states; `DetectorResult` | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
 | `:core:detector` | The headless detector contract: `Detector` (identity, scanner, loading report, card model, export, consents and app zygote work), `DetectorConsent`, `DetectorSpecificApi`, the opt-in marker that keeps each detector's typed object outside the stable contract, the `DetectorScanner` port and `run`, which returns a `DetectorResult` without any UI | Compose, specific detectors, probes |
-| `:core:ui` | Theme, card frames, shared Compose components, typed auto-expansion directive, shared strings, the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with, `ConsentCard`, which shows a detector's consent, and `CardDetectorFeature`, the one session and view model every standard card shares | Detector rules, probes, specific detectors |
+| `:core:designsystem` | The visual language every UI module shares: `DuckDetectorTheme` with its monochrome color scheme, whose accents invert with the theme, typography, the grouped palette and its status colors, shapes with continuous corners from AndroidX graphics-shapes, motion tokens, button colors and the status bar protection of edge-to-edge screens | Detectors, evidence, reports, scans, strings |
+| `:core:ui` | Card frames and shared Compose components built on `:core:designsystem`, shared strings, the `DetectorFeature` / `DetectorSession` and device profile contract the composition root works with, `ConsentCard`, which shows a detector's consent, and `CardDetectorFeature`, the one session and view model every standard card shares | Detector rules, probes, specific detectors |
 | `:capability:<unit>:domain` | Evidence types a capability shares with several features | Android, feature interpretation, UI |
 | `:capability:<unit>:data` | Collection of shared evidence: package inventory, early preload capture, system property reads, helper processes, SELinux policy carriers, attestation | Feature verdicts, presentation, other capabilities |
 | `:feature:<unit>:domain` | The feature's result and report models and pure judgement rules | Android, JNI, UI, other features |

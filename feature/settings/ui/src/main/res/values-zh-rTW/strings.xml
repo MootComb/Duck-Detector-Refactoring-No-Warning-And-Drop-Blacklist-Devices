@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">複製版本、建置時間與建置雜湊</string>
     <string name="about_copy_toast">建置資訊已複製</string>
     <string name="about_label_build_hash">建置雜湊</string>
-    <string name="about_label_build_details">建置詳情</string>
     <string name="about_label_build_time">建置時間</string>
     <string name="about_label_copy_build_info">複製建置資訊</string>
     <string name="about_label_email">電子郵件</string>
@@ -53,7 +52,6 @@ limitations under the License.
     <string name="licenses_dialog_open">開啟</string>
     <string name="licenses_dialog_source_repo">原始碼倉庫</string>
     <string name="licenses_dialog_version">版本 %1$s</string>
-    <string name="licenses_entry_label">透明度</string>
     <string name="licenses_entry_subtitle">瀏覽此建置內含的第三方專案，並查看其授權聲明。</string>
     <string name="licenses_entry_title">開源函式庫</string>
     <string name="licenses_inventory_subtitle">點選任一依賴項即可檢視授權文本與上游專案連結。</string>
@@ -61,7 +59,7 @@ limitations under the License.
     <string name="licenses_screen_back">返回</string>
     <string name="licenses_screen_subtitle">此建置內含的第三方元件。</string>
     <string name="licenses_screen_title">開源授權</string>
-    <string name="settings_subtitle">線上驗證控制與 GitHub Nightly 更新狀態。</string>
+    <string name="settings_section_detection">檢測選項</string>
     <string name="settings_title">設定</string>
     <string name="update_settings_label">檢查更新</string>
     <string name="update_status_available">有新的 Nightly 建置；輕觸查看詳情</string>

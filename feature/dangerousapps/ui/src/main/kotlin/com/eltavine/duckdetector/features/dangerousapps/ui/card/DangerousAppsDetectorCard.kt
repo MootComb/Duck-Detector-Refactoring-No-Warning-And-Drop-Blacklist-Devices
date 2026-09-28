@@ -21,17 +21,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,12 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.core.ui.components.ContextLine
+import com.eltavine.duckdetector.core.ui.components.DetectorActionButton
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
+import com.eltavine.duckdetector.core.ui.components.DetectorFact
+import com.eltavine.duckdetector.core.ui.components.DetectorFactPair
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
-import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 import com.eltavine.duckdetector.core.ui.model.ContextItemModel
-import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsCardModel
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFact
 import com.eltavine.duckdetector.features.dangerousapps.presentation.model.DangerousAppsHeaderFactModel
@@ -79,20 +72,11 @@ internal fun DangerousAppsDetectorCard(
             DangerousAppsOverview(model = model)
         },
         footerActions = {
-            OutlinedButton(
+            DetectorActionButton(
+                label = "View target apps (${model.targetApps.size})",
+                icon = Icons.Rounded.Apps,
                 onClick = { showTargetsDialog = true },
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Apps,
-                    contentDescription = null,
-                )
-                WrapSafeText(
-                    text = "View target apps (${model.targetApps.size})",
-                    modifier = Modifier.padding(start = 8.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
+            )
         },
     ) {
         model.hmaAlert?.let { hmaAlert ->
@@ -154,53 +138,12 @@ private fun DangerousAppsFactPairCard(
     secondary: DangerousAppsHeaderFactModel,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    DetectorFactPair(
+        primary = primary.asDetectorFact(),
+        secondary = secondary.asDetectorFact(),
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerExtraLarge,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            DangerousAppsFactPairRow(fact = primary)
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.32f),
-                thickness = 1.dp,
-            )
-            DangerousAppsFactPairRow(fact = secondary)
-        }
-    }
+    )
 }
 
-@Composable
-private fun DangerousAppsFactPairRow(
-    fact: DangerousAppsHeaderFactModel,
-) {
-    val appearance = rememberStatusAppearance(fact.status)
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(15.dp),
-            )
-            WrapSafeText(
-                text = fact.label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        WrapSafeText(
-            text = fact.value,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-}
+private fun DangerousAppsHeaderFactModel.asDetectorFact() =
+    DetectorFact(label = label, value = value, status = status)

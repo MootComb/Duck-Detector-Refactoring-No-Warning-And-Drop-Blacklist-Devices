@@ -28,12 +28,12 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":core:designsystem"))
     api(project(":core:detector"))
     api(project(":core:evidence"))
     api(project(":core:report"))
     api(project(":core:scan"))
     implementation(libs.androidx.annotation)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

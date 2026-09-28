@@ -23,9 +23,9 @@ limitations under the License.
     <string name="agreement_risk_body_emphasis">単一の結果だけを、法務、コンプライアンス、保証、またはセキュリティに関する最終結論として扱わないでください。</string>
     <string name="agreement_risk_body_template">Duck Detector は参考用のシグナルのみを提供します。%1$s行動を起こす前に、必ず手動確認、上流の根拠、およびご自身のリスク評価を組み合わせて判断してください。</string>
     <string name="user_agreement_title">利用規約</string>
-    <string name="user_agreement_content" formatted="false">Duck Detector を利用することで、以下の条件に同意したものとみなされます:&#10;&#10;1. 利用目的&#10;このアプリは教育目的および個人のセキュリティ評価のために設計されており、ユーザーが自分の端末のセキュリティ状態を理解できるよう支援します。&#10;&#10;2. 保証の否認&#10;このアプリは &quot;現状のまま&quot; 提供され、明示または黙示を問わずいかなる保証も行いません。開発者は検出結果の正確性、完全性、信頼性を保証しません。&#10;&#10;3. ユーザーの責任&#10;このアプリの利用方法およびそれに伴って生じるあらゆる結果については、ユーザー自身が責任を負うものとします。&#10;&#10;4. 法令遵守&#10;ユーザーは適用されるすべての地域法、国内法、国際法を遵守してこのアプリを利用することに同意します。</string>
+    <string name="user_agreement_content" formatted="false">Duck Detector を利用することで、以下の条件に同意したものとみなされます:\n\n1. 利用目的\nこのアプリは教育目的および個人のセキュリティ評価のために設計されており、ユーザーが自分の端末のセキュリティ状態を理解できるよう支援します。\n\n2. 保証の否認\nこのアプリは \"現状のまま\" 提供され、明示または黙示を問わずいかなる保証も行いません。開発者は検出結果の正確性、完全性、信頼性を保証しません。\n\n3. ユーザーの責任\nこのアプリの利用方法およびそれに伴って生じるあらゆる結果については、ユーザー自身が責任を負うものとします。\n\n4. 法令遵守\nユーザーは適用されるすべての地域法、国内法、国際法を遵守してこのアプリを利用することに同意します。</string>
     <string name="disclaimer_title">免責事項</string>
-    <string name="disclaimer_content" formatted="false">重要なお知らせ:&#10;&#10;1. 検出の限界&#10;Duck Detector は端末のセキュリティ状態を検出するために複数の方法を使用しますが、どの方法も 100&#37; 正確ではありません。結果は最終判定ではなく、参考情報として扱ってください。&#10;&#10;2. 誤検出と見逃し&#10;このアプリは誤検出または見逃しを起こす可能性があります。より包括的な判断のために、専門的なセキュリティツールとご自身の確認を必ず併用してください。&#10;&#10;3. 責任の制限&#10;Duck Detector の開発者、貢献者、および配布者は、このアプリの使用または使用不能によって生じる直接的、間接的、付随的、特別、または結果的損害について責任を負いません。&#10;&#10;4. 第三者サービス&#10;TEE の失効確認は既定でアプリ内蔵スナップショットを使用します。オンライン失効データ更新を許可すると、アプリが Google attestation revocation endpoint に接続する場合があります。セキュリティスキャン自体は引き続き端末上でローカルに実行され、検出結果がスキャンテレメトリとして意図的にアップロードされることはありません。</string>
+    <string name="disclaimer_content" formatted="false">重要なお知らせ:\n\n1. 検出の限界\nDuck Detector は端末のセキュリティ状態を検出するために複数の方法を使用しますが、どの方法も 100&#37; 正確ではありません。結果は最終判定ではなく、参考情報として扱ってください。\n\n2. 誤検出と見逃し\nこのアプリは誤検出または見逃しを起こす可能性があります。より包括的な判断のために、専門的なセキュリティツールとご自身の確認を必ず併用してください。\n\n3. 責任の制限\nDuck Detector の開発者、貢献者、および配布者は、このアプリの使用または使用不能によって生じる直接的、間接的、付随的、特別、または結果的損害について責任を負いません。\n\n4. 第三者サービス\nTEE の失効確認は既定でアプリ内蔵スナップショットを使用します。オンライン失効データ更新を許可すると、アプリが Google attestation revocation endpoint に接続する場合があります。セキュリティスキャン自体は引き続き端末上でローカルに実行され、検出結果がスキャンテレメトリとして意図的にアップロードされることはありません。</string>
     <string name="privacy_notice_title">プライバシー通知</string>
     <string name="privacy_notice_content" formatted="false">プライバシー概要: セキュリティチェックは端末上でローカルに実行され、検出結果がスキャンテレメトリとしてアップロードされることはありません。TEE の失効確認は既定で内蔵スナップショットを使用します。起動時の選択完了後、アプリはコールドスタートごとに GitHub へ一度接続し、Nightly 更新メタデータを確認します。</string>
     <string name="timer_elapsed">30 秒経過</string>
@@ -42,7 +42,7 @@ limitations under the License.
     <string name="dialog_continue_waiting">続行 (%1$d 秒)</string>
     <string name="detector_result_title">サポートを求める前に</string>
     <string name="detector_result_notice">サポートを受けるには、十分な情報を提供してください。</string>
-    <string name="detector_result_detail">危険および警告カードは、完全に確認できるよう自動的に展開されました。</string>
+    <string name="detector_result_detail">危険および警告カードを開いて、証拠をすべて確認してください。</string>
     <string name="startup_review_label">起動ポリシー確認</string>
     <string name="startup_preparing_title">起動を準備中</string>
     <string name="startup_before_scan_title">スキャン前</string>

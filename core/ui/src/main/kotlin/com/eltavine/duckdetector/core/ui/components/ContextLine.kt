@@ -16,44 +16,43 @@
 
 package com.eltavine.duckdetector.core.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.ui.model.ContextItemModel
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 public fun ContextLine(
     item: ContextItemModel,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = ShapeTokens.CornerLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = DuckTheme.palette.groupedInset, shape = ShapeTokens.CornerMedium)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-        ) {
-            WrapSafeText(
-                text = item.label,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            WrapSafeText(
-                text = item.value,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        WrapSafeText(
+            text = item.label,
+            modifier = Modifier.fillMaxWidth(),
+            style = DuckTypography.Caption,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        WrapSafeText(
+            text = item.value,
+            modifier = Modifier.fillMaxWidth(),
+            style = DuckTypography.Callout,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }

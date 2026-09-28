@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package com.eltavine.duckdetector.core.ui.theme
+package com.eltavine.duckdetector.core.designsystem.theme
 
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
-public val Shapes: Shapes = Shapes(
-    extraSmall = RoundedCornerShape(4.dp),
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(28.dp),
+internal val Shapes: Shapes = Shapes(
+    extraSmall = ContinuousCornerShape(4.dp),
+    small = ContinuousCornerShape(8.dp),
+    medium = ContinuousCornerShape(12.dp),
+    large = ContinuousCornerShape(16.dp),
+    extraLarge = ContinuousCornerShape(28.dp),
 )
 
 public object ShapeTokens {
-    public val CornerLarge: RoundedCornerShape = RoundedCornerShape(16.dp)
-    public val CornerLargeIncreased: RoundedCornerShape = RoundedCornerShape(20.dp)
-    public val CornerExtraLarge: RoundedCornerShape = RoundedCornerShape(28.dp)
-    public val CornerExtraLargeIncreased: RoundedCornerShape = RoundedCornerShape(32.dp)
+    public val CornerMedium: CornerBasedShape = ContinuousCornerShape(12.dp)
+    public val CornerLarge: CornerBasedShape = ContinuousCornerShape(16.dp)
+    public val CornerLargeIncreased: CornerBasedShape = ContinuousCornerShape(20.dp)
+    public val CornerExtraLarge: CornerBasedShape = ContinuousCornerShape(24.dp)
+    public val CornerExtraLargeIncreased: CornerBasedShape = ContinuousCornerShape(28.dp)
     public val CornerFull: RoundedCornerShape = RoundedCornerShape(50)
 }

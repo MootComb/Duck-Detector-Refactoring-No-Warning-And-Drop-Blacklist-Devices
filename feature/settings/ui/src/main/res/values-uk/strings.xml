@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">Копіювати версію, час збірки та хеш збірки</string>
     <string name="about_copy_toast">Інформацію про збірку скопійовано</string>
     <string name="about_label_build_hash">Хеш збірки</string>
-    <string name="about_label_build_details">Деталі збірки</string>
     <string name="about_label_build_time">Час збірки</string>
     <string name="about_label_copy_build_info">Копіювати інформацію про збірку</string>
     <string name="about_label_email">Електронна пошта</string>
@@ -56,7 +55,6 @@ limitations under the License.
     <string name="licenses_dialog_open">Відкрити</string>
     <string name="licenses_dialog_source_repo">Репозиторій коду</string>
     <string name="licenses_dialog_version">Версія %1$s</string>
-    <string name="licenses_entry_label">Прозорість</string>
     <string name="licenses_entry_subtitle">Переглянути вбудовані сторонні проекти та ознайомитися з їхніми ліцензіями.</string>
     <string name="licenses_entry_title">Бібліотеки з відкритим кодом</string>
     <string name="licenses_inventory_subtitle">Натисніть на будь-яку залежність, щоб переглянути текст ліцензії та посилання на проект.</string>
@@ -64,7 +62,7 @@ limitations under the License.
     <string name="licenses_screen_back">Назад</string>
     <string name="licenses_screen_subtitle">Сторонні компоненти, включені в цю збірку.</string>
     <string name="licenses_screen_title">Ліцензії відкритого коду</string>
-    <string name="settings_subtitle">Керування онлайн-перевіркою та стан оновлення GitHub Nightly.</string>
+    <string name="settings_section_detection">Параметри виявлення</string>
     <string name="settings_title">Налаштування</string>
     <string name="update_settings_label">Перевірити оновлення</string>
     <string name="update_status_available">Доступна новіша збірка Nightly; торкніться для подробиць</string>

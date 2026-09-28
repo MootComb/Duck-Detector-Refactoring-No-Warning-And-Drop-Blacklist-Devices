@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:detector"))
     implementation(project(":core:evidence"))
     api(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":feature:dangerousapps:detector"))
     implementation(project(":feature:dangerousapps:presentation"))
     implementation(libs.androidx.material.icons.extended)

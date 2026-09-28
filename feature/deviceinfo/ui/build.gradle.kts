@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:evidence"))
     implementation(project(":core:report"))
     api(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     api(project(":feature:deviceinfo:domain"))
     api(project(":feature:deviceinfo:presentation"))
     api(libs.androidx.lifecycle.viewmodel.compose)

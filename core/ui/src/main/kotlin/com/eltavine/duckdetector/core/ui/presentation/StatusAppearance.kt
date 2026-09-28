@@ -27,6 +27,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.evidence.InfoKind
@@ -38,15 +39,14 @@ public data class StatusAppearance(
     val metaLabel: String?,
     val icon: ImageVector,
     val iconTint: Color,
-)
-
-private val SupportIconTint = Color(0xFF757575)
-private val SafeIconTint = Color(0xFF2E7D32)
-private val WarningIconTint = Color(0xFFB28704)
-private val ErrorIconTint = Color(0xFFC62828)
+) {
+    /** The tint thinned into a background: text over it keeps the content color, not the tint. */
+    val tintWash: Color get() = iconTint.copy(alpha = 0.14f)
+}
 
 @Composable
 public fun rememberStatusAppearance(status: DetectorStatus): StatusAppearance {
+    val palette = DuckTheme.palette
     val infoLabel = stringResource(R.string.status_info)
     val infoErrorLabel = stringResource(R.string.status_info_error)
     val infoSupportLabel = stringResource(R.string.status_info_support)
@@ -62,7 +62,7 @@ public fun rememberStatusAppearance(status: DetectorStatus): StatusAppearance {
                 label = infoLabel,
                 metaLabel = if (isError) infoErrorLabel else infoSupportLabel,
                 icon = if (isError) Icons.Rounded.ErrorOutline else Icons.Rounded.TipsAndUpdates,
-                iconTint = if (isError) ErrorIconTint else SupportIconTint,
+                iconTint = if (isError) palette.critical else palette.neutral,
             )
         }
 
@@ -70,21 +70,21 @@ public fun rememberStatusAppearance(status: DetectorStatus): StatusAppearance {
             label = allClearLabel,
             metaLabel = null,
             icon = Icons.Rounded.Verified,
-            iconTint = SafeIconTint,
+            iconTint = palette.positive,
         )
 
         DetectionSeverity.WARNING -> StatusAppearance(
             label = warningLabel,
             metaLabel = null,
             icon = Icons.Rounded.Warning,
-            iconTint = WarningIconTint,
+            iconTint = palette.caution,
         )
 
         DetectionSeverity.DANGER -> StatusAppearance(
             label = dangerLabel,
             metaLabel = null,
             icon = Icons.Rounded.GppBad,
-            iconTint = ErrorIconTint,
+            iconTint = palette.critical,
         )
     }
 }

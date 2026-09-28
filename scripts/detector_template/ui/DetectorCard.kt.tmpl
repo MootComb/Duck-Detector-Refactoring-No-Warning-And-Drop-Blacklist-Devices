@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.eltavine.duckdetector.core.ui.components.DetectorCardFrame
 import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
+import com.eltavine.duckdetector.core.ui.components.DetectorHairline
 import com.eltavine.duckdetector.core.ui.components.DetectorSectionFrame
 import {{package}}.presentation.model.{{Class}}CardModel
 import {{package}}.presentation.model.{{Class}}DetailRowModel
@@ -42,13 +43,16 @@ private fun {{Class}}RowSection(
         return
     }
     DetectorSectionFrame(title = title, icon = icon) {
-        rows.forEach { row ->
+        rows.forEachIndexed { index, row ->
             DetectorDetailRowBlock(
                 label = row.label,
                 value = row.value,
                 status = row.status,
                 detail = row.detail,
             )
+            if (index < rows.lastIndex) {
+                DetectorHairline()
+            }
         }
     }
 }

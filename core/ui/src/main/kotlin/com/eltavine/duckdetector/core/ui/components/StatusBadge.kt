@@ -16,22 +16,23 @@
 
 package com.eltavine.duckdetector.core.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 
 @Composable
 public fun StatusBadge(
@@ -40,37 +41,35 @@ public fun StatusBadge(
 ) {
     val appearance = rememberStatusAppearance(status)
 
-    Surface(
-        modifier = modifier.widthIn(max = 220.dp),
-        shape = ShapeTokens.CornerFull,
-        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    Column(
+        modifier = modifier
+            .widthIn(max = 220.dp)
+            .background(color = appearance.tintWash, shape = ShapeTokens.CornerMedium)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Icon(
-                    imageVector = appearance.icon,
-                    contentDescription = null,
-                    tint = appearance.iconTint,
-                )
-                WrapSafeText(
-                    text = appearance.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-            appearance.metaLabel?.let { metaLabel ->
-                WrapSafeText(
-                    text = metaLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Icon(
+                imageVector = appearance.icon,
+                contentDescription = null,
+                tint = appearance.iconTint,
+                modifier = Modifier.size(18.dp),
+            )
+            WrapSafeText(
+                text = appearance.label,
+                style = DuckTypography.CalloutEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        appearance.metaLabel?.let { metaLabel ->
+            WrapSafeText(
+                text = metaLabel,
+                style = DuckTypography.Caption,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -82,27 +81,23 @@ public fun CompactStatusBadge(
 ) {
     val appearance = rememberStatusAppearance(status)
 
-    Surface(
-        modifier = modifier,
-        shape = ShapeTokens.CornerFull,
-        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+    Row(
+        modifier = modifier
+            .background(color = appearance.tintWash, shape = ShapeTokens.CornerFull)
+            .padding(start = 7.dp, end = 10.dp, top = 3.dp, bottom = 3.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(16.dp),
-            )
-            WrapSafeText(
-                text = appearance.label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Icon(
+            imageVector = appearance.icon,
+            contentDescription = null,
+            tint = appearance.iconTint,
+            modifier = Modifier.size(14.dp),
+        )
+        WrapSafeText(
+            text = appearance.label,
+            style = DuckTypography.Caption,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }

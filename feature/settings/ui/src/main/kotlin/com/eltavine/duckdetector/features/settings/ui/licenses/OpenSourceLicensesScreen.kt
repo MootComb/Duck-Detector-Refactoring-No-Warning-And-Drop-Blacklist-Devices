@@ -48,9 +48,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.features.settings.ui.R
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.m3.chipColors
@@ -79,7 +80,7 @@ fun OpenSourceLicensesScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(DuckTheme.palette.groupedBackground),
     ) {
         Column(
             modifier = Modifier
@@ -119,8 +120,8 @@ fun OpenSourceLicensesScreen(
                 }
 
                 Surface(
-                    shape = ShapeTokens.CornerLarge,
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = ShapeTokens.CornerMedium,
+                    color = DuckTheme.palette.groupedSurface,
                 ) {
                     Box(
                         modifier = Modifier
@@ -140,8 +141,8 @@ fun OpenSourceLicensesScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth(),
-                shape = ShapeTokens.CornerExtraLarge,
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = ShapeTokens.CornerExtraLargeIncreased,
+                color = DuckTheme.palette.groupedSurface,
             ) {
                 Row(
                     modifier = Modifier
@@ -152,7 +153,7 @@ fun OpenSourceLicensesScreen(
                 ) {
                     Surface(
                         shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        color = DuckTheme.palette.groupedInset,
                     ) {
                         Box(
                             modifier = Modifier
@@ -185,8 +186,8 @@ fun OpenSourceLicensesScreen(
                     }
 
                     Surface(
-                        shape = ShapeTokens.CornerLarge,
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        shape = ShapeTokens.CornerMedium,
+                        color = DuckTheme.palette.groupedInset,
                     ) {
                         Box(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
@@ -209,7 +210,7 @@ fun OpenSourceLicensesScreen(
                     .weight(1f),
                 contentPadding = PaddingValues(vertical = 2.dp),
                 colors = LibraryDefaults.libraryColors(
-                    libraryBackgroundColor = MaterialTheme.colorScheme.background,
+                    libraryBackgroundColor = DuckTheme.palette.groupedBackground,
                     libraryContentColor = MaterialTheme.colorScheme.onSurface,
                     licenseChipColors = LibraryDefaults.chipColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,

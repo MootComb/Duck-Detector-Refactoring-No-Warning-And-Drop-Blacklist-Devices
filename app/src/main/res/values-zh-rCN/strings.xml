@@ -23,9 +23,9 @@ limitations under the License.
     <string name="agreement_risk_body_emphasis">请勿将任何单次结果视为最终的法律、合规、保修或安全结论。</string>
     <string name="agreement_risk_body_template">Duck Detector 仅提供参考性信号。%1$s在采取行动前，请务必结合人工核验、上游证据以及您自己的风险判断进行综合评估。</string>
     <string name="user_agreement_title">用户协议</string>
-    <string name="user_agreement_content" formatted="false">使用 Duck Detector 即表示您同意以下条款：&#10;&#10;1. 使用目的&#10;本应用仅用于教育用途和个人安全评估，帮助用户了解其本人设备的安全状态。&#10;&#10;2. 不提供担保&#10;本应用按“现状”提供，不附带任何明示或暗示担保。开发者不保证检测结果的准确性、完整性或可靠性。&#10;&#10;3. 用户责任&#10;您需自行对本应用的使用方式及由此产生的任何后果负责。&#10;&#10;4. 法律合规&#10;您同意按照所有适用的地方法律、国家法律及国际法规使用本应用。</string>
+    <string name="user_agreement_content" formatted="false">使用 Duck Detector 即表示您同意以下条款：\n\n1. 使用目的\n本应用仅用于教育用途和个人安全评估，帮助用户了解其本人设备的安全状态。\n\n2. 不提供担保\n本应用按“现状”提供，不附带任何明示或暗示担保。开发者不保证检测结果的准确性、完整性或可靠性。\n\n3. 用户责任\n您需自行对本应用的使用方式及由此产生的任何后果负责。\n\n4. 法律合规\n您同意按照所有适用的地方法律、国家法律及国际法规使用本应用。</string>
     <string name="disclaimer_title">免责声明</string>
-    <string name="disclaimer_content" formatted="false">重要提示：&#10;&#10;1. 检测局限性&#10;Duck Detector 使用多种方法检测设备安全状态，但没有任何检测方法能做到 100&#37; 准确。结果应视为提示信息，而非最终定论。&#10;&#10;2. 误报与漏报&#10;本应用可能出现误报或漏报。请始终结合专业安全工具与您自己的核验进行全面判断。&#10;&#10;3. 免责条款&#10;对于因使用或无法使用本应用而导致的任何直接、间接、附带、特殊或后果性损失，Duck Detector 的开发者、贡献者和分发者概不承担责任。&#10;&#10;4. 第三方服务&#10;TEE 吊销检查默认使用应用内置快照。如果您允许在线吊销库更新，应用可能会访问 Google 的 attestation revocation endpoint。安全扫描本身仍在您的设备本地执行，检测结果也不会被有意上传为扫描遥测。</string>
+    <string name="disclaimer_content" formatted="false">重要提示：\n\n1. 检测局限性\nDuck Detector 使用多种方法检测设备安全状态，但没有任何检测方法能做到 100&#37; 准确。结果应视为提示信息，而非最终定论。\n\n2. 误报与漏报\n本应用可能出现误报或漏报。请始终结合专业安全工具与您自己的核验进行全面判断。\n\n3. 免责条款\n对于因使用或无法使用本应用而导致的任何直接、间接、附带、特殊或后果性损失，Duck Detector 的开发者、贡献者和分发者概不承担责任。\n\n4. 第三方服务\nTEE 吊销检查默认使用应用内置快照。如果您允许在线吊销库更新，应用可能会访问 Google 的 attestation revocation endpoint。安全扫描本身仍在您的设备本地执行，检测结果也不会被有意上传为扫描遥测。</string>
     <string name="privacy_notice_title">隐私说明</string>
     <string name="privacy_notice_content" formatted="false">隐私摘要：安全检查在您的设备本地执行，检测结果不会被有意上传为扫描遥测。TEE 吊销检查默认使用应用内置快照；如果您允许在线刷新，应用可能会访问 Google 的 attestation revocation endpoint。完成启动选项后，应用会在每次冷启动时访问一次 GitHub，以检查 Nightly 更新元数据。</string>
     <string name="timer_elapsed">已等待 30 秒</string>
@@ -42,7 +42,7 @@ limitations under the License.
     <string name="dialog_continue_waiting">继续（%1$d 秒）</string>
     <string name="detector_result_title">在求助之前</string>
     <string name="detector_result_notice">请提供完整信息以便获得帮助。</string>
-    <string name="detector_result_detail">危险和警告卡片已自动展开，便于完整审查。</string>
+    <string name="detector_result_detail">请展开危险和警告卡片，查看完整证据。</string>
     <string name="startup_review_label">启动策略检查</string>
     <string name="startup_preparing_title">正在准备启动</string>
     <string name="startup_before_scan_title">扫描之前</string>

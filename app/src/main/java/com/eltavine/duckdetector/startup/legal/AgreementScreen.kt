@@ -25,26 +25,32 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,15 +62,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eltavine.duckdetector.R
-import com.eltavine.duckdetector.core.ui.theme.MotionTokens
+import com.eltavine.duckdetector.core.designsystem.components.StatusBarProtection
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTheme
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.startup.StartupHeroGlyph
 import kotlinx.coroutines.delay
 
 @Composable
@@ -83,7 +91,9 @@ fun AgreementScreen(
     val correctAnswer = remember(num1, num2, isAddition) {
         if (isAddition) num1 + num2 else num1 - num2
     }
-    var userAnswer by remember { mutableStateOf("") }
+    // Kept only for the lifetime of the composition, like the numbers and the countdown it goes with.
+    val answerState = remember { TextFieldState() }
+    val userAnswer = answerState.text.toString()
     val isCheatCode = userAnswer == "196912"
     val mathCorrect = userAnswer.toIntOrNull() == correctAnswer || isCheatCode
     val scrollState = rememberScrollState()
@@ -102,12 +112,9 @@ fun AgreementScreen(
         ),
         label = "agreement_button_scale",
     )
-    val buttonAlpha by animateFloatAsState(
-        targetValue = if (canProceed) 1f else 0.5f,
-        animationSpec = tween(MotionTokens.Duration.Medium2),
-        label = "agreement_button_alpha",
-    )
     var showContent by remember { mutableStateOf(false) }
+    var panelHeightPx by remember { mutableIntStateOf(0) }
+    val panelHeight = with(LocalDensity.current) { panelHeightPx.toDp() }
 
     LaunchedEffect(Unit) {
         showContent = true
@@ -120,155 +127,144 @@ fun AgreementScreen(
         }
     }
 
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(DuckTheme.palette.groupedBackground),
     ) {
+        // The consent panel floats over the document. Only its height is reserved here, not the
+        // keyboard's, so the scroll range, and with it the scrolled-to-the-end condition, stays
+        // the same while the answer is being typed.
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding(),
+                .verticalScroll(scrollState)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                )
+                .windowInsetsPadding(
+                    WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Bottom),
+                )
+                .padding(start = 20.dp, end = 20.dp, bottom = panelHeight + 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(horizontal = 24.dp),
+                    .widthIn(max = 560.dp)
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Spacer(modifier = Modifier.height(40.dp))
-
-                AnimatedVisibility(
-                    visible = showContent,
-                    enter = scaleIn(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow,
-                        ),
-                    ) + fadeIn(),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = CircleShape,
-                                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            )
-                            .clip(CircleShape)
-                            .background(
-                                Brush.radialGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
-                                    ),
-                                ),
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Security,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                AnimatedVisibility(
-                    visible = showContent,
-                    enter = slideInVertically(
-                        initialOffsetY = { it / 2 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow,
-                        ),
-                    ) + fadeIn(),
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.user_agreement),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                        Text(
-                            text = stringResource(R.string.disclaimer),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                AnimatedVisibility(
-                    visible = showContent,
-                    enter = fadeIn(animationSpec = tween(delayMillis = 200)),
-                ) {
-                    Text(
-                        text = stringResource(R.string.please_read_carefully),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
+                AgreementHeader(showContent = showContent)
 
                 AgreementRiskBanner()
-
-                Spacer(modifier = Modifier.height(24.dp))
 
                 AgreementSection(
                     icon = Icons.Outlined.Gavel,
                     title = stringResource(R.string.user_agreement_title),
                     content = stringResource(R.string.user_agreement_content),
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 AgreementSection(
                     icon = Icons.Outlined.Warning,
                     title = stringResource(R.string.disclaimer_title),
                     content = stringResource(R.string.disclaimer_content),
                     tone = AgreementSectionTone.Warning,
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 AgreementSection(
                     icon = Icons.Outlined.PrivacyTip,
                     title = stringResource(R.string.privacy_notice_title),
                     content = stringResource(R.string.privacy_notice_content),
                     tone = AgreementSectionTone.Notice,
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
             }
+        }
 
-            AgreementConsentPanel(
-                countdown = countdown,
-                timerComplete = timerComplete,
-                num1 = num1,
-                num2 = num2,
-                isAddition = isAddition,
-                userAnswer = userAnswer,
-                onUserAnswerChange = { userAnswer = it },
-                mathCorrect = mathCorrect,
-                isScrolledToBottom = isScrolledToBottom,
-                canProceed = canProceed,
-                buttonScale = buttonScale,
-                buttonAlpha = buttonAlpha,
-                onAgree = onAgree,
+        AgreementConsentPanel(
+            countdown = countdown,
+            timerComplete = timerComplete,
+            num1 = num1,
+            num2 = num2,
+            isAddition = isAddition,
+            answerState = answerState,
+            mathCorrect = mathCorrect,
+            isScrolledToBottom = isScrolledToBottom,
+            canProceed = canProceed,
+            buttonScale = buttonScale,
+            onAgree = onAgree,
+            onContentHeightChanged = { panelHeightPx = it },
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+
+        StatusBarProtection(modifier = Modifier.align(Alignment.TopCenter))
+    }
+}
+
+@Composable
+private fun AgreementHeader(
+    showContent: Boolean,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 36.dp, bottom = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        AnimatedVisibility(
+            visible = showContent,
+            enter = scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow,
+                ),
+            ) + fadeIn(),
+        ) {
+            StartupHeroGlyph(icon = Icons.Outlined.Security)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        AnimatedVisibility(
+            visible = showContent,
+            enter = slideInVertically(
+                initialOffsetY = { it / 2 },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow,
+                ),
+            ) + fadeIn(),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.user_agreement),
+                    modifier = Modifier.semantics { heading() },
+                    style = DuckTypography.LargeTitle,
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.onSurface,
+                )
+                Text(
+                    text = stringResource(R.string.disclaimer),
+                    style = DuckTypography.Title3,
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        AnimatedVisibility(
+            visible = showContent,
+            enter = fadeIn(animationSpec = tween(delayMillis = 200)),
+        ) {
+            Text(
+                text = stringResource(R.string.please_read_carefully),
+                style = DuckTypography.CalloutEmphasized,
+                color = colorScheme.onSurface,
+                textAlign = TextAlign.Center,
             )
         }
     }

@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">バージョン、ビルド時刻、ビルドハッシュをコピー</string>
     <string name="about_copy_toast">ビルド情報をコピーしました</string>
     <string name="about_label_build_hash">ビルドハッシュ</string>
-    <string name="about_label_build_details">ビルドの詳細</string>
     <string name="about_label_build_time">ビルド時刻</string>
     <string name="about_label_copy_build_info">ビルド情報をコピー</string>
     <string name="about_label_email">メール</string>
@@ -51,7 +50,6 @@ limitations under the License.
     <string name="licenses_dialog_open">開く</string>
     <string name="licenses_dialog_source_repo">ソースリポジトリ</string>
     <string name="licenses_dialog_version">バージョン %1$s</string>
-    <string name="licenses_entry_label">透明性</string>
     <string name="licenses_entry_subtitle">このビルドに含まれるサードパーティープロジェクトを確認し、ライセンス通知を閲覧します。</string>
     <string name="licenses_entry_title">オープンソースライブラリ</string>
     <string name="licenses_inventory_subtitle">任意の dependency をタップして、ライセンステキストと上流プロジェクトのリンクを確認してください。</string>
@@ -59,7 +57,7 @@ limitations under the License.
     <string name="licenses_screen_back">戻る</string>
     <string name="licenses_screen_subtitle">このビルドに同梱されているサードパーティーコンポーネントです。</string>
     <string name="licenses_screen_title">オープンソースライセンス</string>
-    <string name="settings_subtitle">オンライン検証の制御と GitHub Nightly 更新状況です。</string>
+    <string name="settings_section_detection">検出オプション</string>
     <string name="settings_title">設定</string>
     <string name="update_settings_label">更新を確認</string>
     <string name="update_status_available">新しい Nightly ビルドがあります。タップして詳細を表示</string>

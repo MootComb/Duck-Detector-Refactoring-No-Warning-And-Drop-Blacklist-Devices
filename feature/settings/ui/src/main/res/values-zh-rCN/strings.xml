@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">复制版本、构建时间和构建哈希</string>
     <string name="about_copy_toast">构建信息已复制</string>
     <string name="about_label_build_hash">构建哈希</string>
-    <string name="about_label_build_details">构建详情</string>
     <string name="about_label_build_time">构建时间</string>
     <string name="about_label_copy_build_info">复制构建信息</string>
     <string name="about_label_email">邮箱</string>
@@ -54,7 +53,6 @@ limitations under the License.
     <string name="licenses_dialog_open">打开</string>
     <string name="licenses_dialog_source_repo">源代码仓库</string>
     <string name="licenses_dialog_version">版本 %1$s</string>
-    <string name="licenses_entry_label">透明度</string>
     <string name="licenses_entry_subtitle">浏览此构建内置的第三方项目，并查看其许可证声明。</string>
     <string name="licenses_entry_title">开源库</string>
     <string name="licenses_inventory_subtitle">点击任意依赖项以查看许可证文本和上游项目链接。</string>
@@ -62,7 +60,7 @@ limitations under the License.
     <string name="licenses_screen_back">返回</string>
     <string name="licenses_screen_subtitle">此构建内置的第三方组件。</string>
     <string name="licenses_screen_title">开源许可证</string>
-    <string name="settings_subtitle">在线验证控制与 GitHub Nightly 更新状态。</string>
+    <string name="settings_section_detection">检测选项</string>
     <string name="settings_title">设置</string>
     <string name="update_settings_label">检查更新</string>
     <string name="update_status_available">有新的 Nightly 构建；点按查看详情</string>

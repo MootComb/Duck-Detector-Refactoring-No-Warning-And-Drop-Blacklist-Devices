@@ -28,7 +28,6 @@ limitations under the License.
     <string name="about_copy_build_info_summary">نسخ الإصدار ووقت البناء ومُعرف البناء</string>
     <string name="about_copy_toast">تم نسخ معلومات البناء</string>
     <string name="about_label_build_hash">مُعرف البناء</string>
-    <string name="about_label_build_details">تفاصيل البناء</string>
     <string name="about_label_build_time">وقت البناء</string>
     <string name="about_label_copy_build_info">نسخ معلومات البناء</string>
     <string name="about_label_email">البريد الإلكتروني</string>
@@ -56,7 +55,6 @@ limitations under the License.
     <string name="licenses_dialog_open">فتح</string>
     <string name="licenses_dialog_source_repo">مستودع المصدر</string>
     <string name="licenses_dialog_version">الإصدار %1$s</string>
-    <string name="licenses_entry_label">الشفافية</string>
     <string name="licenses_entry_subtitle">استعرض مشاريع الجهات الخارجية المضمَّنة في هذا البناء واطّلع على إشعارات تراخيصها.</string>
     <string name="licenses_entry_title">مكتبات مفتوحة المصدر</string>
     <string name="licenses_inventory_subtitle">اضغط على أي dependency لعرض نص الترخيص وروابط المشروع الأصلي.</string>
@@ -64,7 +62,7 @@ limitations under the License.
     <string name="licenses_screen_back">رجوع</string>
     <string name="licenses_screen_subtitle">مكونات الجهات الخارجية المضمَّنة في هذا البناء.</string>
     <string name="licenses_screen_title">تراخيص المصادر المفتوحة</string>
-    <string name="settings_subtitle">عناصر تحكم التحقق عبر الإنترنت وحالة تحديث GitHub Nightly.</string>
+    <string name="settings_section_detection">خيارات الكشف</string>
     <string name="settings_title">الإعدادات</string>
     <string name="update_settings_label">التحقق من التحديثات</string>
     <string name="update_status_available">يتوفر إصدار Nightly أحدث؛ اضغط للتفاصيل</string>

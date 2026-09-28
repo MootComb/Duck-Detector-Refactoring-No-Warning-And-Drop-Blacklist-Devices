@@ -17,7 +17,6 @@
 package com.eltavine.duckdetector.ui.shell
 
 import com.eltavine.duckdetector.core.evidence.DetectorId
-import com.eltavine.duckdetector.core.scan.DetectorSummary
 import com.eltavine.duckdetector.core.evidence.DetectorStatus
 import com.eltavine.duckdetector.features.dashboard.presentation.model.DashboardOverviewModel
 import com.eltavine.duckdetector.features.dashboard.presentation.model.OverviewCounts
@@ -72,47 +71,6 @@ class DetectorResultNoticeDialogTest {
         )
     }
 
-    @Test
-    fun `returns ids of ready danger and warning detectors only`() {
-        val ids = attentionDetectorIds(
-            listOf(
-                DetectorSummary(
-                    id = DetectorId("bootloader"),
-                    title = "Bootloader",
-                    status = DetectorStatus.danger(),
-                    headline = "Danger",
-                    summary = "summary",
-                    ready = true,
-                ),
-                DetectorSummary(
-                    id = DetectorId("tee"),
-                    title = "TEE",
-                    status = DetectorStatus.warning(),
-                    headline = "Warning",
-                    summary = "summary",
-                    ready = true,
-                ),
-                DetectorSummary(
-                    id = DetectorId("memory"),
-                    title = "Memory",
-                    status = DetectorStatus.allClear(),
-                    headline = "OK",
-                    summary = "summary",
-                    ready = true,
-                ),
-                DetectorSummary(
-                    id = DetectorId("virtualization"),
-                    title = "Virtualization",
-                    status = DetectorStatus.danger(),
-                    headline = "Danger",
-                    summary = "summary",
-                    ready = false,
-                ),
-            ),
-        )
-
-        assertEquals(linkedSetOf(DetectorId("bootloader"), DetectorId("tee")), ids)
-    }
     @Test
     fun `notice key ignores wording and follows the typed outcome`() {
         val base = noticeOverview(focus = listOf("mount", "tee"), danger = 1)

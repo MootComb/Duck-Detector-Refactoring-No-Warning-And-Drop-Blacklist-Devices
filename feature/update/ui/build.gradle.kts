@@ -25,6 +25,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
     api(project(":feature:update:domain"))
     api(project(":feature:update:presentation"))
     api(libs.androidx.lifecycle.viewmodel.ktx)

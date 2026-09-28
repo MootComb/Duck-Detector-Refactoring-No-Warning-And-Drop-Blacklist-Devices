@@ -16,9 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.ui.card
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -42,10 +40,8 @@ import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material.icons.rounded.VpnKey
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,12 +49,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.eltavine.duckdetector.core.designsystem.theme.DuckTypography
+import com.eltavine.duckdetector.core.designsystem.theme.ShapeTokens
 import com.eltavine.duckdetector.core.ui.R as CoreUiR
 import com.eltavine.duckdetector.core.ui.components.DetectorDetailRowBlock
+import com.eltavine.duckdetector.core.ui.components.DetectorFact
+import com.eltavine.duckdetector.core.ui.components.DetectorFactPair
+import com.eltavine.duckdetector.core.ui.components.DetectorHairline
 import com.eltavine.duckdetector.core.ui.components.WrapSafeText
+import com.eltavine.duckdetector.core.ui.copyPlainTextToClipboard
 import com.eltavine.duckdetector.core.ui.presentation.rememberStatusAppearance
-import com.eltavine.duckdetector.core.ui.theme.ShapeTokens
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactGroupModel
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactIcon
 import com.eltavine.duckdetector.features.tee.presentation.model.TeeFactRowModel
@@ -72,85 +75,39 @@ internal fun TeeFactPairCard(
     secondary: TeeHeaderFactModel,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    DetectorFactPair(
+        primary = primary.asDetectorFact(),
+        secondary = secondary.asDetectorFact(),
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerExtraLarge,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            TeeFactPairRow(fact = primary)
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.42f),
-                thickness = 1.dp,
-            )
-            TeeFactPairRow(fact = secondary)
-        }
-    }
+    )
 }
 
-@Composable
-private fun TeeFactPairRow(
-    fact: TeeHeaderFactModel,
-) {
-    val appearance = rememberStatusAppearance(fact.status)
-    Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(15.dp),
-            )
-            WrapSafeText(
-                text = fact.label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        WrapSafeText(
-            text = fact.value,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-}
+private fun TeeHeaderFactModel.asDetectorFact() =
+    DetectorFact(label = label, value = value, status = status)
 
 @Composable
 internal fun TeeHighlightPill(
     signal: TeeHighlightSignalModel,
 ) {
     val appearance = rememberStatusAppearance(signal.status)
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = ShapeTokens.CornerFull,
+    Row(
+        modifier = Modifier
+            .background(color = appearance.tintWash, shape = ShapeTokens.CornerFull)
+            .padding(start = 8.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = appearance.icon,
-                contentDescription = null,
-                tint = appearance.iconTint,
-                modifier = Modifier.size(16.dp),
-            )
-            WrapSafeText(
-                text = "${signal.label}: ${signal.value}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Icon(
+            imageVector = appearance.icon,
+            contentDescription = null,
+            tint = appearance.iconTint,
+            modifier = Modifier.size(15.dp),
+        )
+        WrapSafeText(
+            text = "${signal.label}: ${signal.value}",
+            style = DuckTypography.Caption,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
@@ -158,31 +115,22 @@ internal fun TeeHighlightPill(
 internal fun TeeFactGroup(
     group: TeeFactGroupModel,
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = ShapeTokens.CornerExtraLarge,
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            WrapSafeText(
-                text = group.title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                group.rows.forEachIndexed { index, row ->
-                    TeeFactRow(row = row)
-                    if (index < group.rows.lastIndex) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.42f),
-                            thickness = 1.dp,
-                        )
-                    }
-                }
+        WrapSafeText(
+            text = group.title,
+            modifier = Modifier.semantics { heading() },
+            style = DuckTypography.FootnoteEmphasized,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        group.rows.forEachIndexed { index, row ->
+            TeeFactRow(row = row)
+            if (index < group.rows.lastIndex) {
+                DetectorHairline()
             }
         }
     }
@@ -195,7 +143,8 @@ private fun TeeFactRow(
     val context = LocalContext.current
     val clipboardLabel = stringResource(R.string.tee_diagnostic_clipboard_label)
     val copiedToast = stringResource(CoreUiR.string.tee_diagnostic_copied_toast)
-    val valueModifier = if (row.hiddenCopyText != null) {
+    val copyText = row.hiddenCopyText
+    val valueModifier = if (copyText != null) {
         // 诊断复制是故意做成“无显式 affordance”的双击隐藏入口，避免把正常读卡 UI 变成调试工具面板。
         // Diagnostic copy is intentionally a no-affordance double-tap entry so the normal card UI does not turn into a visible debugging panel.
         Modifier.combinedClickable(
@@ -203,9 +152,7 @@ private fun TeeFactRow(
             indication = null,
             onClick = {},
             onDoubleClick = {
-                context.getSystemService(ClipboardManager::class.java)
-                    ?.setPrimaryClip(ClipData.newPlainText(clipboardLabel, row.hiddenCopyText))
-                Toast.makeText(context, copiedToast, Toast.LENGTH_SHORT).show()
+                copyPlainTextToClipboard(context, clipboardLabel, copyText, copiedToast)
             },
         )
     } else {
