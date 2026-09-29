@@ -101,6 +101,83 @@ class ProcMountViewScannerTest {
     }
 
     @Test
+    fun `tmpfs capacity printed against an older RAM total stays one view`() {
+        val appDataPoints = listOf(
+            "/data/data",
+            "/data/user",
+            "/data/user_de",
+            "/data/misc/profiles/cur",
+            "/data/misc/profiles/ref",
+        )
+        val bootTimeView = cleanMountInfo + appDataPoints.mapIndexed { index, point ->
+            "${120 + index} 22 0:${40 + index} / $point rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs " +
+                "rw,seclabel,size=2878476k,nr_inodes=719619,mode=751"
+        }
+        val laterView = cleanMountInfo + appDataPoints.mapIndexed { index, point ->
+            "${980 + index} 22 0:${212 + index} / $point rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs " +
+                "rw,seclabel,mode=751"
+        }
+        val result = scanner.evaluate(
+            pids = listOf("1000", "2000"),
+            lineReader = { pid -> if (pid == "2000") laterView else bootTimeView },
+        )
+
+        assertTrue(result.available)
+        assertEquals(1, result.distinctViewCount)
+        assertFalse(result.divergent)
+    }
+
+    @Test
+    fun `tmpfs mounts that differ beyond capacity stay distinct views`() {
+        val stockView = cleanMountInfo + listOf(
+            "120 22 0:40 / /data/data rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs " +
+                "rw,seclabel,size=2878476k,nr_inodes=719619,mode=751",
+        )
+        val changedView = cleanMountInfo + listOf(
+            "980 22 0:212 / /data/data rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,seclabel,mode=755",
+        )
+        val result = scanner.evaluate(
+            pids = listOf("1000", "2000"),
+            lineReader = { pid -> if (pid == "2000") changedView else stockView },
+        )
+
+        assertEquals(2, result.distinctViewCount)
+        assertTrue(result.divergent)
+    }
+
+    @Test
+    fun `size option outside shmem filesystems still separates views`() {
+        val sizedView = cleanMountInfo + listOf(
+            "60 22 0:50 / /dev/hugepages rw,relatime - hugetlbfs hugetlbfs rw,seclabel,pagesize=2M,size=1073741824",
+        )
+        val unsizedView = cleanMountInfo + listOf(
+            "60 22 0:50 / /dev/hugepages rw,relatime - hugetlbfs hugetlbfs rw,seclabel,pagesize=2M",
+        )
+        val result = scanner.evaluate(
+            pids = listOf("1000", "2000"),
+            lineReader = { pid -> if (pid == "2000") unsizedView else sizedView },
+        )
+
+        assertEquals(2, result.distinctViewCount)
+        assertTrue(result.divergent)
+    }
+
+    @Test
+    fun `devtmpfs and rootfs capacity is ignored like tmpfs`() {
+        listOf("devtmpfs" to "/dev", "rootfs" to "/").forEach { (type, point) ->
+            val result = scanner.evaluate(
+                pids = listOf("1000", "2000"),
+                lineReader = { pid ->
+                    val capacity = if (pid == "1000") "size=2878476k,nr_inodes=719619," else ""
+                    listOf("2 1 0:2 / $point rw,relatime - $type $type rw,seclabel,${capacity}mode=755")
+                },
+            )
+
+            assertEquals(type, 1, result.distinctViewCount)
+        }
+    }
+
+    @Test
     fun `unreadable processes are skipped`() {
         val result = scanner.evaluate(
             pids = listOf("1000", "3000", "2000"),

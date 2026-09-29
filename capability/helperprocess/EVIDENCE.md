@@ -10,8 +10,8 @@ The helper process capability runs probes in a separate helper process and in an
 
 - Observable signal: the helper's and isolated process's mount namespace, mount anchors, dex path and UID identity, and the per-process mount view scan.
 - Producing subsystem: zygote's specialization of each process and the kernel's namespaces.
-- Mechanism: zygote gives an isolated process its own UID and a fresh mount namespace; an app virtualization host or a root profile that changes the main process does not change the isolated one the same way.
-- References: frameworks/base core/jni/com_android_internal_os_Zygote.cpp (per-process UID and mount setup); kernel/common Documentation/filesystems/proc.rst (ns and mountinfo).
+- Mechanism: zygote gives an isolated process its own UID and a fresh mount namespace; an app virtualization host or a root profile that changes the main process does not change the isolated one the same way. The mount view scan compares tables without the size= and nr_inodes= options of tmpfs, devtmpfs and rootfs: the kernel prints them only while they differ from half of the current RAM, so a change in total RAM after boot would split otherwise identical tables, such as the app data tmpfs zygote mounts without a size.
+- References: frameworks/base core/jni/com_android_internal_os_Zygote.cpp (per-process UID and mount setup, MountAppDataTmpFs); kernel/common Documentation/filesystems/proc.rst (ns and mountinfo); kernel/common mm/shmem.c (shmem_show_options compares capacity with the current totalram_pages()).
 - Applicability: every release that supports isolated services.
 - Visibility limits: a helper that fails to bind or start leaves its snapshot unavailable.
 - Result states: collected, unavailable.

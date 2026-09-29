@@ -52,6 +52,16 @@ class MemoryNativeBridgeTest {
     }
 
     @Test
+    fun `parse reads whether the vdso checks ran`() {
+        val checked = bridge.parse("AVAILABLE=1\nVDSO_CHECKS_RAN=1\nVDSO_REMAPPED=1\n")
+        val skipped = bridge.parse("AVAILABLE=1\nVDSO_CHECKS_RAN=0\n")
+
+        assertTrue(checked.vdsoChecksRan)
+        assertTrue(checked.vdsoRemapped)
+        assertFalse(skipped.vdsoChecksRan)
+    }
+
+    @Test
     fun `parse falls back safely on blank raw data`() {
         val snapshot = bridge.parse("")
 

@@ -183,7 +183,11 @@ class MemoryRepository(
                     snapshot.mapsOnlyModule || snapshot.vdsoRemapped || snapshot.vdsoUnusualBase -> MemoryMethodOutcome.REVIEW
                     else -> MemoryMethodOutcome.CLEAN
                 },
-                detail = "Compares /proc/self/maps against dl_iterate_phdr and sanity-checks the current process [vdso] view.",
+                detail = if (snapshot.vdsoChecksRan) {
+                    "Compares /proc/self/maps against dl_iterate_phdr and sanity-checks the current process [vdso] view."
+                } else {
+                    "Compares /proc/self/maps against dl_iterate_phdr. The kernel mapped no vDSO into this process, which is normal for 32-bit processes on kernels built without a compat vDSO, so there was no [vdso] view to check."
+                },
             ),
         )
     }

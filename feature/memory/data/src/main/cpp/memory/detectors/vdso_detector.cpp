@@ -32,10 +32,27 @@ namespace duckdetector::memory {
         }
 
         const auto auxv_base = static_cast<std::uintptr_t>(::getauxval(AT_SYSINFO_EHDR));
+        // The kernel passes AT_SYSINFO_EHDR only for a vDSO it mapped, and bionic falls back to
+        // syscalls without one. arm64 kernels always map one for AArch64 processes, but 32-bit
+        // processes get none on arm64 kernels built without CONFIG_COMPAT_VDSO or on arm kernels
+        // without CONFIG_VDSO, and x86 kernels can have it disabled with vdso= or vdso32=.
+        // https://android.googlesource.com/kernel/common/+/refs/heads/android12-5.10/arch/arm64/kernel/vdso.c
+        // https://android.googlesource.com/platform/bionic/+/refs/heads/main/libc/bionic/vdso.cpp
+#if defined(__aarch64__)
+        constexpr bool kernel_may_omit_vdso = false;
+#else
+        constexpr bool kernel_may_omit_vdso = true;
+#endif
+        if (kernel_may_omit_vdso && auxv_base == 0 && vdso_entries.empty()) {
+            return signals;
+        }
+        signals.checks_ran = true;
+
         if (vdso_entries.size() != 1U) {
             signals.remapped = true;
             std::ostringstream detail;
-            detail << "Expected 1 [vdso] mapping but saw " << vdso_entries.size();
+            detail << "Expected 1 [vdso] mapping but saw " << vdso_entries.size()
+                   << " (AT_SYSINFO_EHDR=0x" << std::hex << auxv_base << ")";
             signals.findings.push_back(
                     Finding{
                             .section = "VDSO",

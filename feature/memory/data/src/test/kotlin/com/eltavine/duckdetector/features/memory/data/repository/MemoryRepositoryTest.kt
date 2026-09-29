@@ -59,6 +59,25 @@ class MemoryRepositoryTest {
     }
 
     @Test
+    fun `loader visibility stays clean and explains a process without a vdso`() {
+        val loader = repository.buildMethods(MemoryNativeSnapshot(available = true, vdsoChecksRan = false))
+            .first { it.label == "Loader visibility" }
+
+        assertEquals(MemoryMethodOutcome.CLEAN, loader.outcome)
+        assertTrue(loader.detail.contains("no vDSO"))
+    }
+
+    @Test
+    fun `loader visibility reviews a remapped vdso once the checks ran`() {
+        val loader = repository.buildMethods(
+            MemoryNativeSnapshot(available = true, vdsoChecksRan = true, vdsoRemapped = true),
+        ).first { it.label == "Loader visibility" }
+
+        assertEquals(MemoryMethodOutcome.REVIEW, loader.outcome)
+        assertTrue(loader.detail.contains("[vdso] view"))
+    }
+
+    @Test
     fun `sanitizes benign zygote jit swapped pages`() {
         val snapshot = MemoryNativeSnapshot(
             available = true,

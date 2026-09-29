@@ -95,6 +95,7 @@ class MemoryNativeBridge(
             "SIGNAL_HANDLER" -> copy(signalHandler = value.asBool())
             "FRIDA_SIGNAL" -> copy(fridaSignal = value.asBool())
             "ANONYMOUS_SIGNAL" -> copy(anonymousSignal = value.asBool())
+            "VDSO_CHECKS_RAN" -> copy(vdsoChecksRan = value.asBool())
             "VDSO_REMAPPED" -> copy(vdsoRemapped = value.asBool())
             "VDSO_UNUSUAL_BASE" -> copy(vdsoUnusualBase = value.asBool())
             "DELETED_LIBRARY" -> copy(deletedLibrary = value.asBool())

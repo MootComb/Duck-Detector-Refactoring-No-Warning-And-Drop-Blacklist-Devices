@@ -95,6 +95,8 @@ namespace duckdetector::memory {
     };
 
     struct VdsoSignals {
+        // False when the kernel mapped no vDSO into this process, leaving nothing to check.
+        bool checks_ran = false;
         bool remapped = false;
         bool unusual_base = false;
         std::vector<Finding> findings;

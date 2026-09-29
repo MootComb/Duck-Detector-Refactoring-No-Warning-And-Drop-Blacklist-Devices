@@ -100,6 +100,7 @@ namespace duckdetector::memory {
         output << "FRIDA_SIGNAL=" << (snapshot.signal.frida_named_handler ? '1' : '0') << '\n';
         output << "ANONYMOUS_SIGNAL=" << (snapshot.signal.anonymous_handler ? '1' : '0') << '\n';
 
+        output << "VDSO_CHECKS_RAN=" << (snapshot.vdso.checks_ran ? '1' : '0') << '\n';
         output << "VDSO_REMAPPED=" << (snapshot.vdso.remapped ? '1' : '0') << '\n';
         output << "VDSO_UNUSUAL_BASE=" << (snapshot.vdso.unusual_base ? '1' : '0') << '\n';
 

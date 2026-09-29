@@ -47,6 +47,7 @@ data class MemoryNativeSnapshot(
     val signalHandler: Boolean = false,
     val fridaSignal: Boolean = false,
     val anonymousSignal: Boolean = false,
+    val vdsoChecksRan: Boolean = false,
     val vdsoRemapped: Boolean = false,
     val vdsoUnusualBase: Boolean = false,
     val deletedLibrary: Boolean = false,

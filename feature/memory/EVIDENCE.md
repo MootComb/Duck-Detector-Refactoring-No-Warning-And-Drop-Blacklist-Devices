@@ -22,10 +22,10 @@ The Memory detector asks whether this process's own code and mappings show signs
 - Observable signal: writable or anonymous executable mappings, dirty or swapped executable system pages, executable memfd, ashmem, deleted libraries or /dev/zero, modules visible to maps but not to dl_iterate_phdr, and a remapped or unusually based [vdso].
 - Producing subsystem: the kernel's view of this process's address space.
 - Mechanism: injected code usually needs anonymous or writable executable memory or hides its loader entry.
-- References: kernel/common Documentation/filesystems/proc.rst (maps and smaps fields such as Private_Dirty and Swap, and the [vdso] mapping).
-- Applicability: every ABI and release.
-- Visibility limits: ART's JIT legitimately creates anonymous executable code; the repository removes that known case.
-- Result states: anomaly, review, clean.
+- References: kernel/common Documentation/filesystems/proc.rst (maps and smaps fields such as Private_Dirty and Swap, and the [vdso] mapping); kernel/common arch/arm64/kernel/vdso.c and arch/arm64/include/asm/elf.h (AArch64 processes always get a vDSO and AT_SYSINFO_EHDR, 32-bit processes only with CONFIG_COMPAT_VDSO); bionic libc/bionic/vdso.cpp (no AT_SYSINFO_EHDR means no vDSO).
+- Applicability: every ABI and release; the [vdso] checks need a vDSO, which the kernel does not map for 32-bit processes on arm64 kernels without CONFIG_COMPAT_VDSO, on arm kernels without CONFIG_VDSO, or on x86 kernels with it disabled.
+- Visibility limits: ART's JIT legitimately creates anonymous executable code; the repository removes that known case. Outside arm64, a process with neither AT_SYSINFO_EHDR nor a [vdso] mapping is taken as one the kernel gave no vDSO, so code that removes both goes unnoticed there.
+- Result states: anomaly, review, clean; the [vdso] checks also report when the kernel mapped no vDSO.
 - Interpretation: writable or anonymous executable code outside ART is danger; swapped executable pages are review.
 
 ### Signal handlers
