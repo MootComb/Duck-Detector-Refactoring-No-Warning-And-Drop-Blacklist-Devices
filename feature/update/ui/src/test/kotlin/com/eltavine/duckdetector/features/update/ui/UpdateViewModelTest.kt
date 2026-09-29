@@ -167,6 +167,26 @@ class UpdateViewModelTest {
     }
 
     @Test
+    fun `download opens through the route of the check that resolves it`() = runTest(dispatcher) {
+        val proxiedUrl = "https://gh-proxy.com/${manifest.apk.downloadUrl}"
+        var calls = 0
+        val viewModel = viewModel(
+            checker = NightlyUpdateChecker { _, _ ->
+                calls += 1
+                UpdateCheckResult.Available(
+                    if (calls == 1) availableUpdate() else availableUpdate(downloadUrl = proxiedUrl),
+                )
+            },
+        )
+        viewModel.checkAutomatically()
+        advanceUntilIdle()
+
+        val resolution = viewModel.resolveDownload()
+
+        assertEquals(UpdateDownloadResolution.Ready(proxiedUrl), resolution)
+    }
+
+    @Test
     fun `download resolution refreshes a superseded Nightly instead of opening its stale URL`() =
         runTest(dispatcher) {
             val newerManifest = manifest.copy(
@@ -209,6 +229,7 @@ class UpdateViewModelTest {
 
     private fun availableUpdate(
         updateManifest: NightlyUpdateManifest = manifest,
+        downloadUrl: String = updateManifest.apk.downloadUrl,
     ): AvailableNightlyUpdate {
         return AvailableNightlyUpdate(
             manifest = updateManifest,
@@ -220,6 +241,7 @@ class UpdateViewModelTest {
                 ),
             ),
             remainingCommitCount = 0,
+            downloadUrl = downloadUrl,
             compareUrl =
                 "https://github.com/eltavine/Duck-Detector-Refactoring/compare/$TEST_BASE_SHA...${updateManifest.commit.sha}",
         )

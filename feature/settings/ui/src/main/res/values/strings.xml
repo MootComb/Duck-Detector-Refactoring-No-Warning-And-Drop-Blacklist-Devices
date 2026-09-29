@@ -34,7 +34,7 @@ limitations under the License.
     <string name="about_label_privacy">Privacy / Data Use</string>
     <string name="about_label_version">Version</string>
     <string name="about_label_website">Website</string>
-    <string name="about_privacy_summary">Checks run locally on-device and findings are not uploaded. The app contacts GitHub once per cold start for Nightly update metadata. Online CRL refresh remains optional.</string>
+    <string name="about_privacy_summary">Checks run locally on-device and findings are not uploaded. The app contacts GitHub once per cold start for Nightly update metadata, through gh-proxy.com while GitHub acceleration is on. Online CRL refresh remains optional.</string>
     <string name="about_subtitle">Project links and build metadata.</string>
     <string name="about_title">About</string>
     <string name="about_value_build_time">%1$s UTC</string>
@@ -58,6 +58,9 @@ limitations under the License.
     <string name="author_summary_wxx">CI (Kotlin)</string>
     <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
     <string name="author_summary_zg089">Arabic translation</string>
+    <string name="github_acceleration_footer">gh-proxy.com is a third-party service. While this is on, update checks and Nightly downloads go through it instead of connecting to GitHub directly. It cannot relay commit comparisons, so the update dialog may list only the newest commit.</string>
+    <string name="github_acceleration_summary">Check for and download Nightly updates through gh-proxy.com</string>
+    <string name="github_acceleration_title">GitHub acceleration</string>
     <string name="licenses_dialog_close">Close</string>
     <string name="licenses_dialog_home_page">Home page</string>
     <string name="licenses_dialog_no_license_text">No license text available.</string>
@@ -72,6 +75,7 @@ limitations under the License.
     <string name="licenses_screen_subtitle">Third-party components bundled in this build.</string>
     <string name="licenses_screen_title">Open-source licenses</string>
     <string name="settings_section_detection">Detection options</string>
+    <string name="settings_section_network">Network</string>
     <string name="settings_title">Settings</string>
     <string name="update_settings_label">Check for updates</string>
     <string name="update_status_available">A newer Nightly build is available; tap for details</string>

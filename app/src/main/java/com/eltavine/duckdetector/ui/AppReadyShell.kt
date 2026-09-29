@@ -33,9 +33,11 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,7 +55,11 @@ import com.eltavine.duckdetector.features.dashboard.ui.DashboardScreen
 import com.eltavine.duckdetector.features.settings.presentation.model.SettingsUiState
 import com.eltavine.duckdetector.features.settings.ui.ConsentToggle
 import com.eltavine.duckdetector.features.settings.ui.SettingsScreen
+import com.eltavine.duckdetector.features.update.data.GitHubAccelerationStore
+import com.eltavine.duckdetector.features.update.domain.GitHubAcceleration
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
+import com.eltavine.duckdetector.features.update.presentation.shouldOfferGitHubAcceleration
+import com.eltavine.duckdetector.features.update.ui.GitHubAccelerationDialog
 import com.eltavine.duckdetector.features.update.ui.NightlyUpdateDialog
 import com.eltavine.duckdetector.features.update.ui.UpdateViewModel
 import com.eltavine.duckdetector.notifications.ScanProgressNotificationSnapshot
@@ -78,6 +84,13 @@ internal fun AppReadyShell(
     val notifier = remember(appContext) { ScanProgressNotifier(appContext) }
     val updateFactory = remember(context) { updateViewModelFactory(context) }
     val updateViewModel: UpdateViewModel = viewModel(factory = updateFactory)
+    val accelerationStore = remember(appContext) { GitHubAccelerationStore.getInstance(appContext) }
+    val gitHubAcceleration by accelerationStore.acceleration.collectAsState(initial = null)
+    // Closing the offer without answering leaves the choice open, so the next cold start asks again.
+    var accelerationOfferDismissed by rememberSaveable { mutableStateOf(false) }
+    val appLocale = LocalConfiguration.current.locales[0]
+    val offerGitHubAcceleration = !accelerationOfferDismissed &&
+        gitHubAcceleration?.let { shouldOfferGitHubAcceleration(it, appLocale) } == true
     // Every detector session starts scanning when it is created, so the catalog order is the order
     // in which detector scans begin.
     val detectorSessions = DetectorFeatures.all.map { feature -> key(feature.id) { feature.rememberSession() } }
@@ -86,8 +99,13 @@ internal fun AppReadyShell(
     val detectors = remember(detectorSessions) { detectorSessions.sortedBy { it.id.value } }
     val updateUiState by updateViewModel.uiState.collectAsState()
 
-    LaunchedEffect(updateViewModel) {
-        updateViewModel.checkAutomatically()
+    // The automatic check waits for the answer to the acceleration offer, so turning acceleration on
+    // already sends that first check through gh-proxy.com.
+    val automaticUpdateCheckReady = gitHubAcceleration != null && !offerGitHubAcceleration
+    LaunchedEffect(updateViewModel, automaticUpdateCheckReady) {
+        if (automaticUpdateCheckReady) {
+            updateViewModel.checkAutomatically()
+        }
     }
     val scanViewModel: DetectorScanViewModel = viewModel(
         factory = remember { DetectorScanViewModel.factory(detectors.map { it.summary }) },
@@ -115,13 +133,14 @@ internal fun AppReadyShell(
             isLoading = isDashboardLoading,
         )
     }
-    val settingsState = remember(updateUiState.status) {
+    val settingsState = remember(updateUiState.status, gitHubAcceleration) {
         SettingsUiState(
             versionName = BuildConfig.VERSION_NAME,
             versionCode = BuildConfig.VERSION_CODE,
             buildTimeUtc = BuildConfig.BUILD_TIME_UTC,
             buildHash = BuildConfig.BUILD_HASH,
             updateStatus = updateUiState.status.toSettingsUpdateStatus(),
+            gitHubAccelerationEnabled = gitHubAcceleration == GitHubAcceleration.ENABLED,
         )
     }
     val consentToggles = DetectorFeatures.consentCards.map { consentCard ->
@@ -172,6 +191,9 @@ internal fun AppReadyShell(
                     uiState = settingsState,
                     consentToggles = consentToggles,
                     onCheckForUpdates = updateViewModel::onSettingsUpdateAction,
+                    onGitHubAccelerationChange = { enabled ->
+                        scope.launch { accelerationStore.setEnabled(enabled) }
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -236,6 +258,14 @@ internal fun AppReadyShell(
                         }
                     }
                 },
+            )
+        }
+
+        if (offerGitHubAcceleration) {
+            GitHubAccelerationDialog(
+                onEnable = { scope.launch { accelerationStore.setEnabled(true) } },
+                onDecline = { scope.launch { accelerationStore.setEnabled(false) } },
+                onDismiss = { accelerationOfferDismissed = true },
             )
         }
     }

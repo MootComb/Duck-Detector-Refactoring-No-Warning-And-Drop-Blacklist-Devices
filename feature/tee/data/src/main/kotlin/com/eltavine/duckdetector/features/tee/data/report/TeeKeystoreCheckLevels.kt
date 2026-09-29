@@ -245,6 +245,7 @@ internal fun generateModeAnomalyLevel(artifacts: TeeScanArtifacts): TeeSignalLev
     generateModeAnomalyState(artifacts)
 ) {
     GenerateModeAnomalyState.MATCHED -> TeeSignalLevel.FAIL
+    GenerateModeAnomalyState.REVIEW -> TeeSignalLevel.WARN
     GenerateModeAnomalyState.CLEAN -> TeeSignalLevel.PASS
     GenerateModeAnomalyState.UNAVAILABLE -> TeeSignalLevel.INFO
 }

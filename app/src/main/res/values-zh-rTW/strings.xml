@@ -27,7 +27,7 @@ limitations under the License.
     <string name="disclaimer_title">免責聲明</string>
     <string name="disclaimer_content" formatted="false">重要提示：\n\n1. 檢測侷限性\nDuck Detector 使用多種方法檢測裝置安全狀態，但沒有任何檢測方法能做到 100&#37; 準確。結果應視為提示資訊，而非最終定論。\n\n2. 誤報與漏報\n本應用可能出現誤報或漏報。請務必結合專業安全工具與您自己的核驗進行全面判斷。\n\n3. 免責條款\n對於因使用或無法使用本應用而導致的任何直接、間接、附帶、特殊或後果性損失，Duck Detector 的開發者、貢獻者和散佈者概不承擔責任。\n\n4. 第三方服務\nTEE 吊銷檢查預設使用應用內建快照。如果您允許線上吊銷庫更新，應用可能會存取 Google 的 attestation revocation endpoint。安全掃描本身仍在您的裝置本地執行，檢測結果也不會被刻意上傳為掃描遙測。</string>
     <string name="privacy_notice_title">隱私說明</string>
-    <string name="privacy_notice_content" formatted="false">隱私摘要：安全檢查在您的裝置本地執行，檢測結果不會被刻意上傳為掃描遙測。TEE 吊銷檢查預設使用應用內建快照；如果您允許線上重新整理，應用可能會存取 Google 的 attestation revocation endpoint。完成啟動選項後，應用會在每次冷啟動時存取一次 GitHub，以檢查 Nightly 更新中繼資料。</string>
+    <string name="privacy_notice_content" formatted="false">隱私摘要：安全檢查在您的裝置本地執行，檢測結果不會被刻意上傳為掃描遙測。TEE 吊銷檢查預設使用應用內建快照；如果您允許線上重新整理，應用可能會存取 Google 的 attestation revocation endpoint。完成啟動選項後，應用會在每次冷啟動時存取一次 GitHub，以檢查 Nightly 更新中繼資料。如果您開啟 GitHub 加速，這些請求將改由第三方服務 gh-proxy.com 轉送。</string>
     <string name="timer_elapsed">已等待 30 秒</string>
     <string name="timer_waiting">請等待 %1$d 秒</string>
     <string name="fully_reviewed">已完整閱讀</string>

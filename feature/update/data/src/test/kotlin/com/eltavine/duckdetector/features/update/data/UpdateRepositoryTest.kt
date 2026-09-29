@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -133,7 +134,7 @@ class UpdateRepositoryTest {
         val result = repository.check(400, TEST_BASE_SHA) as UpdateCheckResult.Available
 
         assertEquals("feat(update): publish Nightly metadata", result.update.changelog.single().subject)
-        assertEquals(0, result.update.remainingCommitCount)
+        assertNull(result.update.remainingCommitCount)
     }
 
     @Test
@@ -161,13 +162,69 @@ class UpdateRepositoryTest {
         assertTrue(result is UpdateCheckResult.Available)
     }
 
+    @Test
+    fun `direct check opens the manifest download URL`() = runBlocking {
+        val repository = repository(
+            client = UpdateHttpClient { url, _ ->
+                if (url == UpdateRepository.MANIFEST_URL) {
+                    validUpdateManifestJson()
+                } else {
+                    compareResponseJson(1, listOf(testCommit(1)))
+                }
+            },
+        )
+
+        val result = repository.check(400, TEST_BASE_SHA) as UpdateCheckResult.Available
+
+        assertEquals(TEST_DOWNLOAD_URL, result.update.downloadUrl)
+    }
+
+    @Test
+    fun `accelerated check goes through gh-proxy without comparing commits`() = runBlocking {
+        val urls = mutableListOf<String>()
+        val repository = repository(
+            route = GitHubRoute.GH_PROXY,
+            client = UpdateHttpClient { url, _ ->
+                urls += url
+                validUpdateManifestJson()
+            },
+        )
+
+        val result = repository.check(400, TEST_BASE_SHA) as UpdateCheckResult.Available
+
+        assertEquals(listOf("https://gh-proxy.com/${UpdateRepository.MANIFEST_URL}"), urls)
+        assertEquals("https://gh-proxy.com/$TEST_DOWNLOAD_URL", result.update.downloadUrl)
+        assertEquals("feat(update): publish Nightly metadata", result.update.changelog.single().subject)
+        assertNull(result.update.remainingCommitCount)
+        assertTrue(result.update.compareUrl.startsWith("https://github.com/"))
+    }
+
+    @Test
+    fun `accelerated check still lists a cached comparison`() = runBlocking {
+        val cache = FakeUpdateCompareCache()
+        val cacheKey = "${TEST_BASE_SHA.lowercase()}...${TEST_HEAD_SHA.lowercase()}"
+        cache.values[cacheKey] = compareResponseJson(2, listOf(testCommit(1), testCommit(2)))
+        val repository = repository(
+            cache = cache,
+            route = GitHubRoute.GH_PROXY,
+            client = UpdateHttpClient { _, _ -> validUpdateManifestJson() },
+        )
+
+        val result = repository.check(400, TEST_BASE_SHA) as UpdateCheckResult.Available
+
+        assertEquals(listOf("Commit 2", "Commit 1"), result.update.changelog.map { it.subject })
+        assertEquals(0, result.update.remainingCommitCount)
+    }
+
     private fun repository(
         client: UpdateHttpClient,
         cache: UpdateCompareCache = FakeUpdateCompareCache(),
+        route: GitHubRoute = GitHubRoute.DIRECT,
     ): UpdateRepository {
         return UpdateRepository(
             httpClient = client,
             cache = cache,
+            currentRoute = { route },
             ioDispatcher = Dispatchers.Unconfined,
         )
     }

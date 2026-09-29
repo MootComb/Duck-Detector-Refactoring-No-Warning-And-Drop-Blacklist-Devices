@@ -17,306 +17,272 @@
 package com.eltavine.duckdetector.features.tee.data.verification.keystore
 
 import com.eltavine.duckdetector.core.platform.PlatformFailureName
+import java.util.Locale
 
-data class GenerateKeyReplyParcelParseResult(
-    val parseSucceeded: Boolean,
-    val authorizationCount: Int?,
-    val lastAuthorizationSecLevel: Long?,
-    val lastAuthorizationTag: Long?,
-    val lastAuthorizationUnionTag: Long?,
-    val lastAuthorizationHasUnknownUnionTag: Boolean,
-    val modificationTimeMs: Long?,
-    val matched: Boolean = false,
-    val rawPrefix: String?,
-    val detail: String,
-)
+/** Why a generateKey reply could not have come from keystore2 over a stock KeyMint. */
+enum class GenerateKeyReplyAnomaly {
+    /**
+     * The last authorization is not a SOFTWARE-level USER_ID. keystore2's store_new_key appends one
+     * after the KeyMint characteristics of every key it stores, so keystore2 did not assemble this
+     * reply.
+     * https://android.googlesource.com/platform/system/security/+/refs/heads/main/keystore2/src/security_level.rs
+     */
+    USER_ID_NOT_APPENDED_BY_KEYSTORE,
 
-private data class AuthorizationSlot(
-    val secLevel: Long,
-    val tag: Long,
-    val unionTag: Long,
+    /**
+     * CREATION_DATETIME came back outside the KEYSTORE level. The KeyMint spec only requires it to be
+     * software-enforced, but the Rust and C++ reference KeyMint and km_compat all return it at
+     * KEYSTORE, so another level is a lead rather than proof.
+     * https://android.googlesource.com/platform/hardware/interfaces/+/refs/heads/main/security/keymint/aidl/android/hardware/security/keymint/Tag.aidl
+     * https://android.googlesource.com/platform/system/keymint/+/refs/heads/main/common/src/tag/info.rs
+     */
+    CREATION_DATETIME_OUTSIDE_KEYSTORE,
+}
+
+data class GenerateKeyReplyAuthorization(
+    val securityLevel: Int,
+    val tag: Int,
+    val valueTag: Int,
+    /** The enum, boolean, integer or date value; null for a blob or an unknown member. */
+    val value: Long?,
+    /** The length of a blob value; null for every other member. */
+    val blobLength: Int?,
     val startOffset: Int,
     val endOffset: Int,
+)
+
+/**
+ * [parseSucceeded] covers the fields the checks read, up to the authorizations. The certificate, the
+ * chain and the modification time stay null when the rest of the reply cannot be read.
+ */
+data class GenerateKeyReplyParcelParseResult(
+    val parseSucceeded: Boolean,
+    val exceptionCode: Int? = null,
+    val keySecurityLevel: Int? = null,
+    val authorizations: List<GenerateKeyReplyAuthorization> = emptyList(),
+    val certificateLength: Int? = null,
+    val certificateChainLength: Int? = null,
+    val modificationTimeMs: Long? = null,
+    val anomaly: GenerateKeyReplyAnomaly? = null,
+    val rawPrefix: String?,
+    val detail: String,
 )
 
 class GenerateKeyReplyParcelParser {
 
     fun parse(rawReply: ByteArray, rawPrefix: String? = null): GenerateKeyReplyParcelParseResult {
         val resolvedRawPrefix = rawPrefix ?: rawReply.toHexPrefix()
-        if (rawReply.size < MIN_REPLY_BYTES) {
-            return failure(
-                rawReply = rawReply,
-                rawPrefix = resolvedRawPrefix,
-                reason = "reply_too_short",
-            )
-        }
-
+        var exceptionCode: Int? = null
         return runCatching {
-            val exceptionCode = readIntLe(rawReply, 0)
-            val authorizationCount = readIntLe(rawReply, AUTHORIZATION_COUNT_OFFSET)
-
+            val reader = ParcelReader(rawReply)
+            exceptionCode = reader.readInt()
             require(exceptionCode == 0) { "unexpected_exception_code=$exceptionCode" }
-            require(authorizationCount in 1..MAX_AUTHORIZATION_COUNT) {
+            // keystore2 writes stable AIDL through the Rust backend: a non-null marker before every
+            // parcelable and union, and a size header that counts itself at the start of every
+            // parcelable. The size headers bound each field, so fields added later are skipped.
+            // https://android.googlesource.com/platform/frameworks/native/+/refs/heads/main/libs/binder/rust/src/parcel.rs
+            reader.expectNonNull("key_metadata")
+            reader.readParcelableEnd()
+            reader.expectNonNull("key_descriptor")
+            reader.skipTo(reader.readParcelableEnd(), "key_descriptor")
+            val keySecurityLevel = reader.readInt()
+            val authorizationCount = reader.readInt()
+            require(authorizationCount in 0..MAX_AUTHORIZATION_COUNT) {
                 "authorization_count_out_of_range=$authorizationCount"
             }
-
-            val authorizations = parseAuthorizations(rawReply, authorizationCount)
-            val lastAuthorization = authorizations.last()
-            val metadataTail = parseMetadataTail(rawReply, lastAuthorization.endOffset)
-            val modificationTimeMs = metadataTail.modificationTimeMs
-
-            val lastAuthorizationHasUnknownUnionTag = isUnknownKeyParameterValueUnionTag(lastAuthorization.unionTag)
-            val matched =
-                modificationTimeMs > TARGET_HIGH_MODIFICATION_TIME_MS_THRESHOLD ||
-                    (
-                        modificationTimeMs == TARGET_MODIFICATION_TIME_MS &&
-                            lastAuthorization.secLevel in TARGET_LAST_AUTHORIZATION_SEC_LEVELS &&
-                            lastAuthorization.tag == TARGET_LAST_AUTHORIZATION_TAG &&
-                            lastAuthorization.unionTag == TARGET_LAST_AUTHORIZATION_UNION_TAG &&
-                            lastAuthorizationHasUnknownUnionTag
-                        )
+            val authorizations = List(authorizationCount) { readAuthorization(reader) }
+            val tail = runCatching { readTail(reader) }
+            val anomaly = anomalyOf(authorizations)
             GenerateKeyReplyParcelParseResult(
                 parseSucceeded = true,
-                authorizationCount = authorizationCount,
-                lastAuthorizationSecLevel = lastAuthorization.secLevel,
-                lastAuthorizationTag = lastAuthorization.tag,
-                lastAuthorizationUnionTag = lastAuthorization.unionTag,
-                lastAuthorizationHasUnknownUnionTag = lastAuthorizationHasUnknownUnionTag,
-                modificationTimeMs = modificationTimeMs,
-                matched = matched,
+                exceptionCode = exceptionCode,
+                keySecurityLevel = keySecurityLevel,
+                authorizations = authorizations,
+                certificateLength = tail.getOrNull()?.certificateLength,
+                certificateChainLength = tail.getOrNull()?.certificateChainLength,
+                modificationTimeMs = tail.getOrNull()?.modificationTimeMs,
+                anomaly = anomaly,
                 rawPrefix = resolvedRawPrefix,
-                detail = buildDetail(
-                    parseSucceeded = true,
-                    reason = "ok",
-                    rawSize = rawReply.size,
-                    rawPrefix = resolvedRawPrefix,
-                    exceptionCode = exceptionCode,
-                    authorizationCount = authorizationCount,
-                    lastAuthorizationSecLevel = lastAuthorization.secLevel,
-                    lastAuthorizationTag = lastAuthorization.tag,
-                    lastAuthorizationUnionTag = lastAuthorization.unionTag,
-                    lastAuthorizationHasUnknownUnionTag = lastAuthorizationHasUnknownUnionTag,
-                    modificationTimeMs = modificationTimeMs,
-                    finalOffset = metadataTail.modificationTimeOffset + Long.SIZE_BYTES,
-                    certificateLength = metadataTail.certificateLength,
-                    certificateChainLength = metadataTail.certificateChainLength,
-                    matched = matched,
-                ),
+                detail = listOf(
+                    "parseSucceeded=true",
+                    "rawSize=${rawReply.size}",
+                    "keySecurityLevel=$keySecurityLevel",
+                    "authorizationCount=$authorizationCount",
+                    "lastAuthorization=${authorizations.lastOrNull()?.describe() ?: "none"}",
+                    "creationDatetimeLevels=${authorizations.creationDatetimeLevels()}",
+                    "tail=${tail.fold({ it.describe() }, { it.message ?: PlatformFailureName.of(it) })}",
+                    "anomaly=${anomaly ?: "none"}",
+                ).joinToString(separator = ";"),
             )
         }.getOrElse { throwable ->
-            failure(
-                rawReply = rawReply,
+            GenerateKeyReplyParcelParseResult(
+                parseSucceeded = false,
+                exceptionCode = exceptionCode,
                 rawPrefix = resolvedRawPrefix,
-                reason = throwable.message ?: PlatformFailureName.of(throwable),
+                detail = listOf(
+                    "parseSucceeded=false",
+                    "rawSize=${rawReply.size}",
+                    "reason=${throwable.message ?: PlatformFailureName.of(throwable)}",
+                ).joinToString(separator = ";"),
             )
         }
     }
 
-    private fun failure(
-        rawReply: ByteArray,
-        rawPrefix: String?,
-        reason: String,
-    ): GenerateKeyReplyParcelParseResult {
-        return GenerateKeyReplyParcelParseResult(
-            parseSucceeded = false,
-            authorizationCount = null,
-            lastAuthorizationSecLevel = null,
-            lastAuthorizationTag = null,
-            lastAuthorizationUnionTag = null,
-            lastAuthorizationHasUnknownUnionTag = false,
-            modificationTimeMs = null,
-            matched = false,
-            rawPrefix = rawPrefix,
-            detail = buildDetail(
-                parseSucceeded = false,
-                reason = reason,
-                rawSize = rawReply.size,
-                rawPrefix = rawPrefix,
-            ),
+    private fun readAuthorization(reader: ParcelReader): GenerateKeyReplyAuthorization {
+        val startOffset = reader.position
+        reader.expectNonNull("authorization")
+        val authorizationEnd = reader.readParcelableEnd()
+        val securityLevel = reader.readInt()
+        reader.expectNonNull("key_parameter")
+        val parameterEnd = reader.readParcelableEnd()
+        require(parameterEnd <= authorizationEnd) { "key_parameter_overruns_authorization@$startOffset" }
+        val tag = reader.readInt()
+        reader.expectNonNull("key_parameter_value")
+        val valueTag = reader.readInt()
+        var value: Long? = null
+        var blobLength: Int? = null
+        when (valueTag) {
+            in INT_VALUE_TAGS -> value = reader.readInt().toLong()
+            in LONG_VALUE_TAGS -> value = reader.readLong()
+            BLOB_VALUE_TAG -> blobLength = reader.skipByteArray("key_parameter_blob")
+        }
+        reader.skipTo(parameterEnd, "key_parameter")
+        reader.skipTo(authorizationEnd, "authorization")
+        return GenerateKeyReplyAuthorization(
+            securityLevel = securityLevel,
+            tag = tag,
+            valueTag = valueTag,
+            value = value,
+            blobLength = blobLength,
+            startOffset = startOffset,
+            endOffset = authorizationEnd,
         )
     }
 
-    private fun buildDetail(
-        parseSucceeded: Boolean,
-        reason: String,
-        rawSize: Int,
-        rawPrefix: String?,
-        exceptionCode: Int? = null,
-        authorizationCount: Int? = null,
-        lastAuthorizationSecLevel: Long? = null,
-        lastAuthorizationTag: Long? = null,
-        lastAuthorizationUnionTag: Long? = null,
-        lastAuthorizationHasUnknownUnionTag: Boolean? = null,
-        modificationTimeMs: Long? = null,
-        finalOffset: Int? = null,
-        certificateLength: Int? = null,
-        certificateChainLength: Int? = null,
-        matched: Boolean? = null,
-    ): String {
-        return listOf(
-            "parseSucceeded=$parseSucceeded",
-            "reason=$reason",
-            "rawSize=$rawSize",
-            "rawPrefix=${rawPrefix ?: "null"}",
-            "exceptionCode=${exceptionCode ?: "null"}",
-            "authorizationCount=${authorizationCount ?: "null"}",
-            "lastAuthorizationSecLevel=${lastAuthorizationSecLevel ?: "null"}",
-            "lastAuthorizationTag=${lastAuthorizationTag ?: "null"}",
-            "lastAuthorizationUnionTag=${lastAuthorizationUnionTag ?: "null"}",
-            "lastAuthorizationHasUnknownUnionTag=${lastAuthorizationHasUnknownUnionTag ?: "null"}",
-            "modificationTimeMs=${modificationTimeMs ?: "null"}",
-            "finalOffset=${finalOffset ?: "null"}",
-            "certificateLength=${certificateLength ?: "null"}",
-            "certificateChainLength=${certificateChainLength ?: "null"}",
-            "matched=${matched ?: "null"}",
-        ).joinToString(separator = ";")
-    }
-
-    private fun parseAuthorizations(rawReply: ByteArray, authorizationCount: Int): List<AuthorizationSlot> {
-        var offset = AUTHORIZATION_LOGICAL_START_OFFSET
-        return buildList {
-            repeat(authorizationCount) {
-                val startOffset = offset
-                require(offset + AUTHORIZATION_HEADER_BYTES <= rawReply.size) {
-                    "authorization_block_truncated"
-                }
-                val secLevel = readUnsignedIntLe(rawReply, offset)
-                val tag = readUnsignedIntLe(rawReply, offset + AUTHORIZATION_TAG_OFFSET)
-                val unionTag = readUnsignedIntLe(rawReply, offset + AUTHORIZATION_UNION_TAG_OFFSET)
-                offset += AUTHORIZATION_HEADER_BYTES
-                offset += keyParameterValuePayloadSize(rawReply, offset, unionTag)
-                offset = alignToParcelWord(offset)
-                add(
-                    AuthorizationSlot(
-                        secLevel = secLevel,
-                        tag = tag,
-                        unionTag = unionTag,
-                        startOffset = startOffset,
-                        endOffset = offset,
-                    ),
-                )
-            }
-        }
-    }
-
-    private fun isUnknownKeyParameterValueUnionTag(unionTag: Long): Boolean = unionTag !in KNOWN_KEY_PARAMETER_VALUE_UNION_TAGS
-
-    private fun parseMetadataTail(rawReply: ByteArray, authorizationEndOffset: Int): MetadataTail {
-        val certificatePresenceOffset = authorizationEndOffset
-        require(certificatePresenceOffset + INT_SIZE_BYTES <= rawReply.size) {
-            "certificate_field_out_of_bounds"
-        }
-        val certificatePresent = readIntLe(rawReply, certificatePresenceOffset) != 0
-        var offset = certificatePresenceOffset + INT_SIZE_BYTES
-        val certificateLength = if (certificatePresent) {
-            readByteArrayLength(rawReply, offset).also { length ->
-                offset = skipByteArray(rawReply, offset, length, "certificate")
-            }
-        } else {
-            0
-        }
-
-        require(offset + INT_SIZE_BYTES <= rawReply.size) {
-            "certificate_chain_field_out_of_bounds"
-        }
-        val certificateChainPresent = readIntLe(rawReply, offset) != 0
-        offset += INT_SIZE_BYTES
-        val certificateChainLength = if (certificateChainPresent) {
-            readByteArrayLength(rawReply, offset).also { length ->
-                offset = skipByteArray(rawReply, offset, length, "certificate_chain")
-            }
-        } else {
-            0
-        }
-
-        val modificationTimeOffset = alignToParcelWord(offset)
-        require(modificationTimeOffset + Long.SIZE_BYTES <= rawReply.size) {
-            "modification_time_out_of_bounds"
-        }
-        return MetadataTail(
-            certificateLength = certificateLength,
-            certificateChainLength = certificateChainLength,
-            modificationTimeMs = readLongLe(rawReply, modificationTimeOffset),
-            modificationTimeOffset = modificationTimeOffset,
+    private fun readTail(reader: ParcelReader): ReplyTail {
+        return ReplyTail(
+            certificateLength = reader.skipNullableByteArray("certificate"),
+            certificateChainLength = reader.skipNullableByteArray("certificate_chain"),
+            modificationTimeMs = reader.readLong(),
         )
     }
 
-    private fun keyParameterValuePayloadSize(rawReply: ByteArray, offset: Int, unionTag: Long): Int {
-        return when (unionTag) {
-            in INT_LIKE_KEY_PARAMETER_VALUE_UNION_TAGS -> INT_SIZE_BYTES
-            in LONG_LIKE_KEY_PARAMETER_VALUE_UNION_TAGS -> Long.SIZE_BYTES
-            BLOB_KEY_PARAMETER_VALUE_UNION_TAG -> {
-                val length = readByteArrayLength(rawReply, offset)
-                skipByteArray(rawReply, offset, length, "key_parameter_blob") - offset
-            }
-            else -> 0
+    private fun anomalyOf(authorizations: List<GenerateKeyReplyAuthorization>): GenerateKeyReplyAnomaly? {
+        val last = authorizations.lastOrNull()
+        return when {
+            last == null || last.tag != TAG_USER_ID || last.securityLevel != SECURITY_LEVEL_SOFTWARE ->
+                GenerateKeyReplyAnomaly.USER_ID_NOT_APPENDED_BY_KEYSTORE
+
+            authorizations.any { it.tag == TAG_CREATION_DATETIME && it.securityLevel != SECURITY_LEVEL_KEYSTORE } ->
+                GenerateKeyReplyAnomaly.CREATION_DATETIME_OUTSIDE_KEYSTORE
+
+            else -> null
         }
     }
 
-    private fun readIntLe(bytes: ByteArray, offset: Int): Int {
-        require(offset >= 0 && offset + 4 <= bytes.size) { "int_out_of_bounds@$offset" }
-        return (bytes[offset].toInt() and 0xFF) or
-            ((bytes[offset + 1].toInt() and 0xFF) shl 8) or
-            ((bytes[offset + 2].toInt() and 0xFF) shl 16) or
-            ((bytes[offset + 3].toInt() and 0xFF) shl 24)
+    private fun GenerateKeyReplyAuthorization.describe(): String {
+        return "0x${"%08X".format(Locale.ROOT, tag)}@$securityLevel"
     }
 
-    private fun readUnsignedIntLe(bytes: ByteArray, offset: Int): Long = readIntLe(bytes, offset).toLong() and 0xFFFFFFFFL
-
-    private fun readByteArrayLength(bytes: ByteArray, offset: Int): Int {
-        val length = readIntLe(bytes, offset)
-        require(length >= 0) { "byte_array_length_negative=$length" }
-        return length
-    }
-
-    private fun skipByteArray(bytes: ByteArray, offset: Int, length: Int, label: String): Int {
-        val dataOffset = offset + INT_SIZE_BYTES
-        val endOffset = dataOffset + length
-        require(endOffset <= bytes.size) { "${label}_truncated" }
-        return alignToParcelWord(endOffset)
-    }
-
-    private fun readLongLe(bytes: ByteArray, offset: Int): Long {
-        require(offset >= 0 && offset + Long.SIZE_BYTES <= bytes.size) { "long_out_of_bounds@$offset" }
-        return (0 until Long.SIZE_BYTES).fold(0L) { acc, index ->
-            acc or ((bytes[offset + index].toLong() and 0xFFL) shl (index * 8))
-        }
-    }
-
-    private fun alignToParcelWord(offset: Int): Int {
-        return (offset + PARCEL_WORD_MASK) and PARCEL_WORD_MASK.inv()
+    private fun List<GenerateKeyReplyAuthorization>.creationDatetimeLevels(): String {
+        return filter { it.tag == TAG_CREATION_DATETIME }
+            .joinToString(separator = ",") { it.securityLevel.toString() }
+            .ifEmpty { "none" }
     }
 
     private fun ByteArray.toHexPrefix(maxBytes: Int = DEFAULT_PREFIX_BYTES): String {
         return take(maxBytes).joinToString(" ") { "%02X".format(it.toInt() and 0xFF) }
     }
 
-    private data class MetadataTail(
-        val certificateLength: Int,
-        val certificateChainLength: Int,
+    private data class ReplyTail(
+        val certificateLength: Int?,
+        val certificateChainLength: Int?,
         val modificationTimeMs: Long,
-        val modificationTimeOffset: Int,
-    )
+    ) {
+        fun describe(): String {
+            return "certificate=${certificateLength ?: "null"},chain=${certificateChainLength ?: "null"}," +
+                "modificationTimeMs=$modificationTimeMs"
+        }
+    }
+
+    private class ParcelReader(private val bytes: ByteArray) {
+        var position: Int = 0
+            private set
+
+        fun readInt(): Int {
+            require(position >= 0 && position + Int.SIZE_BYTES <= bytes.size) { "int_out_of_bounds@$position" }
+            val value = (bytes[position].toInt() and 0xFF) or
+                ((bytes[position + 1].toInt() and 0xFF) shl 8) or
+                ((bytes[position + 2].toInt() and 0xFF) shl 16) or
+                ((bytes[position + 3].toInt() and 0xFF) shl 24)
+            position += Int.SIZE_BYTES
+            return value
+        }
+
+        fun readLong(): Long {
+            require(position >= 0 && position + Long.SIZE_BYTES <= bytes.size) { "long_out_of_bounds@$position" }
+            val value = (0 until Long.SIZE_BYTES).fold(0L) { acc, index ->
+                acc or ((bytes[position + index].toLong() and 0xFFL) shl (index * Byte.SIZE_BITS))
+            }
+            position += Long.SIZE_BYTES
+            return value
+        }
+
+        fun expectNonNull(label: String) {
+            val marker = readInt()
+            require(marker == NON_NULL_MARKER) { "${label}_marker=$marker" }
+        }
+
+        /** Reads a parcelable's size header and returns the offset its fields end at. */
+        fun readParcelableEnd(): Int {
+            val start = position
+            val size = readInt()
+            require(size >= Int.SIZE_BYTES) { "parcelable_size=$size@$start" }
+            return start + size
+        }
+
+        fun skipTo(end: Int, label: String) {
+            require(end in position..bytes.size) { "${label}_end=$end@$position" }
+            position = end
+        }
+
+        fun skipByteArray(label: String): Int {
+            val length = readInt()
+            require(length >= 0) { "${label}_length=$length" }
+            skipTo(alignToParcelWord(position + length), label)
+            return length
+        }
+
+        fun skipNullableByteArray(label: String): Int? {
+            val length = readInt()
+            if (length == NULL_LENGTH) {
+                return null
+            }
+            require(length >= 0) { "${label}_length=$length" }
+            skipTo(alignToParcelWord(position + length), label)
+            return length
+        }
+
+        private fun alignToParcelWord(offset: Int): Int {
+            return (offset + PARCEL_WORD_MASK) and PARCEL_WORD_MASK.inv()
+        }
+    }
 
     private companion object {
         const val DEFAULT_PREFIX_BYTES = 32
-        const val INT_SIZE_BYTES = 4
-        const val PARCEL_WORD_MASK = INT_SIZE_BYTES - 1
+        const val PARCEL_WORD_MASK = Int.SIZE_BYTES - 1
+        const val NON_NULL_MARKER = 1
+        const val NULL_LENGTH = -1
         const val MAX_AUTHORIZATION_COUNT = 256
-        const val MIN_REPLY_BYTES = 48
-        const val AUTHORIZATION_COUNT_OFFSET = 44
-        const val AUTHORIZATION_LOGICAL_START_OFFSET = 48
-        const val AUTHORIZATION_HEADER_BYTES = 12
-        const val AUTHORIZATION_TAG_OFFSET = 4
-        const val AUTHORIZATION_UNION_TAG_OFFSET = 8
-        const val TARGET_MODIFICATION_TIME_MS = 4294967297L
-        const val TARGET_HIGH_MODIFICATION_TIME_MS_THRESHOLD = 4_999_999_999L
-        val TARGET_LAST_AUTHORIZATION_SEC_LEVELS = setOf(4L, 256L)
-        const val TARGET_LAST_AUTHORIZATION_TAG = 0x00000001L
-        const val TARGET_LAST_AUTHORIZATION_UNION_TAG = 32L
-        val KNOWN_KEY_PARAMETER_VALUE_UNION_TAGS = (0L..14L).toSet()
-        val INT_LIKE_KEY_PARAMETER_VALUE_UNION_TAGS = setOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L)
-        val LONG_LIKE_KEY_PARAMETER_VALUE_UNION_TAGS = setOf(12L, 13L)
-        const val BLOB_KEY_PARAMETER_VALUE_UNION_TAG = 14L
+        const val SECURITY_LEVEL_SOFTWARE = 0
+        const val SECURITY_LEVEL_KEYSTORE = 100
+        const val TAG_USER_ID = 0x300001F5
+        const val TAG_CREATION_DATETIME = 0x600002BD
+
+        // KeyParameterValue members: invalid, the enums, boolValue and integer are int32; longInteger
+        // and dateTime are int64; blob is a byte array.
+        val INT_VALUE_TAGS = 0..11
+        val LONG_VALUE_TAGS = 12..13
+        const val BLOB_VALUE_TAG = 14
     }
 }

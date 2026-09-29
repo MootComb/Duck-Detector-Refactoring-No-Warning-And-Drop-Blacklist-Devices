@@ -78,11 +78,8 @@ class BootloaderCardModelMapper {
             BootloaderStage.LOADING -> "Scanning boot state and verified boot evidence"
             BootloaderStage.FAILED -> "Bootloader scan failed"
             BootloaderStage.READY -> when {
-                report.dangerFindings.isNotEmpty() -> if (report.dangerFindings.areWidevineOnly()) {
-                    "${report.dangerFindings.size} critical DRM consistency signal(s)"
-                } else {
+                report.dangerFindings.isNotEmpty() ->
                     "${report.dangerFindings.size} critical boot integrity signal(s)"
-                }
 
                 report.warningFindings.isNotEmpty() -> if (report.warningFindings.areWidevineOnly()) {
                     "${report.warningFindings.size} DRM consistency signal(s) need review"
@@ -111,7 +108,7 @@ class BootloaderCardModelMapper {
 
             BootloaderStage.READY -> when {
                 report.dangerFindings.isNotEmpty() ->
-                    "Unlocked state, attestation contradictions, broken certificate trust, verified-boot failures, or a corroborated Widevine DRM inconsistency indicate reduced device trust."
+                    "Unlocked state, attestation contradictions, broken certificate trust, or verified-boot failures indicate reduced device trust."
 
                 report.warningFindings.isNotEmpty() ->
                     "The boot chain is not obviously broken, but custom-root, software-only, Widevine DRM, or cross-source coherence signals still need review."

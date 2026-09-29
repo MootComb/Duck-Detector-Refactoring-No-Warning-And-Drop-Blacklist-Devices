@@ -205,13 +205,20 @@ fun NightlyUpdateDialog(
                                     }
                                 }
                             }
-                            if (update.remainingCommitCount > 0) {
+                            val remainingCommitCount = update.remainingCommitCount
+                            val remainingCommits = when {
+                                remainingCommitCount == null ->
+                                    stringResource(R.string.update_remaining_commits_unknown)
+                                remainingCommitCount > 0 -> pluralStringResource(
+                                    R.plurals.update_remaining_commits,
+                                    remainingCommitCount,
+                                    remainingCommitCount,
+                                )
+                                else -> null
+                            }
+                            if (remainingCommits != null) {
                                 WrapSafeText(
-                                    text = pluralStringResource(
-                                        R.plurals.update_remaining_commits,
-                                        update.remainingCommitCount,
-                                        update.remainingCommitCount,
-                                    ),
+                                    text = remainingCommits,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )

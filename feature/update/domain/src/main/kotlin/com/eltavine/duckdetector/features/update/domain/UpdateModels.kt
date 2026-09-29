@@ -51,7 +51,10 @@ data class UpdateChangelogEntry(
 data class AvailableNightlyUpdate(
     val manifest: NightlyUpdateManifest,
     val changelog: List<UpdateChangelogEntry>,
-    val remainingCommitCount: Int,
+    /** Null when GitHub could not compare the builds, so [changelog] holds only the newest commit. */
+    val remainingCommitCount: Int?,
+    /** The manifest's GitHub download URL, or that URL through gh-proxy.com while acceleration is on. */
+    val downloadUrl: String,
     val compareUrl: String,
 )
 

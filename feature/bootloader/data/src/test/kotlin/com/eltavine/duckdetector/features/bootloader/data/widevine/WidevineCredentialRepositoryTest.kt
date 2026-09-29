@@ -20,6 +20,7 @@ import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingGro
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingSeverity
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderMethodOutcome
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -37,10 +38,10 @@ class WidevineCredentialRepositoryTest {
         )
 
         assertTrue(evidence.findings.all { it.group == BootloaderFindingGroup.CONSISTENCY })
-        assertEquals(
-            BootloaderFindingSeverity.WARNING,
-            evidence.findings.single { it.id == "widevine_credential" }.severity,
-        )
+        val credential = evidence.findings.single { it.id == "widevine_credential" }
+        assertEquals(BootloaderFindingSeverity.WARNING, credential.severity)
+        assertTrue(credential.corroborating)
+        assertFalse(evidence.findings.single { it.id == "widevine_property_parity" }.corroborating)
         assertEquals(BootloaderMethodOutcome.WARNING, evidence.method.outcome)
         assertEquals(1, evidence.anomalyCount)
         assertEquals(BootloaderFindingSeverity.WARNING, evidence.impacts.single().severity)
@@ -65,7 +66,7 @@ class WidevineCredentialRepositoryTest {
     }
 
     @Test
-    fun `corroborated Widevine anomaly maps to danger`() {
+    fun `sentinel with a lower session maps to a corroborating warning`() {
         val repository = repository(
             snapshot(
                 systemId = WIDEVINE_SENTINEL_SYSTEM_ID,
@@ -81,8 +82,9 @@ class WidevineCredentialRepositoryTest {
         )
 
         val credential = evidence.findings.single { it.id == "widevine_credential" }
-        assertEquals(BootloaderFindingSeverity.DANGER, credential.severity)
-        assertEquals(BootloaderMethodOutcome.DANGER, evidence.method.outcome)
+        assertEquals(BootloaderFindingSeverity.WARNING, credential.severity)
+        assertTrue(credential.corroborating)
+        assertEquals(BootloaderMethodOutcome.WARNING, evidence.method.outcome)
     }
 
     @Test

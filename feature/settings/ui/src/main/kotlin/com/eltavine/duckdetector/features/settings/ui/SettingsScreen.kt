@@ -41,6 +41,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -66,6 +68,7 @@ import com.eltavine.duckdetector.features.settings.ui.components.ConsentSettingI
 import com.eltavine.duckdetector.features.settings.ui.components.ContributorNameWordmark
 import com.eltavine.duckdetector.features.settings.ui.components.ContributorsSection
 import com.eltavine.duckdetector.features.settings.ui.components.SettingsSection
+import com.eltavine.duckdetector.features.settings.ui.components.SettingsSwitchItem
 import com.eltavine.duckdetector.features.settings.ui.licenses.OpenSourceLicensesScreen
 
 private const val SettingsPageKey = "settings"
@@ -80,6 +83,7 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     consentToggles: List<ConsentToggle>,
     onCheckForUpdates: () -> Unit,
+    onGitHubAccelerationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showingLicenses by rememberSaveable { mutableStateOf(false) }
@@ -106,6 +110,7 @@ fun SettingsScreen(
                     uiState = uiState,
                     consentToggles = consentToggles,
                     onCheckForUpdates = onCheckForUpdates,
+                    onGitHubAccelerationChange = onGitHubAccelerationChange,
                     onOpenLicenses = { showingLicenses = true },
                 )
             }
@@ -126,6 +131,7 @@ private fun SettingsPage(
     uiState: SettingsUiState,
     consentToggles: List<ConsentToggle>,
     onCheckForUpdates: () -> Unit,
+    onGitHubAccelerationChange: (Boolean) -> Unit,
     onOpenLicenses: () -> Unit,
 ) {
     Box(
@@ -160,6 +166,17 @@ private fun SettingsPage(
                             ConsentSettingItem(toggle = toggle)
                         }
                     }
+                }
+
+                SettingsSection(title = stringResource(R.string.settings_section_network)) {
+                    SettingsSwitchItem(
+                        headline = stringResource(R.string.github_acceleration_title),
+                        summary = stringResource(R.string.github_acceleration_summary),
+                        footer = stringResource(R.string.github_acceleration_footer),
+                        icon = Icons.Rounded.Speed,
+                        checked = uiState.gitHubAccelerationEnabled,
+                        onCheckedChange = onGitHubAccelerationChange,
+                    )
                 }
 
                 AboutSection(

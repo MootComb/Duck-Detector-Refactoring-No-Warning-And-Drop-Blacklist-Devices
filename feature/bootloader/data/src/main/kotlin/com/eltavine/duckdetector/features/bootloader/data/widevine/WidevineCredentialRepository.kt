@@ -51,6 +51,7 @@ internal class WidevineCredentialRepository(
                     group = BootloaderFindingGroup.CONSISTENCY,
                     severity = finding.severity.toFindingSeverity(),
                     detail = finding.detail,
+                    corroborating = finding.corroborating,
                 )
             },
             impacts = assessment.impact?.let { impact ->
@@ -75,7 +76,6 @@ internal class WidevineCredentialRepository(
         return when (this) {
             WidevineAssessmentSeverity.SAFE -> BootloaderFindingSeverity.SAFE
             WidevineAssessmentSeverity.WARNING -> BootloaderFindingSeverity.WARNING
-            WidevineAssessmentSeverity.DANGER -> BootloaderFindingSeverity.DANGER
             WidevineAssessmentSeverity.SUPPORT -> BootloaderFindingSeverity.INFO
         }
     }
@@ -84,7 +84,6 @@ internal class WidevineCredentialRepository(
         return when (this) {
             WidevineAssessmentSeverity.SAFE -> BootloaderMethodOutcome.CLEAN
             WidevineAssessmentSeverity.WARNING -> BootloaderMethodOutcome.WARNING
-            WidevineAssessmentSeverity.DANGER -> BootloaderMethodOutcome.DANGER
             WidevineAssessmentSeverity.SUPPORT -> BootloaderMethodOutcome.SUPPORT
         }
     }

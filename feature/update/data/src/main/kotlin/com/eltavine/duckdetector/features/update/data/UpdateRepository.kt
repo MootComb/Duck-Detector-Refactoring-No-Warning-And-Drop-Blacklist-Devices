@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 class UpdateRepository internal constructor(
     private val httpClient: UpdateHttpClient = HttpUrlConnectionUpdateClient(),
     private val cache: UpdateCompareCache,
+    private val currentRoute: suspend () -> GitHubRoute,
     private val manifestParser: UpdateManifestParser = UpdateManifestParser(),
     private val compareParser: GitHubCompareParser = GitHubCompareParser(),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -39,7 +40,8 @@ class UpdateRepository internal constructor(
         currentVersionCode: Int,
         currentCommitSha: String,
     ): UpdateCheckResult = withContext(ioDispatcher) {
-        val manifestJson = httpClient.get(MANIFEST_URL, JSON_ACCEPT)
+        val route = currentRoute()
+        val manifestJson = httpClient.get(route.url(MANIFEST_URL), JSON_ACCEPT)
         val manifest = manifestParser.parse(manifestJson)
         if (!isNightlyUpdateAvailable(manifest, currentVersionCode, currentCommitSha)) {
             return@withContext UpdateCheckResult.Current(manifest)
@@ -49,6 +51,7 @@ class UpdateRepository internal constructor(
             update = buildAvailableUpdate(
                 manifest = manifest,
                 currentCommitSha = currentCommitSha,
+                route = route,
             ),
         )
     }
@@ -56,10 +59,11 @@ class UpdateRepository internal constructor(
     private suspend fun buildAvailableUpdate(
         manifest: NightlyUpdateManifest,
         currentCommitSha: String,
+        route: GitHubRoute,
     ): AvailableNightlyUpdate {
         val compareUrl = buildCompareWebUrl(currentCommitSha, manifest.commit.sha)
         val comparePage = runCatching {
-            loadComparePage(currentCommitSha, manifest.commit.sha)
+            loadComparePage(currentCommitSha, manifest.commit.sha, route)
         }.getOrNull()
         val visibleCommits = comparePage?.commits
             .orEmpty()
@@ -75,16 +79,20 @@ class UpdateRepository internal constructor(
                 )
             }
         val totalCommits = comparePage?.totalCommits?.coerceAtLeast(visibleCommits.size)
-            ?: visibleCommits.size
         return AvailableNightlyUpdate(
             manifest = manifest,
             changelog = visibleCommits,
-            remainingCommitCount = (totalCommits - visibleCommits.size).coerceAtLeast(0),
+            remainingCommitCount = totalCommits?.let { (it - visibleCommits.size).coerceAtLeast(0) },
+            downloadUrl = route.url(manifest.apk.downloadUrl),
             compareUrl = compareUrl,
         )
     }
 
-    private suspend fun loadComparePage(baseSha: String, headSha: String): GitHubComparePage {
+    private suspend fun loadComparePage(
+        baseSha: String,
+        headSha: String,
+        route: GitHubRoute,
+    ): GitHubComparePage {
         if (!COMPARABLE_SHA_REGEX.matches(baseSha) || !COMPARABLE_SHA_REGEX.matches(headSha)) {
             throw IllegalArgumentException("Commit SHA cannot be compared through GitHub.")
         }
@@ -94,16 +102,19 @@ class UpdateRepository internal constructor(
                 .getOrNull()
                 ?.let { return it }
         }
+        if (!route.comparesCommits) {
+            throw UnsupportedOperationException("Commits cannot be compared through $route.")
+        }
 
         val firstPageJson = httpClient.get(
-            buildCompareApiUrl(baseSha, headSha, page = 1),
+            route.url(buildCompareApiUrl(baseSha, headSha, page = 1)),
             GITHUB_JSON_ACCEPT,
         )
         val firstPage = compareParser.parse(firstPageJson)
         val selectedJson = if (firstPage.totalCommits > COMPARE_PAGE_SIZE) {
             val lastPage = ceil(firstPage.totalCommits.toDouble() / COMPARE_PAGE_SIZE).toInt()
             httpClient.get(
-                buildCompareApiUrl(baseSha, headSha, page = lastPage),
+                route.url(buildCompareApiUrl(baseSha, headSha, page = lastPage)),
                 GITHUB_JSON_ACCEPT,
             )
         } else {

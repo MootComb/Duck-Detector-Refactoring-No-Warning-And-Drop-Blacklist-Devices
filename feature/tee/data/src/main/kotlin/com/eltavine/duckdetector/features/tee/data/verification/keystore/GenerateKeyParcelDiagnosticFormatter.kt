@@ -67,192 +67,55 @@ internal object GenerateKeyParcelDiagnosticFormatter {
             appendLine("  Reply parcel unavailable.")
             return
         }
-        appendLine("  --- [Parcel raw binary sequence] ---")
         appendLine("  (length: ${rawReply.size} bytes)")
-        val parsed = parseReplyForDiagnostic(rawReply)
-        if (parsed == null) {
-            val reason = parseResult?.detail ?: "reply parse unavailable"
-            appendLine("  [!] Reply parse interrupted: $reason")
-        } else {
-            appendLine(
-                "  Offset: 0x0000-0x0004 | exception header: ${parsed.exceptionCode} " +
-                    "(${if (parsed.exceptionCode == 0) "SUCCESS" else "ERROR"})"
-            )
-            if (parsed.exceptionCode == 0) {
-                appendLine("  [KeyMetadata return value parse]:")
-                appendLine("    Offset: 0x0004 | [KeyMetadata structure start]")
-                appendLine("      [Field] key (KeyDescriptor):")
-                appendLine("        Offset: 0x0004-0x0028 | Descriptor block: 40 bytes")
-                appendLine(
-                    "      Offset: 0x0028-0x002C | keySecurityLevel: " +
-                        "${rawReply.readUnsignedIntLe(KEY_SECURITY_LEVEL_OFFSET)}"
-                )
-                appendLine("      Offset: 0x002C | authorizations (Authorization[]):")
-                appendLine("        Count: ${parsed.authorizations.size}")
-                parsed.authorizations.forEachIndexed { index, authorization ->
-                    appendAuthorization(index, authorization)
-                }
-                appendLine("      [Field] certificate: ${parsed.certificateLength} bytes")
-                appendLine("      [Field] certificateChain: ${parsed.certificateChainLength} bytes")
-                appendLine("      [Field] modificationTimeMs: ${parsed.modificationTimeMs}")
-            } else {
+        val exceptionCode = parseResult?.exceptionCode
+        when {
+            parseResult == null -> appendLine("  [!] Reply parse unavailable.")
+            exceptionCode != null && exceptionCode != 0 -> {
+                appendLine("  exception header: $exceptionCode (ERROR)")
                 appendLine("  [!] Transaction failed; no KeyMetadata body parsed.")
             }
+
+            !parseResult.parseSucceeded -> appendLine("  [!] Reply parse interrupted.")
+            else -> appendKeyMetadata(parseResult)
         }
-        appendFingerprintTuple(parseResult)
+        appendChecks(parseResult)
         appendLine("--- [Reply Raw Hex] ---")
         appendLine(rawReply.toHexDump())
     }
 
-    private fun StringBuilder.appendAuthorization(
-        index: Int,
-        authorization: DiagnosticAuthorization,
-    ) {
-        appendLine("          [$index] Authorization:")
-        appendLine("            SecLevel: ${authorization.secLevel}")
-        appendLine(
-            "            Tag: 0x${authorization.tag.toHexWord()} " +
-                "(ID=${authorization.tag and KEYMASTER_TAG_ID_MASK}, Type=${authorization.tag ushr KEYMASTER_TAG_TYPE_SHIFT})"
-        )
-        appendLine("              UnionTag (member index): ${authorization.unionTag}")
-        authorization.valueLine?.let {
-            appendLine("              $it")
+    private fun StringBuilder.appendKeyMetadata(parsed: GenerateKeyReplyParcelParseResult) {
+        appendLine("  exception header: 0 (SUCCESS)")
+        appendLine("  [KeyMetadata]:")
+        appendLine("    keySecurityLevel: ${parsed.keySecurityLevel}")
+        appendLine("    authorizations: ${parsed.authorizations.size}")
+        parsed.authorizations.forEachIndexed { index, authorization ->
+            appendLine("      [$index] ${authorization.describe()}")
         }
-        if (authorization.unknownUnionTag) {
-            appendLine("              [!] Unknown UnionTag: ${authorization.unionTag}")
-        }
-        appendLine("            Offset: ${formatOffsetRange(authorization.startOffset, authorization.endOffset)}")
+        appendLine("    certificate: ${parsed.certificateLength?.let { "$it bytes" } ?: "null or unreadable"}")
+        appendLine("    certificateChain: ${parsed.certificateChainLength?.let { "$it bytes" } ?: "null or unreadable"}")
+        appendLine("    modificationTimeMs: ${parsed.modificationTimeMs ?: "unreadable"}")
     }
 
-    private fun StringBuilder.appendFingerprintTuple(parseResult: GenerateKeyReplyParcelParseResult?) {
-        appendLine("  [Fingerprint tuple]:")
-        if (parseResult == null) {
-            appendLine("    parserResult: unavailable")
-            return
+    private fun StringBuilder.appendChecks(parseResult: GenerateKeyReplyParcelParseResult?) {
+        appendLine("  [Keystore2 reply checks]:")
+        if (parseResult == null || !parseResult.parseSucceeded) {
+            appendLine("    anomaly: not evaluated")
+        } else {
+            appendLine("    anomaly: ${parseResult.anomaly ?: "none"}")
         }
-        appendLine("    modificationTimeMs: ${parseResult.modificationTimeMs}")
-        appendLine("    last Authorization SecLevel: ${parseResult.lastAuthorizationSecLevel}")
-        appendLine("    last Authorization UnionTag: ${parseResult.lastAuthorizationUnionTag}")
-        appendLine("    last UnionTag unknown/non-standard: ${parseResult.lastAuthorizationHasUnknownUnionTag}")
-        appendLine("    matched: ${parseResult.matched}")
+        parseResult?.let { appendLine("    parser: ${it.detail}") }
     }
 
-    private fun parseReplyForDiagnostic(rawReply: ByteArray): DiagnosticReply? {
-        return runCatching {
-            val exceptionCode = rawReply.readIntLe(0)
-            if (exceptionCode != 0) {
-                return@runCatching DiagnosticReply(exceptionCode = exceptionCode)
-            }
-            val authorizationCount = rawReply.readIntLe(AUTHORIZATION_COUNT_OFFSET)
-            require(authorizationCount in 0..MAX_AUTHORIZATION_COUNT) {
-                "authorization_count_out_of_range=$authorizationCount"
-            }
-            var offset = AUTHORIZATION_START_OFFSET
-            val authorizations = buildList {
-                repeat(authorizationCount) {
-                    val startOffset = offset
-                    val secLevel = rawReply.readUnsignedIntLe(offset)
-                    val tag = rawReply.readUnsignedIntLe(offset + AUTHORIZATION_TAG_OFFSET)
-                    val unionTag = rawReply.readUnsignedIntLe(offset + AUTHORIZATION_UNION_TAG_OFFSET)
-                    offset += AUTHORIZATION_HEADER_BYTES
-                    val value = readDiagnosticUnionValue(rawReply, offset, unionTag)
-                    offset += value.payloadSize
-                    offset = alignToParcelWord(offset)
-                    add(
-                        DiagnosticAuthorization(
-                            secLevel = secLevel,
-                            tag = tag,
-                            unionTag = unionTag,
-                            valueLine = value.valueLine,
-                            unknownUnionTag = unionTag !in KNOWN_UNION_TAGS,
-                            startOffset = startOffset,
-                            endOffset = offset,
-                        )
-                    )
-                }
-            }
-            val certificate = rawReply.readNullableByteArray(offset, "certificate")
-            offset = certificate.endOffset
-            val certificateChain = rawReply.readNullableByteArray(offset, "certificateChain")
-            offset = certificateChain.endOffset
-            val modificationTimeOffset = alignToParcelWord(offset)
-            val modificationTimeMs = rawReply.readLongLe(modificationTimeOffset)
-            DiagnosticReply(
-                exceptionCode = exceptionCode,
-                authorizations = authorizations,
-                certificateLength = certificate.length,
-                certificateChainLength = certificateChain.length,
-                modificationTimeMs = modificationTimeMs,
-            )
-        }.getOrNull()
-    }
-
-    private fun readDiagnosticUnionValue(
-        bytes: ByteArray,
-        offset: Int,
-        unionTag: Long,
-    ): DiagnosticUnionValue {
-        return when (unionTag) {
-            in INT_LIKE_UNION_TAGS -> {
-                val intValue = bytes.readIntLe(offset)
-                DiagnosticUnionValue(
-                    payloadSize = INT_SIZE_BYTES,
-                    valueLine = "Value (Int/Enum): $intValue",
-                )
-            }
-            BOOL_UNION_TAG -> {
-                val boolValue = bytes.readIntLe(offset) != 0
-                DiagnosticUnionValue(
-                    payloadSize = INT_SIZE_BYTES,
-                    valueLine = "Value (Boolean): $boolValue",
-                )
-            }
-            in LONG_LIKE_UNION_TAGS -> {
-                val longValue = bytes.readLongLe(offset)
-                DiagnosticUnionValue(
-                    payloadSize = Long.SIZE_BYTES,
-                    valueLine = "Value (Long/Date): $longValue",
-                )
-            }
-            BLOB_UNION_TAG -> {
-                val length = bytes.readIntLe(offset)
-                require(length >= 0) { "blob_length_negative=$length" }
-                val dataOffset = offset + INT_SIZE_BYTES
-                val endOffset = dataOffset + length
-                require(endOffset <= bytes.size) { "blob_truncated" }
-                val blob = bytes.copyOfRange(dataOffset, endOffset)
-                DiagnosticUnionValue(
-                    payloadSize = alignToParcelWord(endOffset) - offset,
-                    valueLine = buildString {
-                        append("Value (Blob): ")
-                        append(length)
-                        append(" bytes")
-                        if (blob.isNotEmpty() && blob.size <= INLINE_BLOB_HEX_BYTES) {
-                            append(" | Hex: ")
-                            append(blob.toHexCompact())
-                        }
-                    },
-                )
-            }
-            else -> DiagnosticUnionValue(payloadSize = 0, valueLine = null)
+    private fun GenerateKeyReplyAuthorization.describe(): String {
+        val valueText = when {
+            blobLength != null -> "$blobLength bytes"
+            value != null -> value.toString()
+            else -> "unread"
         }
-    }
-
-    private fun ByteArray.readNullableByteArray(offset: Int, label: String): DiagnosticByteArray {
-        val presence = readIntLe(offset)
-        var cursor = offset + INT_SIZE_BYTES
-        if (presence == 0) {
-            return DiagnosticByteArray(length = 0, endOffset = cursor)
-        }
-        val length = readIntLe(cursor)
-        require(length >= 0) { "${label}_length_negative=$length" }
-        cursor += INT_SIZE_BYTES
-        val endOffset = cursor + length
-        require(endOffset <= size) { "${label}_truncated" }
-        return DiagnosticByteArray(
-            length = length,
-            endOffset = alignToParcelWord(endOffset),
-        )
+        val tagType = TAG_TYPE_NAMES.getOrElse(tag ushr TAG_TYPE_SHIFT) { "TYPE_${tag ushr TAG_TYPE_SHIFT}" }
+        return "tag=0x${"%08X".format(Locale.US, tag)} ($tagType|${tag and TAG_ID_MASK}) " +
+            "level=$securityLevel value[$valueTag]=$valueText @${formatOffsetRange(startOffset, endOffset)}"
     }
 
     private fun ByteArray.readParcelString(offset: Int): ParcelString {
@@ -285,15 +148,6 @@ internal object GenerateKeyParcelDiagnosticFormatter {
             ((this[offset + 3].toInt() and 0xFF) shl 24)
     }
 
-    private fun ByteArray.readUnsignedIntLe(offset: Int): Long = readIntLe(offset).toLong() and 0xFFFFFFFFL
-
-    private fun ByteArray.readLongLe(offset: Int): Long {
-        require(offset >= 0 && offset + Long.SIZE_BYTES <= size) { "long_out_of_bounds@$offset" }
-        return (0 until Long.SIZE_BYTES).fold(0L) { acc, index ->
-            acc or ((this[offset + index].toLong() and 0xFFL) shl (index * Byte.SIZE_BITS))
-        }
-    }
-
     private fun ByteArray.toHexDump(bytesPerLine: Int = HEX_BYTES_PER_LINE): String {
         if (isEmpty()) {
             return ""
@@ -304,12 +158,6 @@ internal object GenerateKeyParcelDiagnosticFormatter {
                 line.joinToString(separator = " ") { "%02X".format(Locale.US, it.toInt() and 0xFF) }
             }
     }
-
-    private fun ByteArray.toHexCompact(): String {
-        return joinToString(separator = "") { "%02X".format(Locale.US, it.toInt() and 0xFF) }
-    }
-
-    private fun Long.toHexWord(): String = "%08X".format(Locale.US, this and 0xFFFFFFFFL)
 
     private fun ParcelString.range(): String = formatOffsetRange(startOffset, endOffset)
 
@@ -327,50 +175,12 @@ internal object GenerateKeyParcelDiagnosticFormatter {
         val endOffset: Int,
     )
 
-    private data class DiagnosticReply(
-        val exceptionCode: Int,
-        val authorizations: List<DiagnosticAuthorization> = emptyList(),
-        val certificateLength: Int = 0,
-        val certificateChainLength: Int = 0,
-        val modificationTimeMs: Long? = null,
-    )
-
-    private data class DiagnosticAuthorization(
-        val secLevel: Long,
-        val tag: Long,
-        val unionTag: Long,
-        val valueLine: String?,
-        val unknownUnionTag: Boolean,
-        val startOffset: Int,
-        val endOffset: Int,
-    )
-
-    private data class DiagnosticUnionValue(
-        val payloadSize: Int,
-        val valueLine: String?,
-    )
-
-    private data class DiagnosticByteArray(
-        val length: Int,
-        val endOffset: Int,
-    )
-
     private const val INT_SIZE_BYTES = 4
     private const val PARCEL_WORD_MASK = INT_SIZE_BYTES - 1
     private const val HEX_BYTES_PER_LINE = 16
-    private const val INLINE_BLOB_HEX_BYTES = 64
-    private const val KEY_SECURITY_LEVEL_OFFSET = 40
-    private const val AUTHORIZATION_COUNT_OFFSET = 44
-    private const val AUTHORIZATION_START_OFFSET = 48
-    private const val AUTHORIZATION_HEADER_BYTES = 12
-    private const val AUTHORIZATION_TAG_OFFSET = 4
-    private const val AUTHORIZATION_UNION_TAG_OFFSET = 8
-    private const val MAX_AUTHORIZATION_COUNT = 256
-    private const val KEYMASTER_TAG_ID_MASK = 0x0FFFFFFFL
-    private const val KEYMASTER_TAG_TYPE_SHIFT = 28
-    private const val BOOL_UNION_TAG = 10L
-    private const val BLOB_UNION_TAG = 14L
-    private val KNOWN_UNION_TAGS = (0L..14L).toSet()
-    private val INT_LIKE_UNION_TAGS = setOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 11L)
-    private val LONG_LIKE_UNION_TAGS = setOf(12L, 13L)
+    private const val TAG_TYPE_SHIFT = 28
+    private const val TAG_ID_MASK = 0x0FFFFFFF
+    private val TAG_TYPE_NAMES = listOf(
+        "INVALID", "ENUM", "ENUM_REP", "UINT", "UINT_REP", "ULONG", "DATE", "BOOL", "BIGNUM", "BYTES", "ULONG_REP",
+    )
 }

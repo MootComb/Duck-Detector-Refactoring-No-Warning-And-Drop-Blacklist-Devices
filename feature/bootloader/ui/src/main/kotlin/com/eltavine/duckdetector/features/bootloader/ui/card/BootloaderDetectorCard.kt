@@ -63,9 +63,6 @@ internal fun BootloaderDetectorCard(
         BootloaderCardAssessment.AUTHORITATIVE -> null
         BootloaderCardAssessment.CONSISTENCY_REVIEW ->
             stringResource(R.string.bootloader_widevine_consistency_review)
-
-        BootloaderCardAssessment.CONSISTENCY_CONFLICT ->
-            stringResource(R.string.bootloader_widevine_consistency_conflict)
     }
     DetectorCardFrame(
         title = model.title,

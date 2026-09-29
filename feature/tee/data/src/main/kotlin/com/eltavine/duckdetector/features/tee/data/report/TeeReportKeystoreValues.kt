@@ -368,6 +368,9 @@ internal fun generateModeAnomalyValue(artifacts: TeeScanArtifacts): String {
         GenerateModeAnomalyState.MATCHED ->
             "Matched TEE Simulator generate-mode fingerprint."
 
+        GenerateModeAnomalyState.REVIEW ->
+            "KeyMint returned CREATION_DATETIME outside the KEYSTORE level that AOSP KeyMint implementations use."
+
         GenerateModeAnomalyState.CLEAN ->
             "No TEE Simulator generate-mode fingerprint observed."
 

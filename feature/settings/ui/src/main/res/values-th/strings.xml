@@ -34,7 +34,7 @@ limitations under the License.
     <string name="about_label_privacy">ความเป็นส่วนตัว / การใช้ข้อมูล</string>
     <string name="about_label_version">เวอร์ชัน</string>
     <string name="about_label_website">เว็บไซต์</string>
-    <string name="about_privacy_summary">การตรวจสอบทำงานภายในอุปกรณ์และไม่อัปโหลดผลลัพธ์ แอปเชื่อมต่อ GitHub หนึ่งครั้งต่อ cold start เพื่อรับข้อมูล Nightly ส่วนการรีเฟรช CRL ออนไลน์ยังเป็นทางเลือก</string>
+    <string name="about_privacy_summary">การตรวจสอบทำงานภายในอุปกรณ์และไม่อัปโหลดผลลัพธ์ แอปเชื่อมต่อ GitHub หนึ่งครั้งต่อ cold start เพื่อรับข้อมูล Nightly (ผ่าน gh-proxy.com เมื่อเปิดเร่งความเร็ว GitHub) ส่วนการรีเฟรช CRL ออนไลน์ยังเป็นทางเลือก</string>
     <string name="about_subtitle">ลิงก์โปรเจกต์และข้อมูลเมตาของบิลด์</string>
     <string name="about_title">เกี่ยวกับ</string>
     <string name="about_value_build_time">%1$s UTC</string>
@@ -43,6 +43,9 @@ limitations under the License.
     <string name="author_summary_eltavine">มีส่วนร่วมด้าน UI, C++, ASM และ Kotlin</string>
     <string name="author_summary_wxx">CI (Kotlin)</string>
     <string name="author_summary_xiaotong">TEE (C++, Kotlin)</string>
+    <string name="github_acceleration_footer">gh-proxy.com เป็นบริการของบุคคลที่สาม เมื่อเปิดใช้ การตรวจสอบอัปเดตและการดาวน์โหลด Nightly จะส่งผ่านบริการนี้แทนการเชื่อมต่อ GitHub โดยตรง บริการนี้ส่งต่อการเปรียบเทียบ commit ไม่ได้ หน้าต่างอัปเดตจึงอาจแสดงเฉพาะ commit ล่าสุด</string>
+    <string name="github_acceleration_summary">ตรวจสอบและดาวน์โหลดอัปเดต Nightly ผ่าน gh-proxy.com</string>
+    <string name="github_acceleration_title">เร่งความเร็ว GitHub</string>
     <string name="licenses_dialog_close">ปิด</string>
     <string name="licenses_dialog_home_page">หน้าแรก</string>
     <string name="licenses_dialog_no_license_text">ไม่มีข้อความใบอนุญาต</string>
@@ -57,6 +60,7 @@ limitations under the License.
     <string name="licenses_screen_subtitle">คอมโพเนนต์ภายนอกที่รวมมาในบิลด์นี้</string>
     <string name="licenses_screen_title">ใบอนุญาตโอเพนซอร์ส</string>
     <string name="settings_section_detection">ตัวเลือกการตรวจจับ</string>
+    <string name="settings_section_network">เครือข่าย</string>
     <string name="settings_title">การตั้งค่า</string>
     <string name="update_settings_label">ตรวจสอบอัปเดต</string>
     <string name="update_status_available">มี Nightly รุ่นใหม่; แตะเพื่อดูรายละเอียด</string>

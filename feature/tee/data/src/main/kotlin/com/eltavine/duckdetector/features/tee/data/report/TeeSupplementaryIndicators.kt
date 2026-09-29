@@ -67,12 +67,13 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
             )
         )
     }
-    if (generateModeAnomalyState(artifacts) == GenerateModeAnomalyState.MATCHED) {
+    val generateModeLevel = generateModeAnomalyLevel(artifacts)
+    if (generateModeLevel == TeeSignalLevel.FAIL || generateModeLevel == TeeSignalLevel.WARN) {
         add(
             fact(
                 "TEE Simulator generate-mode fingerprint",
-                "Matched TEE Simulator generate-mode fingerprint.",
-                TeeSignalLevel.FAIL,
+                generateModeAnomalyValue(artifacts),
+                generateModeLevel,
                 hiddenCopyText = artifacts.generateModeParcelFingerprint.diagnosticCopyText,
             )
         )

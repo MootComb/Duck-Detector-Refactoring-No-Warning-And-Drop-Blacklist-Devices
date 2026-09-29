@@ -25,6 +25,7 @@ limitations under the License.
         <item quantity="one">Ще 1 коміт не показано</item>
         <item quantity="other">Ще %1$d комітів не показано</item>
     </plurals>
+    <string name="update_remaining_commits_unknown">Попередні коміти можуть бути не показані</string>
     <string name="update_later">Пізніше</string>
     <string name="update_view_changes">Переглянути всі зміни на GitHub</string>
     <string name="update_download">Відкрити завантаження</string>

@@ -79,17 +79,14 @@ internal fun trustStatus(report: BootloaderReport): DetectorStatus {
 }
 
 internal fun BootloaderReport.toCardAssessment(): BootloaderCardAssessment {
-    val widevineFindings = findings.filter { finding ->
-        finding.id.startsWith(WIDEVINE_FINDING_PREFIX)
+    val widevineReview = findings.any { finding ->
+        finding.id.startsWith(WIDEVINE_FINDING_PREFIX) &&
+            finding.severity == BootloaderFindingSeverity.WARNING
     }
-    return when {
-        widevineFindings.any { it.severity == BootloaderFindingSeverity.DANGER } ->
-            BootloaderCardAssessment.CONSISTENCY_CONFLICT
-
-        widevineFindings.any { it.severity == BootloaderFindingSeverity.WARNING } ->
-            BootloaderCardAssessment.CONSISTENCY_REVIEW
-
-        else -> BootloaderCardAssessment.AUTHORITATIVE
+    return if (widevineReview) {
+        BootloaderCardAssessment.CONSISTENCY_REVIEW
+    } else {
+        BootloaderCardAssessment.AUTHORITATIVE
     }
 }
 

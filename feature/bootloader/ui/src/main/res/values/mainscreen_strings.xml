@@ -18,5 +18,4 @@ limitations under the License.
     tools:ignore="MissingTranslation"
     tools:locale="en">
     <string name="bootloader_widevine_consistency_review">Widevine consistency needs review</string>
-    <string name="bootloader_widevine_consistency_conflict">Critical Widevine consistency conflict</string>
 </resources>

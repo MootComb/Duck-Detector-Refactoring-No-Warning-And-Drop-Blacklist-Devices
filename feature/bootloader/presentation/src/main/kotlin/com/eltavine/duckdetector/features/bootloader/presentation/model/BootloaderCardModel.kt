@@ -22,7 +22,6 @@ import com.eltavine.duckdetector.core.report.DetectorHeadline
 enum class BootloaderCardAssessment {
     AUTHORITATIVE,
     CONSISTENCY_REVIEW,
-    CONSISTENCY_CONFLICT,
 }
 
 data class BootloaderCardModel(
@@ -48,7 +47,6 @@ data class BootloaderCardModel(
         get() = when (assessment) {
             BootloaderCardAssessment.AUTHORITATIVE -> null
             BootloaderCardAssessment.CONSISTENCY_REVIEW -> DetectorStatus.warning()
-            BootloaderCardAssessment.CONSISTENCY_CONFLICT -> DetectorStatus.danger()
         }
 }
 

@@ -27,7 +27,7 @@ limitations under the License.
     <string name="disclaimer_title">免責事項</string>
     <string name="disclaimer_content" formatted="false">重要なお知らせ:\n\n1. 検出の限界\nDuck Detector は端末のセキュリティ状態を検出するために複数の方法を使用しますが、どの方法も 100&#37; 正確ではありません。結果は最終判定ではなく、参考情報として扱ってください。\n\n2. 誤検出と見逃し\nこのアプリは誤検出または見逃しを起こす可能性があります。より包括的な判断のために、専門的なセキュリティツールとご自身の確認を必ず併用してください。\n\n3. 責任の制限\nDuck Detector の開発者、貢献者、および配布者は、このアプリの使用または使用不能によって生じる直接的、間接的、付随的、特別、または結果的損害について責任を負いません。\n\n4. 第三者サービス\nTEE の失効確認は既定でアプリ内蔵スナップショットを使用します。オンライン失効データ更新を許可すると、アプリが Google attestation revocation endpoint に接続する場合があります。セキュリティスキャン自体は引き続き端末上でローカルに実行され、検出結果がスキャンテレメトリとして意図的にアップロードされることはありません。</string>
     <string name="privacy_notice_title">プライバシー通知</string>
-    <string name="privacy_notice_content" formatted="false">プライバシー概要: セキュリティチェックは端末上でローカルに実行され、検出結果がスキャンテレメトリとしてアップロードされることはありません。TEE の失効確認は既定で内蔵スナップショットを使用します。起動時の選択完了後、アプリはコールドスタートごとに GitHub へ一度接続し、Nightly 更新メタデータを確認します。</string>
+    <string name="privacy_notice_content" formatted="false">プライバシー概要: セキュリティチェックは端末上でローカルに実行され、検出結果がスキャンテレメトリとしてアップロードされることはありません。TEE の失効確認は既定で内蔵スナップショットを使用します。起動時の選択完了後、アプリはコールドスタートごとに GitHub へ一度接続し、Nightly 更新メタデータを確認します。GitHub 高速化をオンにすると、これらのリクエストはサードパーティの gh-proxy.com を経由します。</string>
     <string name="timer_elapsed">30 秒経過</string>
     <string name="timer_waiting">%1$d 秒お待ちください</string>
     <string name="fully_reviewed">全文確認済み</string>

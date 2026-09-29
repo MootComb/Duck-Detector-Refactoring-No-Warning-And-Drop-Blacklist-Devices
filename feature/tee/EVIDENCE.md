@@ -52,7 +52,7 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 
 ### Timing side channel and skip signatures
 
-- Observable signal: getKeyEntry timing for attested and non-attested keys through keystore2's private binder, the exception stacks captured when that measurement cannot start, and the generate-mode parcel fingerprint (the Timing side-channel and TEE Simulator generate-mode fingerprint rows).
+- Observable signal: getKeyEntry timing for attested and non-attested keys through keystore2's private binder, and the exception stacks captured when that measurement cannot start (the Timing side-channel row; TEE Simulator's legacy-database stack also marks the TEE Simulator generate-mode fingerprint row).
 - Producing subsystem: keystore2 and any process intercepting its binder calls.
 - Mechanism: an interception module that post-processes attested keys adds latency, and some modules answer with characteristic error codes and stacks.
 - References: frameworks/base core/java/android/content/pm/PackageManager.java (FEATURE_KEYSTORE_APP_ATTEST_KEY). Discovery only: the TrickyStore and TEE Simulator stack signatures come from collected samples.
@@ -60,6 +60,17 @@ The TEE detector asks whether this device's hardware-backed keystore behaves lik
 - Visibility limits: timing varies with CPU frequency and load; the proxy numbering in the stack needles depends on this app's own proxy creation.
 - Result states: measured, suspicious, skipped with a matched signature, skipped.
 - Interpretation: the specific signatures are FAIL worded as matching a known keystore-interception module; the generic binder exception fallback applies only where app attestation keys are advertised.
+
+### generateKey reply structure
+
+- Observable signal: the reply keystore2 sends for this app's own generateKey call, read as a stable AIDL parcel (the TEE Simulator generate-mode fingerprint row).
+- Producing subsystem: keystore2, which adds its own USER_ID to the KeyMint characteristics, the KeyMint behind it, and any process intercepting its binder calls.
+- Mechanism: keystore2's store_new_key appends a SOFTWARE-level USER_ID after the KeyMint characteristics of every key it stores, so a reply without it as the last authorization was not assembled by keystore2; every AOSP KeyMint path returns CREATION_DATETIME at the KEYSTORE level.
+- References: system/security keystore2/src/security_level.rs (store_new_key) and keystore2/src/km_compat/km_compat.cpp; system/keymint common/src/tag/info.rs and system/keymaster ng/AndroidKeyMintDevice.cpp (CREATION_DATETIME at KEYSTORE); hardware/interfaces security/keymint/aidl Tag.aidl (CREATION_DATETIME only has to be software-enforced); frameworks/native libs/binder/rust/src/parcel.rs (non-null markers and self-counting size headers).
+- Applicability: keystore2, so Android 12 and later.
+- Visibility limits: an interceptor that simulates KeyMint beneath keystore2 leaves keystore2's own reply intact, so these checks see only what the simulated KeyMint returns; the TEE Simulator samples come from earlier releases.
+- Result states: matched, review, clean, unavailable.
+- Interpretation: a reply keystore2 could not have assembled is FAIL; a CREATION_DATETIME outside KEYSTORE, which the KeyMint spec permits, is WARN.
 
 ### Keystore2 binder, grant and metadata probes
 

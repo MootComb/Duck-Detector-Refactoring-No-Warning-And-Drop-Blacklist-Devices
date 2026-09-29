@@ -25,6 +25,7 @@ limitations under the License.
         <item quantity="one">추가 커밋 1개가 표시되지 않음</item>
         <item quantity="other">추가 커밋 %1$d개가 표시되지 않음</item>
     </plurals>
+    <string name="update_remaining_commits_unknown">이전 커밋이 표시되지 않을 수 있음</string>
     <string name="update_later">나중에</string>
     <string name="update_view_changes">GitHub에서 모든 변경 사항 보기</string>
     <string name="update_download">다운로드 열기</string>

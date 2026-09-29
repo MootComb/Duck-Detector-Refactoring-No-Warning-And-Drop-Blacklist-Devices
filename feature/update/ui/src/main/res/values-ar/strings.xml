@@ -25,6 +25,7 @@ limitations under the License.
         <item quantity="one">لم يتم عرض التزام إضافي واحد</item>
         <item quantity="other">لم يتم عرض %1$d من الالتزامات الإضافية</item>
     </plurals>
+    <string name="update_remaining_commits_unknown">قد لا تُعرض الالتزامات الأقدم</string>
     <string name="update_later">لاحقًا</string>
     <string name="update_view_changes">عرض كل التغييرات على GitHub</string>
     <string name="update_download">فتح التنزيل</string>

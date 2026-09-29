@@ -34,7 +34,7 @@ limitations under the License.
     <string name="about_label_privacy">الخصوصية / استخدام البيانات</string>
     <string name="about_label_version">الإصدار</string>
     <string name="about_label_website">الموقع الإلكتروني</string>
-    <string name="about_privacy_summary">تعمل الفحوصات محليًا ولا تُرفع نتائج الكشف. يتصل التطبيق بـ GitHub مرة واحدة عند كل تشغيل بارد لجلب بيانات تحديث Nightly. يظل تحديث CRL عبر الإنترنت اختياريًا.</string>
+    <string name="about_privacy_summary">تعمل الفحوصات محليًا ولا تُرفع نتائج الكشف. يتصل التطبيق بـ GitHub مرة واحدة عند كل تشغيل بارد لجلب بيانات تحديث Nightly (عبر gh-proxy.com عند تفعيل تسريع GitHub). يظل تحديث CRL عبر الإنترنت اختياريًا.</string>
     <string name="about_subtitle">روابط المشروع وبيانات البناء.</string>
     <string name="about_title">حول</string>
     <string name="about_value_build_time">%1$s UTC</string>
@@ -48,6 +48,9 @@ limitations under the License.
     <string name="author_summary_victor">CI</string>
     <string name="author_summary_wxx">CI ‏(Kotlin)</string>
     <string name="author_summary_xiaotong">TEE ‏(C++، Kotlin)</string>
+    <string name="github_acceleration_footer">gh-proxy.com خدمة تابعة لجهة خارجية. أثناء التفعيل، تمر عمليات التحقق من التحديثات وتنزيلات Nightly عبرها بدلًا من الاتصال بـ GitHub مباشرة. ولا يمكنها تمرير مقارنة الالتزامات، لذا قد لا يعرض مربع حوار التحديث إلا أحدث التزام.</string>
+    <string name="github_acceleration_summary">التحقق من تحديثات Nightly وتنزيلها عبر gh-proxy.com</string>
+    <string name="github_acceleration_title">تسريع GitHub</string>
     <string name="licenses_dialog_close">إغلاق</string>
     <string name="licenses_dialog_home_page">الصفحة الرئيسية</string>
     <string name="licenses_dialog_no_license_text">لا يتوفر نص ترخيص.</string>
@@ -62,6 +65,7 @@ limitations under the License.
     <string name="licenses_screen_subtitle">مكونات الجهات الخارجية المضمَّنة في هذا البناء.</string>
     <string name="licenses_screen_title">تراخيص المصادر المفتوحة</string>
     <string name="settings_section_detection">خيارات الكشف</string>
+    <string name="settings_section_network">الشبكة</string>
     <string name="settings_title">الإعدادات</string>
     <string name="update_settings_label">التحقق من التحديثات</string>
     <string name="update_status_available">يتوفر إصدار Nightly أحدث؛ اضغط للتفاصيل</string>

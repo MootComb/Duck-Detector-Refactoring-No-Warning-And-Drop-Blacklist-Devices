@@ -16,6 +16,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.report
 
+import com.eltavine.duckdetector.features.tee.data.verification.keystore.GenerateKeyReplyAnomaly
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyMetadataSemanticsResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyMintCapabilityResult
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.KeyMintCryptoCapabilityResult
@@ -177,7 +178,7 @@ class TeeReportReducerKeyMintTest {
                 generateModeParcelFingerprint = Keystore2GenerateModeParcelFingerprintResult(
                     executed = true,
                     available = true,
-                    matched = true,
+                    anomaly = GenerateKeyReplyAnomaly.USER_ID_NOT_APPENDED_BY_KEYSTORE,
                     diagnosticCopyText = "reply raw hex dump",
                     detail = "generate-mode parcel fingerprint observed",
                 ),
@@ -186,6 +187,7 @@ class TeeReportReducerKeyMintTest {
 
         assertEquals(TeeVerdict.CONSISTENT, report.verdict)
         assertEquals(1, report.supplementaryIndicatorCount)
+        assertEquals(TeeSignalLevel.FAIL, report.supplementaryReviewLevel)
         assertTrue(report.summary.contains("TEE Simulator generate-mode fingerprint", ignoreCase = true))
         assertTrue(report.signals.take(4).any { it.label == "Signals" })
         assertTrue(report.signals.any {
@@ -200,13 +202,39 @@ class TeeReportReducerKeyMintTest {
     }
 
     @Test
+    fun `creation datetime outside keystore is a supplementary warning rather than a failure`() {
+        val report = reducer.reduce(
+            baseArtifacts(
+                generateModeParcelFingerprint = Keystore2GenerateModeParcelFingerprintResult(
+                    executed = true,
+                    available = true,
+                    anomaly = GenerateKeyReplyAnomaly.CREATION_DATETIME_OUTSIDE_KEYSTORE,
+                    diagnosticCopyText = "review diagnostic",
+                    detail = "creation datetime outside keystore",
+                ),
+            ),
+        )
+
+        assertEquals(TeeVerdict.CONSISTENT, report.verdict)
+        assertEquals(1, report.supplementaryIndicatorCount)
+        assertEquals(TeeSignalLevel.WARN, report.supplementaryReviewLevel)
+        assertTrue(report.signals.any {
+            it.label == "TEE Simulator generate-mode fingerprint" && it.value == "Review"
+        })
+        assertTrue(report.sections.single { it.title == "Checks" }.items.any {
+            it.title == "TEE Simulator generate-mode fingerprint" &&
+                it.body.contains("CREATION_DATETIME") &&
+                it.hiddenCopyText == "review diagnostic"
+        })
+    }
+
+    @Test
     fun `generate mode parcel fingerprint clean state stays out of supplementary review`() {
         val report = reducer.reduce(
             baseArtifacts(
                 generateModeParcelFingerprint = Keystore2GenerateModeParcelFingerprintResult(
                     executed = true,
                     available = true,
-                    matched = false,
                     diagnosticCopyText = "clean diagnostic",
                     detail = "clean",
                 ),

@@ -69,6 +69,11 @@ data class BootloaderFinding(
     val severity: BootloaderFindingSeverity,
     val detail: String? = null,
     val detailMonospace: Boolean = false,
+    /**
+     * True for evidence that is shown at its severity but can only corroborate other findings, so it
+     * does not set the verdict on its own.
+     */
+    val corroborating: Boolean = false,
 )
 
 data class BootloaderImpact(
@@ -103,11 +108,13 @@ data class BootloaderReport(
     val methods: List<BootloaderMethodResult>,
     val errorMessage: String? = null,
 ) {
+    /** The danger findings that set the verdict; corroborating findings are left out. */
     val dangerFindings: List<BootloaderFinding>
-        get() = findings.filter { it.severity == BootloaderFindingSeverity.DANGER }
+        get() = findings.filter { it.severity == BootloaderFindingSeverity.DANGER && !it.corroborating }
 
+    /** The warning findings that set the verdict; corroborating findings are left out. */
     val warningFindings: List<BootloaderFinding>
-        get() = findings.filter { it.severity == BootloaderFindingSeverity.WARNING }
+        get() = findings.filter { it.severity == BootloaderFindingSeverity.WARNING && !it.corroborating }
 
     val stateRows: List<BootloaderFinding>
         get() = findings.filter { it.group == BootloaderFindingGroup.STATE }

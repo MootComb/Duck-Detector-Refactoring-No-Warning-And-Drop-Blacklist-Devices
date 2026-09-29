@@ -22,6 +22,7 @@ data class SettingsUiState(
     val buildTimeUtc: String,
     val buildHash: String,
     val updateStatus: SettingsUpdateStatus,
+    val gitHubAccelerationEnabled: Boolean,
 )
 
 enum class SettingsUpdateStatus {

@@ -31,7 +31,6 @@ internal class WidevineCredentialClassifier {
         return WidevineCredentialAssessment(
             findings = findings,
             methodSummary = when (methodSeverity) {
-                WidevineAssessmentSeverity.DANGER -> "DRM inconsistency"
                 WidevineAssessmentSeverity.WARNING -> "Needs review"
                 WidevineAssessmentSeverity.SUPPORT -> "Partial"
                 WidevineAssessmentSeverity.SAFE -> "Consistent"
@@ -93,10 +92,15 @@ internal class WidevineCredentialClassifier {
         }
 
         val detail = buildDetail(snapshot, bootContext)
+        // The system ID is read from the L1 keybox or OEM certificate, and the CDM falls back to L3
+        // when that credential is invalid, so the two signs observe one credential rather than
+        // corroborating each other.
+        // https://android.googlesource.com/platform/vendor/widevine/+/refs/tags/android-9.0.0_r1/libwvdrmengine/cdm/core/src/crypto_session.cpp
+        // https://android.googlesource.com/platform/vendor/widevine/+/refs/tags/android-9.0.0_r1/libwvdrmengine/cdm/core/src/oemcrypto_adapter_dynamic.cpp
         return when {
             sentinel && sessionDowngrade -> credentialFinding(
-                value = "Corroborated anomaly",
-                severity = WidevineAssessmentSeverity.DANGER,
+                value = "Sentinel ID and lower session",
+                severity = WidevineAssessmentSeverity.WARNING,
                 detail = detail,
             )
 
@@ -268,28 +272,13 @@ internal class WidevineCredentialClassifier {
         parity: WidevineAssessmentFinding,
     ): WidevineAssessmentFinding? {
         return when {
-            credential.severity == WidevineAssessmentSeverity.DANGER ->
-                WidevineAssessmentFinding(
-                    id = "widevine_impact",
-                    label = "Widevine impact",
-                    value = "Auxiliary DRM inconsistency",
-                    severity = WidevineAssessmentSeverity.DANGER,
-                    detail = "The exact sentinel and a lower maximum-session level were observed despite video/mp4 HW_SECURE_ALL support. This is a critical DRM conflict, not standalone proof of the current bootloader state.",
-                )
-
             credential.severity == WidevineAssessmentSeverity.WARNING ->
                 WidevineAssessmentFinding(
                     id = "widevine_impact",
                     label = "Widevine impact",
                     value = "Auxiliary DRM signal",
                     severity = WidevineAssessmentSeverity.WARNING,
-                    detail = when (credential.value) {
-                        "Sentinel system ID" ->
-                            "The exact Widevine sentinel requires review but does not override the current bootloader state."
-
-                        else ->
-                            "The maximum-security session resolved below HW_SECURE_ALL despite reported support; the DRM result requires review."
-                    },
+                    detail = "Widevine reports L1 but returned the sentinel system ID or a lower maximum session. A wiped or invalid keybox can look the same as an unlock, so this needs review and does not change the bootloader verdict on its own.",
                 )
 
             parity.severity == WidevineAssessmentSeverity.WARNING ->
@@ -316,6 +305,7 @@ internal class WidevineCredentialClassifier {
             value = value,
             severity = severity,
             detail = detail,
+            corroborating = true,
         )
     }
 
@@ -366,7 +356,6 @@ internal class WidevineCredentialClassifier {
 
     private fun List<WidevineAssessmentSeverity>.highestSeverity(): WidevineAssessmentSeverity {
         return when {
-            WidevineAssessmentSeverity.DANGER in this -> WidevineAssessmentSeverity.DANGER
             WidevineAssessmentSeverity.WARNING in this -> WidevineAssessmentSeverity.WARNING
             WidevineAssessmentSeverity.SUPPORT in this -> WidevineAssessmentSeverity.SUPPORT
             else -> WidevineAssessmentSeverity.SAFE

@@ -189,8 +189,14 @@ internal fun buildSignals(
                 ),
             ),
         )
-        if (generateModeAnomalyState(artifacts) == GenerateModeAnomalyState.MATCHED) {
-            add(TeeSignal("TEE Simulator generate-mode fingerprint", "Matched", TeeSignalLevel.FAIL))
+        when (generateModeAnomalyState(artifacts)) {
+            GenerateModeAnomalyState.MATCHED ->
+                add(TeeSignal("TEE Simulator generate-mode fingerprint", "Matched", TeeSignalLevel.FAIL))
+
+            GenerateModeAnomalyState.REVIEW ->
+                add(TeeSignal("TEE Simulator generate-mode fingerprint", "Review", TeeSignalLevel.WARN))
+
+            GenerateModeAnomalyState.CLEAN, GenerateModeAnomalyState.UNAVAILABLE -> Unit
         }
         add(TeeSignal("CRL", crlSignalValue(artifacts), crlSignalLevel(artifacts)))
         if (artifacts.native.trickyStoreDetected || artifacts.native.leafDerPrimaryDetected || artifacts.native.leafDerSecondaryDetected) {

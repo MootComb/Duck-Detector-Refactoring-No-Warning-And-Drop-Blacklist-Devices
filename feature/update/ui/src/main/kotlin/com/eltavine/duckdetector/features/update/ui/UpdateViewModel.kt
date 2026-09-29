@@ -96,7 +96,7 @@ class UpdateViewModel internal constructor(
                         isDialogVisible = true,
                     )
                     if (result.update.manifest == displayedManifest) {
-                        UpdateDownloadResolution.Ready(result.update.manifest.apk.downloadUrl)
+                        UpdateDownloadResolution.Ready(result.update.downloadUrl)
                     } else {
                         UpdateDownloadResolution.Refreshed
                     }

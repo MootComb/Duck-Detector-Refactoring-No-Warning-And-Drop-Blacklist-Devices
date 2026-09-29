@@ -24,54 +24,90 @@ internal fun hexToBytes(rawHex: String): ByteArray {
     }
 }
 
-internal fun variableCountGenerateModeReply(
-    firstUnionTag: Int = 1,
-    lastSecLevel: Int = 256,
-    lastTag: Int = 0x00000001,
-    lastUnionTag: Int = 32,
-    modificationTimeMs: Long = 4_294_967_297L,
+internal data class ReplyAuthorization(
+    val securityLevel: Int,
+    val tag: Int,
+    val valueTag: Int,
+    /** The int or long value, or the length of a blob. */
+    val value: Long,
+)
+
+internal val ALGORITHM_EC = ReplyAuthorization(securityLevel = 1, tag = 0x10000002, valueTag = 1, value = 3)
+internal val EC_CURVE_P256 = ReplyAuthorization(securityLevel = 1, tag = 0x1000000A, valueTag = 5, value = 1)
+internal val CREATION_DATETIME_KEYSTORE =
+    ReplyAuthorization(securityLevel = 100, tag = 0x600002BD, valueTag = 13, value = 1_780_330_308_000L)
+internal val USER_ID_SOFTWARE = ReplyAuthorization(securityLevel = 0, tag = 0x300001F5, valueTag = 11, value = 0)
+
+/** What keystore2 over a stock KeyMint returns: KeyMint characteristics, then keystore2's USER_ID. */
+internal val STOCK_AUTHORIZATIONS = listOf(ALGORITHM_EC, EC_CURVE_P256, CREATION_DATETIME_KEYSTORE, USER_ID_SOFTWARE)
+
+/** Builds a generateKey reply the way keystore2's Rust AIDL backend writes it. */
+internal fun generateKeyReply(
+    authorizations: List<ReplyAuthorization> = STOCK_AUTHORIZATIONS,
+    exceptionCode: Int = 0,
+    modificationTimeMs: Long = 1_780_330_308_917L,
 ): ByteArray {
     return buildList {
-        addIntLe(0)
-        addKeyDescriptorHeader(totalPayloadBytes = 0)
-        addIntLe(1)
-        addIntLe(2)
-        addAuthorization(secLevel = 1, tag = 0x00000020, unionTag = firstUnionTag, value = 1)
-        addAuthorization(secLevel = lastSecLevel, tag = lastTag, unionTag = lastUnionTag, value = 1)
-        addIntLe(1)
-        addIntLe(1)
-        add(0xAA.toByte())
-        padToParcelWord()
-        addIntLe(1)
-        addIntLe(1)
-        add(0xBB.toByte())
-        padToParcelWord()
-        addLongLe(modificationTimeMs)
+        addIntLe(exceptionCode)
+        addParcelable {
+            addParcelable {
+                addIntLe(4)
+                addLongLe(0x1122334455667788L)
+                addIntLe(-1)
+                addIntLe(-1)
+            }
+            addIntLe(1)
+            addIntLe(authorizations.size)
+            authorizations.forEach { authorization ->
+                addParcelable {
+                    addIntLe(authorization.securityLevel)
+                    addParcelable {
+                        addIntLe(authorization.tag)
+                        addIntLe(1)
+                        addIntLe(authorization.valueTag)
+                        when (authorization.valueTag) {
+                            12, 13 -> addLongLe(authorization.value)
+                            14 -> addByteArray(ByteArray(authorization.value.toInt()))
+                            else -> addIntLe(authorization.value.toInt())
+                        }
+                    }
+                }
+            }
+            addByteArray(byteArrayOf(0xAA.toByte()))
+            addByteArray(byteArrayOf(0xBB.toByte()))
+            addLongLe(modificationTimeMs)
+        }
     }.toByteArray()
 }
 
-private fun MutableList<Byte>.addKeyDescriptorHeader(totalPayloadBytes: Int) {
-    addIntLe(totalPayloadBytes)
-    addIntLe(1)
-    addIntLe(24)
-    addIntLe(4)
-    addLongLe(0x1122334455667788L)
-    addLongLe(-1L)
-    addIntLe(1)
+/**
+ * The reply from the stock Samsung device in issue #63, up to its last authorization, followed by its
+ * certificate and chain lengths with zeroed contents and its modification time.
+ */
+internal fun samsungStockReply(): ByteArray {
+    return buildList {
+        addAll(hexToBytes(SAMSUNG_STOCK_REPLY_PREFIX_HEX).asList())
+        addByteArray(ByteArray(681))
+        addByteArray(ByteArray(2410))
+        addLongLe(1_780_330_308_917L)
+    }.toByteArray()
 }
 
-private fun MutableList<Byte>.addAuthorization(
-    secLevel: Int,
-    tag: Int,
-    unionTag: Int,
-    value: Int,
-) {
-    addIntLe(secLevel)
-    addIntLe(tag)
-    addIntLe(unionTag)
-    if (unionTag in 1..11) {
-        addIntLe(value)
+private fun MutableList<Byte>.addParcelable(fields: MutableList<Byte>.() -> Unit) {
+    addIntLe(1)
+    val sizeOffset = size
+    addIntLe(0)
+    fields()
+    val parcelableSize = size - sizeOffset
+    repeat(Int.SIZE_BYTES) { index ->
+        this[sizeOffset + index] = ((parcelableSize ushr (index * Byte.SIZE_BITS)) and 0xFF).toByte()
     }
+}
+
+private fun MutableList<Byte>.addByteArray(bytes: ByteArray) {
+    addIntLe(bytes.size)
+    addAll(bytes.asList())
+    padToParcelWord()
 }
 
 private fun MutableList<Byte>.addIntLe(value: Int) {
@@ -233,4 +269,38 @@ internal val LEAF_CERTIFICATE_REPLY_HEX = """
     01 00 00 00 20 00 00 00 00 00 00 00 01 00 00 00
     14 00 00 00 F5 01 00 30 01 00 00 00 0B 00 00 00
     00 00 00 00 A3 02 00 00 30 82 02 9F
+""".trimIndent()
+
+internal val SAMSUNG_STOCK_REPLY_PREFIX_HEX = """
+    00 00 00 00 01 00 00 00 04 0E 00 00 01 00 00 00
+    18 00 00 00 04 00 00 00 E1 C0 5D 8D A6 32 2A 9A
+    FF FF FF FF FF FF FF FF 01 00 00 00 0C 00 00 00
+    01 00 00 00 20 00 00 00 01 00 00 00 01 00 00 00
+    14 00 00 00 02 00 00 10 01 00 00 00 01 00 00 00
+    03 00 00 00 01 00 00 00 20 00 00 00 01 00 00 00
+    01 00 00 00 14 00 00 00 0A 00 00 10 01 00 00 00
+    05 00 00 00 01 00 00 00 01 00 00 00 20 00 00 00
+    01 00 00 00 01 00 00 00 14 00 00 00 BE 02 00 10
+    01 00 00 00 06 00 00 00 00 00 00 00 01 00 00 00
+    20 00 00 00 01 00 00 00 01 00 00 00 14 00 00 00
+    01 00 00 20 01 00 00 00 07 00 00 00 02 00 00 00
+    01 00 00 00 20 00 00 00 01 00 00 00 01 00 00 00
+    14 00 00 00 05 00 00 20 01 00 00 00 04 00 00 00
+    04 00 00 00 01 00 00 00 20 00 00 00 01 00 00 00
+    01 00 00 00 14 00 00 00 F7 01 00 70 01 00 00 00
+    0A 00 00 00 01 00 00 00 01 00 00 00 20 00 00 00
+    01 00 00 00 01 00 00 00 14 00 00 00 C1 02 00 30
+    01 00 00 00 0B 00 00 00 E0 22 02 00 01 00 00 00
+    20 00 00 00 01 00 00 00 01 00 00 00 14 00 00 00
+    C2 02 00 30 01 00 00 00 0B 00 00 00 06 17 03 00
+    01 00 00 00 20 00 00 00 01 00 00 00 01 00 00 00
+    14 00 00 00 CE 02 00 30 01 00 00 00 0B 00 00 00
+    59 FE 34 01 01 00 00 00 20 00 00 00 01 00 00 00
+    01 00 00 00 14 00 00 00 CF 02 00 30 01 00 00 00
+    0B 00 00 00 59 FE 34 01 01 00 00 00 24 00 00 00
+    64 00 00 00 01 00 00 00 18 00 00 00 BD 02 00 60
+    01 00 00 00 0D 00 00 00 29 A5 F4 83 9E 01 00 00
+    01 00 00 00 20 00 00 00 00 00 00 00 01 00 00 00
+    14 00 00 00 F5 01 00 30 01 00 00 00 0B 00 00 00
+    00 00 00 00
 """.trimIndent()

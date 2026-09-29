@@ -107,7 +107,7 @@ class BootloaderCardModelMapperTest {
     }
 
     @Test
-    fun `Widevine warning adds review assessment without changing verified state`() {
+    fun `corroborating Widevine warning adds a review badge without changing the verdict`() {
         val model = mapper.map(
             report = report(
                 findings = listOf(
@@ -118,6 +118,7 @@ class BootloaderCardModelMapperTest {
                         group = BootloaderFindingGroup.CONSISTENCY,
                         severity = BootloaderFindingSeverity.WARNING,
                         detail = "DRM credential anomaly; not standalone unlock proof.",
+                        corroborating = true,
                     ),
                 ),
                 methods = listOf(
@@ -139,8 +140,8 @@ class BootloaderCardModelMapperTest {
         assertEquals(BootloaderCardAssessment.CONSISTENCY_REVIEW, model.assessment)
         assertTrue(model.showConsistencyQuestionIcon)
         assertEquals(DetectorStatus.warning(), model.assessmentStatus)
-        assertEquals(DetectorStatus.warning(), model.status)
-        assertEquals("1 DRM consistency signal(s) need review", model.verdict)
+        assertEquals(DetectorStatus.allClear(), model.status)
+        assertEquals("Locked and attested verified", model.verdict)
         assertEquals(
             DetectorStatus.warning(),
             model.consistencyRows.single { it.label == "Widevine credential" }.status,
@@ -156,46 +157,28 @@ class BootloaderCardModelMapperTest {
     }
 
     @Test
-    fun `Widevine danger adds conflict assessment without changing verified state`() {
+    fun `Widevine parity warning still sets the card verdict`() {
         val model = mapper.map(
             report = report(
                 findings = listOf(
                     BootloaderFinding(
-                        id = "widevine_credential",
-                        label = "Widevine credential",
-                        value = "Corroborated anomaly",
+                        id = "widevine_property_parity",
+                        label = "Widevine Java/native parity",
+                        value = "Mismatch",
                         group = BootloaderFindingGroup.CONSISTENCY,
-                        severity = BootloaderFindingSeverity.DANGER,
-                    ),
-                ),
-                methods = listOf(
-                    BootloaderMethodResult(
-                        label = "Widevine credential",
-                        summary = "DRM inconsistency",
-                        outcome = BootloaderMethodOutcome.DANGER,
+                        severity = BootloaderFindingSeverity.WARNING,
                     ),
                 ),
                 consistencyFindingCount = 1,
             ),
         )
 
-        assertEquals("Verified", model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.value)
+        assertEquals(DetectorStatus.warning(), model.status)
+        assertEquals("1 DRM consistency signal(s) need review", model.verdict)
+        assertEquals(BootloaderCardAssessment.CONSISTENCY_REVIEW, model.assessment)
         assertEquals(
             DetectorStatus.allClear(),
             model.headerFacts.single { it.fact == BootloaderHeaderFact.STATE }.status,
-        )
-        assertEquals(BootloaderCardAssessment.CONSISTENCY_CONFLICT, model.assessment)
-        assertTrue(model.showConsistencyQuestionIcon)
-        assertEquals(DetectorStatus.danger(), model.assessmentStatus)
-        assertEquals(DetectorStatus.danger(), model.status)
-        assertEquals("1 critical DRM consistency signal(s)", model.verdict)
-        assertEquals(
-            DetectorStatus.danger(),
-            model.consistencyRows.single { it.label == "Widevine credential" }.status,
-        )
-        assertEquals(
-            DetectorStatus.danger(),
-            model.scanRows.single { it.label == "Cross-checks" }.status,
         )
     }
 
@@ -217,6 +200,7 @@ class BootloaderCardModelMapperTest {
                         value = "Sentinel system ID",
                         group = BootloaderFindingGroup.CONSISTENCY,
                         severity = BootloaderFindingSeverity.WARNING,
+                        corroborating = true,
                     ),
                 ),
                 consistencyFindingCount = 1,

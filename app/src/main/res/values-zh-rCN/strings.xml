@@ -27,7 +27,7 @@ limitations under the License.
     <string name="disclaimer_title">免责声明</string>
     <string name="disclaimer_content" formatted="false">重要提示：\n\n1. 检测局限性\nDuck Detector 使用多种方法检测设备安全状态，但没有任何检测方法能做到 100&#37; 准确。结果应视为提示信息，而非最终定论。\n\n2. 误报与漏报\n本应用可能出现误报或漏报。请始终结合专业安全工具与您自己的核验进行全面判断。\n\n3. 免责条款\n对于因使用或无法使用本应用而导致的任何直接、间接、附带、特殊或后果性损失，Duck Detector 的开发者、贡献者和分发者概不承担责任。\n\n4. 第三方服务\nTEE 吊销检查默认使用应用内置快照。如果您允许在线吊销库更新，应用可能会访问 Google 的 attestation revocation endpoint。安全扫描本身仍在您的设备本地执行，检测结果也不会被有意上传为扫描遥测。</string>
     <string name="privacy_notice_title">隐私说明</string>
-    <string name="privacy_notice_content" formatted="false">隐私摘要：安全检查在您的设备本地执行，检测结果不会被有意上传为扫描遥测。TEE 吊销检查默认使用应用内置快照；如果您允许在线刷新，应用可能会访问 Google 的 attestation revocation endpoint。完成启动选项后，应用会在每次冷启动时访问一次 GitHub，以检查 Nightly 更新元数据。</string>
+    <string name="privacy_notice_content" formatted="false">隐私摘要：安全检查在您的设备本地执行，检测结果不会被有意上传为扫描遥测。TEE 吊销检查默认使用应用内置快照；如果您允许在线刷新，应用可能会访问 Google 的 attestation revocation endpoint。完成启动选项后，应用会在每次冷启动时访问一次 GitHub，以检查 Nightly 更新元数据。如果您开启 GitHub 加速，这些请求将改由第三方服务 gh-proxy.com 中转。</string>
     <string name="timer_elapsed">已等待 30 秒</string>
     <string name="timer_waiting">请等待 %1$d 秒</string>
     <string name="fully_reviewed">已完整阅读</string>

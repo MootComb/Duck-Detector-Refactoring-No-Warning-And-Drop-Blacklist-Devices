@@ -18,6 +18,12 @@ package com.eltavine.duckdetector.features.update.data
 
 import android.content.Context
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateChecker
+import kotlinx.coroutines.flow.first
 
-fun createNightlyUpdateChecker(appContext: Context): NightlyUpdateChecker =
-    UpdateRepository(cache = UpdateCacheStore.getInstance(appContext))
+fun createNightlyUpdateChecker(appContext: Context): NightlyUpdateChecker {
+    val accelerationStore = GitHubAccelerationStore.getInstance(appContext)
+    return UpdateRepository(
+        cache = UpdateCacheStore.getInstance(appContext),
+        currentRoute = { GitHubRoute.of(accelerationStore.acceleration.first()) },
+    )
+}

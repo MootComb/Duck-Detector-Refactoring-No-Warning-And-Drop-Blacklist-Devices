@@ -44,8 +44,8 @@ The Bootloader detector asks whether the bootloader is locked and verified boot 
 - Observable signal: ro.boot.warranty_bit and ro.boot.knox.state on Samsung devices, and the Widevine security level and credential through MediaDrm.
 - Producing subsystem: Samsung's bootloader, and the Widevine DRM plugin.
 - Mechanism: Samsung trips a permanent fuse on unofficial boot images; Widevine L1 is withheld from unlocked devices on many vendors.
-- References: Discovery only: the warranty properties and the Widevine behaviour are vendor behaviour, not documented AOSP contracts.
+- References: Discovery only: the warranty properties and the Widevine behaviour are vendor behaviour, not documented AOSP contracts, and the meaning of the sentinel system ID is unconfirmed. vendor/widevine libwvdrmengine/cdm/core/src/crypto_session.cpp and oemcrypto_adapter_dynamic.cpp at android-9.0.0_r1 show the system ID read from the L1 keybox or OEM certificate, and the CDM falling back to L3 when that credential is invalid.
 - Applicability: the warranty properties exist only on Samsung devices; Widevine behaviour varies by vendor.
-- Visibility limits: Widevine can be unavailable for reasons unrelated to the bootloader.
+- Visibility limits: Widevine can be unavailable for reasons unrelated to the bootloader; a wiped or invalid keybox can produce the same credential signs as an unlock.
 - Result states: tripped, not tripped, conflict, consistent, unavailable.
-- Interpretation: a tripped fuse is danger; Widevine conflicts corroborate and are not standalone proof.
+- Interpretation: a tripped fuse is danger. A Widevine credential conflict, an L1 claim contradicted by the system ID or the maximum session, is shown as a review item and does not set the verdict on its own; a Java/NDK property mismatch points to an in-process MediaDrm hook and is a warning.

@@ -82,7 +82,7 @@ Supporting modules provide the dashboard, device information, settings, update c
 | **ABIs** | Native syscall paths are provided for `arm64-v8a`, `armeabi-v7a`, `x86`, and `x86_64`. Some timing and virtualization trap probes are available only on `arm64-v8a`. |
 | **Privileges** | Root access is not required. Android permissions and platform visibility rules still limit what the app can observe. |
 | **Device variance** | OEM changes, kernel configuration, Android version, and sandbox policy may cause a probe to be unsupported, unavailable, or lower-confidence. |
-| **Network use** | Core device scans run locally. TEE revocation checks always include the bundled snapshot; downloading Google's current revocation feed requires user consent. The app also checks GitHub for Nightly updates after a cold start and when requested from Settings. |
+| **Network use** | Core device scans run locally. TEE revocation checks always include the bundled snapshot; downloading Google's current revocation feed requires user consent. The app also checks GitHub for Nightly updates after a cold start and when requested from Settings. With GitHub acceleration on, which Chinese-language users are asked about and Settings can switch, those checks and the Nightly download go through the third-party [gh-proxy.com](https://gh-proxy.com/docs) service instead. |
 
 # Architecture
 
@@ -177,7 +177,7 @@ Without the complete set, the local `release` build is signed with the debug key
 # Privacy and limitations
 
 - Detection is performed on the device. The project does not claim that every modified environment can be detected.
-- Network-capable features are limited to the consented TEE revocation refresh, GitHub update metadata and changelog checks, and links explicitly opened by the user.
+- Network-capable features are limited to the consented TEE revocation refresh, GitHub update metadata and changelog checks (through gh-proxy.com while GitHub acceleration is on), and links explicitly opened by the user.
 - Results are heuristic and can contain false positives, false negatives, unsupported checks, or incomplete evidence.
 - Hardware-backed KeyStore, StrongBox, Binder behavior, `/proc`, SELinux, mount namespaces, and other low-level interfaces vary by device and OS build.
 

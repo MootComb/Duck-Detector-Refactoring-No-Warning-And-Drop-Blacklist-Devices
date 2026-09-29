@@ -25,6 +25,7 @@ limitations under the License.
         <item quantity="one">ยังไม่แสดง commit อีก 1 รายการ</item>
         <item quantity="other">ยังไม่แสดง commit อีก %1$d รายการ</item>
     </plurals>
+    <string name="update_remaining_commits_unknown">อาจยังไม่แสดง commit ก่อนหน้า</string>
     <string name="update_later">ภายหลัง</string>
     <string name="update_view_changes">ดูการเปลี่ยนแปลงทั้งหมดบน GitHub</string>
     <string name="update_download">เปิดหน้าดาวน์โหลด</string>

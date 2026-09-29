@@ -25,5 +25,5 @@ android {
 dependencies {
     api(project(":feature:update:domain"))
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.coroutines.android)
 }

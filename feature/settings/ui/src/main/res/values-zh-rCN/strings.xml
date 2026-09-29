@@ -34,7 +34,7 @@ limitations under the License.
     <string name="about_label_privacy">隐私 / 数据使用</string>
     <string name="about_label_version">版本</string>
     <string name="about_label_website">网站</string>
-    <string name="about_privacy_summary">检查在设备本地运行，不会上传检测结果。应用会在每次冷启动时访问一次 GitHub 获取 Nightly 更新元数据；在线 CRL 刷新仍为可选功能。</string>
+    <string name="about_privacy_summary">检查在设备本地运行，不会上传检测结果。应用会在每次冷启动时访问一次 GitHub 获取 Nightly 更新元数据（开启 GitHub 加速后经由 gh-proxy.com）；在线 CRL 刷新仍为可选功能。</string>
     <string name="about_subtitle">项目链接与构建元数据。</string>
     <string name="about_title">关于</string>
     <string name="about_value_build_time">%1$s UTC</string>
@@ -46,6 +46,9 @@ limitations under the License.
     <string name="author_summary_qwq233">TEE</string>
     <string name="author_summary_wxx">CI（Kotlin）</string>
     <string name="author_summary_xiaotong">TEE（C++、Kotlin）</string>
+    <string name="github_acceleration_footer">gh-proxy.com 为第三方服务。开启后，更新检查和 Nightly 下载将经由它中转，不再直接连接 GitHub。它无法中转提交对比，因此更新弹窗可能只列出最新一次提交。</string>
+    <string name="github_acceleration_summary">通过 gh-proxy.com 检查和下载 Nightly 更新</string>
+    <string name="github_acceleration_title">GitHub 加速</string>
     <string name="licenses_dialog_close">关闭</string>
     <string name="licenses_dialog_home_page">主页</string>
     <string name="licenses_dialog_no_license_text">无可用许可证文本。</string>
@@ -60,6 +63,7 @@ limitations under the License.
     <string name="licenses_screen_subtitle">此构建内置的第三方组件。</string>
     <string name="licenses_screen_title">开源许可证</string>
     <string name="settings_section_detection">检测选项</string>
+    <string name="settings_section_network">网络</string>
     <string name="settings_title">设置</string>
     <string name="update_settings_label">检查更新</string>
     <string name="update_status_available">有新的 Nightly 构建；点按查看详情</string>
