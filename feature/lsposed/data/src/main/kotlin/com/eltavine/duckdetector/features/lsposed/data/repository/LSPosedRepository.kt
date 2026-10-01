@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.lsposed.data.repository
 
 import android.content.Context
+import android.os.SystemClock
 import com.eltavine.duckdetector.features.lsposed.data.native.LSPosedNativeBridge
 import com.eltavine.duckdetector.features.lsposed.data.native.LSPosedNativeTrace
 import com.eltavine.duckdetector.features.lsposed.data.probes.LSPosedBinderProbe
@@ -69,6 +70,7 @@ class LSPosedRepository(
     }
 
     private suspend fun scanInternal(): LSPosedReport {
+        val scanStartedAt = SystemClock.elapsedRealtime()
         val classResult = classProbe.run()
         val classLoaderResult = classLoaderProbe.run()
         val bridgeFieldResult = bridgeFieldProbe.run()
@@ -79,7 +81,7 @@ class LSPosedRepository(
         val zygotePermissionResult = zygotePermissionProbe.run(appContext)
         val runtimeArtifactResult = runtimeArtifactProbe.run(appContext.packageName)
         val logcatResult = logcatProbe.run()
-        val selinuxSnapshot = dirtyPolicyCarrierManager.collectSnapshot()
+        val selinuxSnapshot = dirtyPolicyCarrierManager.collectSnapshot(scanStartedAt)
         val dirtyPolicyResult = dirtyPolicyProbe.run(selinuxSnapshot)
         val nativeSnapshot = nativeBridge.collectSnapshot()
         val nativeSignals = nativeSnapshot.traces.mapIndexed(::nativeSignal)

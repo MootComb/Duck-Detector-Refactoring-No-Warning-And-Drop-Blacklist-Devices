@@ -26,7 +26,8 @@ public open class SelinuxContextValidityBridge(
 ) {
 
     public open fun collectLocalSnapshot(): SelinuxContextValiditySnapshot = collector.collect(
-        readPayload = ::nativeCollectContextValiditySnapshotInternal,
+        // No status page probe ran in this process, so libselinux is not trusted with the page.
+        readPayload = { nativeCollectContextValiditySnapshotInternal(allowAccessChecks = false) },
         parse = ::parse,
         unavailable = { status ->
             // Previously an unloadable library produced a fixed reason while a probe that threw
@@ -196,7 +197,7 @@ public open class SelinuxContextValidityBridge(
 
     private fun String.decodeValue(): String = NativePayloadCodec.decodeValue(this)
 
-    private external fun nativeCollectContextValiditySnapshotInternal(): String
+    private external fun nativeCollectContextValiditySnapshotInternal(allowAccessChecks: Boolean): String
 
     private external fun nativeCloseProcessLocalAvc()
 
@@ -211,9 +212,10 @@ public open class SelinuxContextValidityBridge(
         public val isNativeLibraryLoaded: Boolean
             get() = nativeLoaded
 
+        /** [allowAccessChecks]: whether selinux_check_access may run, as decided by the status page probe. */
         @JvmStatic
-        public fun nativeCollectContextValiditySnapshot(): String {
-            return SelinuxContextValidityBridge().nativeCollectContextValiditySnapshotInternal()
+        public fun nativeCollectContextValiditySnapshot(allowAccessChecks: Boolean): String {
+            return SelinuxContextValidityBridge().nativeCollectContextValiditySnapshotInternal(allowAccessChecks)
         }
 
         @JvmStatic

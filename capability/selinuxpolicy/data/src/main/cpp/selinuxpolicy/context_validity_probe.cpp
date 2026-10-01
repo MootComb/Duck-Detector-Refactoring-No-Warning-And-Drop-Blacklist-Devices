@@ -16,6 +16,7 @@
 
 #include "selinuxpolicy/context_validity_probe.h"
 #include "selinuxpolicy/context_validity_internal.h"
+#include <android/log.h>
 #include <atomic>
 #include <cerrno>
 #include <cstddef>
@@ -41,6 +42,14 @@ namespace duckdetector::selinux {
     using namespace detail;
 
     namespace {
+
+        // The oracle runs only in the app zygote preload. Its steps go to the SDK preload trace's
+        // tag, so one logcat filter shows the last step an app zygote reached before it was killed.
+        constexpr const char *kPreloadTraceTag = "DuckZygotePreload";
+
+        void trace_step(const char *step) {
+            __android_log_write(ANDROID_LOG_INFO, kPreloadTraceTag, step);
+        }
 
         bool is_selinux_netlink_socket(int fd) {
             struct stat fd_stat{};
@@ -103,9 +112,13 @@ namespace duckdetector::selinux {
         }
     }
 
-    ContextValidityProbeSnapshot collect_context_validity_snapshot(JNIEnv *env) {
+    ContextValidityProbeSnapshot collect_context_validity_snapshot(
+            JNIEnv *env,
+            const bool allow_access_checks
+    ) {
         ContextValidityProbeSnapshot snapshot;
         snapshot.query_method = kQueryMethod;
+        trace_step("selinux native: selinux state");
         const LoadedSelinuxSymbols symbols = load_selinux_symbols();
         JavaSelinuxAccess java_access = resolve_java_selinux_access(env);
         if (symbols.is_selinux_enabled != nullptr) {
@@ -134,6 +147,7 @@ namespace duckdetector::selinux {
         append_note(snapshot, std::string("Carrier context: ") + carrier_context);
         append_note(snapshot, std::string("Expected carrier type: ") + kExpectedCarrierType);
 
+        trace_step("selinux native: context getters");
         if (const auto current_context = call_context_getter(symbols, symbols.getcon);
             current_context.has_value()) {
             snapshot.pid_context_matches_current = (*current_context == carrier_context);
@@ -146,20 +160,25 @@ namespace duckdetector::selinux {
             proc_self_context.has_value()) {
             snapshot.proc_self_context_matches_current = (*proc_self_context == carrier_context);
         }
-        snapshot.dyntransition_check_passed = check_access_rule(
-                symbols,
-                kExpectedCarrierPrefix,
-                kIsolatedAppContext,
-                kProcessClass,
-                kDyntransitionPermission
-        );
+        trace_step("selinux native: dyntransition access check");
+        if (allow_access_checks) {
+            snapshot.dyntransition_check_passed = check_access_rule(
+                    symbols,
+                    kExpectedCarrierPrefix,
+                    kIsolatedAppContext,
+                    kProcessClass,
+                    kDyntransitionPermission
+            );
+        }
+        trace_step("selinux native: dirty policy access checks");
         snapshot.dirty_policy = collect_dirty_policy_snapshot(
                 symbols,
                 env,
                 java_access,
                 carrier_context,
                 snapshot.carrier_matches_expected,
-                snapshot.dyntransition_check_passed
+                snapshot.dyntransition_check_passed,
+                allow_access_checks
         );
 
         if (!snapshot.carrier_matches_expected ||
@@ -225,6 +244,7 @@ namespace duckdetector::selinux {
 
         snapshot.probe_attempted = true;
 
+        trace_step("selinux native: context validity controls");
         const ControlPairResult carrier_control = check_context_pair_validity(carrier_context.c_str());
         const ControlPairResult negative_control = check_context_pair_validity(kNegativeControlContext);
         const ControlPairResult file_control = check_context_pair_validity(kStockFileControlContext);
@@ -281,6 +301,7 @@ namespace duckdetector::selinux {
             return snapshot;
         }
 
+        trace_step("selinux native: KernelSU context checks");
         const ContextCheckResult domain_first = check_context_validity(kKsuContext);
         const ContextCheckResult domain_second = check_context_validity(kKsuContext);
         const ContextCheckResult file_first = check_context_validity(kKsuFileContext);

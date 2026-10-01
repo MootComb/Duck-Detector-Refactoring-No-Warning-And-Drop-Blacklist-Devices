@@ -22,6 +22,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.os.SystemClock
+import com.eltavine.duckdetector.core.platform.AppZygoteStartGate
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -34,25 +37,61 @@ public open class SelinuxContextValidityCarrierManager(
     private val serviceClass: Class<out Service> = SelinuxContextValidityCarrierService::class.java,
 ) {
 
-    public open suspend fun collectSnapshot(): SelinuxContextValiditySnapshot {
+    /**
+     * Collects the carrier snapshot for a scan that started at [scanStartedAt], on the
+     * [SystemClock.elapsedRealtime] clock. Another detector's collection from the same scan is
+     * reused rather than starting the carrier's app zygote a second time.
+     */
+    public open suspend fun collectSnapshot(scanStartedAt: Long): SelinuxContextValiditySnapshot {
         val appContext = context?.applicationContext ?: return carrierFailureSnapshot(
             "SELinux carrier service unavailable.",
         )
-        return withTimeoutOrNull(DETECTION_TIMEOUT_MS) {
-            performRemoteSnapshotCollection(appContext)
-        } ?: carrierFailureSnapshot(
-            "SELinux carrier probe timed out.",
+        return sharedCollection(serviceClass).collect(scanStartedAt) {
+            withTimeoutOrNull(DETECTION_TIMEOUT_MS) {
+                AppZygoteStartGate.Default.admit(
+                    scanStartedAt = scanStartedAt,
+                    refused = { failedAttempt(SKIPPED_AFTER_FAILED_START) },
+                    stoppedBeforeConnecting = CarrierAttempt::stoppedBeforeConnecting,
+                    attempt = { performRemoteSnapshotCollection(appContext) },
+                ).snapshot
+            } ?: carrierFailureSnapshot(
+                "SELinux carrier probe timed out.",
+            )
+        }
+    }
+
+    private suspend fun performRemoteSnapshotCollection(context: Context): CarrierAttempt {
+        return performRemoteCall(
+            context = context,
+            onConnected = { proxy ->
+                CarrierAttempt(
+                    snapshot = SelinuxContextValidityBridge().parse(proxy.collectSnapshot()),
+                    stoppedBeforeConnecting = false,
+                )
+            },
+            onNullBinder = { failedAttempt("SELinux carrier service returned a null binder.") },
+            onBindingDied = { connected ->
+                failedAttempt(
+                    reason = "The dedicated SELinux carrier binding died before it answered.",
+                    stoppedBeforeConnecting = !connected,
+                )
+            },
+            onError = { error -> failedAttempt(error) },
         )
     }
 
-    private suspend fun performRemoteSnapshotCollection(context: Context): SelinuxContextValiditySnapshot {
-        return performRemoteCall(
-            context = context,
-            onConnected = { proxy -> SelinuxContextValidityBridge().parse(proxy.collectSnapshot()) },
-            onNullBinder = { carrierFailureSnapshot("SELinux carrier service returned a null binder.") },
-            onError = { error -> carrierFailureSnapshot(error) },
-        )
-    }
+    private fun failedAttempt(
+        reason: String,
+        stoppedBeforeConnecting: Boolean = false,
+    ): CarrierAttempt = CarrierAttempt(
+        snapshot = carrierFailureSnapshot(reason),
+        stoppedBeforeConnecting = stoppedBeforeConnecting,
+    )
+
+    private class CarrierAttempt(
+        val snapshot: SelinuxContextValiditySnapshot,
+        val stoppedBeforeConnecting: Boolean,
+    )
 
     private fun carrierFailureSnapshot(
         reason: String,
@@ -71,12 +110,14 @@ public open class SelinuxContextValidityCarrierManager(
         context: Context,
         onConnected: (SelinuxContextValidityCarrierProxy) -> T,
         onNullBinder: () -> T,
+        onBindingDied: (connected: Boolean) -> T,
         onError: (String) -> T,
     ): T = suspendCancellableCoroutine { continuation ->
         val bindAttemptFinished = AtomicBoolean(false)
         val cleanupRequested = AtomicBoolean(false)
         val unbindAttempted = AtomicBoolean(false)
         val completionAttempted = AtomicBoolean(false)
+        val connected = AtomicBoolean(false)
         lateinit var connection: ServiceConnection
 
         fun requestCleanup() {
@@ -98,6 +139,7 @@ public open class SelinuxContextValidityCarrierManager(
                 name: ComponentName?,
                 service: IBinder?,
             ) {
+                connected.set(true)
                 if (service == null) {
                     finish(onNullBinder())
                     return
@@ -117,7 +159,7 @@ public open class SelinuxContextValidityCarrierManager(
             // A carrier brought down before it connected, as when its app zygote cannot start, is
             // reported only here (frameworks/base LoadedApk.ServiceDispatcher.doConnected, dead).
             override fun onBindingDied(name: ComponentName?) {
-                finish(onError("The dedicated SELinux carrier binding died before it answered."))
+                finish(onBindingDied(connected.get()))
             }
 
             override fun onServiceDisconnected(name: ComponentName?) = Unit
@@ -153,6 +195,18 @@ public open class SelinuxContextValidityCarrierManager(
 
     public companion object {
         private const val DETECTION_TIMEOUT_MS = 15_000L
+        private const val SKIPPED_AFTER_FAILED_START =
+            "Not started: an app zygote carrier was stopped before it connected earlier in this " +
+                "scan, and starting another would stop the app's other helper processes again."
         private val REMOTE_CALLBACK_EXECUTOR = Dispatchers.IO.asExecutor()
+        private val sharedCollections =
+            ConcurrentHashMap<Class<out Service>, ScanSharedCollection<SelinuxContextValiditySnapshot>>()
+
+        private fun sharedCollection(
+            serviceClass: Class<out Service>,
+        ): ScanSharedCollection<SelinuxContextValiditySnapshot> =
+            sharedCollections.computeIfAbsent(serviceClass) {
+                ScanSharedCollection(clock = SystemClock::elapsedRealtime)
+            }
     }
 }

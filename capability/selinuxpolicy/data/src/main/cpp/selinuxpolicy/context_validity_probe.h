@@ -80,7 +80,13 @@ namespace duckdetector::selinux {
         std::vector<std::string> notes;
     };
 
-    ContextValidityProbeSnapshot collect_context_validity_snapshot(JNIEnv *env);
+    // allow_access_checks says whether selinux_check_access may run. Its first call maps
+    // /sys/fs/selinux/status through avc_open and reads it, which kills the process when a kernel
+    // hook breaks that node, so the caller decides from probe_selinux_status_page().
+    ContextValidityProbeSnapshot collect_context_validity_snapshot(
+            JNIEnv *env,
+            bool allow_access_checks
+    );
 
     void close_process_local_avc();
 

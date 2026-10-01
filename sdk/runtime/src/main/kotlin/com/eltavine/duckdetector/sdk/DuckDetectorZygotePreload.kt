@@ -18,6 +18,7 @@ package com.eltavine.duckdetector.sdk
 
 import android.app.ZygotePreload
 import android.content.pm.ApplicationInfo
+import android.util.Log
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityPreload
 
 /**
@@ -33,8 +34,22 @@ public class DuckDetectorZygotePreload : ZygotePreload {
     private val selinuxContextValidity = SelinuxContextValidityPreload()
 
     override fun doPreload(appInfo: ApplicationInfo) {
-        selinuxContextValidity.preload(appInfo) {
-            DetectorCatalog.all.forEach { detector -> detector.appZygotePreload(appInfo) }
+        selinuxContextValidity.preload(appInfo, trace = ::trace) {
+            DetectorCatalog.all.forEach { detector ->
+                trace("detector: ${detector.id}")
+                detector.appZygotePreload(appInfo)
+            }
         }
+        trace("preload finished")
+    }
+
+    // An app zygote killed with SIGKILL leaves no crash report, so the last step logged before it
+    // died is the only record of what the preload was doing.
+    private fun trace(step: String) {
+        Log.i(TRACE_TAG, step)
+    }
+
+    private companion object {
+        const val TRACE_TAG = "DuckZygotePreload"
     }
 }

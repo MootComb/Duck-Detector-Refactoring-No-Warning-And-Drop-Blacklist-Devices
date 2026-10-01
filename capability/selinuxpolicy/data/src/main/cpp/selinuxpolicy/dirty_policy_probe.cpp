@@ -39,7 +39,8 @@ namespace duckdetector::selinux::detail {
             const JavaSelinuxAccess &java_access,
             const std::string &carrier_context,
             const bool carrier_matches_expected,
-            const std::optional<bool> &dyntransition_check_passed
+            const std::optional<bool> &dyntransition_check_passed,
+            const bool allow_access_checks
     ) {
         DirtyPolicyProbeSnapshot snapshot;
         snapshot.query_method = kDirtyPolicyQueryMethod;
@@ -50,6 +51,11 @@ namespace duckdetector::selinux::detail {
         snapshot.notes.push_back(std::string("Query method: ") + kDirtyPolicyQueryMethod);
         if (!snapshot.available) {
             snapshot.failure_reason = "selinux_check_access unavailable from the current carrier.";
+            return snapshot;
+        }
+        if (!allow_access_checks) {
+            snapshot.failure_reason =
+                    "Skipped: the status page probe did not show libselinux can map /sys/fs/selinux/status safely.";
             return snapshot;
         }
         if (!carrier_matches_expected || carrier_context.rfind(kExpectedCarrierPrefix, 0) != 0) {

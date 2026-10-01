@@ -34,4 +34,5 @@ kotlin {
 
 dependencies {
     implementation(project(":core:evidence"))
+    implementation(libs.kotlinx.coroutines.core)
 }

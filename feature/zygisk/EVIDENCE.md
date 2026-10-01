@@ -35,6 +35,6 @@ The Zygisk detector asks whether code injected through zygote (Zygisk, Zygisk Ne
 - Mechanism: Zygisk closes or reopens descriptors around specialization, and tracing tools set TracerPid.
 - References: kernel/common Documentation/filesystems/proc.rst (status TracerPid, fd); frameworks/base core/jni/com_android_internal_os_Zygote.cpp for the specialization path. Discovery only for the FD trap's Zygisk-specific expectation.
 - Applicability: the FD trap is skipped under a debugger or profiling agent.
-- Visibility limits: debuggers and agents legitimately change descriptors and TracerPid.
+- Visibility limits: debuggers and agents legitimately change descriptors and TracerPid. A detector binding the system stops before it connects, as it does to every service of the package when another of its processes fails to start, is bound once more; a second stop leaves the FD trap unavailable.
 - Result states: FD trap hit, heuristic hit, clean, skipped.
 - Interpretation: an FD trap hit is danger; thread and descriptor names are heuristics.

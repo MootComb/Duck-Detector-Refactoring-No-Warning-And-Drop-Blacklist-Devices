@@ -24,7 +24,7 @@ class SelinuxContextValidityCarrierManagerTest {
 
     @Test
     fun `missing context reports carrier failure across related probes`() = runBlocking {
-        val snapshot = SelinuxContextValidityCarrierManager(context = null).collectSnapshot()
+        val snapshot = SelinuxContextValidityCarrierManager(context = null).collectSnapshot(scanStartedAt = 0L)
 
         assertEquals("SELinux carrier service unavailable.", snapshot.failureReason)
         assertEquals("SELinux carrier service unavailable.", snapshot.procAttrCurrentFailureReason)

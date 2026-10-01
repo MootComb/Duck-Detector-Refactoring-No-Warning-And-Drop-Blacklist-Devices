@@ -24,6 +24,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import com.eltavine.duckdetector.core.native.NativeCollectionOutcome
 import com.eltavine.duckdetector.core.native.NativeCollectionStatus
+import com.eltavine.duckdetector.core.platform.AppZygoteStartGate
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -45,9 +46,11 @@ open class ThroneHuntCarrierManager(
     private var activeConnection: ServiceConnection? = null
     private var activeProxy: ThroneHuntCarrierProxy? = null
 
-    // Setup call. Safe to repeat: it never reads the event stream.
-    open suspend fun collectSnapshot(): ThroneHuntCarrierState {
+    // Setup call. Safe to repeat: it never reads the event stream. [scanStartedAt] is the scan's
+    // start on the SystemClock.elapsedRealtime clock, which the app zygote start gate compares.
+    open suspend fun collectSnapshot(scanStartedAt: Long): ThroneHuntCarrierState {
         return performRemoteCollection(
+            scanStartedAt = scanStartedAt,
             onConnected = { proxy ->
                 ThroneHuntCarrierPayloadCodec.decode(proxy.collectSnapshot())
             },
@@ -56,8 +59,9 @@ open class ThroneHuntCarrierManager(
 
     // Verdict call. Reading the event stream consumes it, so call this exactly once per round,
     // after the stimulus window has elapsed.
-    open suspend fun drainEvents(): ThroneHuntCarrierState {
+    open suspend fun drainEvents(scanStartedAt: Long): ThroneHuntCarrierState {
         return performRemoteCollection(
+            scanStartedAt = scanStartedAt,
             onConnected = { proxy ->
                 ThroneHuntCarrierPayloadCodec.decode(proxy.drainEvents())
             },
@@ -65,15 +69,20 @@ open class ThroneHuntCarrierManager(
     }
 
     private suspend fun performRemoteCollection(
+        scanStartedAt: Long,
         onConnected: (ThroneHuntCarrierProxy) -> ThroneHuntCarrierState,
     ): ThroneHuntCarrierState {
         val appContext = context?.applicationContext ?: return carrierFailureState(
             "Throne hunt carrier service unavailable.",
         )
         return withTimeoutOrNull(DETECTION_TIMEOUT_MS) {
-            val proxy = synchronized(this) {
-                activeProxy
-            } ?: connect(appContext) ?: return@withTimeoutOrNull null
+            val proxy = synchronized(this@ThroneHuntCarrierManager) { activeProxy }
+                ?: when (val connection = connectThroughGate(appContext, scanStartedAt)) {
+                    is CarrierConnection.Connected -> connection.proxy
+                    is CarrierConnection.Failed -> return@withTimeoutOrNull carrierFailureState(
+                        connection.reason,
+                    )
+                }
 
             try {
                 onConnected(proxy)
@@ -98,12 +107,25 @@ open class ThroneHuntCarrierManager(
         )
     }
 
-    private suspend fun connect(context: Context): ThroneHuntCarrierProxy? =
+    private suspend fun connectThroughGate(
+        context: Context,
+        scanStartedAt: Long,
+    ): CarrierConnection = AppZygoteStartGate.Default.admit(
+        scanStartedAt = scanStartedAt,
+        refused = { CarrierConnection.Failed(SKIPPED_AFTER_FAILED_START) },
+        stoppedBeforeConnecting = { connection ->
+            connection is CarrierConnection.Failed && connection.stoppedBeforeConnecting
+        },
+        attempt = { connect(context) },
+    )
+
+    private suspend fun connect(context: Context): CarrierConnection =
         suspendCancellableCoroutine { continuation ->
             val bindAttemptFinished = AtomicBoolean(false)
             val cleanupRequested = AtomicBoolean(false)
             val unbindAttempted = AtomicBoolean(false)
             val completionAttempted = AtomicBoolean(false)
+            val connected = AtomicBoolean(false)
             lateinit var connection: ServiceConnection
 
             fun requestCleanup() {
@@ -113,12 +135,12 @@ open class ThroneHuntCarrierManager(
                 }
             }
 
-            fun finish(proxy: ThroneHuntCarrierProxy?) {
-                if (proxy == null) {
+            fun finish(outcome: CarrierConnection) {
+                if (outcome is CarrierConnection.Failed) {
                     requestCleanup()
                 }
                 if (completionAttempted.compareAndSet(false, true)) {
-                    continuation.resume(proxy)
+                    continuation.resume(outcome)
                 }
             }
 
@@ -127,8 +149,9 @@ open class ThroneHuntCarrierManager(
                     name: ComponentName?,
                     service: IBinder?,
                 ) {
+                    connected.set(true)
                     if (service == null) {
-                        finish(null)
+                        finish(CarrierConnection.Failed(NULL_BINDER))
                         return
                     }
                     try {
@@ -138,14 +161,34 @@ open class ThroneHuntCarrierManager(
                             activeConnection = connection
                             activeProxy = proxy
                         }
-                        finish(proxy)
+                        finish(CarrierConnection.Connected(proxy))
                     } catch (throwable: Throwable) {
-                        finish(null)
+                        finish(
+                            CarrierConnection.Failed(
+                                throwable.message ?: "The throne hunt carrier binder could not be used.",
+                            ),
+                        )
                     }
                 }
 
                 override fun onNullBinding(name: ComponentName?) {
-                    finish(null)
+                    finish(CarrierConnection.Failed(NULL_BINDER))
+                }
+
+                // A carrier brought down before it connected, as when its app zygote cannot start,
+                // is reported only here (frameworks/base LoadedApk.ServiceDispatcher.doConnected,
+                // dead). A binding that dies later must still be unbound before it can be rebound.
+                override fun onBindingDied(name: ComponentName?) {
+                    if (connected.get()) {
+                        close()
+                    } else {
+                        finish(
+                            CarrierConnection.Failed(
+                                reason = "The throne hunt carrier binding died before it connected.",
+                                stoppedBeforeConnecting = true,
+                            ),
+                        )
+                    }
                 }
 
                 override fun onServiceDisconnected(name: ComponentName?) {
@@ -177,7 +220,7 @@ open class ThroneHuntCarrierManager(
             }
 
             if (!bound) {
-                finish(null)
+                finish(CarrierConnection.Failed("The throne hunt carrier process could not be bound."))
             }
         }
 
@@ -195,8 +238,21 @@ open class ThroneHuntCarrierManager(
         }
     }
 
+    private sealed interface CarrierConnection {
+        class Connected(val proxy: ThroneHuntCarrierProxy) : CarrierConnection
+
+        class Failed(
+            val reason: String,
+            val stoppedBeforeConnecting: Boolean = false,
+        ) : CarrierConnection
+    }
+
     companion object {
         private const val DETECTION_TIMEOUT_MS = 15_000L
+        private const val NULL_BINDER = "The throne hunt carrier returned a null binder."
+        private const val SKIPPED_AFTER_FAILED_START =
+            "Not started: an app zygote carrier was stopped before it connected earlier in this " +
+                "scan, and starting another would stop the app's other helper processes again."
         private val REMOTE_CALLBACK_EXECUTOR = Dispatchers.IO.asExecutor()
     }
 }

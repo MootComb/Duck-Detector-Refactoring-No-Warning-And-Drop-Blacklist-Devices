@@ -51,6 +51,7 @@ object SelinuxProcAttrCurrentLabels {
 object SelinuxPolicyloadSeqnoLabels {
     const val STATUS_CLEAN = "Clean"
     const val STATUS_SUSPICIOUS = "Seqno split"
+    const val STATUS_PAGE_FAULTED = "Status page faulted"
     const val STATUS_INCONCLUSIVE = "Info"
     const val STATUS_UNAVAILABLE = "Unavailable"
 }

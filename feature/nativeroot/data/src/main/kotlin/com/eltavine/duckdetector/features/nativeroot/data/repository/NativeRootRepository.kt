@@ -17,6 +17,7 @@
 package com.eltavine.duckdetector.features.nativeroot.data.repository
 
 import android.content.Context
+import android.os.SystemClock
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.nativeroot.data.native.NativeRootNativeBridge
 import com.eltavine.duckdetector.features.nativeroot.data.native.NativeRootNativeFinding
@@ -63,6 +64,7 @@ class NativeRootRepository(
     }
 
     internal suspend fun scanInternal(): NativeRootReport {
+        val scanStartedAt = SystemClock.elapsedRealtime()
         val snapshot = nativeBridge.collectSnapshot()
         val nativeFindings = snapshot.findings.mapIndexed { index, finding ->
             finding.toDomainFinding(index)
@@ -75,7 +77,7 @@ class NativeRootRepository(
         val tempRootArtifactResult = tempRootArtifactProbe.run()
         // The throne hunt round is the only probe that mutates observable system state, so it runs
         // last and keeps its watch/verdict split explicit.
-        val throneHuntRoundResult = throneHuntRound.run()
+        val throneHuntRoundResult = throneHuntRound.run(scanStartedAt)
         val throneHuntResult = throneHuntProbe.run(throneHuntRoundResult)
         val findings =
             nativeFindings +

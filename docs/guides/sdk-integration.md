@@ -104,6 +104,8 @@ class HostZygotePreload : ZygotePreload {
 
 The preload runs each detector's app zygote work, such as Native Root's throne-hunt watch, and then captures the SELinux context validity evidence, before any isolated process forks from the app zygote. Without it, the SELinux and LSPosed carriers report their app zygote evidence as unavailable, and Native Root's throne-hunt carrier reports its collection as failed.
 
+Each step of the preload is logged at info level under the `DuckZygotePreload` tag. If the app zygote is killed during the preload, it leaves no crash report, and the last line under that tag names the step it had reached.
+
 ### Early launch capture
 
 The Mount and Virtualization detectors compare their scan with evidence captured before the first Java activity. Make the SDK's launcher your launch activity and name the activity it hands over to:

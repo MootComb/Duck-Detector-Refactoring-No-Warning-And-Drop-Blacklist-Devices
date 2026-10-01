@@ -39,6 +39,17 @@ The SELinux detector asks whether SELinux is enforcing for this app, whether the
 - Result states: clean, valid root context, unavailable.
 - Interpretation: a valid root-tool context is supporting evidence of a modified policy.
 
+### Policy reload and status page
+
+- Observable signal: the app_zygote seqno oracle: the status page's policyload counter against the access oracle's sequence number, and whether reading the status page killed the disposable child that read it.
+- Producing subsystem: selinuxfs's status and access nodes, read through the selinuxpolicy capability's app_zygote carrier.
+- Mechanism: a policy reload after boot, as root tools do to inject rules, leaves the two counters apart; a hook on the status node's open handler breaks its mapping, and the read kills the reader.
+- References: kernel/common security/selinux/selinuxfs.c (status and access nodes); capability/selinuxpolicy/EVIDENCE.md (Policy reload and process context, Status page mapping).
+- Applicability: where the app_zygote carrier starts; the oracle needs android:zygotePreloadName.
+- Visibility limits: an odd sequence was read mid-update; a status page that was not read leaves the oracle unavailable.
+- Result states: clean, seqno split, status page faulted, info, unavailable.
+- Interpretation: a seqno split and a faulted status page are danger: the first shows a policy reload after boot, the second a status node whose kernel handler was altered. Info and unavailable leave the verdict to the other checks.
+
 ### Audit integrity
 
 - Observable signal: whether a controlled AVC denial appears in app-readable auditd logs, whether allow or rewrite markers appear, and auditpatch module residue.

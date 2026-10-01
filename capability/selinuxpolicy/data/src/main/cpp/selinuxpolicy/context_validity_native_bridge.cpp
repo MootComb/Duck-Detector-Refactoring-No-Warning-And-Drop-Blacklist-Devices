@@ -245,12 +245,16 @@ namespace {
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_eltavine_duckdetector_capability_selinuxpolicy_data_SelinuxContextValidityBridge_nativeCollectContextValiditySnapshotInternal(
         JNIEnv *env,
-        jclass clazz) {
+        jobject,
+        jboolean allow_access_checks) {
     try {
         return to_jstring(
                 env,
                 encode_snapshot(
-                        duckdetector::selinux::collect_context_validity_snapshot(env)
+                        duckdetector::selinux::collect_context_validity_snapshot(
+                                env,
+                                allow_access_checks == JNI_TRUE
+                        )
                 )
         );
     } catch (const std::exception &error) {

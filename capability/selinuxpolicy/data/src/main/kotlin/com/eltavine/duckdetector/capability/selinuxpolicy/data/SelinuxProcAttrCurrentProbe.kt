@@ -47,8 +47,10 @@ public data class SelinuxProcAttrCurrentResult(
 
 public class SelinuxProcAttrCurrentProbe {
 
-    public fun inspect(): List<SelinuxProcAttrCurrentResult> {
+    /** [beforeWrite] receives each context just before it is written. */
+    public fun inspect(beforeWrite: (context: String) -> Unit = {}): List<SelinuxProcAttrCurrentResult> {
         return TARGETS.map { target ->
+            beforeWrite(target.context)
             runProbe(target.label, target.context)
         }
     }

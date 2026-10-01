@@ -36,7 +36,8 @@ class KernelSuThroneHuntRound(
 
     private val appContext = context?.applicationContext
 
-    suspend fun run(): KernelSuThroneHuntRoundResult {
+    // [scanStartedAt] is the Native Root scan's start on the SystemClock.elapsedRealtime clock.
+    suspend fun run(scanStartedAt: Long): KernelSuThroneHuntRoundResult {
         try {
             val context = appContext ?: return KernelSuThroneHuntRoundResult(
                 available = false,
@@ -49,7 +50,7 @@ class KernelSuThroneHuntRound(
                 detail = "Context unavailable.",
             )
 
-            val carrierState = carrierManager.collectSnapshot()
+            val carrierState = carrierManager.collectSnapshot(scanStartedAt)
             if (!carrierState.collection.isTrustworthy) {
                 return KernelSuThroneHuntRoundResult(
                     available = false,
@@ -83,7 +84,7 @@ class KernelSuThroneHuntRound(
         // everything that happened before the stimulus - our own startup noise, or an unrelated
         // packages.list rewrite that kicked off a hunt of its own. Draining it here means the final
         // drain covers the stimulus window only, and none of that can be read as our result.
-            val baseline = carrierManager.drainEvents()
+            val baseline = carrierManager.drainEvents(scanStartedAt)
             if (!baseline.collection.isTrustworthy) {
                 return KernelSuThroneHuntRoundResult(
                     available = false,
@@ -129,7 +130,7 @@ class KernelSuThroneHuntRound(
 
         // Drained after the wait so the event stream covers the full stimulus window rather than
         // the moment before the settings write landed.
-            val observed = carrierManager.drainEvents()
+            val observed = carrierManager.drainEvents(scanStartedAt)
             if (!observed.collection.isTrustworthy || !observed.watchInstalled) {
                 return KernelSuThroneHuntRoundResult(
                     available = false,

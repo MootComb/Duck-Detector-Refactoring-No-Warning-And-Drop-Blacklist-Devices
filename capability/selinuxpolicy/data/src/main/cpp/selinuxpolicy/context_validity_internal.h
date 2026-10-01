@@ -371,7 +371,8 @@ namespace duckdetector::selinux::detail {
             const JavaSelinuxAccess &java_access,
             const std::string &carrier_context,
             const bool carrier_matches_expected,
-            const std::optional<bool> &dyntransition_check_passed
+            const std::optional<bool> &dyntransition_check_passed,
+            bool allow_access_checks
     );
 
     void append_repeat_note(
