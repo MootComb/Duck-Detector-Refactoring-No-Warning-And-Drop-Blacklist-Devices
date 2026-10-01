@@ -130,6 +130,8 @@ The launcher captures the evidence, then starts the activity that `com.eltavine.
 
 The isolated mount-view scanner is ported from PrivIsolated, which creates a WebView before it binds any helper process. The app keeps that order. Before its UI starts, it attaches the invisible view from `DuckDetector.createProcMountSampler(activity)` as a 1x1 child, and destroys it with the activity. Do the same to scan under the same conditions as the app.
 
+The sampler's renderer runs as an isolated service of your package, so ActivityManager stops it whenever it stops the package's services, as it does when any of the package's processes fails to start. WebView kills a host whose renderer exits unless the host handles the exit, so the sampler handles it: it removes itself from its parent and destroys itself. Destroying it again with the activity is harmless.
+
 ## Permissions
 
 The SDK declares no permissions, so the host decides what its process may observe. The app declares these for detection:

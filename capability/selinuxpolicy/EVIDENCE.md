@@ -13,7 +13,7 @@ The SELinux policy capability asks the loaded policy questions an ordinary app c
 - Mechanism: writing a context to /sys/fs/selinux/context succeeds only for contexts the loaded policy defines, so root-tool domains are valid only in a policy that added them.
 - References: kernel/common security/selinux/selinuxfs.c (sel_write_context; the context node is world readable and writable).
 - Applicability: carriers in app_zygote and dedicated processes; see SelinuxContextValidityCarrierManager.
-- Visibility limits: a carrier that cannot start leaves the snapshot unavailable.
+- Visibility limits: a carrier that cannot start leaves the snapshot unavailable. ActivityManager answers that failure by stopping every service of the package (frameworks/base ProcessList.handleProcessStart -> forceStopPackageLocked), so helpers other detectors bound in the same scan stop with it.
 - Result states: valid, invalid, unavailable.
 - Interpretation: consumers decide which valid contexts are evidence.
 

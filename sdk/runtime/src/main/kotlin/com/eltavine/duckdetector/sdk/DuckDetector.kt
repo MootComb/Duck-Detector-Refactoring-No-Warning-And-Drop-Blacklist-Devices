@@ -20,7 +20,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyMountPreloadStore
 import com.eltavine.duckdetector.capability.earlypreload.data.EarlyVirtualizationPreloadStore
 import com.eltavine.duckdetector.capability.packageinventory.data.InstalledPackageVisibilityChecker
@@ -90,7 +93,9 @@ public object DuckDetector {
      *
      * The application attaches it before binding any helper process, matching the WebView-before-
      * bind order of PrivIsolated, from which the isolated mount-view scanner is ported. Destroy it
-     * with the activity.
+     * with the activity. If its renderer exits, the sampler removes itself from its parent and
+     * destroys itself instead of letting WebView kill the host process; destroying it again with
+     * the activity is harmless.
      */
     public fun createProcMountSampler(context: Context): WebView? = runCatching {
         WebView(context).apply {
@@ -99,6 +104,7 @@ public object DuckDetector {
             isFocusable = false
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
             setBackgroundColor(Color.TRANSPARENT)
+            webViewClient = ProcMountSamplerClient
             loadDataWithBaseURL(
                 null,
                 "<html><body></body></html>",
@@ -108,4 +114,17 @@ public object DuckDetector {
             )
         }
     }.getOrNull()
+}
+
+// WebView kills the host process when a renderer exits and onRenderProcessGone returns false, its
+// default. The renderer runs as an isolated service of this package, which ActivityManager stops
+// with the rest of the package's services whenever one of its processes fails to start
+// (frameworks/base ProcessList.handleProcessStart -> forceStopPackageLocked, "start failure"). The
+// sampler holds no content, so it is dropped rather than reloaded.
+private object ProcMountSamplerClient : WebViewClient() {
+    override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+        (view.parent as? ViewGroup)?.removeView(view)
+        view.destroy()
+        return true
+    }
 }

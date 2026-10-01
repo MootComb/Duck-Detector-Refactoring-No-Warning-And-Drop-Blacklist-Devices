@@ -114,6 +114,12 @@ public open class SelinuxContextValidityCarrierManager(
                 finish(onNullBinder())
             }
 
+            // A carrier brought down before it connected, as when its app zygote cannot start, is
+            // reported only here (frameworks/base LoadedApk.ServiceDispatcher.doConnected, dead).
+            override fun onBindingDied(name: ComponentName?) {
+                finish(onError("The dedicated SELinux carrier binding died before it answered."))
+            }
+
             override fun onServiceDisconnected(name: ComponentName?) = Unit
         }
 
