@@ -268,5 +268,14 @@
     "avatarAssetPath": "github_contributors/avatars/sakanyanotbot.jpg",
     "summaryKey": "author_summary_wuying",
     "login": "SakanyaNotBot"
+  },
+  {
+    "profileUrl": "https://github.com/sinanb9",
+    "contributionKeys": ["security"],
+    "contributions": 1,
+    "name": "sinanb9",
+    "avatarAssetPath": "github_contributors/avatars/sinanb9.jpg",
+    "summaryKey": "author_summary_sinanb9",
+    "login": "sinanb9"
   }
 ]

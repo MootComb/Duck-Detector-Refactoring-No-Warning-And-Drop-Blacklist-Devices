@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +22,15 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.RandomAccessFile
 
+// States are only appended, so every existing state keeps its ordinal.
 public enum class SelinuxPolicyloadSeqnoState {
     CLEAN,
     SUSPICIOUS,
+    INCONCLUSIVE,
+    UNAVAILABLE,
 
     /** Reading the status page this oracle compares killed a disposable child; stock selinuxfs never does. */
     STATUS_PAGE_FAULTED,
-    INCONCLUSIVE,
-    UNAVAILABLE,
 }
 
 public data class SelinuxPolicyloadSeqnoResult(
@@ -56,33 +58,39 @@ public class SelinuxPolicyloadSeqnoProbe {
     internal fun inspect(
         statusPage: SelinuxStatusPageResult,
         queryAccess: () -> AccessDecision = ::queryAccessDecision,
-    ): SelinuxPolicyloadSeqnoResult {
-        if (statusPage.state == SelinuxStatusPageState.HOSTILE) {
-            return SelinuxPolicyloadSeqnoResult(
-                state = SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED,
-                available = true,
-                probeAttempted = true,
-                notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
-            )
-        }
-        val header = statusPage.header
-            ?: return SelinuxPolicyloadSeqnoResult(
-                state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
-                available = false,
-                probeAttempted = statusPage.attempted,
-                failureReason = statusPage.failureReason ?: "SELinux status page was not read.",
-                notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
-            )
-        return runCatching { interpret(header, queryAccess()) }.getOrElse { throwable ->
-            SelinuxPolicyloadSeqnoResult(
-                state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
-                available = false,
-                probeAttempted = true,
-                failureReason = throwable.message ?: PlatformFailureName.of(throwable),
-                notes = listOf(ZYGOTE_PRELOAD_NOTE),
-            )
-        }
+    ): SelinuxPolicyloadSeqnoResult = when (statusPage) {
+        is SelinuxStatusPageResult.Intact -> runCatching { interpret(statusPage.header, queryAccess()) }
+            .getOrElse { throwable ->
+                SelinuxPolicyloadSeqnoResult(
+                    state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
+                    available = false,
+                    probeAttempted = true,
+                    failureReason = throwable.message ?: PlatformFailureName.of(throwable),
+                    notes = listOf(ZYGOTE_PRELOAD_NOTE),
+                )
+            }
+
+        is SelinuxStatusPageResult.Faulted -> SelinuxPolicyloadSeqnoResult(
+            state = SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED,
+            available = true,
+            probeAttempted = true,
+            notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
+        )
+
+        is SelinuxStatusPageResult.Unavailable -> unreadStatusPage(statusPage, statusPage.reason)
+        is SelinuxStatusPageResult.Inconclusive -> unreadStatusPage(statusPage, statusPage.reason)
     }
+
+    private fun unreadStatusPage(
+        statusPage: SelinuxStatusPageResult,
+        reason: String,
+    ): SelinuxPolicyloadSeqnoResult = SelinuxPolicyloadSeqnoResult(
+        state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
+        available = false,
+        probeAttempted = statusPage.attempted,
+        failureReason = reason,
+        notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
+    )
 
     internal fun interpret(
         status: SelinuxStatusHeader,

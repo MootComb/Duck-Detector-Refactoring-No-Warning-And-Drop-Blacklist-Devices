@@ -1,5 +1,6 @@
 <!--
 Copyright 2026 Duck Apps Contributor
+If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,6 +45,7 @@ limitations under the License.
     <string name="author_summary_baka">TEE 与 Zygisk</string>
     <string name="author_summary_eltavine">负责 UI、C++、ASM 与 Kotlin。</string>
     <string name="author_summary_qwq233">TEE</string>
+    <string name="author_summary_sinanb9">SELinux app zygote 崩溃反馈与内核追踪</string>
     <string name="author_summary_wxx">CI（Kotlin）</string>
     <string name="author_summary_xiaotong">TEE（C++、Kotlin）</string>
     <string name="github_acceleration_footer">gh-proxy.com 为第三方服务。开启后，更新检查和 Nightly 下载将经由它中转，不再直接连接 GitHub。它无法中转提交对比，因此更新弹窗可能只列出最新一次提交。</string>

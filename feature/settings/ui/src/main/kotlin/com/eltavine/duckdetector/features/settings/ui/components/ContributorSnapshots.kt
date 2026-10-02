@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +137,7 @@ internal fun summaryResIdForKey(summaryKey: String?): Int {
         "author_summary_aviraxp" -> R.string.author_summary_aviraxp
         "author_summary_5ec1cff" -> R.string.author_summary_5ec1cff
         "author_summary_wuying" -> R.string.author_summary_wuying
+        "author_summary_sinanb9" -> R.string.author_summary_sinanb9
         else -> R.string.author_summary_default
     }
 }

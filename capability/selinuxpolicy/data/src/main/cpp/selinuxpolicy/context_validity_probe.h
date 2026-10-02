@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +83,7 @@ namespace duckdetector::selinux {
 
     // allow_access_checks says whether selinux_check_access may run. Its first call maps
     // /sys/fs/selinux/status through avc_open and reads it, which kills the process when a kernel
-    // hook breaks that node, so the caller decides from probe_selinux_status_page().
+    // hook breaks that node, so the caller decides from the status page probe's result.
     ContextValidityProbeSnapshot collect_context_validity_snapshot(
             JNIEnv *env,
             bool allow_access_checks

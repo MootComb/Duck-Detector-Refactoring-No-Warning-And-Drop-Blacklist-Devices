@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +21,6 @@ import com.eltavine.duckdetector.core.native.NativePayloadCodec
 import com.eltavine.duckdetector.core.native.NativePayloadContract
 import com.eltavine.duckdetector.core.native.NativeSnapshotCollector
 
-/** What a disposable child of this process saw when it opened, mapped and read /sys/fs/selinux/status. */
-internal enum class SelinuxStatusPageState {
-    /** The page read back like stock selinuxfs. */
-    INTACT,
-
-    /** A signal killed the child on the first read of the mapping. */
-    HOSTILE,
-
-    /** open or mmap failed, so libselinux falls back to netlink and never reads a mapping. */
-    UNAVAILABLE,
-
-    /** The child could not run or did not report, so whether the read faults is unknown. */
-    INCONCLUSIVE,
-}
-
 /** struct selinux_kernel_status, as the status page holds it. */
 internal data class SelinuxStatusHeader(
     val version: Long,
@@ -44,37 +30,62 @@ internal data class SelinuxStatusHeader(
     val denyUnknown: Long,
 )
 
-internal data class SelinuxStatusPageResult(
-    val state: SelinuxStatusPageState,
-    val attempted: Boolean = false,
-    val terminatingSignal: Int? = null,
-    /** The header the child read, present only when [state] is [SelinuxStatusPageState.INTACT]. */
-    val header: SelinuxStatusHeader? = null,
-    val failureReason: String? = null,
-    val notes: List<String> = emptyList(),
-) {
-    /**
-     * Whether this process may let libselinux map and read the page itself. The first
-     * android.os.SELinux.checkSELinuxAccess does exactly that, so only a page that read back intact,
-     * or one libselinux cannot map either, is safe; a hostile or unknown page is not.
-     */
-    val allowsInProcessAccess: Boolean
-        get() = state == SelinuxStatusPageState.INTACT || state == SelinuxStatusPageState.UNAVAILABLE
+/** What a disposable child of this process saw when it opened, mapped and read /sys/fs/selinux/status. */
+internal sealed interface SelinuxStatusPageResult {
 
-    /** Why access checks that would make libselinux read the page were skipped, or null if they may run. */
-    val skipReason: String?
-        get() = when (state) {
-            SelinuxStatusPageState.INTACT, SelinuxStatusPageState.UNAVAILABLE -> null
-            SelinuxStatusPageState.HOSTILE ->
+    /** Whether a child was forked to read the page. */
+    val attempted: Boolean
+
+    val notes: List<String>
+
+    /**
+     * Why this process must not let libselinux map and read the page, or null when it may. The first
+     * android.os.SELinux.checkSELinuxAccess does exactly that, so only a page that read back intact, or
+     * one libselinux cannot map either and so never reads, is safe.
+     */
+    val accessCheckBlockReason: String?
+        get() = when (this) {
+            is Intact, is Unavailable -> null
+            is Faulted ->
                 "Skipped: reading /sys/fs/selinux/status killed a disposable child" +
-                    (terminatingSignal?.let { " (signal $it)" } ?: "") +
+                    signal?.let { " (signal $it)" }.orEmpty() +
                     ", and libselinux reads it on the first access check."
 
-            SelinuxStatusPageState.INCONCLUSIVE ->
-                "Skipped: the status page probe was inconclusive" +
-                    (failureReason?.let { " ($it)" } ?: "") +
-                    ", so libselinux was not allowed to read /sys/fs/selinux/status."
+            is Inconclusive ->
+                "Skipped: the status page probe was inconclusive ($reason), " +
+                    "so libselinux was not allowed to read /sys/fs/selinux/status."
         }
+
+    /** The page read back like stock selinuxfs. */
+    data class Intact(
+        val header: SelinuxStatusHeader,
+        override val notes: List<String> = emptyList(),
+    ) : SelinuxStatusPageResult {
+        override val attempted: Boolean get() = true
+    }
+
+    /** The child mapped the page, and a signal ended it before it read the header back. */
+    data class Faulted(
+        val signal: Int?,
+        override val notes: List<String> = emptyList(),
+    ) : SelinuxStatusPageResult {
+        override val attempted: Boolean get() = true
+    }
+
+    /** open or mmap failed, so libselinux falls back to netlink and never reads a mapping. */
+    data class Unavailable(
+        val reason: String,
+        override val notes: List<String> = emptyList(),
+    ) : SelinuxStatusPageResult {
+        override val attempted: Boolean get() = true
+    }
+
+    /** The child could not run, ended before it mapped the page, or did not report. */
+    data class Inconclusive(
+        val reason: String,
+        override val attempted: Boolean,
+        override val notes: List<String> = emptyList(),
+    ) : SelinuxStatusPageResult
 }
 
 /**
@@ -85,17 +96,17 @@ internal data class SelinuxStatusPageResult(
  * reader. Doing the read in a child turns that kill into a result instead of losing the app_zygote
  * carrier, and tells the carrier whether its own access checks would be killed the same way.
  */
-internal open class SelinuxStatusPageProbe(
+internal class SelinuxStatusPageProbe(
     private val collector: NativeSnapshotCollector = NativeSnapshotCollector.Default,
 ) {
 
-    open fun inspect(): SelinuxStatusPageResult = collector.collect(
+    fun inspect(): SelinuxStatusPageResult = collector.collect(
         readPayload = ::nativeProbeStatusPage,
         parse = ::parse,
         unavailable = { status ->
-            SelinuxStatusPageResult(
-                state = SelinuxStatusPageState.INCONCLUSIVE,
-                failureReason = status.explain("SELinux status page probe was unavailable"),
+            SelinuxStatusPageResult.Inconclusive(
+                reason = status.explain("SELinux status page probe was unavailable"),
+                attempted = false,
             )
         },
     )
@@ -117,20 +128,17 @@ internal open class SelinuxStatusPageProbe(
                 }
             }
 
+        val attempted = NativePayloadCodec.decodeFlag(values["ATTEMPTED"])
+        val reason = values["FAILURE_REASON"]?.let(NativePayloadCodec::decodeValue) ?: UNREPORTED_REASON
         // An outcome this build does not know is treated as unknown, which keeps libselinux off the page.
-        val reportedState = SelinuxStatusPageState.entries.firstOrNull { it.name == values["OUTCOME"] }
-            ?: SelinuxStatusPageState.INCONCLUSIVE
-        val header = if (reportedState == SelinuxStatusPageState.INTACT) parseHeader(values) else null
-        val incompleteRead = reportedState == SelinuxStatusPageState.INTACT && header == null
-        return SelinuxStatusPageResult(
-            state = if (incompleteRead) SelinuxStatusPageState.INCONCLUSIVE else reportedState,
-            attempted = NativePayloadCodec.decodeFlag(values["ATTEMPTED"]),
-            terminatingSignal = values["SIGNAL"]?.toIntOrNull(),
-            header = header,
-            failureReason = values["FAILURE_REASON"]?.let(NativePayloadCodec::decodeValue)
-                ?: "Status page read back without a complete header.".takeIf { incompleteRead },
-            notes = notes,
-        )
+        return when (Outcome.entries.firstOrNull { it.name == values["OUTCOME"] }) {
+            Outcome.INTACT -> parseHeader(values)?.let { header -> SelinuxStatusPageResult.Intact(header, notes) }
+                ?: SelinuxStatusPageResult.Inconclusive(INCOMPLETE_HEADER_REASON, attempted, notes)
+
+            Outcome.FAULTED -> SelinuxStatusPageResult.Faulted(values["SIGNAL"]?.toIntOrNull(), notes)
+            Outcome.UNAVAILABLE -> SelinuxStatusPageResult.Unavailable(reason, notes)
+            Outcome.INCONCLUSIVE, null -> SelinuxStatusPageResult.Inconclusive(reason, attempted, notes)
+        }
     }
 
     private fun parseHeader(values: Map<String, String>): SelinuxStatusHeader? {
@@ -144,4 +152,17 @@ internal open class SelinuxStatusPageProbe(
     }
 
     private external fun nativeProbeStatusPage(): String
+
+    /** The outcome names selinux_status_page_native_bridge.cpp writes. */
+    private enum class Outcome {
+        INTACT,
+        FAULTED,
+        UNAVAILABLE,
+        INCONCLUSIVE,
+    }
+
+    private companion object {
+        const val INCOMPLETE_HEADER_REASON = "Status page read back without a complete header."
+        const val UNREPORTED_REASON = "The status page probe did not report a reason."
+    }
 }

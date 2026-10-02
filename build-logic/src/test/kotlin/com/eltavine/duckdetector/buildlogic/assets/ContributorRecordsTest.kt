@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +29,10 @@ class ContributorRecordsTest {
     @Test
     fun `the manual contributor wins over GitHub's record of the same login`() {
         val records = contributorRecords(listOf(remote("SakanyaNotBot", 99)), recorded = emptyMap())
+        val record = records.single { it.login == "SakanyaNotBot" }
 
-        assertEquals(1, records.single().contributions)
-        assertEquals("author_summary_wuying", records.single().summaryKey)
+        assertEquals(1, record.contributions)
+        assertEquals("author_summary_wuying", record.summaryKey)
     }
 
     @Test
@@ -45,7 +47,7 @@ class ContributorRecordsTest {
         assertEquals("github_contributors/avatars/some_user.jpg", record.avatarAssetPath)
         assertEquals("summary", record.summaryKey)
         assertEquals(listOf("tee"), record.contributionKeys)
-        assertEquals(listOf("Some.User", "SakanyaNotBot"), records.map { it.login })
+        assertEquals(listOf("Some.User", "SakanyaNotBot", "sinanb9"), records.map { it.login })
     }
 
     @Test

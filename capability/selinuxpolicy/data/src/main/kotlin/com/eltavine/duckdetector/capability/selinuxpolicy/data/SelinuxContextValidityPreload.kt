@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,14 +45,15 @@ public class SelinuxContextValidityPreload {
             // node, the first access check kills this carrier.
             trace("selinux: status page probe")
             val statusPage = statusPageProbe.inspect()
-            val baseSnapshot = collectBaseSnapshot(currentUid, appInfo.uid, statusPage, trace)
+            val accessCheckBlockReason = statusPage.accessCheckBlockReason
+            val baseSnapshot = collectBaseSnapshot(currentUid, appInfo.uid, accessCheckBlockReason, trace)
             var dirtyPolicyTraced = false
             val snapshot = augmentPreloadSnapshot(
                 baseSnapshot = baseSnapshot,
                 currentUid = currentUid,
                 appUid = appInfo.uid,
                 isUserBuild = Build.TYPE == "user",
-                statusPage = statusPage,
+                accessCheckBlockReason = accessCheckBlockReason,
                 inspectProcAttrCurrent = {
                     procAttrCurrentProbe.inspect { context -> trace("selinux: proc attr current write $context") }
                 },
@@ -85,22 +87,23 @@ public class SelinuxContextValidityPreload {
     private fun collectBaseSnapshot(
         currentUid: Int,
         appUid: Int,
-        statusPage: SelinuxStatusPageResult,
+        accessCheckBlockReason: String?,
         trace: (step: String) -> Unit,
     ): SelinuxContextValiditySnapshot {
         if (currentUid != appUid) {
             return fallbackSnapshot("UID mismatch: $currentUid != app uid $appUid.")
         }
+        val allowAccessChecks = accessCheckBlockReason == null
         trace("selinux: native context oracle")
-        val nativeSnapshot = collectNativeCarrierSnapshot(statusPage.allowsInProcessAccess)
+        val nativeSnapshot = collectNativeCarrierSnapshot(allowAccessChecks)
         trace("selinux: java carrier checks")
-        val javaCarrierSnapshot = collectJavaCarrierSnapshot(currentUid, appUid, statusPage.allowsInProcessAccess)
+        val javaCarrierSnapshot = collectJavaCarrierSnapshot(currentUid, appUid, allowAccessChecks)
         val merged = mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = nativeSnapshot,
             javaCarrierSnapshot = javaCarrierSnapshot,
         )
-        val skipReason = statusPage.skipReason ?: return merged
-        return merged.copy(notes = merged.notes + "Dyntransition self-check: $skipReason")
+        accessCheckBlockReason ?: return merged
+        return merged.copy(notes = merged.notes + "Dyntransition self-check: $accessCheckBlockReason")
     }
 
     private fun collectNativeCarrierSnapshot(allowAccessChecks: Boolean): SelinuxContextValiditySnapshot {
@@ -270,7 +273,7 @@ public class SelinuxContextValidityPreload {
             currentUid: Int,
             appUid: Int,
             isUserBuild: Boolean,
-            statusPage: SelinuxStatusPageResult,
+            accessCheckBlockReason: String?,
             inspectProcAttrCurrent: () -> List<com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult>,
             inspectPolicyloadSeqno: () -> SelinuxPolicyloadSeqnoResult,
             checkAccess: (String, String, String, String) -> Boolean?,
@@ -299,8 +302,8 @@ public class SelinuxContextValidityPreload {
                 inspectPolicyloadSeqno = inspectPolicyloadSeqno,
             )
 
-            // Every android.os.SELinux.checkSELinuxAccess lets libselinux map and read the status page.
-            statusPage.skipReason?.let { reason ->
+            // The first android.os.SELinux.checkSELinuxAccess makes libselinux map and read the status page.
+            accessCheckBlockReason?.let { reason ->
                 return snapshotWithPolicyloadSeqno.copy(
                     javaDirtyPolicyAvailable = false,
                     javaDirtyPolicyProbeAttempted = false,

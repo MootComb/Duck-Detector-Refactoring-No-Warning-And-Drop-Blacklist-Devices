@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,30 +44,39 @@ class SelinuxStatusPageProbeTest {
             """.trimIndent(),
         )
 
-        assertEquals(SelinuxStatusPageState.INTACT, result.state)
+        assertEquals(
+            SelinuxStatusPageResult.Intact(
+                header = SelinuxStatusHeader(1, 4, 1, 2, 0),
+                notes = listOf("Status page read back: version=1 sequence=4 enforcing=1 policyload=2 deny_unknown=0."),
+            ),
+            result,
+        )
         assertTrue(result.attempted)
-        assertEquals(SelinuxStatusHeader(1, 4, 1, 2, 0), result.header)
-        assertTrue(result.allowsInProcessAccess)
-        assertNull(result.skipReason)
-        assertEquals(1, result.notes.size)
+        assertNull(result.accessCheckBlockReason)
     }
 
     @Test
-    fun `a page that killed the child keeps libselinux off it and names the signal`() {
+    fun `a page that faulted keeps libselinux off it and names the signal`() {
         val result = probe.parse(
             """
             ATTEMPTED=1
-            OUTCOME=HOSTILE
+            OUTCOME=FAULTED
             SIGNAL=9
             NOTE=Child opened and mapped /sys/fs/selinux/status, then was killed by SIGKILL on the first read of the mapping.
             """.trimIndent(),
         )
 
-        assertEquals(SelinuxStatusPageState.HOSTILE, result.state)
-        assertEquals(9, result.terminatingSignal)
-        assertNull(result.header)
-        assertFalse(result.allowsInProcessAccess)
-        assertTrue(result.skipReason.orEmpty().contains("signal 9"))
+        assertEquals(9, (result as SelinuxStatusPageResult.Faulted).signal)
+        assertTrue(result.attempted)
+        assertTrue(result.accessCheckBlockReason.orEmpty().contains("signal 9"))
+    }
+
+    @Test
+    fun `a faulted report without its signal still keeps libselinux off the page`() {
+        val result = probe.parse("ATTEMPTED=1\nOUTCOME=FAULTED\n")
+
+        assertEquals(SelinuxStatusPageResult.Faulted(signal = null), result)
+        assertTrue(result.accessCheckBlockReason.orEmpty().contains("killed a disposable child"))
     }
 
     @Test
@@ -79,10 +89,11 @@ class SelinuxStatusPageProbeTest {
             """.trimIndent(),
         )
 
-        assertEquals(SelinuxStatusPageState.UNAVAILABLE, result.state)
-        assertTrue(result.allowsInProcessAccess)
-        assertNull(result.skipReason)
-        assertEquals("open of /sys/fs/selinux/status failed (errno=13).", result.failureReason)
+        assertEquals(
+            SelinuxStatusPageResult.Unavailable(reason = "open of /sys/fs/selinux/status failed (errno=13)."),
+            result,
+        )
+        assertNull(result.accessCheckBlockReason)
     }
 
     @Test
@@ -95,10 +106,14 @@ class SelinuxStatusPageProbeTest {
             """.trimIndent(),
         )
 
-        assertEquals(SelinuxStatusPageState.INCONCLUSIVE, result.state)
-        assertEquals("Status page child did not finish within 1000 ms\nand was stopped.", result.failureReason)
-        assertFalse(result.allowsInProcessAccess)
-        assertTrue(result.skipReason.orEmpty().contains("inconclusive"))
+        assertEquals(
+            SelinuxStatusPageResult.Inconclusive(
+                reason = "Status page child did not finish within 1000 ms\nand was stopped.",
+                attempted = true,
+            ),
+            result,
+        )
+        assertTrue(result.accessCheckBlockReason.orEmpty().contains("inconclusive"))
     }
 
     @Test
@@ -112,18 +127,22 @@ class SelinuxStatusPageProbeTest {
             """.trimIndent(),
         )
 
-        assertEquals(SelinuxStatusPageState.INCONCLUSIVE, result.state)
-        assertNull(result.header)
-        assertFalse(result.allowsInProcessAccess)
-        assertEquals("Status page read back without a complete header.", result.failureReason)
+        assertEquals(
+            SelinuxStatusPageResult.Inconclusive(
+                reason = "Status page read back without a complete header.",
+                attempted = true,
+            ),
+            result,
+        )
+        assertTrue(result.accessCheckBlockReason != null)
     }
 
     @Test
     fun `an outcome this build does not know fails safe`() {
         val result = probe.parse("ATTEMPTED=1\nOUTCOME=SOMETHING_NEW\n")
 
-        assertEquals(SelinuxStatusPageState.INCONCLUSIVE, result.state)
-        assertFalse(result.allowsInProcessAccess)
+        assertTrue(result is SelinuxStatusPageResult.Inconclusive)
+        assertTrue(result.accessCheckBlockReason != null)
     }
 
     @Test
@@ -139,9 +158,9 @@ class SelinuxStatusPageProbeTest {
 
         val result = unloaded.inspect()
 
-        assertEquals(SelinuxStatusPageState.INCONCLUSIVE, result.state)
+        assertTrue(result is SelinuxStatusPageResult.Inconclusive)
         assertFalse(result.attempted)
-        assertFalse(result.allowsInProcessAccess)
-        assertTrue(result.failureReason.orEmpty().contains("dlopen failed"))
+        assertTrue((result as SelinuxStatusPageResult.Inconclusive).reason.contains("dlopen failed"))
+        assertTrue(result.accessCheckBlockReason.orEmpty().contains("dlopen failed"))
     }
 }

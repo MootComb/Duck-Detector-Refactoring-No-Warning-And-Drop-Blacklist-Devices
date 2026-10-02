@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +143,16 @@ private val LOCAL_CONTRIBUTORS = listOf(
         avatarAssetPath = "github_contributors/avatars/sakanyanotbot.jpg",
         contributions = 1,
         summaryKey = "author_summary_wuying",
+        contributionKeys = listOf("security"),
+    ),
+    LocalContributor(
+        login = "sinanb9",
+        name = "sinanb9",
+        profileUrl = "https://github.com/sinanb9",
+        avatarFileName = "sinanb9.jpg",
+        avatarAssetPath = "github_contributors/avatars/sinanb9.jpg",
+        contributions = 1,
+        summaryKey = "author_summary_sinanb9",
         contributionKeys = listOf("security"),
     ),
 )

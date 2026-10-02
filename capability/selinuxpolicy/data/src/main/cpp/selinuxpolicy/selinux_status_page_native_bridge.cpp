@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +26,17 @@
 
 namespace {
 
+    using duckdetector::selinux::StatusPageHeader;
     using duckdetector::selinux::StatusPageOutcome;
     using duckdetector::selinux::StatusPageProbeResult;
 
+    // The names SelinuxStatusPageProbe parses; an outcome it does not know reads as inconclusive.
     const char *outcome_name(const StatusPageOutcome outcome) {
         switch (outcome) {
             case StatusPageOutcome::kIntact:
                 return "INTACT";
-            case StatusPageOutcome::kHostile:
-                return "HOSTILE";
+            case StatusPageOutcome::kFaulted:
+                return "FAULTED";
             case StatusPageOutcome::kUnavailable:
                 return "UNAVAILABLE";
             case StatusPageOutcome::kInconclusive:
@@ -49,20 +52,13 @@ namespace {
         if (result.terminating_signal != 0) {
             output << "SIGNAL=" << result.terminating_signal << '\n';
         }
-        if (result.version.has_value()) {
-            output << "VERSION=" << *result.version << '\n';
-        }
-        if (result.sequence.has_value()) {
-            output << "SEQUENCE=" << *result.sequence << '\n';
-        }
-        if (result.enforcing.has_value()) {
-            output << "ENFORCING=" << *result.enforcing << '\n';
-        }
-        if (result.policyload.has_value()) {
-            output << "POLICYLOAD=" << *result.policyload << '\n';
-        }
-        if (result.deny_unknown.has_value()) {
-            output << "DENY_UNKNOWN=" << *result.deny_unknown << '\n';
+        if (result.header.has_value()) {
+            const StatusPageHeader &header = *result.header;
+            output << "VERSION=" << header.version << '\n';
+            output << "SEQUENCE=" << header.sequence << '\n';
+            output << "ENFORCING=" << header.enforcing << '\n';
+            output << "POLICYLOAD=" << header.policyload << '\n';
+            output << "DENY_UNKNOWN=" << header.deny_unknown << '\n';
         }
         if (!result.failure_reason.empty()) {
             output << "FAILURE_REASON="
