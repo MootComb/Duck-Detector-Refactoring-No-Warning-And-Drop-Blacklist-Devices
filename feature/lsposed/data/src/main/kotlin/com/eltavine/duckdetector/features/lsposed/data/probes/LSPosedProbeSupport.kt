@@ -35,6 +35,10 @@ internal object LSPosedProbeSupport {
         "hiddenapi",
     )
 
+    // DuckDetectorZygotePreload's trace tag. The app zygote runs under this app's UID, so logd
+    // returns its lines to this probe, and they name probe targets such as u:r:lsposed_file:s0.
+    val selfLogTags = setOf("DuckZygotePreload")
+
     val logcatTags = listOf(
         "LSPosed",
         "LSPosed-Bridge",

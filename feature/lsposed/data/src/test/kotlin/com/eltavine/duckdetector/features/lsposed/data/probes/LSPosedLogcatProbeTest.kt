@@ -134,6 +134,47 @@ class LSPosedLogcatProbeTest {
     }
 
     @Test
+    fun `own app zygote preload trace does not become lsposed hit`() {
+        val probe = LSPosedLogcatProbe()
+        val result = probe.evaluate(
+            mapOf(
+                "overview" to LSPosedLogcatCommandOutput(
+                    output = """
+                        I/DuckZygotePreload( 6602): detector: lsposed
+                        I/DuckZygotePreload( 6602): selinux: proc attr current write u:r:lsposed_file:s0
+                    """.trimIndent(),
+                ),
+                "tag:LSPosed" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosed-Bridge" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosedService" to LSPosedLogcatCommandOutput(),
+                "process" to LSPosedLogcatCommandOutput(),
+            ),
+        )
+
+        assertTrue(result.available)
+        assertTrue(result.signals.isEmpty())
+    }
+
+    @Test
+    fun `line only mentioning the preload trace tag still reports`() {
+        val probe = LSPosedLogcatProbe()
+        val result = probe.evaluate(
+            mapOf(
+                "overview" to LSPosedLogcatCommandOutput(
+                    output = "I/OtherTag( 123): DuckZygotePreload: lsposed bridge attached",
+                ),
+                "tag:LSPosed" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosed-Bridge" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosedService" to LSPosedLogcatCommandOutput(),
+                "process" to LSPosedLogcatCommandOutput(),
+            ),
+        )
+
+        assertEquals(1, result.dangerHitCount)
+        assertEquals("Logcat direct hit", result.signals.single().label)
+    }
+
+    @Test
     fun `log access denied downgrades to unavailable`() {
         val probe = LSPosedLogcatProbe(
             commandRunner = LSPosedLogcatCommandRunner { _, _ ->

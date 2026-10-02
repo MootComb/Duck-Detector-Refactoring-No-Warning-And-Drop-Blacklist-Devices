@@ -32,11 +32,7 @@ internal fun parseOverview(
 
     val signals = mutableListOf<LSPosedSignal>()
     meaningfulLines(output).forEach { line ->
-        val tag = Regex("""^[VDIWEF]/([^(]+)\(""")
-            .find(line)
-            ?.groupValues
-            ?.getOrNull(1)
-            ?.trim()
+        val tag = line.briefTag()
 
         tag?.let { currentTag ->
             LSPosedProbeSupport.logcatTags.firstOrNull { knownTag ->
@@ -183,6 +179,9 @@ private fun meaningfulLines(
 private fun shouldExcludeLine(
     line: String,
 ): Boolean {
+    if (line.briefTag() in LSPosedProbeSupport.selfLogTags) {
+        return true
+    }
     val lower = line.lowercase()
     if (SELINUX_AUDIT_MARKER in lower) {
         return true
@@ -191,6 +190,13 @@ private fun shouldExcludeLine(
         return true
     }
     return LSPosedProbeSupport.runtimeExcludePatterns.any { token -> lower.contains(token) }
+}
+
+private fun String.briefTag(): String? {
+    return BRIEF_TAG_REGEX.find(this)
+        ?.groupValues
+        ?.getOrNull(1)
+        ?.trim()
 }
 
 private fun String.isDirtyPolicyLsposedFileAvc(): Boolean {
@@ -255,6 +261,8 @@ private fun dangerSignal(
 internal const val TAG_COMMAND_PREFIX = "tag:"
 
 private const val SELINUX_AUDIT_MARKER = "duckdetector_probe="
+
+private val BRIEF_TAG_REGEX = Regex("""^[VDIWEF]/([^(]+)\(""")
 
 private val DIRTY_POLICY_LSPOSED_FILE_READ_REGEX =
     Regex("""avc:\s*denied\s*\{\s*read\s*\}""", RegexOption.IGNORE_CASE)
