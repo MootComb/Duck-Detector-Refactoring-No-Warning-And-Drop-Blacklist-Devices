@@ -23,6 +23,7 @@ import com.eltavine.duckdetector.features.bootloader.data.rules.BootloaderCatalo
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFinding
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingGroup
 import com.eltavine.duckdetector.features.bootloader.domain.BootloaderFindingSeverity
+import java.security.MessageDigest
 
 internal fun buildPropertyFindings(
     propertyContext: BootloaderPropertyContext,
@@ -88,6 +89,9 @@ private fun propertyBadgeValue(
             "1" -> "Tripped"
             else -> value
         }
+
+        BootloaderCatalog.VBMETA_DIGEST ->
+            if (emptyInputDigestAlgorithm(value) != null) "Empty-input digest" else value
 
         else -> value
     }
@@ -160,7 +164,9 @@ private fun propertySeverity(
             else -> BootloaderFindingSeverity.INFO
         }
 
-        BootloaderCatalog.VBMETA_DIGEST,
+        BootloaderCatalog.VBMETA_DIGEST ->
+            if (emptyInputDigestAlgorithm(value) != null) BootloaderFindingSeverity.DANGER else BootloaderFindingSeverity.INFO
+
         BootloaderCatalog.AVB_VERSION,
         BootloaderCatalog.VBMETA_SIZE -> BootloaderFindingSeverity.INFO
 
@@ -191,6 +197,9 @@ private fun buildPropertyDetail(
 
         BootloaderCatalog.VBMETA_DIGEST -> {
             notes += "Compared against attested verifiedBootHash when RootOfTrust is available."
+            emptyInputDigestAlgorithm(read.preferredValue)?.let { algorithm ->
+                notes += "This is the $algorithm digest of empty input. libavb digests the loaded vbmeta images, so verified boot does not produce it."
+            }
         }
 
         BootloaderCatalog.VERITYMODE -> {
@@ -230,6 +239,23 @@ private fun isUnlockedValue(value: String): Boolean {
         "false",
         ignoreCase = true
     )
+}
+
+/**
+ * The hash algorithm whose digest of empty input [value] is, or null.
+ *
+ * Verified boot never reports such a digest: libavb computes androidboot.vbmeta.digest over the
+ * loaded vbmeta images, which include at least the top-level one (external/avb
+ * libavb/avb_cmdline.c, avb_append_options), and on a locked device first-stage init rejects a
+ * digest that does not match the images it loads (system/core fs_mgr/libfs_avb/fs_avb.cpp,
+ * AvbVerifier).
+ */
+internal fun emptyInputDigestAlgorithm(value: String): String? {
+    return EMPTY_INPUT_DIGESTS[value.trim().lowercase()]
+}
+
+private val EMPTY_INPUT_DIGESTS: Map<String, String> = listOf("SHA-256", "SHA-512").associateBy { algorithm ->
+    MessageDigest.getInstance(algorithm).digest().joinToString(separator = "") { byte -> "%02x".format(byte) }
 }
 
 internal fun sourceLabel(source: SystemPropertySource): String {
