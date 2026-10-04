@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +34,10 @@ internal object LSPosedProbeSupport {
         "using reflection",
         "hiddenapi",
     )
+
+    // DuckDetectorZygotePreload's trace tag. The app zygote runs under this app's UID, so logd
+    // returns its lines to this probe, and they name probe targets such as u:r:lsposed_file:s0.
+    val selfLogTags = setOf("DuckZygotePreload")
 
     val logcatTags = listOf(
         "LSPosed",

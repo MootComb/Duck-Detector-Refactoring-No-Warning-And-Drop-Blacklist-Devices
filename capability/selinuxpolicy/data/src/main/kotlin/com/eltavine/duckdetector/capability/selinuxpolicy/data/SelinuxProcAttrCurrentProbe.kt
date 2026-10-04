@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +48,10 @@ public data class SelinuxProcAttrCurrentResult(
 
 public class SelinuxProcAttrCurrentProbe {
 
-    public fun inspect(): List<SelinuxProcAttrCurrentResult> {
+    /** [beforeWrite] receives each context just before it is written. */
+    public fun inspect(beforeWrite: (context: String) -> Unit = {}): List<SelinuxProcAttrCurrentResult> {
         return TARGETS.map { target ->
+            beforeWrite(target.context)
             runProbe(target.label, target.context)
         }
     }

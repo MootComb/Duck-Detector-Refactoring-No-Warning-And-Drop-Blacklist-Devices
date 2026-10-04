@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +19,20 @@ package com.eltavine.duckdetector.features.selinux.data.probes
 
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValidityBridge
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxContextValiditySnapshot
+import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxPolicyloadSeqnoState
 import com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult
 import com.eltavine.duckdetector.features.selinux.data.repository.EvidenceSource
 import com.eltavine.duckdetector.features.selinux.data.repository.buildContextValidityMethod
+import com.eltavine.duckdetector.features.selinux.data.repository.buildPolicyloadSeqnoMethod
 import com.eltavine.duckdetector.features.selinux.data.repository.buildProcAttrCurrentMethod
 import com.eltavine.duckdetector.features.selinux.domain.AppZygoteCarrierSupportState
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityReading
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
 import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -85,6 +90,31 @@ class SelinuxContextValidityMethodTest {
 
         assertEquals(listOf("KernelSU", "LSPosed file"), method.attrCurrentDetections)
         assertEquals("Detected: ${method.attrCurrentDetections.joinToString()}", method.status)
+    }
+
+    @Test
+    fun `a faulted status page is an insecure finding that does not borrow a carrier failure`() {
+        val result = SelinuxContextValidityProbe(
+            nativeBridge = FakeBridge(
+                trustedSnapshot().copy(
+                    failureReason = "Context validity oracle self-test failed.",
+                    policyloadSeqnoAvailable = true,
+                    policyloadSeqnoProbeAttempted = true,
+                    policyloadSeqnoState = SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED.name,
+                    policyloadSeqnoNotes = listOf(
+                        "Child opened and mapped /sys/fs/selinux/status, then was killed by SIGKILL on the first read of the mapping.",
+                    ),
+                ),
+            ),
+        ).inspectLocal()
+
+        val method = buildPolicyloadSeqnoMethod(result)
+
+        assertEquals(SelinuxOracle.POLICYLOAD_SEQNO, method.oracle)
+        assertEquals(SelinuxPolicyloadSeqnoLabels.STATUS_PAGE_FAULTED, method.status)
+        assertEquals(false, method.isSecure)
+        assertTrue(method.details.orEmpty().contains("killed by SIGKILL"))
+        assertFalse(method.details.orEmpty().contains("Failure="))
     }
 
     private fun attrResult(label: String, outcome: String) = SelinuxProcAttrCurrentResult(

@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +54,7 @@ class ZygiskFdTrapManager(
 
         return try {
             withTimeoutOrNull(DETECTION_TIMEOUT_MS) {
-                performRemoteDetection(context.applicationContext, trapFd)
+                performRemoteDetectionWithRetry(context.applicationContext, trapFd)
             } ?: ZygiskFdTrapDetectionResult.fromResultCode(
                 resultCode = ZygiskFdTrapNativeBridge.RESULT_TIMEOUT,
                 detail = "Detector service timed out before the child-process verification returned.",
@@ -63,14 +64,34 @@ class ZygiskFdTrapManager(
         }
     }
 
+    // ActivityManager stops every service of this package when any of its processes fails to start
+    // (frameworks/base ProcessList.handleProcessStart -> forceStopPackageLocked), which kills this
+    // binding if it has not connected yet. Nothing ran in the detector process then, so the
+    // detection is bound once more instead of being reported as unavailable.
+    private suspend fun performRemoteDetectionWithRetry(
+        context: Context,
+        trapFd: Int,
+    ): ZygiskFdTrapDetectionResult {
+        repeat(BIND_ATTEMPTS) {
+            performRemoteDetection(context, trapFd)?.let { result -> return result }
+        }
+        return ZygiskFdTrapDetectionResult.fromResultCode(
+            resultCode = ZygiskFdTrapNativeBridge.RESULT_BIND_FAILED,
+            detail = "The system stopped the FD trap detector service before it connected, " +
+                "on both attempts.",
+        )
+    }
+
+    // Null when the binding died before the detector service connected.
     private suspend fun performRemoteDetection(
         context: Context,
         trapFd: Int,
-    ): ZygiskFdTrapDetectionResult = suspendCancellableCoroutine { continuation ->
+    ): ZygiskFdTrapDetectionResult? = suspendCancellableCoroutine { continuation ->
         val bindAttemptFinished = AtomicBoolean(false)
         val cleanupRequested = AtomicBoolean(false)
         val unbindAttempted = AtomicBoolean(false)
         val completionAttempted = AtomicBoolean(false)
+        val connected = AtomicBoolean(false)
         lateinit var connection: ServiceConnection
 
         fun requestCleanup() {
@@ -80,7 +101,7 @@ class ZygiskFdTrapManager(
             }
         }
 
-        fun finish(result: ZygiskFdTrapDetectionResult) {
+        fun finish(result: ZygiskFdTrapDetectionResult?) {
             requestCleanup()
             if (completionAttempted.compareAndSet(false, true)) {
                 continuation.resume(result)
@@ -92,6 +113,7 @@ class ZygiskFdTrapManager(
                 name: ComponentName?,
                 service: IBinder?,
             ) {
+                connected.set(true)
                 if (service == null) {
                     finish(
                         ZygiskFdTrapDetectionResult.fromResultCode(
@@ -147,6 +169,19 @@ class ZygiskFdTrapManager(
                 )
             }
 
+            override fun onBindingDied(name: ComponentName?) {
+                finish(
+                    if (connected.get()) {
+                        ZygiskFdTrapDetectionResult.fromResultCode(
+                            resultCode = ZygiskFdTrapNativeBridge.RESULT_BIND_FAILED,
+                            detail = "The FD trap detector service binding died before it answered.",
+                        )
+                    } else {
+                        null
+                    },
+                )
+            }
+
             override fun onServiceDisconnected(name: ComponentName?) = Unit
         }
 
@@ -185,6 +220,7 @@ class ZygiskFdTrapManager(
 
     companion object {
         private const val DETECTION_TIMEOUT_MS = 7_000L
+        private const val BIND_ATTEMPTS = 2
         private val REMOTE_CALLBACK_EXECUTOR = Dispatchers.IO.asExecutor()
     }
 }

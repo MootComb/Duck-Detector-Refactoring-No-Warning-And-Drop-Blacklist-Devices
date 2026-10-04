@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +131,47 @@ class LSPosedLogcatProbeTest {
 
         assertTrue(result.available)
         assertTrue(result.signals.isEmpty())
+    }
+
+    @Test
+    fun `own app zygote preload trace does not become lsposed hit`() {
+        val probe = LSPosedLogcatProbe()
+        val result = probe.evaluate(
+            mapOf(
+                "overview" to LSPosedLogcatCommandOutput(
+                    output = """
+                        I/DuckZygotePreload( 6602): detector: lsposed
+                        I/DuckZygotePreload( 6602): selinux: proc attr current write u:r:lsposed_file:s0
+                    """.trimIndent(),
+                ),
+                "tag:LSPosed" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosed-Bridge" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosedService" to LSPosedLogcatCommandOutput(),
+                "process" to LSPosedLogcatCommandOutput(),
+            ),
+        )
+
+        assertTrue(result.available)
+        assertTrue(result.signals.isEmpty())
+    }
+
+    @Test
+    fun `line only mentioning the preload trace tag still reports`() {
+        val probe = LSPosedLogcatProbe()
+        val result = probe.evaluate(
+            mapOf(
+                "overview" to LSPosedLogcatCommandOutput(
+                    output = "I/OtherTag( 123): DuckZygotePreload: lsposed bridge attached",
+                ),
+                "tag:LSPosed" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosed-Bridge" to LSPosedLogcatCommandOutput(),
+                "tag:LSPosedService" to LSPosedLogcatCommandOutput(),
+                "process" to LSPosedLogcatCommandOutput(),
+            ),
+        )
+
+        assertEquals(1, result.dangerHitCount)
+        assertEquals("Logcat direct hit", result.signals.single().label)
     }
 
     @Test

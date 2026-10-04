@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +25,7 @@ import com.eltavine.duckdetector.features.tee.data.verification.keystore.Synthet
 import com.eltavine.duckdetector.features.tee.data.verification.keystore.VintfKeyMintVersionAnomalyKind
 import com.eltavine.duckdetector.features.tee.data.verification.rkp.RkpProvisionedManufacturerAnomalyKind
 import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceItem
+import com.eltavine.duckdetector.features.tee.domain.TeeEvidenceTopic
 import com.eltavine.duckdetector.features.tee.domain.TeeSignalLevel
 
 internal fun collectSupplementaryIndicators(artifacts: TeeScanArtifacts): List<TeeEvidenceItem> {
@@ -42,6 +44,21 @@ private fun MutableList<TeeEvidenceItem>.addEnvironmentAndGrantIndicators(artifa
                 "Soter environment",
                 artifacts.soter.summary,
                 TeeSignalLevel.WARN,
+                topic = TeeEvidenceTopic.SOTER,
+            )
+        )
+    }
+    if (artifacts.soter.anomalies.isNotEmpty()) {
+        add(
+            fact(
+                "Soter reply integrity",
+                artifacts.soter.anomalies.joinToString(
+                    separator = "; ",
+                    prefix = "Soter replies need review: ",
+                    postfix = ".",
+                ) { it.detail },
+                artifacts.soter.anomalies.maxOf { it.level },
+                topic = TeeEvidenceTopic.SOTER,
             )
         )
     }

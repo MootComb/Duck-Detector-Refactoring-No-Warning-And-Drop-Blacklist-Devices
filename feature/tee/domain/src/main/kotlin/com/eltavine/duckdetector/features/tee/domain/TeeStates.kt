@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +54,30 @@ data class TeePatchState(
     val summary: String = "Patch data unavailable",
 )
 
+enum class TeeSoterAnomalyKind {
+    D_SOTER_FIXED_SPKI,
+    D_SOTER_ZERO_SIGNATURE,
+    D_SOTER_ZERO_CPU_ID,
+
+    /** An all-zero signature whose length differs from D-Soter's 256 bytes. */
+    ZERO_SIGNATURE,
+
+    /** An all-zero cpu_id whose length differs from D-Soter's 16 characters. */
+    ZERO_CPU_ID,
+    KNOWN_RELAY_CPU_ID,
+    KNOWN_RELAY_SPKI,
+    UID_MISMATCH,
+    CPU_ID_MISMATCH,
+    INVALID_COUNTER,
+    SOFTWARE_HAL_TAKEOVER,
+}
+
+data class TeeSoterAnomaly(
+    val kind: TeeSoterAnomalyKind,
+    val level: TeeSignalLevel,
+    val detail: String,
+)
+
 data class TeeSoterState(
     val serviceReachable: Boolean = false,
     val keyPrepared: Boolean = false,
@@ -60,6 +85,7 @@ data class TeeSoterState(
     val available: Boolean = false,
     val damaged: Boolean = false,
     val abnormalEnvironment: Boolean = false,
+    val anomalies: List<TeeSoterAnomaly> = emptyList(),
     val summary: String = "Soter check skipped",
 )
 

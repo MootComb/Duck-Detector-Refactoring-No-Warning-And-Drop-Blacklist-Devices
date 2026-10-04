@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +68,7 @@ class SelinuxContextValidityPreloadTest {
             currentUid = 10000,
             appUid = 10000,
             isUserBuild = true,
+            accessCheckBlockReason = null,
             inspectProcAttrCurrent = {
                 listOf(
                     SelinuxProcAttrCurrentResult(
@@ -156,6 +158,7 @@ class SelinuxContextValidityPreloadTest {
             currentUid = 10000,
             appUid = 10000,
             isUserBuild = true,
+            accessCheckBlockReason = null,
             inspectProcAttrCurrent = {
                 inspectCalls += 1
                 listOf(
@@ -188,6 +191,72 @@ class SelinuxContextValidityPreloadTest {
             "Carrier pid context did not match the current process context.",
             snapshot.procAttrCurrentFailureReason,
         )
+    }
+
+    @Test
+    fun `a status page that is not safe keeps every access check away from libselinux`() {
+        val faulted = SelinuxStatusPageResult.Faulted(signal = 9)
+        val inconclusive = SelinuxStatusPageResult.Inconclusive(
+            reason = "Status page child could not be started (errno=11); status page probe not run.",
+            attempted = false,
+        )
+
+        listOf(faulted, inconclusive).forEach { statusPage ->
+            var accessChecks = 0
+            var attrWrites = 0
+            val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+                baseSnapshot = trustedCarrierSnapshot(),
+                currentUid = 10000,
+                appUid = 10000,
+                isUserBuild = true,
+                accessCheckBlockReason = statusPage.accessCheckBlockReason,
+                inspectProcAttrCurrent = {
+                    attrWrites += 1
+                    emptyList()
+                },
+                inspectPolicyloadSeqno = {
+                    SelinuxPolicyloadSeqnoProbe().inspect(statusPage) {
+                        error("the access node must not be queried for an unread status page")
+                    }
+                },
+                checkAccess = { _, _, _, _ ->
+                    accessChecks += 1
+                    true
+                },
+            )
+
+            assertEquals(0, accessChecks)
+            assertFalse(snapshot.javaDirtyPolicyAvailable)
+            assertFalse(snapshot.javaDirtyPolicyProbeAttempted)
+            assertFalse(snapshot.javaDirtyPolicyTrusted)
+            assertEquals(statusPage.accessCheckBlockReason, snapshot.javaDirtyPolicyFailureReason)
+            // Writing /proc/self/attr/current never touches the status page, so it still runs.
+            assertEquals(1, attrWrites)
+            assertTrue(snapshot.procAttrCurrentProbeAttempted)
+        }
+    }
+
+    @Test
+    fun `a status page that killed the child is reported as a faulted seqno oracle`() {
+        val statusPage = SelinuxStatusPageResult.Faulted(
+            signal = 9,
+            notes = listOf("Child was killed by SIGKILL on the first read of the mapping."),
+        )
+
+        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+            baseSnapshot = trustedCarrierSnapshot(),
+            currentUid = 10000,
+            appUid = 10000,
+            isUserBuild = true,
+            accessCheckBlockReason = statusPage.accessCheckBlockReason,
+            inspectProcAttrCurrent = { emptyList() },
+            inspectPolicyloadSeqno = { SelinuxPolicyloadSeqnoProbe().inspect(statusPage) },
+            checkAccess = { _, _, _, _ -> null },
+        )
+
+        assertEquals(SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED.name, snapshot.policyloadSeqnoState)
+        assertTrue(snapshot.policyloadSeqnoProbeAttempted)
+        assertTrue(snapshot.policyloadSeqnoNotes.contains("Child was killed by SIGKILL on the first read of the mapping."))
     }
 
     @Test
@@ -268,4 +337,15 @@ class SelinuxContextValidityPreloadTest {
         assertEquals(true, merged.ksuFileValid)
         assertEquals("11", merged.bitPair)
     }
+
+    private fun trustedCarrierSnapshot() = SelinuxContextValiditySnapshot(
+        available = true,
+        probeAttempted = true,
+        carrierContext = "u:r:app_zygote:s0:c1,c2",
+        carrierMatchesExpected = true,
+        selinuxEnabled = true,
+        selinuxEnforced = true,
+        pidContextMatchesCurrent = true,
+        procSelfContextMatchesCurrent = true,
+    )
 }

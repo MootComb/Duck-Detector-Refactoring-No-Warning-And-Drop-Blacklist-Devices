@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@ package com.eltavine.duckdetector.features.selinux.data.repository
 
 import android.content.Context
 import android.os.Build
+import android.os.SystemClock
 import com.eltavine.duckdetector.core.platform.PathState
 import com.eltavine.duckdetector.core.platform.PathStat
 import com.eltavine.duckdetector.features.selinux.data.probes.SelinuxContextValidityProbe
@@ -54,6 +56,7 @@ class SelinuxRepository(
     }
 
     private suspend fun scanInternal(): SelinuxReport {
+        val scanStartedAt = SystemClock.elapsedRealtime()
         val methods = mutableListOf<SelinuxCheckResult>()
 
         val filesystemResult = checkSelinuxFilesystem()
@@ -86,7 +89,7 @@ class SelinuxRepository(
         val procAttrResult = checkViaProcAttr()
         methods += procAttrResult
 
-        val carrierSnapshot = contextValidityCarrierManager.collectSnapshot()
+        val carrierSnapshot = contextValidityCarrierManager.collectSnapshot(scanStartedAt)
         val carrierResult = contextValidityProbe.interpret(carrierSnapshot)
         val contextValidityResult = carrierResult
         methods += buildContextValidityMethod(contextValidityResult)

@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +25,7 @@ class SelinuxContextValidityCarrierManagerTest {
 
     @Test
     fun `missing context reports carrier failure across related probes`() = runBlocking {
-        val snapshot = SelinuxContextValidityCarrierManager(context = null).collectSnapshot()
+        val snapshot = SelinuxContextValidityCarrierManager(context = null).collectSnapshot(scanStartedAt = 0L)
 
         assertEquals("SELinux carrier service unavailable.", snapshot.failureReason)
         assertEquals("SELinux carrier service unavailable.", snapshot.procAttrCurrentFailureReason)

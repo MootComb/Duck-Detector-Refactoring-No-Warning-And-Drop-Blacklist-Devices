@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,16 +131,34 @@ public open class HelperProbeManager(
         }
     }
 
-    private suspend fun <T> performRemoteCall(
+    // ActivityManager stops every service of this package when any of its processes fails to start
+    // (frameworks/base ProcessList.handleProcessStart -> forceStopPackageLocked), which kills a
+    // binding that has not connected yet. Nothing ran in the helper then, so the call is bound once
+    // more instead of being reported as unavailable.
+    private suspend fun <T : Any> performRemoteCall(
         context: Context,
         onConnected: (HelperProbeProxy) -> T,
         onNullBinder: () -> T,
         onError: (String) -> T,
-    ): T = suspendCancellableCoroutine { continuation ->
+    ): T {
+        repeat(BIND_ATTEMPTS) {
+            bindOnce(context, onConnected, onNullBinder, onError)?.let { result -> return result }
+        }
+        return onError("The system stopped the helper service before it connected, on both attempts.")
+    }
+
+    // Null when the binding died before the helper service connected.
+    private suspend fun <T : Any> bindOnce(
+        context: Context,
+        onConnected: (HelperProbeProxy) -> T,
+        onNullBinder: () -> T,
+        onError: (String) -> T,
+    ): T? = suspendCancellableCoroutine { continuation ->
         val bindAttemptFinished = AtomicBoolean(false)
         val cleanupRequested = AtomicBoolean(false)
         val unbindAttempted = AtomicBoolean(false)
         val completionAttempted = AtomicBoolean(false)
+        val connected = AtomicBoolean(false)
         lateinit var connection: ServiceConnection
 
         fun requestCleanup() {
@@ -149,7 +168,7 @@ public open class HelperProbeManager(
             }
         }
 
-        fun finish(result: T) {
+        fun finish(result: T?) {
             requestCleanup()
             if (completionAttempted.compareAndSet(false, true)) {
                 continuation.resume(result)
@@ -161,6 +180,7 @@ public open class HelperProbeManager(
                 name: ComponentName?,
                 service: IBinder?,
             ) {
+                connected.set(true)
                 if (service == null) {
                     finish(onNullBinder())
                     return
@@ -175,6 +195,16 @@ public open class HelperProbeManager(
 
             override fun onNullBinding(name: ComponentName?) {
                 finish(onNullBinder())
+            }
+
+            override fun onBindingDied(name: ComponentName?) {
+                finish(
+                    if (connected.get()) {
+                        onError("The helper service binding died before it answered.")
+                    } else {
+                        null
+                    },
+                )
             }
 
             override fun onServiceDisconnected(name: ComponentName?) = Unit
@@ -224,6 +254,7 @@ public open class HelperProbeManager(
 
     public companion object {
         private const val ISOLATED_INSTANCE_NAME = "duck_mount_view"
+        private const val BIND_ATTEMPTS = 2
         private const val DETECTION_TIMEOUT_MS = 6_000L
         private const val PROC_MOUNT_VIEW_TIMEOUT_MS = 15_000L
         private val REMOTE_CALLBACK_EXECUTOR = Dispatchers.IO.asExecutor()

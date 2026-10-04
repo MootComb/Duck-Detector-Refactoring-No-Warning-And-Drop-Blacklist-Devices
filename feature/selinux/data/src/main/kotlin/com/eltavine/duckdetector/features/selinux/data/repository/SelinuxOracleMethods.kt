@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,6 +142,7 @@ internal fun buildPolicyloadSeqnoMethod(
     val status = when (state) {
         SelinuxPolicyloadSeqnoState.CLEAN -> SelinuxPolicyloadSeqnoLabels.STATUS_CLEAN
         SelinuxPolicyloadSeqnoState.SUSPICIOUS -> SelinuxPolicyloadSeqnoLabels.STATUS_SUSPICIOUS
+        SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED -> SelinuxPolicyloadSeqnoLabels.STATUS_PAGE_FAULTED
         SelinuxPolicyloadSeqnoState.INCONCLUSIVE -> SelinuxPolicyloadSeqnoLabels.STATUS_INCONCLUSIVE
         SelinuxPolicyloadSeqnoState.UNAVAILABLE -> SelinuxPolicyloadSeqnoLabels.STATUS_UNAVAILABLE
     }
@@ -153,7 +155,9 @@ internal fun buildPolicyloadSeqnoMethod(
         result.policyloadSeqnoStatusPolicyload?.let { add("status.policyload=$it") }
         result.policyloadSeqnoAccessSeqno?.let { add("access.avd.seqno=$it") }
         result.policyloadSeqnoProcessClass?.let { add("process class=$it") }
-        (result.policyloadSeqnoFailureReason ?: result.failureReason)
+        // A faulted status page is the finding itself, so an unrelated carrier failure is not shown as its cause.
+        (result.policyloadSeqnoFailureReason
+            ?: result.failureReason.takeUnless { state == SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED })
             ?.let { add("Failure=$it") }
         result.policyloadSeqnoNotes.forEach(::add)
     }.joinToString(" | ")
@@ -163,7 +167,8 @@ internal fun buildPolicyloadSeqnoMethod(
         status = status,
         isSecure = when (state) {
             SelinuxPolicyloadSeqnoState.CLEAN -> true
-            SelinuxPolicyloadSeqnoState.SUSPICIOUS -> false
+            SelinuxPolicyloadSeqnoState.SUSPICIOUS,
+            SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED -> false
             SelinuxPolicyloadSeqnoState.INCONCLUSIVE,
             SelinuxPolicyloadSeqnoState.UNAVAILABLE -> null
         },

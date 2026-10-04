@@ -26,6 +26,10 @@ From Android 11, bionic reserves a `PROP_VALUE_MAX` dirty backup block right aft
 
 Lint's `MissingTranslation` check compares a string only against the locales present in the module that declares it. `mount_diagnostic_clipboard_label` and `native_root_diagnostic_clipboard_label` moved from `:app` into feature modules. Those modules have fewer locale folders, so their missing translations are no longer reported, although the strings themselves are unchanged. `feature/tee/ui` has every locale since it took over TEE's consent strings, so lint reports `tee_diagnostic_clipboard_label`'s missing translations again. Add the missing translations, or add a repository-wide translation completeness check that does not depend on module layout.
 
+## Forked probe children outside the disposable child runner
+
+`run_disposable_child` in `:core:native` stops a child at a deadline, stops waiting for it after a second one, and lets a fault end it without a tombstone. Only the SELinux status page probe uses it so far. Seven older children fork and reap on their own and block in `waitpid` until the child exits: Native Root's KernelSU supercall, SUSFS, KernelPatch superkey and KernelPatch supercall latency probes, Mount's statx support check, the helper process's sacrificial syscall pack and the early preload's mntent buffer lookup. Moving one onto the runner changes how a hung or faulting child is reported, so each needs its own change and on-device validation, and the latency probe must keep its measured path in one translation unit.
+
 ## Shared per-scan platform snapshots
 
 Each detector still collects its own platform evidence during its scan, even when several detectors read the same source, such as the package inventory or system properties. A scan session that captures such evidence once and hands the same snapshot to every consumer would make cross-detector correlation exact, but it changes probe timing and ordering, so it needs its own design and on-device validation.

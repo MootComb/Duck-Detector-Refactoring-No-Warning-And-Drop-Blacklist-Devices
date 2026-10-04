@@ -1,0 +1,209 @@
+# Copyright (C) 2026 Duck Apps Contributor
+# If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: CI
+
+# build.yml and release-latest.yml only run on pushes to main and on tags, which left the unit
+# tests, Android lint, and the native build unverified on every pull request. This workflow runs
+# exactly the checks CODING_STANDARDS.md asks contributors to run locally, and needs no secrets.
+#
+# Only pull_request is used, not push. A branch in this repository that has an open pull request
+# would otherwise match both triggers and run the whole matrix twice for one commit.
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: Architecture and cross-language contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Every checker ships a fixture-based self-test so that a regression in the checker
+      # itself cannot quietly turn a violation into a pass.
+      - name: Self-test contract checkers
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 .github/scripts/test-detector-touch-points.py
+          python3 .github/scripts/test-evidence-records.py
+          python3 .github/scripts/test-jni-contracts.py
+          python3 .github/scripts/test-native-boundaries.py
+          python3 .github/scripts/test-reflection-boundaries.py
+          python3 .github/scripts/test-source-file-length.py
+          python3 .github/scripts/test-text-protocols.py
+          python3 scripts/test_new_detector.py
+
+      - name: Verify every detector stays inside its own directory
+        run: python3 .github/scripts/check-detector-touch-points.py
+
+      - name: Verify every detector and capability keeps its evidence record
+        run: python3 .github/scripts/check-evidence-records.py
+
+      - name: Verify JNI bindings
+        run: python3 .github/scripts/check-jni-contracts.py
+
+      - name: Verify native unit boundaries
+        run: python3 .github/scripts/check-native-boundaries.py
+
+      - name: Verify reflection boundaries
+        run: python3 .github/scripts/check-reflection-boundaries.py
+
+      - name: Verify source file length
+        run: python3 .github/scripts/check-source-file-length.py
+
+      - name: Verify no layer or unit branches on another's text
+        run: python3 .github/scripts/check-text-protocols.py
+
+  verify:
+    name: Unit tests, lint, and native build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Android build toolchain
+        uses: ./.github/actions/setup-android-build
+        with:
+          cache-read-only: "true"
+
+      # Every module registers a unitTest lifecycle task, so the unqualified name runs the tests of
+      # all core, capability, feature and app modules; :build-logic:test runs the module boundary
+      # validator's self-tests. Configuring the build already fails on a boundary violation.
+      # checkPublicApi compares the SDK contract modules' public API with their committed dumps.
+      # assembleDebug covers externalNativeBuildDebug, so the CMake configuration and all four ABIs
+      # are compiled here. The contributors asset is deliberately left unrefreshed: pull requests
+      # have no reason to reach github.com during the build.
+      - name: Run unit tests and assemble debug
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace \
+            :build-logic:test \
+            unitTest \
+            checkPublicApi \
+            :app:assembleDebug
+
+      # buildHealth fails when a module declares a dependency its code does not use, uses one it
+      # only reaches transitively, or exposes one through the wrong configuration. The reviewed
+      # exceptions live in DuckDetectorDependencyAnalysisPlugin.
+      - name: Verify every module declares exactly the dependencies it uses
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace buildHealth
+
+      # The UI-free SDK is the second artifact of the same build. Publishing it to the build
+      # directory fuses every headless module, and verifySdkAar fails if a project module is left
+      # out or a UI library reaches it.
+      - name: Assemble and verify the SDK AAR
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace :sdk:aar:publish :sdk:aar:verifySdkAar
+
+      # A separate build that depends only on the published AAR, as another application would:
+      # it proves the POM resolves, the public API links and the services and native libraries merge.
+      - name: Build an application from the SDK AAR alone
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew --stacktrace -p samples/sdk-consumer assembleDebug
+
+      # Gating. lintDebug reports zero errors, so any new one fails the pull request. Translation
+      # completeness is reported as a warning instead (see the lint block in the convention plugin),
+      # because a locale that has not caught up with a new string must not block unrelated work.
+      # :app enables checkDependencies, so this single run analyses every module it depends on.
+      - name: Run Android lint
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Lint analyses every module. A fresh daemon starts it without the heap the earlier
+          # steps left behind, and the Kotlin daemon stops with the Gradle daemon.
+          ./gradlew --stop
+          ./gradlew --stacktrace :app:lintDebug
+
+      # Adding a detector has to stay one command that changes nothing outside feature/<name>/ but
+      # its registrations, and what the scaffold generates has to keep building and passing every
+      # guard as the code around it changes. This step runs last because it adds a detector to the
+      # checkout.
+      - name: Scaffold a native detector and build it
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Spelled through a variable so this file never names the probe's directory itself.
+          probe=scaffoldprobe
+          git status --porcelain | sort > /tmp/status-before
+          python3 scripts/new_detector.py "$probe" --class-name ScaffoldProbe --native \
+            --description "exercises the detector scaffold in CI"
+          git status --porcelain | sort > /tmp/status-after
+          comm -13 /tmp/status-before /tmp/status-after > /tmp/scaffold-changes
+          diff -u - /tmp/scaffold-changes <<EXPECTED
+           M .github/policies/native-boundaries.json
+           M sdk/runtime/src/main/cpp/CMakeLists.txt
+           M sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt
+          ?? feature/$probe/
+          EXPECTED
+
+          python3 .github/scripts/check-detector-touch-points.py
+          python3 .github/scripts/check-jni-contracts.py
+          python3 .github/scripts/check-native-boundaries.py
+          python3 .github/scripts/check-source-file-length.py
+          python3 .github/scripts/check-text-protocols.py
+          # The scaffold's evidence record is a draft, which must fail until research is recorded.
+          if python3 .github/scripts/check-evidence-records.py 2> /tmp/evidence-errors; then
+            echo "the scaffolded draft evidence record was accepted" >&2
+            exit 1
+          fi
+          grep -q "feature/$probe/EVIDENCE.md is still a draft" /tmp/evidence-errors
+          ./gradlew --stacktrace unitTest :app:assembleDebug buildHealth
+
+      - name: Upload test and lint reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verify-reports
+          path: |
+            **/build/reports/tests/
+            app/build/reports/lint-results-debug.html
+            app/build/reports/lint-results-debug.txt
+            build/reports/dependency-analysis/
+            sdk/aar/build/reports/fused_library_report/
+          if-no-files-found: ignore
+          retention-days: 7

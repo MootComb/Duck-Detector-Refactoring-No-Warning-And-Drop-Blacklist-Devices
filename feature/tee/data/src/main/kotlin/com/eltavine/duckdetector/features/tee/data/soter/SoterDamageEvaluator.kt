@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 
 package com.eltavine.duckdetector.features.tee.data.soter
 
+import com.eltavine.duckdetector.features.tee.domain.TeeSoterAnomaly
 import com.eltavine.duckdetector.features.tee.domain.TeeSoterState
 
 class SoterDamageEvaluator {
@@ -26,10 +28,11 @@ class SoterDamageEvaluator {
         signSessionAvailable: Boolean,
         errorMessage: String?,
         abnormalEnvironment: Boolean = false,
+        anomalies: List<TeeSoterAnomaly> = emptyList(),
     ): TeeSoterState {
         val available = serviceReachable && keyPrepared && signSessionAvailable
         val damaged = serviceReachable && !available
-        val summary = when {
+        val outcome = when {
             available -> "Soter checks succeeded: Treble service was reachable and ASK/AuthKey/initSigh all succeeded."
             abnormalEnvironment ->
                 "Abnormal Soter environment: Simplified Chinese locale on a likely Soter-supporting device, but PackageManager could not resolve com.tencent.soter.soterserver and no biometric authentication was available."
@@ -38,6 +41,12 @@ class SoterDamageEvaluator {
             !keyPrepared -> "Soter key preparation failed after the Treble service became reachable."
             else -> "Soter signing session initialization failed after the Treble service became reachable."
         }
+        val replyReview = anomalies.joinToString(separator = "; ") { it.detail }
+        val summary = when {
+            anomalies.isEmpty() -> outcome
+            available -> "Soter ASK/AuthKey/initSigh calls succeeded, but the replies need review: $replyReview."
+            else -> "${outcome.trimEnd('.')}. Replies need review: $replyReview."
+        }
         return TeeSoterState(
             serviceReachable = serviceReachable,
             keyPrepared = keyPrepared,
@@ -45,6 +54,7 @@ class SoterDamageEvaluator {
             available = available,
             damaged = damaged,
             abnormalEnvironment = abnormalEnvironment,
+            anomalies = anomalies,
             summary = summary,
         )
     }

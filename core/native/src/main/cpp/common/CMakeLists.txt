@@ -2,5 +2,6 @@
 set(DUCKDETECTOR_COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/payload_codec.cpp PARENT_SCOPE)
 
 duckdetector_native_unit(duckdetector_common
+    disposable_child.cpp
     payload_codec.cpp
 )

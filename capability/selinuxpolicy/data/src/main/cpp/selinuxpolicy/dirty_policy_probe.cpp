@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +40,8 @@ namespace duckdetector::selinux::detail {
             const JavaSelinuxAccess &java_access,
             const std::string &carrier_context,
             const bool carrier_matches_expected,
-            const std::optional<bool> &dyntransition_check_passed
+            const std::optional<bool> &dyntransition_check_passed,
+            const bool allow_access_checks
     ) {
         DirtyPolicyProbeSnapshot snapshot;
         snapshot.query_method = kDirtyPolicyQueryMethod;
@@ -60,6 +62,11 @@ namespace duckdetector::selinux::detail {
         if (dyntransition_check_passed.has_value() && !*dyntransition_check_passed) {
             snapshot.failure_reason = "app_zygote dyntransition self-check failed.";
             snapshot.notes.push_back("Dirty policy access checks were skipped because the carrier could not confirm app_zygote -> isolated_app dyntransition.");
+            return snapshot;
+        }
+        if (!allow_access_checks) {
+            snapshot.failure_reason =
+                    "Skipped: the status page probe did not show libselinux can map /sys/fs/selinux/status safely.";
             return snapshot;
         }
 

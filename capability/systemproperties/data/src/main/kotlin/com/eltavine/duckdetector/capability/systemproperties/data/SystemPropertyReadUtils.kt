@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +33,16 @@ public class SystemPropertyReadUtils(
         propertyNames: Collection<String>,
     ): SystemPropertiesNativeSnapshot {
         return nativeBridge.collectSnapshot(propertyNames)
+    }
+
+    /**
+     * Reads every property whose name starts with [prefix], using the same getprop snapshot as the
+     * multi-source property checks. A full snapshot is required because Android does not expose a
+     * public property-enumeration API; an unavailable getprop result is represented by an empty map.
+     */
+    public fun collectByPrefix(prefix: String): Map<String, String> {
+        return getpropSnapshot()
+            .filterKeys { it.startsWith(prefix) }
     }
 
     public fun readProperty(
@@ -78,8 +89,12 @@ public class SystemPropertyReadUtils(
     private fun readViaGetprop(
         property: String,
     ): String {
-        val snapshot = getpropSnapshot ?: readGetpropSnapshot().also { getpropSnapshot = it }
+        val snapshot = getpropSnapshot()
         return snapshot[property].orEmpty()
+    }
+
+    private fun getpropSnapshot(): Map<String, String> {
+        return getpropSnapshot ?: readGetpropSnapshot().also { getpropSnapshot = it }
     }
 
     private fun readViaJvm(

@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +61,7 @@ internal data class BootloaderPropertyContext(
             ).firstOrNull { it.isNullOrBlank().not() }
             val knoxState = readsByProperty[BootloaderCatalog.KNOX_STATE]?.preferredValue
             val verityMode = readsByProperty[BootloaderCatalog.VERITYMODE]?.preferredValue
+            val vbmetaDigest = readsByProperty[BootloaderCatalog.VBMETA_DIGEST]?.preferredValue.orEmpty()
             val verifiedBoot =
                 readsByProperty[BootloaderCatalog.VERIFIED_BOOT_STATE]?.preferredValue.orEmpty()
 
@@ -95,6 +97,7 @@ internal data class BootloaderPropertyContext(
                 bootState == PropertyBootState.ORANGE || bootState == PropertyBootState.RED -> true
                 warrantyVoid -> true
                 verityMode.equals("disabled", ignoreCase = true) || verityMode == "0" -> true
+                emptyInputDigestAlgorithm(vbmetaDigest) != null -> true
                 else -> false
             }
             val hasWarningProperty = when {

@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 package com.eltavine.duckdetector.capability.selinuxpolicy.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -94,10 +96,74 @@ class SelinuxPolicyloadSeqnoProbeTest {
         assertEquals(9L, result.accessSeqno)
     }
 
+    @Test
+    fun `a status page that killed the child is a finding and never queries in process`() {
+        var accessQueries = 0
+        val result = probe.inspect(
+            statusPage = SelinuxStatusPageResult.Faulted(
+                signal = 9,
+                notes = listOf("Child was killed by SIGKILL on the first read of the mapping."),
+            ),
+            queryAccess = {
+                accessQueries += 1
+                access(seqno = 9)
+            },
+        )
+
+        assertEquals(0, accessQueries)
+        assertEquals(SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED, result.state)
+        assertTrue(result.available)
+        assertTrue(result.probeAttempted)
+        assertNull(result.failureReason)
+        assertNull(result.statusPolicyload)
+        assertTrue(result.notes.contains("Child was killed by SIGKILL on the first read of the mapping."))
+    }
+
+    @Test
+    fun `an unread status page is unavailable with the probe's reason`() {
+        var accessQueries = 0
+        val unknown = SelinuxStatusPageResult.Inconclusive(
+            reason = "Status page child did not finish within 1000 ms and was stopped.",
+            attempted = true,
+        )
+        val notForked = SelinuxStatusPageResult.Inconclusive(
+            reason = "Status page child could not be started (errno=11); status page probe not run.",
+            attempted = false,
+        )
+        val unmappable = SelinuxStatusPageResult.Unavailable(
+            reason = "open of /sys/fs/selinux/status failed (errno=13).",
+        )
+
+        val results = listOf(unknown, notForked, unmappable).map { statusPage ->
+            probe.inspect(statusPage) {
+                accessQueries += 1
+                access(seqno = 9)
+            }
+        }
+
+        assertEquals(0, accessQueries)
+        results.forEach { assertEquals(SelinuxPolicyloadSeqnoState.UNAVAILABLE, it.state) }
+        assertEquals(listOf(unknown.reason, notForked.reason, unmappable.reason), results.map { it.failureReason })
+        assertEquals(listOf(true, false, true), results.map { it.probeAttempted })
+    }
+
+    @Test
+    fun `an intact status page is compared from the header the child read`() {
+        val result = probe.inspect(
+            statusPage = SelinuxStatusPageResult.Intact(header = status(sequence = 12, policyload = 9)),
+            queryAccess = { access(seqno = 9) },
+        )
+
+        assertEquals(SelinuxPolicyloadSeqnoState.CLEAN, result.state)
+        assertEquals(12L, result.statusSequence)
+        assertEquals(9L, result.statusPolicyload)
+        assertEquals(9L, result.accessSeqno)
+    }
+
     private fun status(
         sequence: Long,
         policyload: Long,
-    ) = SelinuxPolicyloadSeqnoProbe.SelinuxStatus(
+    ) = SelinuxStatusHeader(
         version = 1,
         sequence = sequence,
         enforcing = 1,

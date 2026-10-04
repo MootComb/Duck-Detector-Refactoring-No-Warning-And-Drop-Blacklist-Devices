@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +25,49 @@ import java.lang.reflect.Method
 public class SelinuxContextValidityPreload {
 
     private val bridge = SelinuxContextValidityBridge()
+    private val statusPageProbe = SelinuxStatusPageProbe()
     private val procAttrCurrentProbe = SelinuxProcAttrCurrentProbe()
     private val policyloadSeqnoProbe = SelinuxPolicyloadSeqnoProbe()
 
-    public fun preload(appInfo: ApplicationInfo, beforeCollection: () -> Unit) {
+    /**
+     * Captures the carrier evidence in the app zygote. [trace] is called before each step, so an
+     * app zygote that is killed partway through still leaves a record of the step it had reached.
+     */
+    public fun preload(
+        appInfo: ApplicationInfo,
+        trace: (step: String) -> Unit = {},
+        beforeCollection: () -> Unit,
+    ) {
         val payload = try {
             beforeCollection()
             val currentUid = Os.getuid()
-            val baseSnapshot = collectBaseSnapshot(currentUid, appInfo.uid)
+            // Before anything that lets libselinux map the status page: on a kernel that breaks that
+            // node, the first access check kills this carrier.
+            trace("selinux: status page probe")
+            val statusPage = statusPageProbe.inspect()
+            val accessCheckBlockReason = statusPage.accessCheckBlockReason
+            val baseSnapshot = collectBaseSnapshot(currentUid, appInfo.uid, accessCheckBlockReason, trace)
+            var dirtyPolicyTraced = false
             val snapshot = augmentPreloadSnapshot(
                 baseSnapshot = baseSnapshot,
                 currentUid = currentUid,
                 appUid = appInfo.uid,
                 isUserBuild = Build.TYPE == "user",
-                inspectProcAttrCurrent = procAttrCurrentProbe::inspect,
-                inspectPolicyloadSeqno = policyloadSeqnoProbe::inspect,
-                checkAccess = ::checkSelinuxAccess,
+                accessCheckBlockReason = accessCheckBlockReason,
+                inspectProcAttrCurrent = {
+                    procAttrCurrentProbe.inspect { context -> trace("selinux: proc attr current write $context") }
+                },
+                inspectPolicyloadSeqno = {
+                    trace("selinux: policyload seqno")
+                    policyloadSeqnoProbe.inspect(statusPage)
+                },
+                checkAccess = { source, target, targetClass, permission ->
+                    if (!dirtyPolicyTraced) {
+                        dirtyPolicyTraced = true
+                        trace("selinux: java dirty policy checks")
+                    }
+                    checkSelinuxAccess(source, target, targetClass, permission)
+                },
             )
             SelinuxContextValidityPayloadCodec.encode(snapshot)
         } catch (throwable: Throwable) {
@@ -59,26 +87,33 @@ public class SelinuxContextValidityPreload {
     private fun collectBaseSnapshot(
         currentUid: Int,
         appUid: Int,
+        accessCheckBlockReason: String?,
+        trace: (step: String) -> Unit,
     ): SelinuxContextValiditySnapshot {
         if (currentUid != appUid) {
             return fallbackSnapshot("UID mismatch: $currentUid != app uid $appUid.")
         }
-        val nativeSnapshot = collectNativeCarrierSnapshot()
-        val javaCarrierSnapshot = collectJavaCarrierSnapshot(currentUid, appUid)
-        return mergeCarrierSelfCheckSnapshot(
+        val allowAccessChecks = accessCheckBlockReason == null
+        trace("selinux: native context oracle")
+        val nativeSnapshot = collectNativeCarrierSnapshot(allowAccessChecks)
+        trace("selinux: java carrier checks")
+        val javaCarrierSnapshot = collectJavaCarrierSnapshot(currentUid, appUid, allowAccessChecks)
+        val merged = mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = nativeSnapshot,
             javaCarrierSnapshot = javaCarrierSnapshot,
         )
+        accessCheckBlockReason ?: return merged
+        return merged.copy(notes = merged.notes + "Dyntransition self-check: $accessCheckBlockReason")
     }
 
-    private fun collectNativeCarrierSnapshot(): SelinuxContextValiditySnapshot {
+    private fun collectNativeCarrierSnapshot(allowAccessChecks: Boolean): SelinuxContextValiditySnapshot {
         if (!SelinuxContextValidityBridge.isNativeLibraryLoaded) {
             return SelinuxContextValiditySnapshot(
                 failureReason = "duckdetector native library unavailable from preload carrier.",
             )
         }
         return runCatching {
-            bridge.parse(SelinuxContextValidityBridge.nativeCollectContextValiditySnapshot())
+            bridge.parse(SelinuxContextValidityBridge.nativeCollectContextValiditySnapshot(allowAccessChecks))
         }.getOrElse { throwable ->
             SelinuxContextValiditySnapshot(
                 failureReason = throwable.message ?: "Dedicated native app_zygote oracle failed.",
@@ -102,6 +137,7 @@ public class SelinuxContextValidityPreload {
     private fun collectJavaCarrierSnapshot(
         currentUid: Int,
         appUid: Int,
+        allowAccessChecks: Boolean,
     ): SelinuxContextValiditySnapshot {
         if (currentUid != appUid) {
             return fallbackSnapshot("UID mismatch: $currentUid != app uid $appUid.")
@@ -115,12 +151,16 @@ public class SelinuxContextValidityPreload {
         val procSelfContext = invokeSelinuxStringStringArg(selinuxClass, "getFileContext", "/proc/self")
         val selinuxEnabled = invokeSelinuxBoolean(selinuxClass, "isSELinuxEnabled")
         val selinuxEnforced = invokeSelinuxBoolean(selinuxClass, "isSELinuxEnforced")
-        val dyntransitionCheckPassed = checkSelinuxAccess(
-            APP_ZYGOTE_PREFIX,
-            ISOLATED_APP_CONTEXT,
-            "process",
-            "dyntransition",
-        )
+        val dyntransitionCheckPassed = if (allowAccessChecks) {
+            checkSelinuxAccess(
+                APP_ZYGOTE_PREFIX,
+                ISOLATED_APP_CONTEXT,
+                "process",
+                "dyntransition",
+            )
+        } else {
+            null
+        }
         return SelinuxContextValiditySnapshot(
             available = !carrierContext.isNullOrBlank(),
             carrierContext = carrierContext,
@@ -233,6 +273,7 @@ public class SelinuxContextValidityPreload {
             currentUid: Int,
             appUid: Int,
             isUserBuild: Boolean,
+            accessCheckBlockReason: String?,
             inspectProcAttrCurrent: () -> List<com.eltavine.duckdetector.capability.selinuxpolicy.data.SelinuxProcAttrCurrentResult>,
             inspectPolicyloadSeqno: () -> SelinuxPolicyloadSeqnoResult,
             checkAccess: (String, String, String, String) -> Boolean?,
@@ -261,6 +302,17 @@ public class SelinuxContextValidityPreload {
                 inspectPolicyloadSeqno = inspectPolicyloadSeqno,
             )
 
+            // The first android.os.SELinux.checkSELinuxAccess makes libselinux map and read the status page.
+            accessCheckBlockReason?.let { reason ->
+                return snapshotWithPolicyloadSeqno.copy(
+                    javaDirtyPolicyAvailable = false,
+                    javaDirtyPolicyProbeAttempted = false,
+                    javaDirtyPolicyCarrierContext = snapshotWithPolicyloadSeqno.carrierContext,
+                    javaDirtyPolicyCarrierMatchesExpected = snapshotWithPolicyloadSeqno.carrierMatchesExpected,
+                    javaDirtyPolicyQueryMethod = DIRTY_POLICY_QUERY_METHOD,
+                    javaDirtyPolicyFailureReason = reason,
+                )
+            }
             return snapshotWithPolicyloadSeqno.applyJavaDirtyPolicyResults(
                 isUserBuild = isUserBuild,
                 checkAccess = checkAccess,

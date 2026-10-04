@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,6 +272,7 @@ internal fun strongBoxLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when 
 
 internal fun soterLevel(artifacts: TeeScanArtifacts): TeeSignalLevel = when {
     artifacts.soter.damaged -> TeeSignalLevel.FAIL
+    artifacts.soter.anomalies.isNotEmpty() -> artifacts.soter.anomalies.maxOf { it.level }
     artifacts.soter.available -> TeeSignalLevel.PASS
     artifacts.soter.abnormalEnvironment -> TeeSignalLevel.WARN
     !artifacts.soter.serviceReachable -> TeeSignalLevel.WARN

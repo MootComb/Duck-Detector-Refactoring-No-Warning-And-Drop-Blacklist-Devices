@@ -1,5 +1,6 @@
 /*
  * Copyright 2026 Duck Apps Contributor
+ * If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +22,15 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.RandomAccessFile
 
+// States are only appended, so every existing state keeps its ordinal.
 public enum class SelinuxPolicyloadSeqnoState {
     CLEAN,
     SUSPICIOUS,
     INCONCLUSIVE,
     UNAVAILABLE,
+
+    /** Reading the status page this oracle compares killed a disposable child; stock selinuxfs never does. */
+    STATUS_PAGE_FAULTED,
 }
 
 public data class SelinuxPolicyloadSeqnoResult(
@@ -42,24 +47,53 @@ public data class SelinuxPolicyloadSeqnoResult(
 
 public class SelinuxPolicyloadSeqnoProbe {
 
-    public fun inspect(): SelinuxPolicyloadSeqnoResult {
-        return runCatching {
-            val status = readStatusStable()
-            val access = queryAccessDecision()
-            interpret(status, access)
-        }.getOrElse { throwable ->
-            SelinuxPolicyloadSeqnoResult(
-                state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
-                available = false,
-                probeAttempted = true,
-                failureReason = throwable.message ?: PlatformFailureName.of(throwable),
-                notes = listOf(ZYGOTE_PRELOAD_NOTE),
-            )
-        }
+    /**
+     * Compares the status page's policyload counter with the access oracle's sequence number.
+     *
+     * The status page comes from the disposable child behind [statusPage]; this process never reads
+     * it. On a kernel whose hook breaks the node, a read() here would make selinuxfs dereference a
+     * bogus page pointer in kernel mode (kernel/common security/selinux/selinuxfs.c,
+     * sel_read_handle_status), and mapping it would kill this carrier the way it killed the child.
+     */
+    internal fun inspect(
+        statusPage: SelinuxStatusPageResult,
+        queryAccess: () -> AccessDecision = ::queryAccessDecision,
+    ): SelinuxPolicyloadSeqnoResult = when (statusPage) {
+        is SelinuxStatusPageResult.Intact -> runCatching { interpret(statusPage.header, queryAccess()) }
+            .getOrElse { throwable ->
+                SelinuxPolicyloadSeqnoResult(
+                    state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
+                    available = false,
+                    probeAttempted = true,
+                    failureReason = throwable.message ?: PlatformFailureName.of(throwable),
+                    notes = listOf(ZYGOTE_PRELOAD_NOTE),
+                )
+            }
+
+        is SelinuxStatusPageResult.Faulted -> SelinuxPolicyloadSeqnoResult(
+            state = SelinuxPolicyloadSeqnoState.STATUS_PAGE_FAULTED,
+            available = true,
+            probeAttempted = true,
+            notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
+        )
+
+        is SelinuxStatusPageResult.Unavailable -> unreadStatusPage(statusPage, statusPage.reason)
+        is SelinuxStatusPageResult.Inconclusive -> unreadStatusPage(statusPage, statusPage.reason)
     }
 
+    private fun unreadStatusPage(
+        statusPage: SelinuxStatusPageResult,
+        reason: String,
+    ): SelinuxPolicyloadSeqnoResult = SelinuxPolicyloadSeqnoResult(
+        state = SelinuxPolicyloadSeqnoState.UNAVAILABLE,
+        available = false,
+        probeAttempted = statusPage.attempted,
+        failureReason = reason,
+        notes = statusPage.notes + ZYGOTE_PRELOAD_NOTE,
+    )
+
     internal fun interpret(
-        status: SelinuxStatus,
+        status: SelinuxStatusHeader,
         access: AccessDecision,
     ): SelinuxPolicyloadSeqnoResult {
         val state = when {
@@ -85,35 +119,6 @@ public class SelinuxPolicyloadSeqnoProbe {
             accessSeqno = access.seqno,
             processClass = access.processClass,
             notes = listOf(ZYGOTE_PRELOAD_NOTE),
-        )
-    }
-
-    private fun readStatusStable(): SelinuxStatus {
-        repeat(STATUS_STABLE_READ_ATTEMPTS) {
-            val status = readStatusOnce()
-            if (status.sequence % 2L == 0L) {
-                return status
-            }
-            Thread.sleep(2L)
-        }
-        return readStatusOnce()
-    }
-
-    private fun readStatusOnce(): SelinuxStatus {
-        val bytes = FileInputStream(SELINUX_STATUS).use { input ->
-            val buffer = ByteArray(STATUS_SIZE_BYTES)
-            val count = input.read(buffer)
-            if (count < STATUS_SIZE_BYTES) {
-                throw IOException("SELinux status short read: $count")
-            }
-            buffer
-        }
-        return SelinuxStatus(
-            version = le32(bytes, 0),
-            sequence = le32(bytes, 4),
-            enforcing = le32(bytes, 8),
-            policyload = le32(bytes, 12),
-            denyUnknown = le32(bytes, 16),
         )
     }
 
@@ -146,34 +151,16 @@ public class SelinuxPolicyloadSeqnoProbe {
         } ?: throw IOException("SELinux process class was unreadable.")
     }
 
-    private fun le32(bytes: ByteArray, offset: Int): Long {
-        return (bytes[offset].toLong() and 0xffL) or
-            ((bytes[offset + 1].toLong() and 0xffL) shl 8) or
-            ((bytes[offset + 2].toLong() and 0xffL) shl 16) or
-            ((bytes[offset + 3].toLong() and 0xffL) shl 24)
-    }
-
-    internal data class SelinuxStatus(
-        val version: Long,
-        val sequence: Long,
-        val enforcing: Long,
-        val policyload: Long,
-        val denyUnknown: Long,
-    )
-
     internal data class AccessDecision(
         val processClass: Int,
         val seqno: Long,
     )
 
     public companion object {
-        private const val SELINUX_STATUS = "/sys/fs/selinux/status"
         private const val SELINUX_ACCESS = "/sys/fs/selinux/access"
         private const val SELINUX_PROCESS_CLASS = "/sys/fs/selinux/class/process/index"
         private const val APP_ZYGOTE_CONTEXT = "u:r:app_zygote:s0"
         private const val ISOLATED_APP_CONTEXT = "u:r:isolated_app:s0"
-        private const val STATUS_SIZE_BYTES = 20
-        private const val STATUS_STABLE_READ_ATTEMPTS = 3
         private const val ACCESS_RESPONSE_MAX_BYTES = 256
         private const val ZYGOTE_PRELOAD_NOTE =
             "This oracle is trusted only when produced by android:zygotePreloadName inside the dedicated app_zygote carrier."

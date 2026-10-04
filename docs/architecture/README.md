@@ -25,8 +25,8 @@ Arrows point from a module to the modules it may depend on. Feature units never 
 | Module | Responsibility | Forbidden knowledge |
 |---|---|---|
 | `:core:evidence` | `DetectorId`, `DetectorStatus`, `DetectionSeverity`, and `ContractValue`, which marks the SDK contract's value types for Poko | Android, reports, scans, UI |
-| `:core:native` | Native library handle, payload codec, the seccomp-trap exit that forked probe children install, and snapshot collection status shared by every JNI bridge | Android, detector semantics, specific native units |
-| `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity, and the hidden `SystemProperties` and `ServiceManager` access | Detector semantics, verdicts, UI |
+| `:core:native` | Native library handle, payload codec, the disposable child runner and the seccomp-trap exit that forked probe children use, and snapshot collection status shared by every JNI bridge | Android, detector semantics, specific native units |
+| `:core:platform` | Android platform access every probe shares: reflection-free failure names, hidden platform failure identity, the hidden `SystemProperties` and `ServiceManager` access, and the gate every app zygote carrier starts through | Detector semantics, verdicts, UI |
 | `:core:report` | Typed export model: `DetectorReport`, `DeviceReport`, rows, facts and blocks; `DetectorHeadline`, which every card model states; `DetectorResult` | Android, rendering, specific detectors |
 | `:core:scan` | `DetectorSummary`, `ScanSessionRunner` (per-detector scan lifecycle), `ScanCoordinator` (dashboard-wide progress and timing) | Android, UI, specific detectors |
 | `:core:detector` | The headless detector contract: `Detector` (identity, scanner, loading report, card model, export, consents and app zygote work), `DetectorConsent`, `DetectorSpecificApi`, the opt-in marker that keeps each detector's typed object outside the stable contract, the `DetectorScanner` port and `run`, which returns a `DetectorResult` without any UI | Compose, specific detectors, probes |

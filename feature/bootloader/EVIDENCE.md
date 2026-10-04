@@ -28,6 +28,17 @@ The Bootloader detector asks whether the bootloader is locked and verified boot 
 - Result states: aligned, mismatch, missing, not compared.
 - Interpretation: a contradiction between the two views is danger.
 
+### VBMeta digest of empty input
+
+- Observable signal: ro.boot.vbmeta.digest equal to the SHA-256 or SHA-512 digest of empty input.
+- Producing subsystem: AVB in the bootloader, which passes androidboot.vbmeta.digest, and init, which checks it at first-stage mount and exposes it; or a tool that rewrote the property after boot.
+- Mechanism: libavb sets androidboot.vbmeta.size and androidboot.vbmeta.digest from the same loaded vbmeta images, which always include the top-level one, so the digest always covers non-empty input; with verification disabled it adds no androidboot.* option at all. On a locked device whose fstab uses avb, first-stage init reloads the vbmeta images, recomputes their size and digest, and fails the mount when the bootloader's values are missing or differ. The digest of empty input therefore never comes from verified boot.
+- References: external/avb libavb/avb_cmdline.c (avb_append_options) and libavb/avb_slot_verify.c (avb_slot_verify_data_calculate_vbmeta_digest; no androidboot.* options when verification is disabled); system/core fs_mgr/libfs_avb/fs_avb.cpp (AvbVerifier, AvbHandle::Open, IsAvbPermissive) and init/first_stage_mount.cpp (InitAvbHandle). Discovery only for the Specter module's boot_hash.sh, which writes ro.boot.vbmeta.* with resetprop from a shell sha256sum and caches the result, which is how the value reported in issue 157 was traced, and for the stock Galaxy S20 fstab.exynos990 quoted in Magisk issue 2559, which uses avb=vbmeta.
+- Applicability: every device; the check reads only the property and needs no attestation.
+- Visibility limits: a device whose bootloader does not use libavb and whose first-stage mount does not use fs_mgr AVB has no such guarantee; none is known. A tool that writes a plausible digest is not caught here and is left to the attestation comparison.
+- Result states: empty-input digest, other value.
+- Interpretation: an empty-input digest is danger: something other than verified boot wrote the property. Unlike the attestation comparison, it still fires when attestation is unavailable or reports the same value.
+
 ### Boot properties and raw boot parameters
 
 - Observable signal: verified boot, lock, AVB and verity properties from several sources, and androidboot.* values in /proc/cmdline and /proc/bootconfig.

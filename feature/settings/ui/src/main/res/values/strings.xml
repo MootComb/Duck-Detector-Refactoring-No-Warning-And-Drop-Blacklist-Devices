@@ -1,5 +1,6 @@
 <!--
 Copyright 2026 Duck Apps Contributor
+If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,6 +53,7 @@ limitations under the License.
     <string name="author_summary_mirin">UI</string>
     <string name="author_summary_qwq233">TEE</string>
     <string name="author_summary_searchur">Dashboard, Dangerous Apps and Zygisk</string>
+    <string name="author_summary_sinanb9">SELinux app zygote crash report and kernel traces</string>
     <string name="author_summary_sqmy">Kotlin</string>
     <string name="author_summary_victor">CI</string>
     <string name="author_summary_wuying">Verified the feasibility of the detection scheme for "KSU throne hunt" behavior.</string>
