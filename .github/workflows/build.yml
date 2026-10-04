@@ -1,5 +1,4 @@
 # Copyright (C) 2026 Duck Apps Contributor
-# If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,23 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build APK And SDK AAR And Push To Telegram
+name: Build APK
 
 on:
   push:
-    branches:
-      - main
   workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    environment: Telegram
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
@@ -40,108 +31,75 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Set up Android build toolchain
+      - name: Read Android toolchain settings
         id: toolchain
-        uses: ./.github/actions/setup-android-build
-        with:
-          cache-read-only: ${{ github.ref_name != github.event.repository.default_branch }}
-
-      - name: Validate credentials and prepare release keystore
-        id: keystore
         shell: bash
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           set -euo pipefail
 
-          required_secrets=(
-            ANDROID_KEYSTORE_BASE64
-            ANDROID_KEYSTORE_PASSWORD
-            ANDROID_KEY_ALIAS
-            ANDROID_KEY_PASSWORD
-            TELEGRAM_BOT_TOKEN
-            TELEGRAM_CHAT_ID
-          )
-          missing_secrets=()
-          for secret_name in "${required_secrets[@]}"; do
-            if [ -z "${!secret_name:-}" ]; then
-              missing_secrets+=("${secret_name}")
-            fi
-          done
-          if [ "${#missing_secrets[@]}" -ne 0 ]; then
-            printf 'Missing required secrets in the Telegram environment: %s\n' \
-              "$(IFS=', '; echo "${missing_secrets[*]}")" >&2
-            exit 1
-          fi
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
 
-          keystore_path="$RUNNER_TEMP/release.keystore"
-          if ! printf '%s' "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "$keystore_path"; then
-            echo "ANDROID_KEYSTORE_BASE64 is not valid base64." >&2
-            exit 1
-          fi
-          if [ ! -s "${keystore_path}" ]; then
-            echo "Decoded release keystore is empty." >&2
-            exit 1
-          fi
-          chmod 600 "${keystore_path}"
-          echo "keystore_path=$keystore_path" >> "$GITHUB_OUTPUT"
+          properties = {}
+          for raw_line in Path("gradle.properties").read_text(encoding="utf-8").splitlines():
+              line = raw_line.strip()
+              if not line or line.startswith("#") or "=" not in line:
+                  continue
+              key, value = line.split("=", 1)
+              properties[key.strip()] = value.strip()
 
-      - name: Extract expected signing fingerprint
-        id: signing_fingerprint
-        shell: bash
-        env:
-          ANDROID_KEYSTORE_PATH: ${{ steps.keystore.outputs.keystore_path }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: |
-          set -euo pipefail
+          mapping = {
+              "build_tools": "duckdetector.android.buildTools",
+              "cmake": "duckdetector.android.cmake",
+              "compile_sdk": "duckdetector.android.compileSdk",
+              "compile_sdk_minor": "duckdetector.android.compileSdkMinor",
+              "ndk": "duckdetector.android.ndk",
+          }
 
-          keytool_output=$(keytool -J-Duser.language=en -J-Duser.country=US -list -v \
-            -keystore "${ANDROID_KEYSTORE_PATH}" \
-            -storepass "${ANDROID_KEYSTORE_PASSWORD}" \
-            -alias "${ANDROID_KEY_ALIAS}")
-
-          expected_sha256=$(printf '%s\n' "${keytool_output}" \
-            | sed -n 's/^[[:space:]]*SHA256:[[:space:]]*//p' \
-            | head -n 1 \
-            | tr -d '[:space:]:' \
-            | tr '[:upper:]' '[:lower:]')
-
-          owner_line=$(printf '%s\n' "${keytool_output}" \
-            | sed -n 's/^Owner: //p' \
-            | head -n 1)
-
-          signer_name=$(OWNER_LINE="${owner_line}" python3 - <<'PY'
-          import os
-          import re
-
-          owner = os.environ.get("OWNER_LINE", "").strip()
-          if not owner:
-              print("Unknown signer", end="")
-              raise SystemExit(0)
-
-          match = re.search(r"(?:^|,\s*)CN=([^,]+)", owner)
-          if match:
-              print(match.group(1).strip(), end="")
-          else:
-              print(owner, end="")
+          for output_name, property_name in mapping.items():
+              value = properties.get(property_name)
+              if not value:
+                  raise SystemExit(f"Missing required Gradle property: {property_name}")
+              print(f"{output_name}={value}")
           PY
-          )
 
-          if [ -z "${expected_sha256}" ]; then
-            echo "Failed to extract SHA-256 fingerprint from the configured keystore." >&2
-            exit 1
-          fi
+      - name: Make Gradle wrapper executable
+        shell: bash
+        run: chmod +x gradlew
 
-          echo "sha256=${expected_sha256}" >> "$GITHUB_OUTPUT"
-          echo "signer_name=${signer_name}" >> "$GITHUB_OUTPUT"
+      - name: Set up Java 17
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
 
-      - name: Build release APK and SDK AAR
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: platform-tools
+
+      - name: Install Android SDK packages
+        shell: bash
+        env:
+          BUILD_TOOLS: ${{ steps.toolchain.outputs.build_tools }}
+          CMAKE: ${{ steps.toolchain.outputs.cmake }}
+          COMPILE_SDK: ${{ steps.toolchain.outputs.compile_sdk }}
+          COMPILE_SDK_MINOR: ${{ steps.toolchain.outputs.compile_sdk_minor }}
+          NDK: ${{ steps.toolchain.outputs.ndk }}
+        run: |
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-${COMPILE_SDK}.${COMPILE_SDK_MINOR}" \
+            "build-tools;${BUILD_TOOLS}" \
+            "cmake;${CMAKE}" \
+            "ndk;${NDK}"
+
+      - name: Build release APK
         id: build
         shell: bash
         env:
@@ -154,14 +112,10 @@ jobs:
 
           start_time=$(date +%s)
           build_time_utc=$(date -u +%Y%m%d%H%M%S)
-          build_time_iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           ./gradlew \
-            --stacktrace \
             -Pduckdetector.buildTimeUtc="${build_time_utc}" \
             -Pduckdetector.teeCrl.refresh=true \
-            -Pduckdetector.githubContributors.refresh=true \
-            :app:assembleRelease \
-            :sdk:aar:assemble
+            :app:assembleRelease
           end_time=$(date +%s)
 
           duration_seconds=$((end_time - start_time))
@@ -172,19 +126,10 @@ jobs:
 
           echo "duration_seconds=$duration_seconds" >> "$GITHUB_OUTPUT"
           echo "duration_human=$duration_human" >> "$GITHUB_OUTPUT"
-          echo "build_time_utc=$build_time_utc" >> "$GITHUB_OUTPUT"
-          echo "build_time_iso=$build_time_iso" >> "$GITHUB_OUTPUT"
 
       - name: Collect artifact metadata
         id: metadata
         shell: bash
-        env:
-          ACTION_RUN_NUMBER: ${{ github.run_number }}
-          ACTION_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
-          DURATION_HUMAN: ${{ steps.build.outputs.duration_human }}
-          GIT_BRANCH: ${{ github.ref_name }}
-          SIGNER_NAME: ${{ steps.signing_fingerprint.outputs.signer_name }}
         run: |
           set -euo pipefail
 
@@ -232,26 +177,15 @@ jobs:
                   f"Expected a single release APK entry, found {len(apk_elements)}: {listed_outputs}"
               )
 
-          output_file = selected_element.get("outputFile", "")
-          if not output_file or Path(output_file).name != output_file:
-              raise SystemExit(f"Unsafe release APK output path: {output_file!r}.")
-
-          apk_path = metadata_path.parent / output_file
-          if not apk_path.is_file() or apk_path.stat().st_size <= 0:
+          apk_path = metadata_path.parent / selected_element["outputFile"]
+          if not apk_path.exists():
               raise SystemExit(f"Release APK not found at {apk_path}.")
-
-          version_name = selected_element.get("versionName")
-          version_code = selected_element.get("versionCode")
-          if not isinstance(version_name, str) or not version_name.strip():
-              raise SystemExit("Release APK versionName is missing.")
-          if not isinstance(version_code, int) or isinstance(version_code, bool) or version_code <= 0:
-              raise SystemExit(f"Release APK versionCode is invalid: {version_code!r}.")
 
           payload = {
               "apk_path": str(apk_path),
               "apk_name": apk_path.name,
-              "version_name": version_name.strip(),
-              "version_code": str(version_code),
+              "version_name": selected_element.get("versionName") or "unknown",
+              "version_code": str(selected_element.get("versionCode") or "unknown"),
           }
           print(json.dumps(payload))
           PY
@@ -262,180 +196,17 @@ jobs:
             exit 1
           fi
 
-          commit_subject=$(git log -1 --pretty=%s)
-          commit_author=$(git log -1 --pretty=%an)
-          git_hash=$(git rev-parse --short=8 HEAD)
-          caption=$(METADATA_JSON="${metadata_json}" COMMIT_SUBJECT="${commit_subject}" COMMIT_AUTHOR="${commit_author}" DURATION_HUMAN="${DURATION_HUMAN}" GIT_BRANCH="${GIT_BRANCH}" GIT_HASH="${git_hash}" SIGNER_NAME="${SIGNER_NAME}" ACTION_RUN_NUMBER="${ACTION_RUN_NUMBER}" ACTION_RUN_URL="${ACTION_RUN_URL}" COMMIT_URL="${COMMIT_URL}" python3 - <<'PY'
-          import json
-          import os
-
-          metadata = json.loads(os.environ["METADATA_JSON"])
-          action_run_number = os.environ["ACTION_RUN_NUMBER"]
-          action_run_url = os.environ["ACTION_RUN_URL"]
-          commit_subject = os.environ["COMMIT_SUBJECT"]
-          commit_author = os.environ["COMMIT_AUTHOR"]
-          commit_url = os.environ["COMMIT_URL"]
-          duration_human = os.environ["DURATION_HUMAN"]
-          git_branch = os.environ["GIT_BRANCH"]
-          git_hash = os.environ["GIT_HASH"]
-          signer_name = os.environ["SIGNER_NAME"] or "Unknown signer"
-
-          def escape_html(text: str) -> str:
-              return (
-                  text.replace("&", "&amp;")
-                  .replace("<", "&lt;")
-                  .replace(">", "&gt;")
-              )
-
-          def escape_html_attribute(text: str) -> str:
-              return escape_html(text).replace('"', "&quot;")
-
-          def render(subject: str) -> str:
-              lines = [
-                  "<b>Duck Detector Nightly</b>",
-                  "",
-                  f"Version: <b>{escape_html(metadata['version_name'])} ({escape_html(metadata['version_code'])})</b>",
-                  f"APK: <b>{escape_html(metadata['apk_name'])}</b>",
-                  "",
-                  f'Commit: <a href="{escape_html_attribute(commit_url)}">{escape_html(git_hash)}</a>',
-                  f"<pre>{escape_html(subject)}</pre>",
-                  f"Author: <b>{escape_html(commit_author)}</b>",
-                  f"Branch: <b>{escape_html(git_branch)}</b>",
-                  f'Action: <a href="{escape_html_attribute(action_run_url)}">#{escape_html(action_run_number)}</a>',
-                  f"Build duration: <b>{escape_html(duration_human)}</b>",
-                  f"Signature: <b>verified by {escape_html(signer_name)}</b>",
-              ]
-              return "\n".join(lines)
-
-          def truncate(text: str, limit: int) -> str:
-              if limit <= 0:
-                  return ""
-              if len(text) <= limit:
-                  return text
-              if limit <= 3:
-                  return text[:limit]
-              return text[: limit - 3].rstrip() + "..."
-
-          max_caption_length = 1024
-
-          caption = render(commit_subject)
-          if len(caption) > max_caption_length:
-              base_without_subject = render("")
-              subject_budget = max_caption_length - len(base_without_subject)
-              if subject_budget < 1:
-                  raise SystemExit("Telegram caption template exceeds the 1024 character limit.")
-              commit_subject = truncate(commit_subject, subject_budget)
-              caption = render(commit_subject)
-
-          print(caption, end="")
-          PY
-          )
-
-          apk_path=$(METADATA_JSON="${metadata_json}" python3 - <<'PY'
-          import json
-          import os
-
-          metadata = json.loads(os.environ["METADATA_JSON"])
-          print(metadata["apk_path"], end="")
-          PY
-          )
-
-          apk_name=$(METADATA_JSON="${metadata_json}" python3 - <<'PY'
-          import json
-          import os
-
-          metadata = json.loads(os.environ["METADATA_JSON"])
-          print(metadata["apk_name"], end="")
-          PY
-          )
-
-          version_name=$(METADATA_JSON="${metadata_json}" python3 - <<'PY'
-          import json
-          import os
-
-          metadata = json.loads(os.environ["METADATA_JSON"])
-          print(metadata["version_name"], end="")
-          PY
-          )
-
-          version_code=$(METADATA_JSON="${metadata_json}" python3 - <<'PY'
-          import json
-          import os
-
-          metadata = json.loads(os.environ["METADATA_JSON"])
-          print(metadata["version_code"], end="")
-          PY
-          )
+          apk_path=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['apk_path'])")
+          apk_name=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['apk_name'])")
+          version_name=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['version_name'])")
+          version_code=$(echo "$metadata_json" | python3 -c "import sys, json; print(json.load(sys.stdin)['version_code'])")
 
           {
+            echo "metadata_json=$metadata_json"
             echo "apk_path=$apk_path"
             echo "apk_name=$apk_name"
             echo "version_name=$version_name"
             echo "version_code=$version_code"
-            delimiter="CAPTION_$(openssl rand -hex 16)"
-            echo "caption<<${delimiter}"
-            printf '%s\n' "$caption"
-            echo "${delimiter}"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Verify APK signature
-        shell: bash
-        env:
-          APK_PATH: ${{ steps.metadata.outputs.apk_path }}
-          BUILD_TOOLS: ${{ steps.toolchain.outputs.build-tools }}
-          EXPECTED_SIGNER_SHA256: ${{ steps.signing_fingerprint.outputs.sha256 }}
-        run: |
-          set -euo pipefail
-
-          apksigner_output=$("${ANDROID_SDK_ROOT}/build-tools/${BUILD_TOOLS}/apksigner" verify --print-certs "${APK_PATH}")
-          printf '%s\n' "${apksigner_output}"
-
-          actual_sha256=$(APKSIGNER_OUTPUT="${apksigner_output}" python3 - <<'PY'
-          import os
-
-          output = os.environ.get("APKSIGNER_OUTPUT", "")
-          marker = "certificate SHA-256 digest:"
-          for raw_line in output.splitlines():
-              if marker not in raw_line or "Source Stamp" in raw_line:
-                  continue
-              digest = raw_line.split(marker, 1)[1].replace(":", "").strip().lower()
-              if digest:
-                  print(digest, end="")
-                  break
-          PY
-          )
-
-          if [ -z "${actual_sha256}" ]; then
-            echo "Failed to extract the APK signer SHA-256 digest." >&2
-            exit 1
-          fi
-
-          if [ "${actual_sha256}" != "${EXPECTED_SIGNER_SHA256}" ]; then
-            echo "APK was not signed with the expected certificate." >&2
-            echo "Expected: ${EXPECTED_SIGNER_SHA256}" >&2
-            echo "Actual:   ${actual_sha256}" >&2
-            exit 1
-          fi
-
-      - name: Prepare SDK AAR artifact
-        id: aar
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          aar_source=sdk/aar/build/outputs/aar/aar.aar
-          if [ ! -s "$aar_source" ]; then
-            echo "SDK AAR is missing or empty: $aar_source" >&2
-            exit 1
-          fi
-          unzip -tq "$aar_source" >/dev/null
-
-          aar_name="duckdetector-sdk-${GITHUB_SHA:0:8}.aar"
-          aar_path="sdk/aar/build/outputs/aar/$aar_name"
-          cp "$aar_source" "$aar_path"
-          {
-            echo "aar_name=$aar_name"
-            echo "aar_path=$aar_path"
           } >> "$GITHUB_OUTPUT"
 
       - name: Upload APK artifact
@@ -444,659 +215,43 @@ jobs:
           name: ${{ steps.metadata.outputs.apk_name }}
           path: ${{ steps.metadata.outputs.apk_path }}
           if-no-files-found: error
-          compression-level: 0
-          retention-days: 14
 
-      - name: Upload SDK AAR artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: ${{ steps.aar.outputs.aar_name }}
-          path: ${{ steps.aar.outputs.aar_path }}
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 14
-
-      - name: Prepare nightly release note
-        if: github.ref_name == github.event.repository.default_branch
+      - name: Generate release tag
+        id: tag
+        if: github.ref_name == 'main' || github.ref_name == 'master'
         shell: bash
         run: |
           set -euo pipefail
+          VERSION_NAME="${{ steps.metadata.outputs.version_name }}"
+          TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+          TAG="v${VERSION_NAME}-${TIMESTAMP}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Generated tag: $TAG"
 
-          cat <<EOF > nightly-release-note.md
-          Nightly APK and SDK AAR build
+      - name: Prepare release note
+        if: github.ref_name == 'main' || github.ref_name == 'master'
+        shell: bash
+        run: |
+          cat <<EOF > release-note.md
+          Automated APK build
 
+          Version: ${{ steps.metadata.outputs.version_name }} (${{ steps.metadata.outputs.version_code }})
           Commit: ${GITHUB_SHA}
           Branch: ${GITHUB_REF_NAME}
+          Build time: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           EOF
 
-      - name: Snapshot previous Nightly release assets
-        id: previous_nightly_assets
-        if: github.ref_name == github.event.repository.default_branch
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          error_file="$RUNNER_TEMP/gh-api-previous-assets-error"
-          release_id=""
-          for attempt in 1 2 3 4; do
-            if release_id=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/nightly" \
-              --jq '.id' 2>"$error_file"); then
-              break
-            fi
-            if grep -q '(HTTP 404)' "$error_file"; then
-              echo 'asset_ids=[]' >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            if [ "$attempt" -eq 4 ]; then
-              cat "$error_file" >&2
-              exit 1
-            fi
-            echo "Nightly release lookup failed (attempt ${attempt}/4); retrying..." >&2
-            sleep $((attempt * 2))
-          done
-
-          if ! [[ "$release_id" =~ ^[0-9]+$ ]]; then
-            echo "GitHub returned an invalid Nightly release id: ${release_id}" >&2
-            exit 1
-          fi
-
-          assets_json=""
-          for attempt in 1 2 3 4; do
-            if assets_json=$(gh api --paginate --slurp \
-              "repos/${GITHUB_REPOSITORY}/releases/${release_id}/assets?per_page=100" \
-              2>"$error_file"); then
-              break
-            fi
-            if [ "$attempt" -eq 4 ]; then
-              cat "$error_file" >&2
-              exit 1
-            fi
-            echo "Previous Nightly asset listing failed (attempt ${attempt}/4); retrying..." >&2
-            sleep $((attempt * 2))
-          done
-
-          asset_ids=$(jq -c '[.[][] | .id]' <<<"$assets_json")
-          if ! jq -e 'type == "array" and all(.[]; type == "number" and . > 0)' \
-            <<<"$asset_ids" >/dev/null; then
-            echo "Previous Nightly asset snapshot contains an invalid asset id." >&2
-            exit 1
-          fi
-          echo "asset_ids=${asset_ids}" >> "$GITHUB_OUTPUT"
-
-      - name: Update nightly APK and SDK AAR release
-        id: nightly_release
+      - name: Create new APK release
+        id: new_release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        if: github.ref_name == github.event.repository.default_branch
+        if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
-          tag_name: nightly
-          target_commitish: ${{ github.sha }}
-          name: Nightly APK and SDK AAR Build
-          body_path: nightly-release-note.md
-          prerelease: true
-          make_latest: false
-          overwrite_files: true
-          fail_on_unmatched_files: true
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "Release ${{ steps.tag.outputs.tag }}"
+          body_path: release-note.md
+          prerelease: false
+          draft: false
           files: |
             ${{ steps.metadata.outputs.apk_path }}
-            ${{ steps.aar.outputs.aar_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Prepare Nightly update manifest
-        id: update_manifest
-        if: github.ref_name == github.event.repository.default_branch
-        shell: bash
-        env:
-          APK_PATH: ${{ steps.metadata.outputs.apk_path }}
-          AAR_PATH: ${{ steps.aar.outputs.aar_path }}
-          # Keep publishing the legacy value until pre-migration clients have upgraded.
-          NIGHTLY_MANIFEST_BRANCH: master
-          BUILD_TIME_ISO: ${{ steps.build.outputs.build_time_iso }}
-          RELEASE_ASSETS_JSON: ${{ steps.nightly_release.outputs.assets }}
-          VERSION_CODE: ${{ steps.metadata.outputs.version_code }}
-          VERSION_NAME: ${{ steps.metadata.outputs.version_name }}
-        run: |
-          set -euo pipefail
-
-          python3 - <<'PY'
-          import hashlib
-          import json
-          import os
-          import subprocess
-          from datetime import datetime, timezone
-          from pathlib import Path
-          from urllib.parse import unquote, urlsplit
-
-          apk_path = Path(os.environ["APK_PATH"])
-          if not apk_path.is_file() or apk_path.stat().st_size <= 0:
-              raise SystemExit(f"Release APK is missing or empty: {apk_path}")
-          aar_path = Path(os.environ["AAR_PATH"])
-          if not aar_path.is_file() or aar_path.stat().st_size <= 0:
-              raise SystemExit(f"SDK AAR is missing or empty: {aar_path}")
-
-          try:
-              release_assets = json.loads(os.environ["RELEASE_ASSETS_JSON"])
-          except json.JSONDecodeError as exc:
-              raise SystemExit(f"Release action returned invalid asset JSON: {exc}") from exc
-          if not isinstance(release_assets, list) or len(release_assets) != 2 or any(
-              not isinstance(asset, dict) for asset in release_assets
-          ):
-              raise SystemExit(
-                  "Expected exactly two uploaded assets: one APK and one SDK AAR."
-              )
-
-          # GitHub may normalize an asset's download name (for example, spaces become dots).
-          # The release action retains the requested filename in its label in that case.
-          def matches_file(asset: dict, path: Path) -> bool:
-              return asset.get("name") == path.name or asset.get("label") == path.name
-
-          apk_assets = [asset for asset in release_assets if matches_file(asset, apk_path)]
-          aar_assets = [asset for asset in release_assets if matches_file(asset, aar_path)]
-          if len(apk_assets) != 1 or len(aar_assets) != 1:
-              raise SystemExit("Release action did not return the expected APK and SDK AAR assets.")
-          apk_asset = apk_assets[0]
-          aar_asset = aar_assets[0]
-          apk_asset_id = apk_asset.get("id")
-          apk_name = apk_asset.get("name", "")
-          apk_url = apk_asset.get("browser_download_url", "")
-          if not isinstance(apk_asset_id, int) or apk_asset_id <= 0:
-              raise SystemExit(f"Release action returned an invalid APK asset id: {apk_asset_id!r}")
-          if apk_asset.get("state") != "uploaded":
-              raise SystemExit(f"APK release asset is not uploaded: {apk_asset.get('state')!r}")
-          if not isinstance(apk_name, str) or not apk_name.lower().endswith(".apk"):
-              raise SystemExit(f"Release action returned an invalid APK asset name: {apk_name!r}")
-          if not isinstance(apk_url, str):
-              raise SystemExit("Release action did not return an APK download URL.")
-
-          expected_prefix = (
-              f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/download/nightly/"
-          )
-          url_name = unquote(Path(urlsplit(apk_url).path).name)
-          if not apk_url.startswith(expected_prefix) or url_name != apk_name:
-              raise SystemExit(f"Unexpected Nightly APK URL: {apk_url}")
-
-          aar_asset_id = aar_asset.get("id")
-          aar_name = aar_asset.get("name", "")
-          aar_url = aar_asset.get("browser_download_url", "")
-          if not isinstance(aar_asset_id, int) or aar_asset_id <= 0:
-              raise SystemExit(f"Release action returned an invalid SDK AAR asset id: {aar_asset_id!r}")
-          if aar_asset.get("state") != "uploaded":
-              raise SystemExit(f"SDK AAR release asset is not uploaded: {aar_asset.get('state')!r}")
-          if not isinstance(aar_name, str) or not aar_name.lower().endswith(".aar"):
-              raise SystemExit(f"Release action returned an invalid SDK AAR asset name: {aar_name!r}")
-          if not isinstance(aar_url, str) or not aar_url.startswith(expected_prefix) or \
-                  unquote(Path(urlsplit(aar_url).path).name) != aar_name:
-              raise SystemExit(f"Unexpected Nightly SDK AAR URL: {aar_url}")
-          aar_size = aar_path.stat().st_size
-          if aar_asset.get("size") != aar_size:
-              raise SystemExit(
-                  f"Uploaded SDK AAR size mismatch: local={aar_size}, release={aar_asset.get('size')!r}"
-              )
-
-          apk_size = apk_path.stat().st_size
-          remote_size = apk_asset.get("size")
-          if remote_size != apk_size:
-              raise SystemExit(
-                  f"Uploaded APK size mismatch: local={apk_size}, release={remote_size!r}"
-              )
-
-          def git(*args: str) -> str:
-              return subprocess.check_output(["git", *args], text=True).strip()
-
-          def iso8601_from_epoch(epoch: str) -> str:
-              return datetime.fromtimestamp(int(epoch), tz=timezone.utc) \
-                  .strftime("%Y-%m-%dT%H:%M:%SZ")
-
-          sha256 = hashlib.sha256()
-          with apk_path.open("rb") as apk_file:
-              for chunk in iter(lambda: apk_file.read(1024 * 1024), b""):
-                  sha256.update(chunk)
-          apk_sha256 = sha256.hexdigest()
-          remote_digest = apk_asset.get("digest")
-          if remote_digest and str(remote_digest).lower() != f"sha256:{apk_sha256}":
-              raise SystemExit(
-                  f"Uploaded APK digest mismatch: local=sha256:{apk_sha256}, release={remote_digest}"
-              )
-
-          aar_sha256 = hashlib.sha256(aar_path.read_bytes()).hexdigest()
-          aar_remote_digest = aar_asset.get("digest")
-          if aar_remote_digest and str(aar_remote_digest).lower() != f"sha256:{aar_sha256}":
-              raise SystemExit(
-                  f"Uploaded SDK AAR digest mismatch: local=sha256:{aar_sha256}, release={aar_remote_digest}"
-              )
-
-          commit_sha = git("rev-parse", "HEAD")
-          manifest = {
-              "schemaVersion": 1,
-              "channel": "nightly",
-              "branch": os.environ["NIGHTLY_MANIFEST_BRANCH"],
-              "versionName": os.environ["VERSION_NAME"],
-              "versionCode": int(os.environ["VERSION_CODE"]),
-              "commit": {
-                  "sha": commit_sha,
-                  "subject": git("log", "-1", "--format=%s", "HEAD"),
-                  "body": git("log", "-1", "--format=%b", "HEAD"),
-                  "authorName": git("log", "-1", "--format=%an", "HEAD"),
-                  "authoredAt": iso8601_from_epoch(git("log", "-1", "--format=%at", "HEAD")),
-              },
-              "builtAtUtc": os.environ["BUILD_TIME_ISO"],
-              "apk": {
-                  "name": apk_name,
-                  "downloadUrl": apk_url,
-                  "sizeBytes": apk_size,
-                  "sha256": apk_sha256,
-              },
-          }
-
-          Path("update.json").write_text(
-              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-              encoding="utf-8",
-          )
-          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
-              output.write(f"apk_asset_id={apk_asset_id}\n")
-              output.write(f"aar_asset_id={aar_asset_id}\n")
-              output.write(f"aar_public_url={aar_url}\n")
-          PY
-
-          jq -e '
-            .schemaVersion == 1 and
-            .channel == "nightly" and
-            .branch == env.NIGHTLY_MANIFEST_BRANCH and
-            .versionCode == (env.VERSION_CODE | tonumber) and
-            .commit.sha == env.GITHUB_SHA and
-            (.apk.name | test("^[^/]+\\.[Aa][Pp][Kk]$")) and
-            (.apk.sizeBytes > 0) and
-            (.apk.downloadUrl | startswith("https://github.com/")) and
-            (.apk.sha256 | test("^[0-9a-f]{64}$"))
-          ' update.json >/dev/null
-
-          {
-            echo "manifest_path=update.json"
-            echo "apk_name=$(jq -r '.apk.name' update.json)"
-            echo "apk_public_url=$(jq -r '.apk.downloadUrl' update.json)"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Publish Nightly update manifest
-        id: nightly_manifest_release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        if: github.ref_name == github.event.repository.default_branch
-        with:
-          tag_name: nightly
-          target_commitish: ${{ github.sha }}
-          name: Nightly APK and SDK AAR Build
-          body_path: nightly-release-note.md
-          prerelease: true
-          make_latest: false
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          files: |
-            ${{ steps.update_manifest.outputs.manifest_path }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify published Nightly assets
-        if: github.ref_name == github.event.repository.default_branch
-        shell: bash
-        env:
-          AAR_ASSET_ID: ${{ steps.update_manifest.outputs.aar_asset_id }}
-          AAR_NAME: ${{ steps.aar.outputs.aar_name }}
-          AAR_PATH: ${{ steps.aar.outputs.aar_path }}
-          APK_ASSET_ID: ${{ steps.update_manifest.outputs.apk_asset_id }}
-          APK_NAME: ${{ steps.update_manifest.outputs.apk_name }}
-          APK_RELEASE_ID: ${{ steps.nightly_release.outputs.id }}
-          EXPECTED_AAR_URL: ${{ steps.update_manifest.outputs.aar_public_url }}
-          EXPECTED_APK_URL: ${{ steps.update_manifest.outputs.apk_public_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MANIFEST_ASSETS_JSON: ${{ steps.nightly_manifest_release.outputs.assets }}
-          MANIFEST_RELEASE_ID: ${{ steps.nightly_manifest_release.outputs.id }}
-        run: |
-          set -euo pipefail
-
-          gh_api_get() {
-            local endpoint="$1"
-            local error_file="$RUNNER_TEMP/gh-api-get-error"
-            local response
-            for attempt in 1 2 3 4; do
-              if response=$(gh api "$endpoint" 2>"$error_file"); then
-                printf '%s' "$response"
-                return 0
-              fi
-              if [ "$attempt" -eq 4 ]; then
-                cat "$error_file" >&2
-                return 1
-              fi
-              echo "GitHub API GET failed (attempt ${attempt}/4); retrying..." >&2
-              sleep $((attempt * 2))
-            done
-          }
-
-          download_release_asset() {
-            local asset_id="$1"
-            local destination="$2"
-            local error_file="$RUNNER_TEMP/gh-api-download-error"
-            for attempt in 1 2 3 4; do
-              if gh api \
-                -H "Accept: application/octet-stream" \
-                "repos/${GITHUB_REPOSITORY}/releases/assets/${asset_id}" \
-                >"$destination" 2>"$error_file" && [ -s "$destination" ]; then
-                return 0
-              fi
-              if [ "$attempt" -eq 4 ]; then
-                cat "$error_file" >&2
-                return 1
-              fi
-              echo "Release asset download failed (attempt ${attempt}/4); retrying..." >&2
-              sleep $((attempt * 2))
-            done
-          }
-
-          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$AAR_ASSET_ID" =~ ^[0-9]+$ && "$APK_RELEASE_ID" =~ ^[0-9]+$ && "$MANIFEST_RELEASE_ID" =~ ^[0-9]+$ ]]; then
-            echo "Release action returned an invalid asset or release id." >&2
-            exit 1
-          fi
-          if [ "$APK_RELEASE_ID" != "$MANIFEST_RELEASE_ID" ]; then
-            echo "APK, SDK AAR and manifest were uploaded to different releases." >&2
-            exit 1
-          fi
-
-          if ! jq -e '
-            type == "array" and
-            length == 1 and
-            .[0].name == "update.json" and
-            .[0].state == "uploaded" and
-            (.[0].id | type == "number" and . > 0)
-          ' <<<"$MANIFEST_ASSETS_JSON" >/dev/null; then
-            echo "Manifest release action returned unexpected asset metadata." >&2
-            exit 1
-          fi
-          manifest_asset_id=$(jq -r '.[0].id' <<<"$MANIFEST_ASSETS_JSON")
-
-          expected_apk_size=$(jq -r '.apk.sizeBytes' update.json)
-          expected_apk_digest="sha256:$(jq -r '.apk.sha256' update.json)"
-          apk_asset_json=$(gh_api_get "repos/${GITHUB_REPOSITORY}/releases/assets/${APK_ASSET_ID}")
-          if ! jq -e \
-            --arg name "$APK_NAME" \
-            --arg url "$EXPECTED_APK_URL" \
-            --arg digest "$expected_apk_digest" \
-            --argjson size "$expected_apk_size" \
-            '.name == $name and
-             .browser_download_url == $url and
-             .state == "uploaded" and
-             .size == $size and
-             (.digest == null or (.digest | ascii_downcase) == $digest)' \
-            <<<"$apk_asset_json" >/dev/null; then
-            echo "Published APK metadata does not match the generated manifest." >&2
-            exit 1
-          fi
-
-          expected_aar_size=$(stat -c '%s' "$AAR_PATH")
-          expected_aar_digest="sha256:$(sha256sum "$AAR_PATH" | cut -d' ' -f1)"
-          aar_asset_json=$(gh_api_get "repos/${GITHUB_REPOSITORY}/releases/assets/${AAR_ASSET_ID}")
-          if ! jq -e \
-            --arg name "$AAR_NAME" \
-            --arg url "$EXPECTED_AAR_URL" \
-            --arg digest "$expected_aar_digest" \
-            --argjson size "$expected_aar_size" \
-            '.name == $name and
-             .browser_download_url == $url and
-             .state == "uploaded" and
-             .size == $size and
-             (.digest == null or (.digest | ascii_downcase) == $digest)' \
-            <<<"$aar_asset_json" >/dev/null; then
-            echo "Published SDK AAR metadata does not match the built artifact." >&2
-            exit 1
-          fi
-
-          manifest_asset_json=$(gh_api_get "repos/${GITHUB_REPOSITORY}/releases/assets/${manifest_asset_id}")
-          if ! jq -e '.name == "update.json" and .state == "uploaded" and .size > 0' \
-            <<<"$manifest_asset_json" >/dev/null; then
-            echo "Published manifest asset metadata is invalid." >&2
-            exit 1
-          fi
-
-          download_release_asset "$manifest_asset_id" published-update.json
-          if ! cmp --silent update.json published-update.json; then
-            echo "Published Nightly manifest differs from the generated manifest." >&2
-            echo "Expected SHA-256: $(sha256sum update.json | cut -d' ' -f1)" >&2
-            echo "Actual SHA-256:   $(sha256sum published-update.json | cut -d' ' -f1)" >&2
-            exit 1
-          fi
-
-      - name: Delete previous Nightly release assets
-        if: github.ref_name == github.event.repository.default_branch
-        shell: bash
-        env:
-          AAR_ASSET_ID: ${{ steps.update_manifest.outputs.aar_asset_id }}
-          AAR_NAME: ${{ steps.aar.outputs.aar_name }}
-          APK_ASSET_ID: ${{ steps.update_manifest.outputs.apk_asset_id }}
-          APK_NAME: ${{ steps.update_manifest.outputs.apk_name }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MANIFEST_ASSETS_JSON: ${{ steps.nightly_manifest_release.outputs.assets }}
-          PREVIOUS_ASSET_IDS: ${{ steps.previous_nightly_assets.outputs.asset_ids }}
-          RELEASE_ID: ${{ steps.nightly_release.outputs.id }}
-        run: |
-          set -euo pipefail
-
-          if ! [[ "$APK_ASSET_ID" =~ ^[0-9]+$ && "$AAR_ASSET_ID" =~ ^[0-9]+$ && "$RELEASE_ID" =~ ^[0-9]+$ ]]; then
-            echo "Release action returned an invalid asset or release id." >&2
-            exit 1
-          fi
-          if ! jq -e 'type == "array" and all(.[]; type == "number" and . > 0)' \
-            <<<"$PREVIOUS_ASSET_IDS" >/dev/null; then
-            echo "Previous Nightly asset snapshot is invalid." >&2
-            exit 1
-          fi
-          if ! jq -e '
-            type == "array" and
-            length == 1 and
-            .[0].name == "update.json" and
-            .[0].state == "uploaded" and
-            (.[0].id | type == "number" and . > 0)
-          ' <<<"$MANIFEST_ASSETS_JSON" >/dev/null; then
-            echo "Manifest release action returned unexpected asset metadata." >&2
-            exit 1
-          fi
-          manifest_asset_id=$(jq -r '.[0].id' <<<"$MANIFEST_ASSETS_JSON")
-
-          while IFS= read -r asset_id; do
-            [ -n "$asset_id" ] || continue
-            if [ "$asset_id" = "$APK_ASSET_ID" ] || [ "$asset_id" = "$AAR_ASSET_ID" ] || [ "$asset_id" = "$manifest_asset_id" ]; then
-              continue
-            fi
-
-            delete_error_file="$RUNNER_TEMP/gh-api-delete-${asset_id}-error"
-            for attempt in 1 2 3 4; do
-              if gh api -X DELETE \
-                "repos/${GITHUB_REPOSITORY}/releases/assets/${asset_id}" \
-                >/dev/null 2>"$delete_error_file"; then
-                echo "Deleted previous Nightly asset id ${asset_id}."
-                break
-              fi
-              if grep -q '(HTTP 404)' "$delete_error_file"; then
-                echo "Previous Nightly asset id ${asset_id} was already replaced or deleted."
-                break
-              fi
-              if [ "$attempt" -eq 4 ]; then
-                cat "$delete_error_file" >&2
-                exit 1
-              fi
-              echo "Release asset deletion failed (attempt ${attempt}/4); retrying..." >&2
-              sleep $((attempt * 2))
-            done
-          done < <(jq -r '.[]' <<<"$PREVIOUS_ASSET_IDS")
-
-          final_assets_verified=false
-          error_file="$RUNNER_TEMP/gh-api-final-assets-error"
-          for attempt in {1..12}; do
-            if assets_json=$(gh api --paginate --slurp \
-              "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?per_page=100" \
-              2>"$error_file"); then
-              if jq -e \
-                --arg apk_name "$APK_NAME" \
-                --arg aar_name "$AAR_NAME" \
-                --argjson apk_id "$APK_ASSET_ID" \
-                --argjson aar_id "$AAR_ASSET_ID" \
-                --argjson manifest_id "$manifest_asset_id" \
-                '[.[][]] as $assets |
-                 ($assets | length) == 3 and
-                 ([$assets[] | select(
-                   .id == $apk_id and
-                   .name == $apk_name and
-                   .state == "uploaded"
-                 )] | length) == 1 and
-                 ([$assets[] | select(
-                   .id == $aar_id and
-                   .name == $aar_name and
-                   .state == "uploaded"
-                 )] | length) == 1 and
-                 ([$assets[] | select(
-                   .id == $manifest_id and
-                   .name == "update.json" and
-                   .state == "uploaded"
-                 )] | length) == 1' \
-                <<<"$assets_json" >/dev/null; then
-                final_assets_verified=true
-                break
-              fi
-              echo "Nightly release still exposes previous assets (attempt ${attempt}/12); waiting for propagation..." >&2
-            elif [ "$attempt" -eq 12 ]; then
-              cat "$error_file" >&2
-            else
-              echo "Final Nightly asset listing failed (attempt ${attempt}/12); retrying..." >&2
-            fi
-            if [ "$attempt" -lt 12 ]; then
-              sleep 5
-            fi
-          done
-
-          if [ "$final_assets_verified" != true ]; then
-            echo "Nightly release did not converge to exactly the current APK, SDK AAR and update.json." >&2
-            exit 1
-          fi
-
-      - name: Move Nightly tag to published commit
-        if: github.ref_name == github.event.repository.default_branch
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          error_file="$RUNNER_TEMP/gh-api-tag-error"
-          for attempt in 1 2 3 4; do
-            if gh api -X PATCH "repos/${GITHUB_REPOSITORY}/git/refs/tags/nightly" \
-              -f sha="$GITHUB_SHA" \
-              -F force=true >/dev/null 2>"$error_file"; then
-              break
-            fi
-            if [ "$attempt" -eq 4 ]; then
-              cat "$error_file" >&2
-              exit 1
-            fi
-            echo "Nightly tag update failed (attempt ${attempt}/4); retrying..." >&2
-            sleep $((attempt * 2))
-          done
-
-          tag_sha=""
-          for attempt in {1..12}; do
-            if tag_sha=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/nightly" \
-              --jq '.object.sha' 2>"$error_file"); then
-              if [ "$tag_sha" = "$GITHUB_SHA" ]; then
-                break
-              fi
-              echo "Nightly tag still points to ${tag_sha} (attempt ${attempt}/12); waiting for GitHub ref propagation..." >&2
-            elif [ "$attempt" -eq 12 ]; then
-              cat "$error_file" >&2
-            else
-              echo "Nightly tag verification request failed (attempt ${attempt}/12); retrying..." >&2
-            fi
-            if [ "$attempt" -lt 12 ]; then
-              sleep 5
-            fi
-          done
-          if [ "$tag_sha" != "$GITHUB_SHA" ]; then
-            echo "Nightly tag verification failed: expected ${GITHUB_SHA}, got ${tag_sha}." >&2
-            exit 1
-          fi
-
-      - name: Push APK to Telegram channel
-        shell: bash
-        env:
-          APK_PATH: ${{ steps.metadata.outputs.apk_path }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CAPTION: ${{ steps.metadata.outputs.caption }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "${TELEGRAM_BOT_TOKEN}" ] || [ -z "${TELEGRAM_CHAT_ID}" ]; then
-            echo "Missing Telegram secrets. Configure TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in the Telegram environment." >&2
-            exit 1
-          fi
-
-          apk_size=$(stat -c '%s' "${APK_PATH}")
-          telegram_max_size=$((50 * 1024 * 1024))
-          if [ "${apk_size}" -gt "${telegram_max_size}" ]; then
-            echo "APK size ${apk_size} exceeds Telegram Bot API's 50 MiB upload limit." >&2
-            exit 1
-          fi
-
-          response_file=$(mktemp)
-          trap 'rm -f "${response_file}"' EXIT
-          if ! http_code=$(curl \
-            --silent \
-            --show-error \
-            --connect-timeout 15 \
-            --max-time 300 \
-            --proto '=https' \
-            --tlsv1.2 \
-            --output "${response_file}" \
-            --write-out "%{http_code}" \
-            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-            -F "chat_id=${TELEGRAM_CHAT_ID}" \
-            -F "document=@${APK_PATH}" \
-            -F "parse_mode=HTML" \
-            --form-string "caption=${TELEGRAM_CAPTION}"); then
-            echo "Telegram upload failed due to a network or timeout error." >&2
-            exit 1
-          fi
-
-          if [ "${http_code}" != "200" ]; then
-            echo "Telegram API returned HTTP ${http_code}." >&2
-            cat "${response_file}" >&2
-            exit 1
-          fi
-
-          RESPONSE_FILE="${response_file}" python3 - <<'PY'
-          import json
-          import os
-
-          response_path = os.environ["RESPONSE_FILE"]
-          with open(response_path, "r", encoding="utf-8") as fh:
-              payload = json.load(fh)
-
-          if not payload.get("ok"):
-              description = payload.get("description", "Telegram API returned ok=false")
-              raise SystemExit(description)
-
-          result = payload.get("result") or {}
-          message_id = result.get("message_id")
-          if message_id is None:
-              raise SystemExit("Telegram API succeeded but did not return a message_id.")
-
-          print(f"Telegram message_id: {message_id}")
-          PY
-
-      - name: Clean up signing material
-        if: always()
-        shell: bash
-        env:
-          ANDROID_KEYSTORE_PATH: ${{ steps.keystore.outputs.keystore_path }}
-        run: |
-          set -euo pipefail
-          keystore_path="${ANDROID_KEYSTORE_PATH:-$RUNNER_TEMP/release.keystore}"
-          if [ -f "${keystore_path}" ]; then
-            rm -f -- "${keystore_path}"
-          fi
