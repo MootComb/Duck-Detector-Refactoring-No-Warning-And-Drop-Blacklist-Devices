@@ -76,8 +76,13 @@ jobs:
             fi
             
             for file in $CONFLICT_FILES; do
-              echo "  🛡️ Keeping our file: $file"
-              git checkout --ours "$file" 2>/dev/null || true
+              if [[ "$file" == .github/* ]]; then
+                echo "  📥 .github → upstream: $file"
+                git checkout --theirs "$file" 2>/dev/null || true
+              else
+                echo "  🛡️ Keeping our file: $file"
+                git checkout --ours "$file" 2>/dev/null || true
+              fi
               git add "$file"
             done
             
