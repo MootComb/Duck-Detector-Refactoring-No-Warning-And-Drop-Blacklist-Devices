@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "registrations": [
+    {
+      "path": "sdk/runtime/src/main/kotlin/com/eltavine/duckdetector/sdk/DetectorCatalog.kt",
+      "layer": "detector",
+      "reason": "The one list of detectors, in the order their scans start. Dashboard cards are generated from the ui modules."
+    }
+  ],
+  "indexes": [
+    {
+      "path": "sdk/runtime/src/main/cpp/CMakeLists.txt",
+      "reason": "The native unit registry names each unit's owning module in link order."
+    },
+    {
+      "path": ".github/policies/native-boundaries.json",
+      "reason": "States the owner of each native unit and what it may include."
+    },
+    {
+      "path": ".github/policies/reflection-allowlist.json",
+      "reason": "Lists every reviewed file that uses reflection."
+    },
+    {
+      "path": "app/lint-baseline.xml",
+      "reason": "Lint records its baselined findings by file path."
+    }
+  ],
+  "exceptions": [
+    {
+      "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
+      "detectors": ["su"],
+      "reason": "Shows a consumer using one detector's typed object through the SDK."
+    }
+  ]
+}

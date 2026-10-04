@@ -1,0 +1,181 @@
+{
+  "schema_version": 2,
+  "cmake_lists": "sdk/runtime/src/main/cpp/CMakeLists.txt",
+  "unit_registry": "DUCKDETECTOR_NATIVE_UNITS",
+  "unit_function": "duckdetector_native_unit",
+  "aggregate_library": "duckdetector",
+  "units": {
+    "common": {
+      "path": "common",
+      "owner": ":core:native",
+      "target": "duckdetector_common",
+      "may_include": []
+    },
+    "tee": {
+      "path": "tee",
+      "owner": ":feature:tee:data",
+      "target": "duckdetector_tee",
+      "may_include": [
+        "common"
+      ]
+    },
+    "packageinventory": {
+      "path": "packageinventory",
+      "owner": ":capability:packageinventory:data",
+      "target": "duckdetector_packageinventory",
+      "may_include": [
+        "common"
+      ]
+    },
+    "su": {
+      "path": "su",
+      "owner": ":feature:su:data",
+      "target": "duckdetector_su",
+      "may_include": [
+        "common"
+      ]
+    },
+    "selinuxpolicy": {
+      "path": "selinuxpolicy",
+      "owner": ":capability:selinuxpolicy:data",
+      "target": "duckdetector_selinuxpolicy",
+      "may_include": [
+        "common"
+      ]
+    },
+    "selinux": {
+      "path": "selinux",
+      "owner": ":feature:selinux:data",
+      "target": "duckdetector_selinux",
+      "may_include": [
+        "common"
+      ]
+    },
+    "customrom": {
+      "path": "customrom",
+      "owner": ":feature:customrom:data",
+      "target": "duckdetector_customrom",
+      "may_include": [
+        "common"
+      ]
+    },
+    "kernelcheck": {
+      "path": "kernelcheck",
+      "owner": ":feature:kernelcheck:data",
+      "target": "duckdetector_kernelcheck",
+      "may_include": [
+        "common"
+      ]
+    },
+    "systemproperties": {
+      "path": "systemproperties",
+      "owner": ":capability:systemproperties:data",
+      "target": "duckdetector_systemproperties",
+      "may_include": [
+        "common"
+      ]
+    },
+    "bootloader": {
+      "path": "bootloader",
+      "owner": ":feature:bootloader:data",
+      "target": "duckdetector_bootloader",
+      "may_include": [
+        "common"
+      ]
+    },
+    "mount": {
+      "path": "mount",
+      "owner": ":feature:mount:data",
+      "target": "duckdetector_mount",
+      "may_include": [
+        "common"
+      ]
+    },
+    "zygotenext": {
+      "path": "mount/zygotenext",
+      "owner": ":feature:mount:data",
+      "target": "main",
+      "may_include": [
+        "common"
+      ]
+    },
+    "preload": {
+      "path": "preload",
+      "owner": ":capability:earlypreload:data",
+      "target": "duckdetector_preload",
+      "may_include": [
+        "common"
+      ]
+    },
+    "memory": {
+      "path": "memory",
+      "owner": ":feature:memory:data",
+      "target": "duckdetector_memory",
+      "may_include": [
+        "common"
+      ]
+    },
+    "playintegrityfix": {
+      "path": "playintegrityfix",
+      "owner": ":feature:playintegrityfix:data",
+      "target": "duckdetector_playintegrityfix",
+      "may_include": [
+        "common"
+      ]
+    },
+    "nativeroot": {
+      "path": "nativeroot",
+      "owner": ":feature:nativeroot:data",
+      "target": "duckdetector_nativeroot",
+      "may_include": [
+        "common"
+      ]
+    },
+    "lsposed": {
+      "path": "lsposed",
+      "owner": ":feature:lsposed:data",
+      "target": "duckdetector_lsposed",
+      "may_include": [
+        "common"
+      ]
+    },
+    "zygisk": {
+      "path": "zygisk",
+      "owner": ":feature:zygisk:data",
+      "target": "duckdetector_zygisk",
+      "may_include": [
+        "common"
+      ]
+    },
+    "virtualization": {
+      "path": "virtualization",
+      "owner": ":capability:helperprocess:data",
+      "target": "duckdetector_virtualization",
+      "may_include": [
+        "common"
+      ]
+    }
+  },
+  "include_exceptions": [
+    {
+      "unit": "preload",
+      "header": "virtualization/snapshot_builder.h",
+      "reason": "The startup virtualization preload runs the same collect_snapshot probe as the runtime virtualization bridge so both snapshots come from one implementation, then reads its mount keys and each finding's typed group and early signal. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_file.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_format.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
+    },
+    {
+      "unit": "customrom",
+      "header": "systemproperties/prop_area_parser.h",
+      "reason": "The custom ROM property integrity probe walks the same bionic property areas as the system properties hole scan, so both use the systemproperties unit's one parser for that layout. The custom ROM probe passes its own dirty backup choice and a visitor that collects the properties it inspects. Both units link into libduckdetector.so."
+    }
+  ]
+}
