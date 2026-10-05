@@ -109,7 +109,7 @@ namespace duckdetector::memory {
             }
 
             if (entry.anonymous_kb > 0 && is_system_path(entry.map.path)) {
-                signals.anonymous_exec = true;
+                signals.system_anonymous_exec = true;
                 std::ostringstream detail;
                 detail << entry.map.path << " reports " << entry.anonymous_kb
                        << " kB anonymous executable pages";

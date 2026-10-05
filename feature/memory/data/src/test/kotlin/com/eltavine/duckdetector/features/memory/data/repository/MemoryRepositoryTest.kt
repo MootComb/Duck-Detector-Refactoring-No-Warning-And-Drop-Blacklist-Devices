@@ -166,4 +166,43 @@ class MemoryRepositoryTest {
 
         assertTrue(repository.isBenignArtCodeCacheSwapFinding(finding))
     }
+
+    @Test
+    fun `anonymous pages on a system mapping are review rather than an anomaly`() {
+        val mapsMethod = repository.buildMethods(
+            MemoryNativeSnapshot(available = true, systemAnonymousExec = true),
+        ).first { it.label == "maps + smaps" }
+
+        assertEquals("Review", mapsMethod.summary)
+        assertEquals(MemoryMethodOutcome.REVIEW, mapsMethod.outcome)
+    }
+
+    @Test
+    fun `anonymous executable mappings stay an anomaly`() {
+        val mapsMethod = repository.buildMethods(
+            MemoryNativeSnapshot(available = true, anonymousExec = true, systemAnonymousExec = true),
+        ).first { it.label == "maps + smaps" }
+
+        assertEquals("Anomaly", mapsMethod.summary)
+        assertEquals(MemoryMethodOutcome.DETECTED, mapsMethod.outcome)
+    }
+
+    @Test
+    fun `sanitizing keeps anonymous pages on the WebView provider's mapping`() {
+        val snapshot = MemoryNativeSnapshot(
+            available = true,
+            systemAnonymousExec = true,
+            findings = listOf(
+                MemoryNativeFinding(
+                    section = "MAPS",
+                    category = "SMAPS",
+                    label = "Anonymous executable pages on system mapping",
+                    severity = "MEDIUM",
+                    detail = "/product/app/webview/webview.apk reports 4 kB anonymous executable pages",
+                ),
+            ),
+        )
+
+        assertEquals(snapshot, repository.sanitizeSnapshot(snapshot))
+    }
 }

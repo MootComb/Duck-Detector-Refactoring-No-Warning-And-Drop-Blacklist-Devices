@@ -80,6 +80,7 @@ class MemoryRepository(
             suspiciousJump = snapshot.suspiciousJump,
             writableExec = snapshot.writableExec,
             anonymousExec = snapshot.anonymousExec,
+            systemAnonymousExec = snapshot.systemAnonymousExec,
             swappedExec = snapshot.swappedExec,
             sharedDirtyExec = snapshot.sharedDirtyExec,
             deletedSo = snapshot.deletedSo,
@@ -134,15 +135,15 @@ class MemoryRepository(
                 method = MemoryMethod.MAPS_SMAPS,
                 summary = when {
                     snapshot.writableExec || snapshot.anonymousExec || snapshot.sharedDirtyExec -> "Anomaly"
-                    snapshot.swappedExec -> "Review"
+                    snapshot.swappedExec || snapshot.systemAnonymousExec -> "Review"
                     else -> "Clean"
                 },
                 outcome = when {
                     snapshot.writableExec || snapshot.anonymousExec || snapshot.sharedDirtyExec -> MemoryMethodOutcome.DETECTED
-                    snapshot.swappedExec -> MemoryMethodOutcome.REVIEW
+                    snapshot.swappedExec || snapshot.systemAnonymousExec -> MemoryMethodOutcome.REVIEW
                     else -> MemoryMethodOutcome.CLEAN
                 },
-                detail = "Scans non-ART executable mappings for writable code, unexpected swapped pages, and shared-dirty system code.",
+                detail = "Scans non-ART executable mappings for writable or anonymous code, shared-dirty or privately copied system code, and swapped pages.",
             ),
             MemoryMethodResult(
                 method = MemoryMethod.FD_BACKED_CODE,

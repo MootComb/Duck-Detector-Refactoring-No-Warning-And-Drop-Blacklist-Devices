@@ -87,6 +87,7 @@ class MemoryNativeBridge(
 
             "WRITABLE_EXEC" -> copy(writableExec = value.asBool())
             "ANONYMOUS_EXEC" -> copy(anonymousExec = value.asBool())
+            "SYSTEM_ANONYMOUS_EXEC" -> copy(systemAnonymousExec = value.asBool())
             "SWAPPED_EXEC" -> copy(swappedExec = value.asBool())
             "SHARED_DIRTY_EXEC" -> copy(sharedDirtyExec = value.asBool())
             "DELETED_SO" -> copy(deletedSo = value.asBool())

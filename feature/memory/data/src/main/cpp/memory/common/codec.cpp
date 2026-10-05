@@ -89,6 +89,7 @@ namespace duckdetector::memory {
 
         output << "WRITABLE_EXEC=" << (snapshot.maps.writable_exec ? '1' : '0') << '\n';
         output << "ANONYMOUS_EXEC=" << (snapshot.maps.anonymous_exec ? '1' : '0') << '\n';
+        output << "SYSTEM_ANONYMOUS_EXEC=" << (snapshot.maps.system_anonymous_exec ? '1' : '0') << '\n';
         output << "SWAPPED_EXEC=" << (snapshot.maps.swapped_exec ? '1' : '0') << '\n';
         output << "SHARED_DIRTY_EXEC=" << (snapshot.maps.shared_dirty_exec ? '1' : '0') << '\n';
 
