@@ -8,14 +8,14 @@ The Memory detector asks whether this process's own code and mappings show signs
 
 ### Symbol resolution and entry prologues
 
-- Observable signal: where dlsym resolves sensitive libc and linker symbols, and the first bytes at those entry points.
+- Observable signal: where dlsym resolves sensitive libc and linker symbols, the first bytes at those entry points, and where a direct branch there lands.
 - Producing subsystem: the dynamic linker and the mapped libc and linker images in this process.
-- Mechanism: a PLT or GOT hook resolves the symbol outside its module; an inline hook replaces the prologue with a branch or a load-and-branch trampoline.
-- References: kernel/common Documentation/filesystems/proc.rst for /proc/self/maps; bionic linker/linker_namespaces.h for the loader's namespaces. Discovery only for the prologue byte patterns, which are the probe's instruction heuristics.
+- Mechanism: a PLT or GOT hook resolves the symbol outside its module; an inline hook replaces the prologue with a branch or a load-and-branch trampoline that hands execution to code outside the module's image. libdl's entry points that pass the loader no caller address, dlclose among the targets, only forward to the loader's weak __loader_* symbols. Clang tail-calls those on x86_64, so the entry is a jmp into libdl's own PLT; AArch64 never tail-calls an extern_weak callee, so there the same forwarders keep a frame and a bl.
+- References: kernel/common Documentation/filesystems/proc.rst for /proc/self/maps; bionic linker/linker_namespaces.h for the loader's namespaces; bionic libdl/libdl.cpp for the forwarders; LLVM lib/Target/AArch64/AArch64ISelLowering.cpp, whose isEligibleForTailCallOptimization refuses extern_weak callees under the AAELF64 rule for calls to undefined weak functions. Discovery only for the prologue byte patterns, which are the probe's instruction heuristics.
 - Applicability: resolution checks on every ABI; entry byte checks only on arm64 and x86_64.
-- Visibility limits: dlopen(nullptr) can fail; other ABIs report the entry check as unsupported.
+- Visibility limits: dlopen(nullptr) can fail; other ABIs report the entry check as unsupported. A direct branch that lands in executable code of the image holding the entry, the run of adjacent mappings of one system file, reads as a forwarder, so a hook that relays through a cave inside that image is not seen here; writing the cave makes a private copy of its page, which the mappings signal below reports as privately copied system code. The GOT slot that a forwarder's PLT entry jumps through is not checked.
 - Result states: mismatch, hook-like, jump entry, clean, unavailable, unsupported ABI.
-- Interpretation: an escaped symbol or branch prologue is danger; a trampoline-style entry alone is review.
+- Interpretation: an escaped symbol, or a branch prologue that leaves its image, is danger; a trampoline-style entry alone is review; an entry that branches within its own system image is clean.
 
 ### Mappings, file-backed code and loader visibility
 
