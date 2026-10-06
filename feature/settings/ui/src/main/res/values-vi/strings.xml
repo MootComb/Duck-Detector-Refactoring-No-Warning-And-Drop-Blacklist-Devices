@@ -69,4 +69,5 @@ limitations under the License.
     <string name="update_status_current">Bạn đang dùng bản Nightly mới nhất</string>
     <string name="update_status_failed">Không thể kiểm tra GitHub; chạm để thử lại</string>
     <string name="update_status_idle">Kiểm tra GitHub Main Nightly sau khi khởi động lạnh; chạm để kiểm tra ngay</string>
+    <string name="settings_section_appearance">Giao diện</string>
 </resources>
