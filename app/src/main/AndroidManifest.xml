@@ -28,6 +28,12 @@ limitations under the License.
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--
+    Android 17 allows silent NsdManager discovery only with ACCESS_LOCAL_NETWORK, which ADB Runtime
+    needs to find this device's own ADB services. The app never requests it; a user who grants it
+    in system settings lets the detector evaluate network ADB.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
     <application
         android:allowBackup="false"
