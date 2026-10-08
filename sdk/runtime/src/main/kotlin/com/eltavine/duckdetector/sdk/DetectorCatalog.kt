@@ -28,6 +28,7 @@ import com.eltavine.duckdetector.features.memory.detector.MemoryDetector
 import com.eltavine.duckdetector.features.mount.detector.MountDetector
 import com.eltavine.duckdetector.features.nativeroot.detector.NativeRootDetector
 import com.eltavine.duckdetector.features.playintegrityfix.detector.PlayIntegrityFixDetector
+import com.eltavine.duckdetector.features.rootmanagers.detector.RootManagersDetector
 import com.eltavine.duckdetector.features.selinux.detector.SelinuxDetector
 import com.eltavine.duckdetector.features.su.detector.SuDetector
 import com.eltavine.duckdetector.features.systemproperties.detector.SystemPropertiesDetector
@@ -56,6 +57,7 @@ public object DetectorCatalog {
         MountDetector,
         NativeRootDetector,
         PlayIntegrityFixDetector,
+        RootManagersDetector,
         SelinuxDetector,
         SuDetector,
         SystemPropertiesDetector,

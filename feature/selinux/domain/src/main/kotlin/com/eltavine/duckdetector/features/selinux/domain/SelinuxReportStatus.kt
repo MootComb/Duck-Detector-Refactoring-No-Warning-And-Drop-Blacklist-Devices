@@ -37,6 +37,8 @@ fun SelinuxReport.toDetectorStatus(): DetectorStatus {
                 procAttrCurrent?.isSecure == false -> DetectorStatus.danger()
                 dirtyPolicyHit != null -> DetectorStatus.warning()
                 appZygoteCarrierState == AppZygoteCarrierSupportState.UNTRUSTED -> DetectorStatus.warning()
+                // After the trusted oracle and carrier checks; before the info-level coverage state, which would mask it.
+                sidtabReading(this)?.verdict == SelinuxSidtabVerdict.DISCREPANCY_OBSERVED -> DetectorStatus.warning()
                 appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED -> DetectorStatus.info(InfoKind.SUPPORT)
                 contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.SELF_TEST_FAILED -> DetectorStatus.warning()
                 contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.AMBIGUOUS -> DetectorStatus.warning()

@@ -24,6 +24,8 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxAuditIntegritySt
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxMode
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxSidtabVerdict
+import com.eltavine.duckdetector.features.selinux.domain.sidtabReading
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxStage
 import com.eltavine.duckdetector.features.selinux.domain.contextValidityResult
@@ -70,6 +72,8 @@ internal fun buildVerdict(report: SelinuxReport): String {
                 dirtyPolicyHit != null -> trustedPolicyRuleVerdict()
                 appZygoteCarrierState == AppZygoteCarrierSupportState.UNTRUSTED ->
                     "Enforcing with untrusted app_zygote carrier"
+                sidtabReading(report)?.verdict == SelinuxSidtabVerdict.DISCREPANCY_OBSERVED ->
+                    "Enforcing with SID-table query discrepancy"
                 appZygoteCarrierState == AppZygoteCarrierSupportState.FAILED ->
                     "Enforcing with reduced app_zygote coverage"
 
@@ -103,6 +107,8 @@ internal fun buildSummary(report: SelinuxReport): String {
     val procAttrCurrent = procAttrCurrentResult(report)
     val policyloadSeqno = policyloadSeqnoResult(report)
     val dirtyPolicyHit = firstTrustedPolicyRuleHit(report)
+    // Coverage states stay in the method row; only a finding belongs in the summary.
+    val sidtabDiscrepancy = sidtabReading(report)?.takeIf { it.verdict == SelinuxSidtabVerdict.DISCREPANCY_OBSERVED }
     val repeatabilityFailed = contextValidity?.contextValidity?.repeatabilityFailed == true
     val appZygoteCarrierState = contextValiditySupportState(contextValidity)
     return when (report.stage) {
@@ -126,7 +132,11 @@ internal fun buildSummary(report: SelinuxReport): String {
                         "SELinux is enforcing and only minor policy drift surfaced."
 
                     SelinuxPolicyWeakness.NONE, null ->
-                        "SELinux is enforcing and the visible policy surface looks internally consistent."
+                        if (sidtabDiscrepancy != null) {
+                            "SELinux is enforcing, but the SID-table experiment did not match stock registration behavior."
+                        } else {
+                            "SELinux is enforcing and the visible policy surface looks internally consistent."
+                        }
                 }
                 val extra = buildList {
                     if (report.paradoxDetected) {
@@ -145,6 +155,7 @@ internal fun buildSummary(report: SelinuxReport): String {
                     if (dirtyPolicyHit != null) {
                         add(trustedPolicyRuleSummary(dirtyPolicyHit))
                     }
+                    sidtabDiscrepancy?.let { add(sidtabExplanation(it)) }
                     when (report.auditIntegrity?.state) {
                         SelinuxAuditIntegrityState.TAMPERED ->
                             add("Recent audit or log markers suggest logd output is being rewritten before apps inspect it.")
