@@ -34,6 +34,8 @@ class SystemPropertiesRepository(
     internal val readUtils: SystemPropertyReadUtils = SystemPropertyReadUtils(),
     private val consistencyUtils: SystemPropertyConsistencyUtils = SystemPropertyConsistencyUtils(),
 ) : DetectorScanner<SystemPropertiesReport> {
+    private val propertyAreaMtimeProbe = PropertyAreaMtimeProbe()
+
     override suspend fun scan(): SystemPropertiesReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
             .getOrElse { throwable ->
@@ -153,6 +155,7 @@ class SystemPropertiesRepository(
                 propAreaContextCount = nativeSnapshot.propAreaContextCount,
                 propAreaHoleCount = nativeSnapshot.propAreaHoleCount,
             ),
+            propertyAreaMtimes = propertyAreaMtimeProbe.read(),
         )
     }
 

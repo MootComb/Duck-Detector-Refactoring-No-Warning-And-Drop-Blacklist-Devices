@@ -22,10 +22,12 @@ import com.eltavine.duckdetector.capability.systemproperties.domain.SystemProper
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySignal
 import com.eltavine.duckdetector.capability.systemproperties.domain.SystemPropertySource
 import com.eltavine.duckdetector.core.evidence.DetectionSeverity
+import com.eltavine.duckdetector.features.systemproperties.domain.PropertyAreaMtime
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodOutcome
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesMethodResult
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesReport
 import com.eltavine.duckdetector.features.systemproperties.domain.SystemPropertiesStage
+import com.eltavine.duckdetector.features.systemproperties.presentation.model.SystemPropertiesHeaderFact
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -121,5 +123,101 @@ class SystemPropertiesCardModelMapperTest {
 
         assertEquals(DetectionSeverity.INFO, model.status.severity)
         assertTrue(model.verdict.contains("reduced coverage", ignoreCase = true))
+    }
+
+    @Test
+    fun `property area mtimes stay an unscored method row whatever their order`() {
+        // System newer than debug, and debug newer than a radio area stamped before the clock was set.
+        val model = mapper.map(
+            mtimeReport(
+                PropertyAreaMtime.Recorded(DEBUG, epochSeconds = 1_791_504_000L, nanoseconds = 5L),
+                PropertyAreaMtime.Recorded(RADIO, epochSeconds = 13_132_800L, nanoseconds = 0L),
+                PropertyAreaMtime.Recorded(SYSTEM, epochSeconds = 1_791_504_100L, nanoseconds = 0L),
+            ),
+        )
+        val row = model.methodRows.single { it.label == "Prop area mtimes" }
+        val review = model.headerFacts.single { it.fact == SystemPropertiesHeaderFact.REVIEW }
+
+        assertEquals(DetectionSeverity.ALL_CLEAR, model.status.severity)
+        assertEquals("No risky property or coherence drift", model.verdict)
+        assertEquals("None", review.value)
+        assertTrue(model.consistencyRows.isEmpty())
+        assertEquals(DetectionSeverity.INFO, row.status.severity)
+        assertEquals("3 recorded", row.value)
+        assertTrue(row.detail.orEmpty().contains("$DEBUG: 2026-10-09T00:00:00.000000005Z"))
+        assertTrue(row.detail.orEmpty().contains("$RADIO: 1970-06-02T00:00:00Z"))
+        assertTrue(row.detail.orEmpty().contains("$SYSTEM: 2026-10-09T00:01:40Z"))
+    }
+
+    @Test
+    fun `an unreadable property area keeps its errno and is not counted as recorded`() {
+        val row = mapper.map(
+            mtimeReport(
+                PropertyAreaMtime.StatFailed(DEBUG, errno = "EACCES"),
+                PropertyAreaMtime.NotRegularFile(RADIO),
+                PropertyAreaMtime.Recorded(SYSTEM, epochSeconds = 0L, nanoseconds = 0L),
+            ),
+        ).methodRows.single { it.label == "Prop area mtimes" }
+
+        assertEquals("1 of 3 recorded", row.value)
+        assertEquals(DetectionSeverity.INFO, row.status.severity)
+        assertTrue(row.detail.orEmpty().contains("$DEBUG: lstat failed: EACCES"))
+        assertTrue(row.detail.orEmpty().contains("$RADIO: not a regular file"))
+        assertTrue(row.detail.orEmpty().contains("$SYSTEM: 1970-01-01T00:00:00Z"))
+    }
+
+    @Test
+    fun `no readable property area reads unavailable`() {
+        val row = mapper.map(
+            mtimeReport(
+                PropertyAreaMtime.StatFailed(DEBUG, errno = "ENOENT"),
+                PropertyAreaMtime.StatFailed(RADIO, errno = "EACCES"),
+                PropertyAreaMtime.StatFailed(SYSTEM, errno = "ENOENT"),
+            ),
+        ).methodRows.single { it.label == "Prop area mtimes" }
+
+        assertEquals("Unavailable", row.value)
+        assertEquals(DetectionSeverity.INFO, row.status.severity)
+    }
+
+    @Test
+    fun `an mtime beyond Instant's range is shown raw`() {
+        val row = mapper.map(
+            mtimeReport(PropertyAreaMtime.Recorded(DEBUG, epochSeconds = Long.MAX_VALUE, nanoseconds = 7L)),
+        ).methodRows.single { it.label == "Prop area mtimes" }
+
+        assertTrue(row.detail.orEmpty().contains("$DEBUG: ${Long.MAX_VALUE} s + 7 ns from the epoch"))
+    }
+
+    @Test
+    fun `a report without property area mtimes adds no method row`() {
+        assertTrue(mapper.map(mtimeReport()).methodRows.isEmpty())
+    }
+
+    private fun mtimeReport(vararg mtimes: PropertyAreaMtime) = SystemPropertiesReport(
+        stage = SystemPropertiesStage.READY,
+        propertySignals = emptyList(),
+        propAreaSignals = emptyList(),
+        infoSignals = emptyList(),
+        checkedRuleCount = 1,
+        observedRuleCount = 1,
+        infoPropertyCount = 0,
+        reflectionHitCount = 1,
+        getpropHitCount = 1,
+        jvmHitCount = 0,
+        nativeHitCount = 1,
+        bootParamHitCount = 0,
+        buildSignalCount = 0,
+        propAreaAvailable = true,
+        propAreaContextCount = 3,
+        propAreaHoleCount = 0,
+        methods = emptyList(),
+        propertyAreaMtimes = mtimes.toList(),
+    )
+
+    private companion object {
+        const val DEBUG = "u:object_r:debug_prop:s0"
+        const val RADIO = "u:object_r:radio_prop:s0"
+        const val SYSTEM = "u:object_r:system_prop:s0"
     }
 }
