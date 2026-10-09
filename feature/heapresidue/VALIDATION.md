@@ -4,6 +4,11 @@ The implementation is experimental. Source auditing and JVM fixtures do not vali
 runtime transport, historical reach or robustness across OEMs. No device was connected during this
 change (`adb devices -l` returned an empty list). Device results must be recorded before leaving Draft.
 
+For issue #363's proposed process-name extensions, follow the separate
+[experiment gates](research/nice-name/EXPERIMENTS.md) and
+[source audit](research/nice-name/README.md). Binary scanner controls do not
+establish renamed-manager coverage or authenticate a String's producer.
+
 ## Automated checks
 
 Run the repository checks and the focused tests:
@@ -35,21 +40,27 @@ Record model, OEM/build fingerprint, API/security patch, ART module version, ABI
 USAP configuration and root/module environment for every run. Keep raw dumps local; report only
 aggregate counts, policy-target matches and diagnostics.
 
-1. On a stock API 36 device, test isolated service startup, hidden FD overload, reliable-pipe SELinux
-   access, dump completion, local debug retention and repeated scans. Verify distinct child PIDs and
-   child exit after completion/cancellation. Check UI responsiveness and wall-clock duration.
-2. On a second Android version, verify explicit unsupported status and that no service or heap dump
-   is started. Supporting that version requires a separate source/format audit and collection tests.
-3. On a rooted/modified API 36 device, start known policy targets before collection. Repeat after
-   uninstall/hiding a target and after reboot. Interpret strings as possible traces, not installation.
+1. On stock devices spanning the audited range (at least API 31 or 32, 34, 36 and 37), test isolated
+   service startup, hidden FD overload, reliable-pipe SELinux access, dump completion, local debug
+   retention and repeated scans. Verify distinct child PIDs and child exit after completion/
+   cancellation. Check UI responsiveness and wall-clock duration. Record the ART module version: a
+   Mainline update can run a newer ART than the platform release.
+2. On API 29 or 30, verify explicit unsupported status and that no service or heap dump is started.
+   On a release newer than API 37, verify the "Newer than audited" row, and on a developer preview
+   the "Pre-release build" row; a changed format or dump path must surface as inconclusive or
+   unavailable rather than as a negative result.
+3. On a rooted/modified device in the audited range, start known policy targets before collection.
+   Repeat after uninstall/hiding a target and after reboot. Interpret strings as possible traces, not
+   installation.
 4. Instrument a test-only variant to collect at different offsets from process startup (immediate,
    0.5, 1, 2, 5, 10 and 30 seconds), record GC counters and correlate with collector logs. Do not
    assume every generation sweep removes non-moving objects. Do not ship delay instrumentation.
 5. Launch several distinct apps between fresh captures. Check whether observed sets grow, shrink
    or differ; compare against a main-process snapshot and across ABI/zygote boundaries. Establish
    neither a boot-wide history nor monotonicity from one device.
-6. Where controllable, compare USAP enabled/disabled and Java/native fork paths. Verify actual
-   ancestry and pool age using device-side diagnostics, rather than inferring fresh fork from bind.
+6. Where controllable, compare USAP enabled/disabled and Java/native fork paths. Verify with
+   device-side diagnostics that the collector's parent is the platform zygote, as source predicts
+   for service launches, rather than inferring a fresh fork from bind.
 7. Force binding denial, service death, hidden method failure, reader cancellation, dump over-budget,
    disk-full/permission failures and GC before capture. Verify unavailable/inconclusive results,
    bounded completion, descriptor cleanup, no lingering child or partial retained file, and that
@@ -99,3 +110,11 @@ Focused tests: 28 passed (15 parser, 2 benchmark, 5 retention, 3 domain, 3 prese
 Runtime device results remain unrecorded: `adb devices -l` was empty. In particular, pipe access,
 hidden method invocation, eventual child exit after timeout, observation window and historic
 coverage must not be considered validated by these host tests.
+
+Release support (2026-10-10, same host): API 31–37 were source-audited against the Android 16
+baseline ([release support audit](research/version-support/README.md)); the online fetch and the
+offline run verified all 135 pinned files. Focused tests: 41 passed (34 data, including release
+and pre-release classification and the Android 17 clock record, 3 domain, 4 presentation). Module lint
+(`:feature:heapresidue:data:lintDebug`) reports no issues; before the API 31 annotation it reported
+`Os.fcntlInt` (API 30) twice, which the former API 36 annotation had masked. No device covering
+any of these releases was connected.

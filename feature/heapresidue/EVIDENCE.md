@@ -2,7 +2,7 @@
 
 Status: reviewed
 
-This experimental probe asks whether a newly bound isolated Android 16 process contains Java
+This experimental probe asks whether a newly bound isolated process on Android 12 or later contains Java
 String objects with complete startup arguments naming an exact policy target. A string's origin
 cannot be authenticated from HPROF. Findings are low-confidence argument traces, not proof that
 a target ran, remains installed, is genuine, or compromised the device. No outcome is all-clear.
@@ -16,18 +16,18 @@ The source mechanism is audited; cumulative history and device reproducibility a
 - Producing subsystem: framework zygote argument handling, ART heap inheritance and ART HPROF serialization.
 - Mechanism: Java parsing obtains arguments with ZygoteCommandBuffer.nextArg and builds String objects; a child can inherit unreclaimed objects. Hprof::ProcessBody uses VisitObjectsPaused inside a GC critical section and ScopedSuspendAll. DumpHeapInstanceObject emits a synthetic byte or big-endian char value array immediately after its String instance. STRING records describe metadata, not arbitrary Java String values. A complete snapshot is not an authenticated record of startup events.
 - References: frameworks/base ZygoteArguments.java#getInstance/parseArgs, ZygoteCommandBuffer.java#nextArg, ZygoteConnection.java#processCommand; art/runtime/hprof/hprof.cc#ProcessBody/DumpHeapInstanceObject/DumpHeap; pinned source links below.
-- Applicability: runtime is restricted to API 36, the audited android16-security-release ART format; byte/char values and 4/8-byte identifiers are parsed. Source checks establish a possible mechanism, not availability on every OEM or runtime update. A later API requires its own audit.
+- Applicability: runs on API 31 and later. The zygote's Java argument parsing and the HPROF String encoding were audited unchanged for API 31–37 ([release support audit](research/version-support/README.md)); newer releases and developer previews run on the parser's runtime checks alone and are labeled as such. Byte/char values and 4/8-byte identifiers are parsed. Source checks establish a possible mechanism, not availability on every OEM or ART module update.
 - Visibility limits: native forkSimpleApps/nativeForkRepeatedly can avoid Java allocations; USAP reads arguments in a pool process, not necessarily the parent zygote. GC, ABI/zygote boundaries, modified runtimes, self-created or spoofed strings, process startup initialization and acquisition delay all affect coverage. No monotonicity or history-since-boot guarantee is established.
-- Result states: observed (low-confidence exact target argument), not observed (complete snapshot with syntactically usable startup arguments for at least one package other than the host), inconclusive (no usable non-host arguments, malformed records or byte limit), unavailable (binding/dump/transport/deadline failure), unsupported (other API), not evaluated (loading).
+- Result states: observed (low-confidence exact target argument), not observed (complete snapshot with syntactically usable startup arguments for at least one package other than the host), inconclusive (no usable non-host arguments, malformed records or byte limit), unavailable (binding/dump/transport/deadline failure), unsupported (API below 31), not evaluated (loading).
 - Interpretation: exact target argument strings are one correlated signal family. A package may already be uninstalled or never have been genuine. No match means only that a target argument was not observed in this snapshot. The host's own arguments are excluded from candidates: every fresh child carries them, so they show nothing about whether residue of other launches is visible. Arbitrary byte arrays, metadata strings, embedded substrings and socket strings are excluded.
 
 ### Fresh isolated-process collection and GC timing diagnostics
 
 - Observable signal: dump completion, age measured from Process.getStartUptimeMillis before hidden API setup, dump-call duration and pre-call art.gc.gc-count.
 - Producing subsystem: ActivityManager isolated service creation, zygote/USAP startup, ART GC and VMDebug.
-- Mechanism: bindIsolatedService assigns a unique instance per scan, without FLAG_USE_APP_ZYGOTE or zygotePreloadName. The child invokes only the hidden Debug.dumpHprofData(String, FileDescriptor) overload. A reliable pipe FD is passed over Binder; the host VM drains it while the child's Java threads are suspended. The child closes the writer and is killed on service destruction. Host nonblocking reads poll at most 250 ms between deadline/cancellation checks; closing the reader releases a pipe writer via EPIPE. Android 16 FdFile::Flush treats EINVAL from pipe fsync as success. A start failure of any process in the package force-stops its services (ProcessList.handleProcessStart → forceStopPackageLocked, "start failure"), which kills a binding before it connects; nothing has been sent to that child, so one fresh instance is bound again. Binding failures are reported results, never coroutine cancellation, and every attempted connection is unbound whatever bindIsolatedService returned, as Context.bindService requires.
-- References: developer.android.com reference/android/content/Context#bindIsolatedService, reference/android/os/Debug, reference/android/os/Process#getStartUptimeMillis; frameworks/base ProcessList.java#startProcess/handleProcessStart, ZygoteProcess.java#shouldAttemptUsapLaunch, Context.java#bindService; art/runtime/gc/heap.cc#PreZygoteFork/PostForkChildAction, collector/concurrent_copying.cc#Sweep; art/libartbase/base/unix_file/fd_file.cc#Flush; system/sepolicy private/app.te, isolated_app_all.te and domain.te; kernel/common fs/pipe.c#pipe_write.
-- Applicability: API 36 only. Service initialization and the host's Application/providers still execute before service binding; SDK hosts must keep their isolated-process initialization small. Main-zygote family routing does not establish that a process freshly forked at scan time: an eligible USAP may predate the scan. No architecture instructions or vendor-private interfaces are used.
+- Mechanism: bindIsolatedService assigns a unique instance per scan, without FLAG_USE_APP_ZYGOTE or zygotePreloadName. The child invokes only the hidden Debug.dumpHprofData(String, FileDescriptor) overload. A reliable pipe FD is passed over Binder; the host VM drains it while the child's Java threads are suspended. The child closes the writer and is killed on service destruction. Host nonblocking reads poll at most 250 ms between deadline/cancellation checks; closing the reader releases a pipe writer via EPIPE. FdFile::Flush treats EINVAL from pipe fsync as success in every audited release. A start failure of any process in the package force-stops its services (ProcessList.handleProcessStart → forceStopPackageLocked, "start failure"), which kills a binding before it connects; nothing has been sent to that child, so one fresh instance is bound again. Binding failures are reported results, never coroutine cancellation, and every attempted connection is unbound whatever bindIsolatedService returned, as Context.bindService requires.
+- References: developer.android.com reference/android/content/Context#bindIsolatedService, reference/android/os/Debug, reference/android/os/Process#getStartUptimeMillis; frameworks/base ActiveServices.java#bringUpServiceLocked, ProcessList.java#startProcess/handleProcessStart, ZygoteProcess.java#shouldAttemptUsapLaunch/policySpecifiesUsapPoolLaunch, Context.java#bindService; art/runtime/gc/heap.cc#PreZygoteFork/PostForkChildAction, collector/concurrent_copying.cc#Sweep; art/libartbase/base/unix_file/fd_file.cc#Flush; system/sepolicy private/app.te, isolated_app_all.te and domain.te; kernel/common fs/pipe.c#pipe_write.
+- Applicability: API 31 and later; API 31–37 audited, newer releases and developer previews unaudited. Service initialization and the host's Application/providers still execute before service binding; SDK hosts must keep their isolated-process initialization small. ActiveServices.bringUpServiceLocked requests the process with ZYGOTE_POLICY_FLAG_EMPTY, which policySpecifiesUsapPoolLaunch never sends to a USAP, so in every audited release the platform zygote of the host's ABI forks it when bound ([routing audit](research/nice-name/README.md#which-process-parses-a-request)); OEM routing changes remain a device check. HiddenApiBypass 6.1 declares support through Android 16; from Android 17 its failure stays in the isolated process and is reported as an unavailable hidden API or dump stage. No architecture instructions or vendor-private interfaces are used.
 - Visibility limits: collection is after onServiceConnected, not Service.onCreate or immediately at fork. Hidden API lookup can allocate or fail and is included in call duration. Age is not an exact fork-to-heap-freeze interval. GC count is diagnostic, not proof that non-moving residue survived. The collector's generation and a device-specific cutoff remain unknown. Binder, SELinux or OEM failure is explicitly unavailable, never negative.
 - Result states: complete, hidden API unavailable, dump failed, reused process rejected, binding failed, timed out, malformed/limited stream, unsupported API.
 - Interpretation: a complete dump establishes collection of this heap only. The implementation does not infer a full startup history, native fast-path participation, actual parent zygote identity, GC immunity or a universal two-second deadline from these diagnostics.
@@ -43,6 +43,11 @@ Audited 2026-10-09 against these immutable repository revisions:
 | system/sepolicy / android16-security-release | `d4a7f392598cee96d9479a8ac0f84259c19b043a` |
 | kernel/common / android16-6.12 | `e65d894191a4f781c98ca3fe40d147d058483419` |
 
+On 2026-10-10 the startup argument parsing, dump path, HPROF String encoding, String layout, pipe
+flush, isolated_app pipe, socket and binder policy, and collector routing of Android 12, 12L, 13,
+14, 15 and 17 were compared with this baseline at their security-release revisions; see the
+[release support audit](research/version-support/README.md).
+
 - [ZygoteArguments](https://android.googlesource.com/platform/frameworks/base/+/e96ce2b091188de3bf9cf6385e50a4559839d921/core/java/com/android/internal/os/ZygoteArguments.java), [ZygoteCommandBuffer](https://android.googlesource.com/platform/frameworks/base/+/e96ce2b091188de3bf9cf6385e50a4559839d921/core/java/com/android/internal/os/ZygoteCommandBuffer.java), [ZygoteConnection](https://android.googlesource.com/platform/frameworks/base/+/e96ce2b091188de3bf9cf6385e50a4559839d921/core/java/com/android/internal/os/ZygoteConnection.java).
 - [ProcessList](https://android.googlesource.com/platform/frameworks/base/+/e96ce2b091188de3bf9cf6385e50a4559839d921/services/core/java/com/android/server/am/ProcessList.java), [ZygoteProcess](https://android.googlesource.com/platform/frameworks/base/+/e96ce2b091188de3bf9cf6385e50a4559839d921/core/java/android/os/ZygoteProcess.java).
 - [HiddenApiBypass 6.1 invoke](https://github.com/LSPosed/AndroidHiddenApiBypass/blob/v6.1/library/src/main/java/org/lsposed/hiddenapibypass/HiddenApiBypass.java) scans method signatures and invokes the matching method without calling the exemption-setting API; runtime compatibility still needs device validation.
@@ -54,7 +59,7 @@ Audited 2026-10-09 against these immutable repository revisions:
 - [ConcurrentCopying](https://android.googlesource.com/platform/art/+/ba2c65bbab5a55e204b32d7b1480011a1bcb57f9/runtime/gc/collector/concurrent_copying.cc) distinguishes immune image/zygote spaces and generational young-only sweeping. Source alone does not establish each inherited object's generation or survival.
 - [isolated_app_all.te](https://android.googlesource.com/platform/system/sepolicy/+/d4a7f392598cee96d9479a8ac0f84259c19b043a/private/isolated_app_all.te) explicitly **allows** read/write of already-open app data files received over IPC while prohibiting opening them directly. This differs from the issue's stated FD limitation. [app.te](https://android.googlesource.com/platform/system/sepolicy/+/d4a7f392598cee96d9479a8ac0f84259c19b043a/private/app.te) permits appdomain FIFO communication. OEM/runtime access is still a device test, not inferred from reference policy.
 - [ACK process memory inheritance](https://android.googlesource.com/kernel/common/+/e65d894191a4f781c98ca3fe40d147d058483419/kernel/fork.c) uses copy_mm/dup_mm; [copy_page_range](https://android.googlesource.com/kernel/common/+/e65d894191a4f781c98ca3fe40d147d058483419/mm/memory.c) write-protects COW mappings. This explains inherited heap pages without establishing how long Java objects remain uncollected.
-- [ACK pipe_write](https://android.googlesource.com/kernel/common/+/e65d894191a4f781c98ca3fe40d147d058483419/fs/pipe.c) uses EPIPE/SIGPIPE when readers disappear. ACK is a semantics reference here, not a claim that every API 36 device ships 6.12.
+- [ACK pipe_write](https://android.googlesource.com/kernel/common/+/e65d894191a4f781c98ca3fe40d147d058483419/fs/pipe.c) uses EPIPE/SIGPIPE when readers disappear. ACK is a semantics reference here, not a claim that every supported device ships 6.12.
 
 ## Algorithm and ownership
 
@@ -85,6 +90,14 @@ prefixes. Neither a raw substring search nor a whole-heap text conversion is use
 
 ## Exact-name policy
 
+The [issue #363 process-name source audit](research/nice-name/README.md) records
+optional shared suffixes, AppZygote routing and Magisk's hide transformation.
+Its candidates have no device validation and are not enabled policy rules.
+See its [experiment gates](research/nice-name/EXPERIMENTS.md) before extending
+the current exact-name policy. The audit also bounds the existing rule: any app
+may declare a global process name equal to a policy package, so a match carried
+only by `--nice-name` can come from an unrelated app's genuine launch.
+
 Names are policy keys, never authenticated application identities. The initial list follows the
 project's existing root-manager and dangerous-app exact-name policies, without importing their
 implementation. Historical/alternate names deliberately remain keys and may no longer identify
@@ -93,7 +106,7 @@ current builds; renamed or repackaged apps are missed.
 Primary examples inspected during this change:
 
 - [Magisk Setup.kt, b268b361](https://github.com/topjohnwu/Magisk/blob/b268b361f0d46318986cf50eac62e90c2dbcd235/app/build-logic/src/main/java/Setup.kt): `com.topjohnwu.magisk`.
-- [KernelSU manager build, df03912f](https://github.com/tiann/KernelSU/blob/df03912f70d92ff2aa9762ef82d607033d37e1da/manager/app/build.gradle.kts): default `me.weishu.kernelsu`, overridable by build property.
+- [KernelSU manager build, df03912f](https://github.com/tiann/KernelSU/blob/df03912f70d92ff2aa9762ef82d607033d37e1da/manager/app/build.gradle.kts): default `me.weishu.kernelsu`, or `me.weishu.kernelsu.pr` for PR builds; both are keys, while a custom `KSU_PACKAGE_NAME` stays unmatched.
 - [APatch app build, 52600361](https://github.com/bmax121/APatch/blob/526003615ce1783b285cd9340643898325e13dfe/app/build.gradle.kts): `me.bmax.apatch` namespace.
 - [LSPosed root build, df74d83e](https://github.com/LSPosed/LSPosed/blob/df74d83eb03a44cc6ad268841ac2ada28d077c77/build.gradle.kts): `org.lsposed.manager` default manager package.
 - [LSPatch root build, bbe8d93f](https://github.com/LSPosed/LSPatch/blob/bbe8d93fb9230f7b04babaf1c4a11642110f55a6/build.gradle.kts): `org.lsposed.lspatch` default manager package.
