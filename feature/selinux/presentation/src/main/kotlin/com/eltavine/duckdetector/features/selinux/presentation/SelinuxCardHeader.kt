@@ -46,6 +46,9 @@ internal fun buildSubtitle(report: SelinuxReport): String {
             if (report.methods.any { it.oracle == SelinuxOracle.ATTR_CURRENT_TIMING }) {
                 append(" + attr/current timing")
             }
+            if (report.methods.any { it.oracle == SelinuxOracle.APP_ZYGOTE_AVC_LOOKUPS }) {
+                append(" + app_zygote AVC counters")
+            }
             if (report.policyAnalysis != null) {
                 append(" + policy")
             }
@@ -72,7 +75,7 @@ internal fun buildVerdict(report: SelinuxReport): String {
                 contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.KSU_PRESENT ->
                     "Enforcing with KSU context materialized"
                 policyloadSeqno?.isSecure == false -> "Enforcing with app_zygote seqno split"
-                procAttrCurrent?.isSecure == false -> "Enforcing with app_zygote attr-write anomaly"
+                procAttrCurrent?.isSecure == false -> "Enforcing with recognized privileged contexts"
                 report.methods.any { it.oracle == SelinuxOracle.ATTR_CURRENT_TIMING && it.isSecure == false } ->
                     "Enforcing with SELinux attr/current timing anomaly"
                 dirtyPolicyHit != null -> trustedPolicyRuleVerdict()
@@ -150,9 +153,9 @@ internal fun buildSummary(report: SelinuxReport): String {
                     }
                     if (procAttrCurrent?.isSecure == false) {
                         add(
-                            "The dedicated app_zygote carrier hit anomalous /proc/self/attr/current write outcomes while probing privileged contexts: ${
+                            "Controlled app_zygote writes repeatedly recognized privileged contexts: ${
                                 procAttrCurrent.attrCurrentDetections.joinToString()
-                            }.",
+                            }. This is supporting policy evidence with limited version coverage.",
                         )
                     }
                     if (policyloadSeqno?.isSecure == false) {

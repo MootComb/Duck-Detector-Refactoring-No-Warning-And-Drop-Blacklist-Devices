@@ -5,6 +5,14 @@
 - 
 - 
 
+## Sources / Provenance
+
+<!-- Descriptive, not a gate: state where the change's knowledge comes from. See CONTRIBUTING.md. -->
+
+- Knowledge source: <!-- original / public docs (AOSP, ACK, …) / black-box observation / reverse engineering of <program> / third party (upstream, sister project) -->
+- Third-party code or text reused, and its licence: <!-- or "none" -->
+- AI / code-generation tools used: <!-- which, and how; or "none" -->
+
 ## Change Type
 
 <!-- Check all that apply. -->

@@ -114,6 +114,7 @@ internal fun buildMethodRows(report: SelinuxReport): List<SelinuxDetailRowModel>
 
 private fun methodRow(result: SelinuxCheckResult): SelinuxDetailRowModel {
     if (result.oracle == SelinuxOracle.SIDTAB_CONSISTENCY && result.sidtab != null) return sidtabRow(result)
+    if (result.oracle == SelinuxOracle.APP_ZYGOTE_AVC_LOOKUPS && result.avcLookup != null) return avcLookupRow(result)
     return SelinuxDetailRowModel(
         label = result.method,
         value = result.status,
@@ -229,7 +230,7 @@ private fun List<SelinuxCheckResult>.ruleEdges(verdict: SelinuxRuleVerdict): Lis
 
 private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
     if (result.oracle == SelinuxOracle.ATTR_CURRENT_TIMING) {
-        return if (result.isSecure == false) DetectorStatus.danger()
+        return if (result.isSecure == false) DetectorStatus.warning()
         else DetectorStatus.info(InfoKind.SUPPORT)
     }
     if (result.oracle == SelinuxOracle.CONTEXT_VALIDITY) {
@@ -248,8 +249,7 @@ private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
     }
     if (result.oracle == SelinuxOracle.PROC_ATTR_CURRENT_WRITE) {
         return when {
-            result.isSecure == false -> DetectorStatus.danger()
-            result.isSecure == true -> DetectorStatus.allClear()
+            result.isSecure == false -> DetectorStatus.warning()
             else -> DetectorStatus.info(InfoKind.SUPPORT)
         }
     }

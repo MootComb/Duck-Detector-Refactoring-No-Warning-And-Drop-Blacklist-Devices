@@ -30,6 +30,7 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityR
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentVerdict
 import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -72,25 +73,92 @@ class SelinuxContextValidityMethodTest {
     }
 
     @Test
-    fun `attr current detections list exactly the targets the status names`() {
-        val result = SelinuxContextValidityProbe(
-            nativeBridge = FakeBridge(
-                trustedSnapshot().copy(
-                    procAttrCurrentProbeAttempted = true,
-                    procAttrCurrentResults = listOf(
-                        attrResult("KernelSU", SelinuxProcAttrCurrentResult.OUTCOME_DETECTED_NON_EINVAL),
-                        attrResult("Magisk", SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL),
-                        attrResult("LSPosed file", SelinuxProcAttrCurrentResult.OUTCOME_SUCCESS),
-                    ),
-                ),
-            ),
-        ).inspectLocal()
-
-        val method = buildProcAttrCurrentMethod(result, EvidenceSource.DEDICATED_CARRIER)
-
+    fun `attr current recognition requires complete controls and names only repeated hits`() {
+        val method = attrMethod(controlledResults())
         assertEquals(listOf("KernelSU", "LSPosed file"), method.attrCurrentDetections)
-        assertEquals("Detected: ${method.attrCurrentDetections.joinToString()}", method.status)
+        assertEquals(SelinuxProcAttrCurrentVerdict.CONTEXT_RECOGNIZED, method.attrCurrentVerdict)
+        assertEquals("Context recognized: KernelSU, LSPosed file", method.status)
+        assertEquals(false, method.isSecure)
     }
+
+    @Test
+    fun `legacy refusals successes and security exceptions cannot establish recognition`() {
+        for (outcome in listOf(SelinuxProcAttrCurrentResult.OUTCOME_DETECTED_NON_EINVAL,
+            SelinuxProcAttrCurrentResult.OUTCOME_SUCCESS,
+            SelinuxProcAttrCurrentResult.OUTCOME_DETECTED_SECURITY_EXCEPTION)) {
+            val method = attrMethod(listOf(attrResult("KernelSU", outcome)))
+            assertTrue(method.attrCurrentDetections.isEmpty())
+            assertEquals(SelinuxProcAttrCurrentVerdict.INCONCLUSIVE, method.attrCurrentVerdict)
+            assertEquals(null, method.isSecure)
+        }
+    }
+
+    @Test
+    fun `failed duplicate or incomplete controls suppress recognized results`() {
+        val valid = controlledResults()
+        val failed = valid.first().copy(outcomeClass = SelinuxProcAttrCurrentResult.OUTCOME_PERMISSION_LIMITED)
+        for (rows in listOf(listOf(failed) + valid.drop(1), valid + valid.first(), valid.dropLast(1))) {
+            val method = attrMethod(rows)
+            assertTrue(method.attrCurrentDetections.isEmpty())
+            assertEquals(null, method.isSecure)
+        }
+        val limited = attrMethod(listOf(failed) + valid.drop(1))
+        assertTrue(limited.permissionDenied)
+        assertEquals(SelinuxProcAttrCurrentVerdict.PERMISSION_LIMITED, limited.attrCurrentVerdict)
+        assertEquals("Permission limited", limited.status)
+        for ((state, verdict) in listOf(
+            SelinuxProcAttrCurrentResult.OUTCOME_UNSUPPORTED to SelinuxProcAttrCurrentVerdict.UNSUPPORTED,
+            SelinuxProcAttrCurrentResult.OUTCOME_UNAVAILABLE to SelinuxProcAttrCurrentVerdict.UNAVAILABLE,
+            SelinuxProcAttrCurrentResult.OUTCOME_INCONCLUSIVE to SelinuxProcAttrCurrentVerdict.INCONCLUSIVE,
+        )) {
+            val method = attrMethod(listOf(failed.copy(outcomeClass = state)))
+            assertEquals(verdict, method.attrCurrentVerdict)
+            assertEquals(verdict.label, method.status)
+            assertFalse(method.permissionDenied)
+        }
+        assertEquals(SelinuxProcAttrCurrentVerdict.INCONCLUSIVE, attrMethod(valid + valid.first()).attrCurrentVerdict)
+        assertEquals(SelinuxProcAttrCurrentVerdict.INCONCLUSIVE, attrMethod(valid.dropLast(1)).attrCurrentVerdict)
+    }
+
+    @Test
+    fun `all tested contexts rejected is an observation and cannot exclude hiding`() {
+        val rows = controlledResults().mapIndexed { index, row ->
+            if (index == 0) row else row.copy(outcomeClass = SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL)
+        }
+        val method = attrMethod(rows)
+        assertEquals(SelinuxProcAttrCurrentVerdict.NOT_RECOGNIZED, method.attrCurrentVerdict)
+        assertEquals("Tested contexts not recognized", method.status)
+        assertEquals(null, method.isSecure)
+        assertTrue(method.details.orEmpty().contains("cannot exclude a hidden policy"))
+    }
+
+    @Test
+    fun `a skipped or empty attr current probe is unsupported and keeps its reason`() {
+        val skipped = buildProcAttrCurrentMethod(
+            SelinuxContextValidityProbe(nativeBridge = FakeBridge(trustedSnapshot().copy(
+                procAttrCurrentFailureReason = "Carrier self-check failed.",
+            ))).inspectLocal(),
+            EvidenceSource.DEDICATED_CARRIER,
+        )
+        assertEquals(SelinuxProcAttrCurrentVerdict.UNSUPPORTED, skipped.attrCurrentVerdict)
+        assertTrue(skipped.details.orEmpty().contains("Carrier self-check failed."))
+        val empty = attrMethod(emptyList())
+        assertEquals(SelinuxProcAttrCurrentVerdict.UNSUPPORTED, empty.attrCurrentVerdict)
+        assertTrue(empty.details.orEmpty().contains("returned no results"))
+        assertEquals(null, empty.isSecure)
+    }
+
+    private fun controlledResults() = listOf(
+        attrResult(SelinuxProcAttrCurrentResult.CONTROL_LABEL, SelinuxProcAttrCurrentResult.OUTCOME_CONTROLS_PASSED),
+    ) + listOf("KernelSU", "Magisk", "LSPosed file", "file1", "file2", "domain1", "domain2", "domain3", "file3")
+        .map { attrResult(it, if (it in listOf("KernelSU", "LSPosed file"))
+            SelinuxProcAttrCurrentResult.OUTCOME_CONTEXT_RECOGNIZED else SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL) }
+
+    private fun attrMethod(rows: List<SelinuxProcAttrCurrentResult>) = buildProcAttrCurrentMethod(
+        SelinuxContextValidityProbe(nativeBridge = FakeBridge(trustedSnapshot().copy(
+            procAttrCurrentProbeAttempted = true, procAttrCurrentResults = rows,
+        ))).inspectLocal(), EvidenceSource.DEDICATED_CARRIER,
+    )
 
     @Test
     fun `a faulted status page is an insecure finding that does not borrow a carrier failure`() {

@@ -88,6 +88,42 @@ stock/pre-fix/fixed-kernel device measurements have not been obtained. The row a
 state the global-statistics limitation and the retained preload capture time; no sensitivity,
 false-positive rate or coverage of all Android kernels is claimed.
 
+### Experimental App Zygote AVC lookup profile
+
+- Observable signal: the selinuxpolicy capability's per-batch AVC lookup deltas for payloads A and B (four rounds of 4096 rejected attr/current writes each, on one pinned CPU), its collection state and the paired timing medians.
+- Producing subsystem: the SELinux attr/current handler and the AVC's per-CPU statistics, measured in a disposable child of the app_zygote preload; see the capability's App Zygote AVC lookup counters record.
+- Mechanism: only a collected snapshot is classified. A payload costs one lookup per write when every batch lies in [1, 1.1] x 4096 lookups and two when every batch lies in [2, 2.1] x 4096; anything else, including rounds that disagree, is unclassified. Extra activity on the CPU and the counter reads only add lookups, so the bands allow a tenth above each count and nothing below it. A≈1/B≈1 is the stock handler's count; A≈1/B≈2 and A≈2/B≈2 mean an extra AVC query on the write path. Timing is shown but never classified, because the stock handler already treats the payloads differently.
+- References: capability/selinuxpolicy/EVIDENCE.md (App Zygote AVC lookup counters) for the pinned ACK, AOSP and KernelSU sources and the source-derived lookup table; ACK [hooks.c](https://android.googlesource.com/kernel/common/+/783025351c5fb3bcb4591d8fc61cbbd709aa4bcf/security/selinux/hooks.c) (`selinux_setprocattr`) and [avc.c](https://android.googlesource.com/kernel/common/+/783025351c5fb3bcb4591d8fc61cbbd709aa4bcf/security/selinux/avc.c) (`avc_lookup`).
+- Applicability: wherever the capability collected counters; see its record. The AVC carrier gate permits app_zygote MLS category suffixes, while full-label identity changes still invalidate collection. The KernelSU shapes in its table come from source review at the cited revisions, not from device measurements, and forks or later revisions can differ.
+- Visibility limits: the counter is shared by every task on the CPU and does not show which code made a query, so a profile cannot attribute the extra lookup to KernelSU or to any tool. A≈1/B≈1 cannot exclude hooks that query only after their own parse fails, which includes KernelSU from df03912 with hiding enabled. Missing counters, permission limits and failed collection are coverage gaps, not negative results.
+- Result states: A≈1/B≈1, A≈1/B≈2, A≈2/B≈2, unclassified (typed as `SelinuxAvcLookupProfile`); not collected, timing only, permission limited, unsupported, unavailable, inconclusive (`SelinuxAvcLookupCollection`).
+- Interpretation: informational only. A≈1/B≈2 and A≈2/B≈2 add one informational impact line; every reading stays an informational method row and never changes the card's status, verdict or summary, and A≈1/B≈1 is shown as not clean. This shares the attr/current path with the controlled context-write and timing observations and is not counted as an independent root indicator.
+
+### Controlled attr/current recognition and ordinary-app timing
+
+- Observable signal: repeated candidate-context refusal classes with preceding/following malformed and stock controls in the app_zygote child, plus the existing ordinary-app paired timing samples.
+- Producing subsystem: procfs and SELinux context conversion/permission checks; the capability owns controlled writes, while this feature owns ordinary-app timing and evidence interpretation.
+- Mechanism: only a complete controlled result with two issued EACCES refusals classifies a candidate as recognized. Repeated EINVAL only says the tested label was not recognized through this path. Timing compares A (the running context) and B (equal length with leading newline), requiring matching EACCES refusals; a payload-sensitive difference may reflect extra processing, scheduling, auditing or a hook. A timing threshold is not an architectural guarantee.
+- References: Android Common Kernel [hooks.c](https://android.googlesource.com/kernel/common/+/783025351c5fb3bcb4591d8fc61cbbd709aa4bcf/security/selinux/hooks.c) (`selinux_setprocattr`); capability/selinuxpolicy/EVIDENCE.md for additional ACK/AOSP controls and version-matched source; KernelSU [df03912](https://github.com/tiann/KernelSU/commit/df03912f70d92ff2aa9762ef82d607033d37e1da), [parent ab23091](https://github.com/tiann/KernelSU/blob/ab23091edfeddc774e1e880b0919b211808a193e/kernel/feature/selinux_hide.c), [3f388ef](https://github.com/tiann/KernelSU/commit/3f388ef137c78e1ca0c92c0ada3b8717cdcc4302) and [a810677](https://github.com/tiann/KernelSU/commit/a810677b847ba564c5f9d3fa0fbabe54794b8eef).
+- Applicability: determined by source mechanisms and runtime controls, not package or KernelSU version strings. SELinux hiding is optional; a hidden backup policy can suppress recognized live types. Source-derived coverage is separated below; it has not been established by paired device measurements.
+- Visibility limits: a failed carrier, SETCURRENT denial, open error or missing control cannot become a positive or negative integrity finding. Legacy uncontrolled records are informational. A stable timing difference does not prove a hook or identify KernelSU; earlier hook implementations can have no A/B difference. Shared SELinux mechanisms are not independent root indicators.
+- Result states: context recognized, tested contexts not recognized, permission limited, unsupported, unavailable, inconclusive (typed as `SelinuxProcAttrCurrentVerdict`); experimental timing candidate, no reproducible asymmetry, unavailable.
+- Interpretation: both positive signals are warnings in the overall card, method row and impact text. Existing stronger findings retain precedence. No negative observation implies absence of KernelSU or policy modifications: "tested contexts not recognized" and every failed collection state add one informational impact line that says so, and the raw per-write record stays in the method row.
+
+| KernelSU source interval / configuration | Source-derived expectation for retained probes |
+| --- | --- |
+| Hiding disabled | Live root contexts may be recognized by existing context queries and controlled writes. A valid context still does not identify the installed tool. |
+| Hiding enabled, before `3f388ef` adds the attr hook | Original attr/current conversion can expose live-valid candidates while selinuxfs queries answer against the backup. Controlled writes can support recognition. |
+| `3f388ef` through the parent of `a810677` | Backup validation hides added root contexts. The existing two-round SID-table registration experiment targets the unsynchronized context-query/attr registration discrepancy. |
+| `a810677` through `ab23091`, hiding enabled | Synchronization removes that SID-table signature and backup validation hides added contexts. Ordinary-app SETCURRENT denial occurs before payload parsing. No reliable coverage is claimed for this gap. |
+| `df03912`, hiding enabled | A stock-valid A reaches backup parsing before original SETCURRENT refusal; leading-newline B skips parsing. Existing timing can seek this difference, but source ordering does not establish a measurable or unique signature. |
+
+The intervals describe the cited source paths, not all releases, forks, backports or future changes.
+Other root probes in the repository retain their own contracts; package visibility, seccomp-blocked
+supercalls and manager inotify behavior do not close this coverage gap. Draft validation must
+record Android/API, kernel revision/configuration, ABI, enforcing state, hiding setting, raw control
+and candidate errors, child outcome and preload capture age on each stock/modified device.
+
 ## Known gaps
 
 - The policy notes pick their severity by matching the note text; see docs/architecture/follow-ups.md.

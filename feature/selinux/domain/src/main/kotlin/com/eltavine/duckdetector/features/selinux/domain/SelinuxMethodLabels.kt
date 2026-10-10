@@ -24,6 +24,7 @@ enum class SelinuxOracle(val label: String) {
     POLICYLOAD_SEQNO("App-zygote seqno oracle"),
     SIDTAB_CONSISTENCY("SID-table query consistency"),
     ATTR_CURRENT_TIMING("SELinux Hide attr/current timing (experimental)"),
+    APP_ZYGOTE_AVC_LOOKUPS("App Zygote AVC lookup profile (experimental)"),
 }
 
 /** The context validity oracle's reading of the two KSU-specific contexts; [label] is the status it is shown with. */
@@ -46,9 +47,18 @@ data class SelinuxContextValidityReading(
     val repeatabilityFailed: Boolean = false,
 )
 
-object SelinuxProcAttrCurrentLabels {
-    const val STATUS_CLEAN = "Normal EINVAL"
-    const val STATUS_UNSUPPORTED = "Unsupported"
+/**
+ * The controlled app_zygote attr/current probe's reading; [label] is the status it is shown with.
+ * Only [CONTEXT_RECOGNIZED] is evidence: the others, including [NOT_RECOGNIZED], cannot exclude a
+ * hidden policy.
+ */
+enum class SelinuxProcAttrCurrentVerdict(val label: String) {
+    CONTEXT_RECOGNIZED("Context recognized"),
+    NOT_RECOGNIZED("Tested contexts not recognized"),
+    PERMISSION_LIMITED("Permission limited"),
+    UNSUPPORTED("Unsupported"),
+    UNAVAILABLE("Unavailable"),
+    INCONCLUSIVE("Inconclusive"),
 }
 
 object SelinuxPolicyloadSeqnoLabels {

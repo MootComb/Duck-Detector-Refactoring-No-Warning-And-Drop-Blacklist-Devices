@@ -28,7 +28,7 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityR
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxContextValidityVerdict
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxOracle
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyloadSeqnoLabels
-import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentLabels
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxProcAttrCurrentVerdict
 import java.io.File
 
 internal fun buildContextValidityMethod(
@@ -183,44 +183,43 @@ internal fun buildProcAttrCurrentMethod(
     source: EvidenceSource,
 ): SelinuxCheckResult {
     val outcomes = result.procAttrCurrentResults
-    if (!result.procAttrCurrentProbeAttempted) {
+    if (!result.procAttrCurrentProbeAttempted || outcomes.isEmpty()) {
+        val reason = if (!result.procAttrCurrentProbeAttempted) "skipped" else "returned no results"
         return SelinuxCheckResult(
             method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
             oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
-            status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
+            status = SelinuxProcAttrCurrentVerdict.UNSUPPORTED.label,
             isSecure = null,
             permissionDenied = false,
             details = listOfNotNull(
                 "Evidence source=${source.label}",
-                result.procAttrCurrentFailureReason ?: "Dedicated app_zygote attr/current write probe skipped.",
+                result.procAttrCurrentFailureReason ?: "Dedicated app_zygote attr/current write probe $reason.",
             ).joinToString(" | "),
-        )
-    }
-    if (outcomes.isEmpty()) {
-        return SelinuxCheckResult(
-            method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
-            oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
-            status = SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED,
-            isSecure = null,
-            permissionDenied = false,
-            details = listOfNotNull(
-                "Evidence source=${source.label}",
-                result.procAttrCurrentFailureReason ?: "Dedicated app_zygote attr/current write probe returned no results.",
-            ).joinToString(" | "),
+            attrCurrentVerdict = SelinuxProcAttrCurrentVerdict.UNSUPPORTED,
         )
     }
 
-    val detected = outcomes.filter(SelinuxProcAttrCurrentResult::detected)
-    val clean = outcomes.all {
-        it.outcomeClass == SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL
+    val controls = outcomes.filter { it.label == SelinuxProcAttrCurrentResult.CONTROL_LABEL }
+    val targets = outcomes.filter { it.label != SelinuxProcAttrCurrentResult.CONTROL_LABEL }
+    val controlState = controls.singleOrNull()?.outcomeClass
+    val controlled = controlState == SelinuxProcAttrCurrentResult.OUTCOME_CONTROLS_PASSED &&
+        targets.size == SelinuxProcAttrCurrentResult.TARGET_COUNT &&
+        targets.distinctBy { it.label }.size == targets.size
+    val detected = if (controlled) targets.filter(SelinuxProcAttrCurrentResult::detected) else emptyList()
+    val verdict = when {
+        detected.isNotEmpty() -> SelinuxProcAttrCurrentVerdict.CONTEXT_RECOGNIZED
+        controlled && targets.all { it.outcomeClass == SelinuxProcAttrCurrentResult.OUTCOME_NORMAL_EINVAL } ->
+            SelinuxProcAttrCurrentVerdict.NOT_RECOGNIZED
+        controlState == SelinuxProcAttrCurrentResult.OUTCOME_PERMISSION_LIMITED -> SelinuxProcAttrCurrentVerdict.PERMISSION_LIMITED
+        controlState == SelinuxProcAttrCurrentResult.OUTCOME_UNSUPPORTED -> SelinuxProcAttrCurrentVerdict.UNSUPPORTED
+        controlState == SelinuxProcAttrCurrentResult.OUTCOME_UNAVAILABLE -> SelinuxProcAttrCurrentVerdict.UNAVAILABLE
+        else -> SelinuxProcAttrCurrentVerdict.INCONCLUSIVE
     }
-    val status = when {
-        detected.isNotEmpty() -> "Detected: ${detected.joinToString { it.label }}"
-        clean -> SelinuxProcAttrCurrentLabels.STATUS_CLEAN
-        else -> SelinuxProcAttrCurrentLabels.STATUS_UNSUPPORTED
-    }
+    val status = if (detected.isEmpty()) verdict.label else "${verdict.label}: ${detected.joinToString { it.label }}"
     val detail = listOf(
         "Evidence source=${source.label}",
+        "Repeated writes with stock/malformed controls; context recognition is supporting policy evidence, not root-family identification. " +
+            "EINVAL cannot exclude a hidden policy; SID-table and timing observations share SELinux mechanisms.",
         outcomes.joinToString(" | ") { outcome ->
             "${outcome.label}=${outcome.outcomeClass} target=${outcome.targetContext} raw=${outcome.rawMessage}"
         },
@@ -230,14 +229,11 @@ internal fun buildProcAttrCurrentMethod(
         method = SelinuxOracle.PROC_ATTR_CURRENT_WRITE.label,
         oracle = SelinuxOracle.PROC_ATTR_CURRENT_WRITE,
         status = status,
-        isSecure = when {
-            detected.isNotEmpty() -> false
-            clean -> true
-            else -> null
-        },
-        permissionDenied = false,
+        isSecure = if (verdict == SelinuxProcAttrCurrentVerdict.CONTEXT_RECOGNIZED) false else null,
+        permissionDenied = verdict == SelinuxProcAttrCurrentVerdict.PERMISSION_LIMITED,
         details = detail,
         attrCurrentDetections = detected.map { it.label },
+        attrCurrentVerdict = verdict,
     )
 }
 
