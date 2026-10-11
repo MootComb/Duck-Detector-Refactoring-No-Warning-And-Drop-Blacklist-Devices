@@ -4,62 +4,60 @@
 
 # Contribution Provenance and Attribution
 
-This document applies to every contribution to this repository: code, documentation, copy, assets, and research material.
-
-It works alongside [`CODING_STANDARDS.md`](./CODING_STANDARDS.md): that document covers how a change is written, tested, and submitted; this one covers how its sources are declared, how attribution is given, and which sources must not be introduced.
+This document covers the provenance and attribution of contributions to this repository, including code, documentation, UI copy, assets, and research material. It works alongside [`CODING_STANDARDS.md`](./CODING_STANDARDS.md), which governs implementation, testing, and commits. The [module architecture](./docs/architecture/README.md) and [detector guide](./docs/guides/adding-a-detector.md) remain authoritative for engineering requirements.
 
 ## 1. Principles
 
-- **Traceable**: a contribution should be able to state the category of its sources and material.
-- **Proportionate**: hard constraints apply only to sources that carry real risk; everything else is handled by disclosure and credit.
-- **Jurisdiction-neutral**: no contributor's jurisdiction is assumed. Statements below about legal rights are framed in terms of "protected expression".
+- **Traceable:** contributors should be able to explain the sources of their research and any material incorporated into their changes.
+- **Proportionate:** enforce licensing and confidentiality requirements, while treating the origins of an idea as descriptive information rather than an automatic barrier to contribution.
+- **Legally precise:** distinguish copyright-protected expression from independently observed facts and general methods. Patent, trade-secret, contractual, and jurisdiction-specific obligations may still apply.
 
 ## 2. Sources and attribution
 
-### 2.1 Ideas and methods are not protected
+### 2.1 Ideas, methods, and independent research
 
-Ideas, methods, algorithms, and discoveries are not protected by copyright and create no ownership: anyone may independently implement the same approach. Being first to think of something does not justify blocking or disparaging another contributor's independent implementation of a comparable detector.
+Copyright generally protects original expression, not ideas, methods, algorithms as such, or independently observed functional behaviour. Independently implementing a comparable detection technique does not, by itself, establish copying or ownership of another person's source code. Being the first to suggest an idea does not justify blocking or disparaging an independent implementation. Separate rights, including patents and trade secrets, may still matter.
 
-### 2.2 Protected expression must be attributed
+### 2.2 Protected expression and licensing
 
-When you quote, adapt, or port another party's copyright-protected **code, text, or assets**, you must:
+If a contribution quotes, adapts, or incorporates third-party code, documentation, tests, images, or other protected expression, the contributor must identify the material and comply with its licence or permission, including required copyright notices, attribution, and modification notices. Preserve these notices in the appropriate files and repository documentation. Attribution alone does **not** make an otherwise prohibited redistribution lawful.
 
-- attribute it at the source (in a Chinese-language context, the right of authorship under Article 10 of the Copyright Law of the People's Republic of China);
-- comply with its licence. Material whose licence is incompatible with this repository (Apache-2.0) must not be introduced (see §3).
+### 2.3 Credit for prior ideas and discoveries
 
-### 2.3 Credit
+Acknowledging useful ideas, prior research, and discoveries is **expected, not mandatory**. This may appear in a PR, a README, or a suitable research reference. Such acknowledgement is distinct from legally required notices and does not imply code co-authorship.
 
-Crediting an idea, a discovery, or prior work is **expected, not required**. Noting it in the README, a source comment, or a `Co-authored-by` trailer is welcome; but missing credit must not be used to allege plagiarism or to demand that a contribution be withdrawn.
+Missing voluntary credit alone must not be used to allege plagiarism or demand that a contribution be withdrawn. Specific concerns about copied expression, authorship, or licence compliance may still be raised with evidence and reviewed on their merits.
 
-## 3. Banned sources (hard rule)
+## 3. Sources that must not be introduced
 
-Do not introduce:
+Do not incorporate:
 
-- code under a licence incompatible with this repository's Apache-2.0, in particular **GPL-family** code (KernelSU, Magisk, and LSPosed are all GPL-3.0);
-- leaked source code, material under NDA, or material obtained in violation of an applicable licence or contract.
+- third-party code or protected material without permission to distribute it under the project's applicable licensing and distribution arrangements. In particular, do not copy GPL-family source into this Apache-2.0 repository and redistribute it as Apache-2.0 merely by adding credit or rewriting identifiers. Apache-2.0-to-GPLv3 compatibility does not work in reverse. External dependencies, linking, and separately licensed submodules require review of their actual licence terms and distribution model rather than a blanket assumption;
+- leaked source code, confidential or NDA-restricted material, or material obtained in violation of applicable legal or contractual restrictions.
 
-For the same functionality, **describe the behaviour and reimplement independently** rather than copying code.
-
-> The subjects this repository inspects (including closed-source hiding modules) expose **functional facts** (timing signatures, property names, and so on), which are not protected by copyright. The constraint in this section targets the **porting of code and protected text**, not whether someone has read or observed a given program.
+It is legitimate to study publicly available implementations and observable behaviour, including closed-source software, and independently implement factual mechanisms. The restriction concerns copying protected material, not merely having read or analysed another program. Describe the observed behaviour and write an independent implementation instead of translating or lightly rewriting restricted code.
 
 ## 4. Provenance disclosure in pull requests
 
-In a PR, state the **category** of the change's knowledge source (**descriptive, not a gate**):
+State the **category of knowledge sources** used, as applicable:
 
-- original;
-- public authoritative documentation (AOSP, ACK, official Android docs, and so on);
-- black-box observation of a publicly available product;
-- reverse engineering of a program (decompilation / disassembly / dynamic analysis);
-- third party (upstream, sister project, and so on).
+- independent or original research;
+- public documentation and authoritative source material (AOSP, ACK, platform specifications, etc.);
+- black-box observation of publicly available software or devices;
+- reverse engineering (decompilation, disassembly, or dynamic analysis);
+- third-party research or upstream projects.
 
-Also state whether AI or code-generation tools were used.
+These categories may be combined. The disclosure is **descriptive, not a standalone merge gate**. Separately identify any third-party code, text, or assets actually copied or adapted, together with the applicable licence or permission; write “none” where appropriate. Also disclose AI or code-generation assistance.
+
+For detector changes, the owning `feature/<name>/EVIDENCE.md` or `capability/<name>/EVIDENCE.md` must document the observable signal, producing subsystem, mechanism, primary references, applicability, visibility limits, result states, and interpretation. Cite release-matched AOSP/kernel paths or reproducible observations where they support the claim; mark exploratory evidence accordingly. The capability collects shared evidence; the feature domain interprets it; presentation and UI display the typed result. Source provenance does not replace mechanism validation, platform compatibility testing, or the checks required by `CODING_STANDARDS.md`.
 
 ## 5. AI and tooling attribution
 
-- AI tools **must not** appear in `Signed-off-by` (that trailer is a person's authorisation statement);
-- when AI or code-generation tools are used, credit them with a `Co-authored-by:` or `Assisted-by: <model>` trailer;
-- keep and formalise the existing conventions, such as `Moew`, `This PR is made by …`, and `Co-authored-by: <tool>`.
+- AI and code-generation tools **must not** appear in `Signed-off-by`, which represents a person's attestation.
+- When AI or code-generation tools materially contribute, disclose the tool and its role in the PR and acknowledge the contribution with a `Co-authored-by:` or `Assisted-by:` trailer. The human contributor remains responsible for reviewing the change, its licensing, and its validation.
+- `Co-authored-by: Name <email>` requires an accurate identity and email. Do not fabricate a person's identity or address for a tool. `Assisted-by: Tool or model` is the appropriate alternative where no valid co-author identity exists; it is a project convention, not a GitHub-recognized co-author trailer.
+- Maintain and formalize existing conventions, such as `Meow` and `This PR is made by …`, without treating them as substitutes for required attribution. Commit titles and bodies must still follow `CODING_STANDARDS.md`.
 
-## 6. What this document does not cover
+## 6. Scope
 
-This document addresses provenance and attribution only. It does not introduce a CLA, a DCO gate, or a code-of-conduct enforcement process. If a concrete trigger ever arises (for example a vendor complaint, a licensing dispute, or a conflict that cannot be resolved internally), that will be discussed separately.
+This document concerns provenance, licensing, and attribution. It does not introduce a Contributor License Agreement (CLA), a Developer Certificate of Origin (DCO) sign-off requirement, or a separate code-of-conduct enforcement process. Concrete licensing, authorship, or confidentiality disputes should be evaluated based on their facts rather than presumed from a contributor's choice of research tools or sources.

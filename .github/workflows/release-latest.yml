@@ -5,7 +5,10 @@ name: Publish Latest GitHub Release
 on:
   push:
     tags:
-      - '*'
+      # Version tags only. A bare '*' also fired on scratch and backup tags, and because this
+      # workflow publishes with make_latest, one stray tag push was enough to promote an
+      # unintended build to the repository's latest release.
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag_name:
@@ -17,17 +20,22 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: publish-latest-release
+  cancel-in-progress: false
+
 jobs:
   publish-release:
     if: github.event_name != 'push' || github.ref_name != 'nightly'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     environment: Telegram
     permissions:
       contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           submodules: true
@@ -36,13 +44,28 @@ jobs:
       - name: Resolve release target
         id: release_target
         shell: bash
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG_NAME: ${{ inputs.tag_name }}
         run: |
           set -euo pipefail
 
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            tag_name="${{ inputs.tag_name }}"
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            expected_workflow_ref="refs/heads/${DEFAULT_BRANCH}"
+            if [ "${GITHUB_REF}" != "${expected_workflow_ref}" ]; then
+              echo "Manual releases must run from the default branch (${DEFAULT_BRANCH})." >&2
+              exit 1
+            fi
+
+            tag_name="${INPUT_TAG_NAME}"
             if [ -z "${tag_name}" ]; then
               echo "tag_name input is required for manual release publishing." >&2
+              exit 1
+            fi
+
+            if ! git check-ref-format "refs/tags/${tag_name}" >/dev/null; then
+              echo "Invalid git tag name: ${tag_name}" >&2
               exit 1
             fi
 
@@ -58,74 +81,58 @@ jobs:
             tag_name="${GITHUB_REF_NAME}"
           fi
 
+          if ! git check-ref-format "refs/tags/${tag_name}" >/dev/null; then
+            echo "Invalid git tag name: ${tag_name}" >&2
+            exit 1
+          fi
+
+          if ! git rev-parse -q --verify "refs/tags/${tag_name}" >/dev/null; then
+            echo "Tag ${tag_name} does not exist in this repository." >&2
+            exit 1
+          fi
+
+          if ! git check-ref-format "refs/heads/${DEFAULT_BRANCH}" >/dev/null; then
+            echo "Repository default branch name is not a valid git ref: ${DEFAULT_BRANCH}" >&2
+            exit 1
+          fi
+
+          git fetch --no-tags origin \
+            "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+
+          tag_commit=$(git rev-parse HEAD)
+          minimum_supported_release_commit=641913a4efa743b200454b10b4d2e41ac02f1f39
+
+          # The shared setup action consumes the duckdetector.android.* property contract added by
+          # this commit. Earlier revisions are deliberately unsupported instead of being rebuilt
+          # with guessed modern Android toolchain versions.
+          if ! git merge-base --is-ancestor \
+            "${minimum_supported_release_commit}" \
+            "${tag_commit}"; then
+            echo "Release tag predates the supported historical-build baseline (${minimum_supported_release_commit})." >&2
+            exit 1
+          fi
+
+          # Build logic from the selected source revision receives release signing credentials.
+          # Only commits already accepted into the default branch belong to that trust boundary.
+          if ! git merge-base --is-ancestor \
+            "${tag_commit}" \
+            "origin/${DEFAULT_BRANCH}"; then
+            echo "Release tag must point to a commit reachable from ${DEFAULT_BRANCH}." >&2
+            exit 1
+          fi
+
           echo "tag_name=${tag_name}" >> "$GITHUB_OUTPUT"
 
-      - name: Read Android toolchain settings
+      - name: Set up Android build toolchain
         id: toolchain
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          from pathlib import Path
-
-          properties = {}
-          for raw_line in Path("gradle.properties").read_text(encoding="utf-8").splitlines():
-              line = raw_line.strip()
-              if not line or line.startswith("#") or "=" not in line:
-                  continue
-              key, value = line.split("=", 1)
-              properties[key.strip()] = value.strip()
-
-          mapping = {
-              "build_tools": "duckdetector.android.buildTools",
-              "cmake": "duckdetector.android.cmake",
-              "compile_sdk": "duckdetector.android.compileSdk",
-              "compile_sdk_minor": "duckdetector.android.compileSdkMinor",
-              "ndk": "duckdetector.android.ndk",
-          }
-
-          for output_name, property_name in mapping.items():
-              value = properties.get(property_name)
-              if not value:
-                  raise SystemExit(f"Missing required Gradle property: {property_name}")
-              print(f"{output_name}={value}")
-          PY
-
-      - name: Make Gradle wrapper executable
-        shell: bash
-        run: chmod +x gradlew
-
-      - name: Set up Java 17
-        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        uses: $/.github/actions/setup-android-build
         with:
-          distribution: temurin
-          java-version: "17"
+          # Tag builds restore the cache but do not write it back: GitHub scopes a cache entry to
+          # the ref that created it, so an entry written from refs/tags/v* can never be read by
+          # another branch or tag and would only consume the repository cache quota.
+          cache-read-only: "true"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
-
-      - name: Install Android SDK packages
-        shell: bash
-        env:
-          BUILD_TOOLS: ${{ steps.toolchain.outputs.build_tools }}
-          CMAKE: ${{ steps.toolchain.outputs.cmake }}
-          COMPILE_SDK: ${{ steps.toolchain.outputs.compile_sdk }}
-          COMPILE_SDK_MINOR: ${{ steps.toolchain.outputs.compile_sdk_minor }}
-          NDK: ${{ steps.toolchain.outputs.ndk }}
-        run: |
-          set -euo pipefail
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-${COMPILE_SDK}.${COMPILE_SDK_MINOR}" \
-            "build-tools;${BUILD_TOOLS}" \
-            "cmake;${CMAKE}" \
-            "ndk;${NDK}"
-
-      - name: Prepare release keystore
+      - name: Validate credentials and prepare release keystore
         id: keystore
         shell: bash
         env:
@@ -136,13 +143,34 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "${ANDROID_KEYSTORE_BASE64}" ] || [ -z "${ANDROID_KEYSTORE_PASSWORD}" ] || [ -z "${ANDROID_KEY_ALIAS}" ] || [ -z "${ANDROID_KEY_PASSWORD}" ]; then
-            echo "Missing release signing secrets. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD in the Telegram environment." >&2
+          required_secrets=(
+            ANDROID_KEYSTORE_BASE64
+            ANDROID_KEYSTORE_PASSWORD
+            ANDROID_KEY_ALIAS
+            ANDROID_KEY_PASSWORD
+          )
+          missing_secrets=()
+          for secret_name in "${required_secrets[@]}"; do
+            if [ -z "${!secret_name:-}" ]; then
+              missing_secrets+=("${secret_name}")
+            fi
+          done
+          if [ "${#missing_secrets[@]}" -ne 0 ]; then
+            printf 'Missing required secrets in the Telegram environment: %s\n' \
+              "$(IFS=', '; echo "${missing_secrets[*]}")" >&2
             exit 1
           fi
 
           keystore_path="$RUNNER_TEMP/release.keystore"
-          echo "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "$keystore_path"
+          if ! printf '%s' "${ANDROID_KEYSTORE_BASE64}" | base64 --decode > "$keystore_path"; then
+            echo "ANDROID_KEYSTORE_BASE64 is not valid base64." >&2
+            exit 1
+          fi
+          if [ ! -s "${keystore_path}" ]; then
+            echo "Decoded release keystore is empty." >&2
+            exit 1
+          fi
+          chmod 600 "${keystore_path}"
           echo "keystore_path=$keystore_path" >> "$GITHUB_OUTPUT"
 
       - name: Extract expected signing fingerprint
@@ -155,7 +183,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          keytool_output=$(keytool -list -v \
+          keytool_output=$(keytool -J-Duser.language=en -J-Duser.country=US -list -v \
             -keystore "${ANDROID_KEYSTORE_PATH}" \
             -storepass "${ANDROID_KEYSTORE_PASSWORD}" \
             -alias "${ANDROID_KEY_ALIAS}")
@@ -208,9 +236,11 @@ jobs:
 
           start_time=$(date +%s)
           build_time_utc=$(date -u +%Y%m%d%H%M%S)
-          ./gradlew \
+          env -u GITHUB_SHA ./gradlew \
+            --stacktrace \
             -Pduckdetector.buildTimeUtc="${build_time_utc}" \
             -Pduckdetector.teeCrl.refresh=true \
+            -Pduckdetector.githubContributors.refresh=true \
             :app:assembleRelease
           end_time=$(date +%s)
 
@@ -242,7 +272,13 @@ jobs:
 
           metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
           elements = metadata.get("elements") or []
-          apk_elements = [element for element in elements if element.get("outputFile", "").endswith(".apk")]
+          if not elements:
+              raise SystemExit("No APK entries found in output-metadata.json.")
+
+          apk_elements = [
+              element for element in elements
+              if element.get("outputFile", "").endswith(".apk")
+          ]
           if not apk_elements:
               raise SystemExit("No APK files were listed in output-metadata.json.")
 
@@ -260,15 +296,32 @@ jobs:
               listed_outputs = ", ".join(sorted(element.get("outputFile", "<missing outputFile>") for element in apk_elements))
               raise SystemExit(f"Expected a single release APK entry, found {len(apk_elements)}: {listed_outputs}")
 
-          apk_path = metadata_path.parent / selected_element["outputFile"]
-          if not apk_path.exists():
+          output_file = selected_element.get("outputFile", "")
+          if not output_file or Path(output_file).name != output_file:
+              raise SystemExit(f"Unsafe release APK output path: {output_file!r}.")
+
+          apk_path = metadata_path.parent / output_file
+          if not apk_path.is_file() or apk_path.stat().st_size <= 0:
               raise SystemExit(f"Release APK not found at {apk_path}.")
+
+          version_name = selected_element.get("versionName")
+          version_code = selected_element.get("versionCode")
+          if not isinstance(version_name, str) or not version_name.strip():
+              raise SystemExit("Release APK versionName is missing.")
+          if (
+              not isinstance(version_code, int)
+              or isinstance(version_code, bool)
+              or version_code <= 0
+          ):
+              raise SystemExit(
+                  f"Release APK versionCode is invalid: {version_code!r}."
+              )
 
           payload = {
               "apk_path": str(apk_path),
               "apk_name": apk_path.name,
-              "version_name": selected_element.get("versionName") or "unknown",
-              "version_code": str(selected_element.get("versionCode") or "unknown"),
+              "version_name": version_name.strip(),
+              "version_code": str(version_code),
           }
           print(json.dumps(payload))
           PY
@@ -313,7 +366,7 @@ jobs:
         shell: bash
         env:
           APK_PATH: ${{ steps.metadata.outputs.apk_path }}
-          BUILD_TOOLS: ${{ steps.toolchain.outputs.build_tools }}
+          BUILD_TOOLS: ${{ steps.toolchain.outputs.build-tools }}
           EXPECTED_SIGNER_SHA256: ${{ steps.signing_fingerprint.outputs.sha256 }}
         run: |
           set -euo pipefail
@@ -393,14 +446,14 @@ jobs:
           EOF
 
       - name: Upload release artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.metadata.outputs.apk_name }}
           path: ${{ steps.metadata.outputs.apk_path }}
           if-no-files-found: error
 
       - name: Publish latest GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ steps.release_target.outputs.tag_name }}
           name: ${{ steps.release_meta.outputs.release_name }}
@@ -412,3 +465,15 @@ jobs:
             ${{ steps.metadata.outputs.apk_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up signing material
+        if: always()
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ steps.keystore.outputs.keystore_path }}
+        run: |
+          set -euo pipefail
+          keystore_path="${ANDROID_KEYSTORE_PATH:-$RUNNER_TEMP/release.keystore}"
+          if [ -f "${keystore_path}" ]; then
+            rm -f -- "${keystore_path}"
+          fi

@@ -60,6 +60,8 @@ jobs:
           python3 .github/scripts/test-reflection-boundaries.py
           python3 .github/scripts/test-source-file-length.py
           python3 .github/scripts/test-text-protocols.py
+          python3 .github/scripts/test-android-toolchain-updates.py
+          python3 .github/scripts/test-android-toolchain-publication.py
           python3 scripts/test_new_detector.py
 
       - name: Test SELinux native parsing and experiment control flow
@@ -246,7 +248,7 @@ jobs:
 
       - name: Upload test and lint reports
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: verify-reports
           path: |

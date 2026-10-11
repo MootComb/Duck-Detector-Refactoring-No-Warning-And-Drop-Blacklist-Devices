@@ -1,0 +1,67 @@
+# Copyright (C) 2026 Duck Apps Contributor
+# If you have any questions, suggestions, or other inquiries, please email Eltavine <me@eltavine.com>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Android toolchain dependency updates
+
+on:
+  schedule:
+    # Same calendar schedule as Dependabot: 08:37 Singapore time on days 1, 4, 7, ...
+    - cron: "37 0 */3 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: android-toolchain-dependency-updates
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    if: github.repository == 'eltavine/Duck-Detector-Refactoring' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          # Validating older bot branches requires their merge base with main.
+          fetch-depth: 0
+          # This job pushes only new bot branches. Checkout removes credentials afterwards.
+          persist-credentials: true
+
+      - name: Test Android toolchain updater
+        run: |
+          python3 .github/scripts/test-android-toolchain-updates.py
+          python3 .github/scripts/test-android-toolchain-publication.py
+
+      - name: Check official stable Android tool versions
+        env:
+          REPORT_DIR: ${{ runner.temp }}/android-toolchain-update
+        run: python3 .github/scripts/update-android-toolchain.py --output-dir "$REPORT_DIR"
+
+      - name: Open dependency pull request and dispatch CI
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          REPORT_DIR: ${{ runner.temp }}/android-toolchain-update
+        run: python3 .github/scripts/publish-android-toolchain-update.py

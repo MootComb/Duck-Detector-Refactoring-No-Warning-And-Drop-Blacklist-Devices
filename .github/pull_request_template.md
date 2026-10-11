@@ -7,11 +7,12 @@
 
 ## Sources / Provenance
 
-<!-- Descriptive, not a gate: state where the change's knowledge comes from. See CONTRIBUTING.md. -->
+<!-- See CONTRIBUTING.md: describe research provenance separately from material copied or adapted. A source category alone is not a merge gate. -->
 
-- Knowledge source: <!-- original / public docs (AOSP, ACK, …) / black-box observation / reverse engineering of <program> / third party (upstream, sister project) -->
-- Third-party code or text reused, and its licence: <!-- or "none" -->
-- AI / code-generation tools used: <!-- which, and how; or "none" -->
+- Knowledge source: <!-- original / public docs (AOSP, ACK, etc.) / black-box observation / reverse engineering / third-party research; multiple categories are fine -->
+- Supporting references: <!-- For detector changes, identify the relevant EVIDENCE.md entry and version-specific source or observation where available. -->
+- Third-party code, text, or assets reused, and their licence: <!-- identify copied/adapted material and required notices, or "none"; an idea or research reference is not copied material -->
+- AI / code-generation tools used: <!-- which tools and for what, or "none"; substantial assistance should use Co-authored-by or Assisted-by in the commit, never Signed-off-by -->
 
 ## Change Type
 
@@ -50,13 +51,13 @@
 
 ## Architecture / Coupling Notes
 
-<!-- Explain why touched modules need to change together. Especially important for native payload + Kotlin parser + reducer + UI changes. -->
+<!-- Identify the relevant data/domain/presentation/detector/ui layers, shared capabilities, native payload/JNI contracts, and SDK impact. A capability collects evidence; a feature interprets it. Explain any necessary cross-layer change. See docs/architecture/README.md. -->
 
 - 
 
 ## Validation
 
-<!-- Required: paste the exact commands run and the result. PRs should include real validation, not only code inspection. Mark anything not run as N/A with a reason. -->
+<!-- Paste the exact commands run and their results, including repository guards and any applicable SDK/API checks. Do not claim an unrun test passed; mark N/A and explain why. See CODING_STANDARDS.md §6. -->
 
 - [ ] Compilation passed:
   - Command:

@@ -1,0 +1,44 @@
+version: 2
+updates:
+  - package-ecosystem: gradle
+    # Included build-logic is discovered from settings.gradle.kts. The SDK sample
+    # shares this catalog and consumes only a locally published SNAPSHOT artifact.
+    directory: /
+    schedule:
+      interval: cron
+      # Calendar-based: days 1, 4, 7, ... at 08:37 Singapore time.
+      # Cron resets at month boundaries; this is not a rolling 72-hour timer.
+      cronjob: "37 0 */3 * *"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      kotlin-toolchain:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.android.tools.build:gradle"
+          - "com.android.application*"
+      library-patches-and-minors:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      # The root workflow scan does not recurse into local composite actions.
+      - /.github/actions/setup-android-build
+    schedule:
+      interval: cron
+      cronjob: "37 0 */3 * *"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
