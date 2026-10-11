@@ -221,8 +221,8 @@ internal fun buildImpactItems(report: SelinuxReport): List<SelinuxImpactItemMode
     }
     if (report.methods.any { it.oracle == SelinuxOracle.ATTR_CURRENT_TIMING && it.isSecure == false }) {
         items += SelinuxImpactItemModel(
-            "attr/current timing suggests extra context processing before access denial. This experimental, device-dependent signal does not identify a root tool.",
-            DetectorStatus.warning(),
+            "Repeatable attr/current timing asymmetry is strong device-side evidence of extra context processing before access denial. This device-dependent side channel alone does not identify a root tool.",
+            DetectorStatus.danger(),
         )
     }
     if (avcLookupReading(report)?.extraLookupObserved == true) {

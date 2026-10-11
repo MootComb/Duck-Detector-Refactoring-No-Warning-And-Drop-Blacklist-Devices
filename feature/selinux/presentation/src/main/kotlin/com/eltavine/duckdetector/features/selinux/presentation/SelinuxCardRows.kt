@@ -230,7 +230,7 @@ private fun List<SelinuxCheckResult>.ruleEdges(verdict: SelinuxRuleVerdict): Lis
 
 private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
     if (result.oracle == SelinuxOracle.ATTR_CURRENT_TIMING) {
-        return if (result.isSecure == false) DetectorStatus.warning()
+        return if (result.isSecure == false) DetectorStatus.danger()
         else DetectorStatus.info(InfoKind.SUPPORT)
     }
     if (result.oracle == SelinuxOracle.CONTEXT_VALIDITY) {

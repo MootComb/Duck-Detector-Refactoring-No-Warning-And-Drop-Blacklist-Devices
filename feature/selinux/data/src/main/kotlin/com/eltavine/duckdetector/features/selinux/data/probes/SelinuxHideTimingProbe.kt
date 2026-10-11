@@ -29,7 +29,7 @@ internal fun buildSelinuxHideTimingMethod(result: SelinuxHideTimingSnapshot): Se
     return SelinuxCheckResult(
         method = SelinuxOracle.ATTR_CURRENT_TIMING.label,
         status = when (state) {
-            SelinuxHideTimingState.CANDIDATE -> "Timing asymmetry (experimental)"
+            SelinuxHideTimingState.CANDIDATE -> "Strong timing asymmetry (experimental)"
             SelinuxHideTimingState.NO_SIGNAL -> "No reproducible asymmetry"
             SelinuxHideTimingState.UNAVAILABLE -> "Unavailable"
         },
