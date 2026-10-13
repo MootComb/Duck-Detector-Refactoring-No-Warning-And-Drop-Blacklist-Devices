@@ -30,6 +30,7 @@ import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyRuleSet
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxPolicyWeakness
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxReport
 import com.eltavine.duckdetector.features.selinux.domain.SelinuxRuleVerdict
+import com.eltavine.duckdetector.features.selinux.domain.SelinuxStatusAbiVerdict
 import com.eltavine.duckdetector.features.selinux.domain.contextValiditySupportState
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxDetailRowModel
 import com.eltavine.duckdetector.features.selinux.presentation.model.SelinuxImpactItemModel
@@ -257,6 +258,15 @@ private fun methodStatus(result: SelinuxCheckResult): DetectorStatus {
         return when {
             result.isSecure == false -> DetectorStatus.danger()
             result.isSecure == true -> DetectorStatus.allClear()
+            else -> DetectorStatus.info(InfoKind.SUPPORT)
+        }
+    }
+    if (result.oracle == SelinuxOracle.STATUS_MMAP_ABI) {
+        return when {
+            result.isSecure == false -> DetectorStatus.danger()
+            // "No violation observed" states what the requests saw; it does not exclude a handler
+            // that keeps the upstream checks, so it stays clear without claiming one is absent.
+            result.statusAbi?.verdict == SelinuxStatusAbiVerdict.NO_VIOLATION -> DetectorStatus.allClear()
             else -> DetectorStatus.info(InfoKind.SUPPORT)
         }
     }

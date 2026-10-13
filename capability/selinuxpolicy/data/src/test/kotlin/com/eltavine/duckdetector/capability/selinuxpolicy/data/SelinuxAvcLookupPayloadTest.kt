@@ -120,7 +120,7 @@ class SelinuxAvcLookupPayloadTest {
     }
 
     @Test fun `a failed carrier gate skips the child and keeps the gate reason`() {
-        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityAugmentation.augmentPreloadSnapshot(
             baseSnapshot = SelinuxContextValiditySnapshot(),
             currentUid = 10001,
             appUid = 10000,

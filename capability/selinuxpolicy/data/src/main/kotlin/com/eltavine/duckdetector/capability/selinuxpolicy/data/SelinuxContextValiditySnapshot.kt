@@ -109,6 +109,7 @@ public data class SelinuxContextValiditySnapshot(
     val procAttrCurrentResults: List<SelinuxProcAttrCurrentResult> = emptyList(),
     val procAttrCurrentFailureReason: String? = null,
     val avcLookup: SelinuxAvcLookupSnapshot = SelinuxAvcLookupSnapshot(),
+    val statusAbi: SelinuxStatusAbiSnapshot = SelinuxStatusAbiSnapshot(),
     val failureReason: String? = null,
     val notes: List<String> = emptyList(),
     /**

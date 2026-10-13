@@ -15,4 +15,6 @@ duckdetector_native_unit(duckdetector_selinuxpolicy
     avc_lookup_io.cpp
     avc_lookup_native_bridge.cpp
     selinux_status_page_probe.cpp
+    selinux_status_abi_probe.cpp
+    selinux_status_abi_native_bridge.cpp
 )

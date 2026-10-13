@@ -52,6 +52,7 @@ public open class SelinuxContextValidityBridge(
         val dirtyPolicyNotes = mutableListOf<String>()
         val javaDirtyPolicyNotes = mutableListOf<String>()
         val policyloadSeqnoNotes = mutableListOf<String>()
+        val statusAbiNotes = mutableListOf<String>()
         val procAttrCurrentResults = mutableListOf<SelinuxProcAttrCurrentResult>()
 
         raw.lineSequence()
@@ -66,6 +67,9 @@ public open class SelinuxContextValidityBridge(
                         .decodeValue()
 
                     line.startsWith("POLICYLOAD_SEQNO_NOTE=") -> policyloadSeqnoNotes += line.removePrefix("POLICYLOAD_SEQNO_NOTE=")
+                        .decodeValue()
+
+                    line.startsWith("STATUS_ABI_NOTE=") -> statusAbiNotes += line.removePrefix("STATUS_ABI_NOTE=")
                         .decodeValue()
 
                     line.startsWith("NOTE=") -> notes += line.removePrefix("NOTE=")
@@ -90,6 +94,7 @@ public open class SelinuxContextValidityBridge(
             policyloadSeqnoNotes = policyloadSeqnoNotes,
             procAttrCurrentResults = procAttrCurrentResults,
             notes = notes,
+            statusAbi = snapshot.statusAbi.copy(notes = statusAbiNotes),
         )
     }
 
@@ -184,6 +189,23 @@ public open class SelinuxContextValidityBridge(
             "PROC_ATTR_CURRENT_PROBE_ATTEMPTED" -> copy(procAttrCurrentProbeAttempted = value.asBool())
             "PROC_ATTR_CURRENT_FAILURE_REASON" -> copy(procAttrCurrentFailureReason = value.decodeValue())
             "APP_ZYGOTE_AVC_LOOKUP" -> copy(avcLookup = SelinuxAvcLookupPayloadCodec.decode(value.decodeValue()))
+            "STATUS_ABI_ATTEMPTED" -> copy(statusAbi = statusAbi.copy(attempted = value.asBool()))
+            "STATUS_ABI_STATE" -> copy(
+                statusAbi = statusAbi.copy(
+                    state = SelinuxStatusAbiState.entries.firstOrNull { it.name == value.decodeValue() }
+                        ?: SelinuxStatusAbiState.INCONCLUSIVE,
+                ),
+            )
+            "STATUS_ABI_VIOLATED" -> copy(
+                statusAbi = statusAbi.copy(
+                    violatedRequests = value.decodeValue().split(',')
+                        .mapNotNull { name ->
+                            SelinuxStatusAbiRequestKind.entries.firstOrNull { it.name == name.trim() }
+                        },
+                ),
+            )
+            "STATUS_ABI_PAGE_SIZE" -> copy(statusAbi = statusAbi.copy(pageSize = value.toLongOrNull()))
+            "STATUS_ABI_FAILURE_REASON" -> copy(statusAbi = statusAbi.copy(failureReason = value.decodeValue()))
             "FAILURE_REASON" -> copy(failureReason = value.decodeValue())
             else -> this
         }

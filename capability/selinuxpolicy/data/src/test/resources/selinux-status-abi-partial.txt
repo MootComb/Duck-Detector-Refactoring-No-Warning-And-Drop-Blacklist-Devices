@@ -1,0 +1,10 @@
+ATTEMPTED=1
+OUTCOME=VIOLATION
+VIOLATED=TWO_PAGE_SHARED
+PAGE_SIZE=4096
+FAILURE_REASON=Status ABI child did not finish within 1000 ms and was stopped.
+NOTE=Request TWO_PAGE_SHARED was granted on the status node.
+NOTE=Request OFFSET_SHARED has no reported outcome.
+NOTE=Request WRITABLE_PRIVATE has no reported outcome.
+NOTE=Request MPROTECT_WRITE has no reported outcome.
+NOTE=Stock selinuxfs rejects every request above; a grant means the status node's mmap handler dropped the corresponding upstream check.

@@ -65,7 +65,7 @@ class SelinuxContextValidityPreloadTest {
 
     @Test
     fun `augment preload snapshot restores DirtySepolicy style attr and rule probes`() {
-        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityAugmentation.augmentPreloadSnapshot(
             baseSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,
@@ -162,7 +162,7 @@ class SelinuxContextValidityPreloadTest {
         var inspectCalls = 0
         var seqnoCalls = 0
 
-        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityAugmentation.augmentPreloadSnapshot(
             baseSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,
@@ -223,7 +223,7 @@ class SelinuxContextValidityPreloadTest {
         listOf(faulted, inconclusive).forEach { statusPage ->
             var accessChecks = 0
             var attrWrites = 0
-            val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+            val snapshot = SelinuxContextValidityAugmentation.augmentPreloadSnapshot(
                 baseSnapshot = trustedCarrierSnapshot(),
                 currentUid = 10000,
                 appUid = 10000,
@@ -262,7 +262,7 @@ class SelinuxContextValidityPreloadTest {
             notes = listOf("Child was killed by SIGKILL on the first read of the mapping."),
         )
 
-        val snapshot = SelinuxContextValidityPreload.augmentPreloadSnapshot(
+        val snapshot = SelinuxContextValidityAugmentation.augmentPreloadSnapshot(
             baseSnapshot = trustedCarrierSnapshot(),
             currentUid = 10000,
             appUid = 10000,
@@ -280,7 +280,7 @@ class SelinuxContextValidityPreloadTest {
 
     @Test
     fun `java carrier snapshot can recover preload gate when native base snapshot fails`() {
-        val merged = SelinuxContextValidityPreload.mergeCarrierSelfCheckSnapshot(
+        val merged = SelinuxContextValidityAugmentation.mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = SelinuxContextValiditySnapshot(
                 available = false,
                 failureReason = "selinux native path unavailable",
@@ -311,7 +311,7 @@ class SelinuxContextValidityPreloadTest {
 
     @Test
     fun `java carrier snapshot preserves native dedicated oracle verdict`() {
-        val merged = SelinuxContextValidityPreload.mergeCarrierSelfCheckSnapshot(
+        val merged = SelinuxContextValidityAugmentation.mergeCarrierSelfCheckSnapshot(
             nativeSnapshot = SelinuxContextValiditySnapshot(
                 available = true,
                 probeAttempted = true,

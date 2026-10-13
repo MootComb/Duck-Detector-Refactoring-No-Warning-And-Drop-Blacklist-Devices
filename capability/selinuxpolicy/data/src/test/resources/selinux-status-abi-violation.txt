@@ -1,0 +1,9 @@
+ATTEMPTED=1
+OUTCOME=VIOLATION
+VIOLATED=TWO_PAGE_SHARED,OFFSET_SHARED,WRITABLE_PRIVATE,MPROTECT_WRITE
+PAGE_SIZE=4096
+NOTE=Request TWO_PAGE_SHARED was granted on the status node.
+NOTE=Request OFFSET_SHARED was granted on the status node.
+NOTE=Request WRITABLE_PRIVATE was granted on the status node.
+NOTE=Request MPROTECT_WRITE was granted on the status node.
+NOTE=Stock selinuxfs rejects every request above; a grant means the status node's mmap handler dropped the corresponding upstream check.

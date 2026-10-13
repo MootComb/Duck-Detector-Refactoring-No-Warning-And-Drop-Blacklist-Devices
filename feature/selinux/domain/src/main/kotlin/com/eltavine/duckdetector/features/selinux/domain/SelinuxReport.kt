@@ -52,6 +52,8 @@ data class SelinuxCheckResult(
     val sidtab: SelinuxSidtabReading? = null,
     /** The app_zygote AVC lookup experiment's reading; set only on that oracle's result. */
     val avcLookup: SelinuxAvcLookupReading? = null,
+    /** The status mmap ABI conformance probe's reading; set only on that oracle's result. */
+    val statusAbi: SelinuxStatusAbiReading? = null,
 )
 
 /** What a policy analysis note says about the loaded policy. */

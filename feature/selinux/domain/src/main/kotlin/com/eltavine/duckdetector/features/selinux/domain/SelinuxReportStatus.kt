@@ -34,6 +34,7 @@ fun SelinuxReport.toDetectorStatus(): DetectorStatus {
                 auditIntegrity?.state == SelinuxAuditIntegrityState.TAMPERED -> DetectorStatus.danger()
                 contextValidity?.contextValidity?.verdict == SelinuxContextValidityVerdict.KSU_PRESENT -> DetectorStatus.danger()
                 policyloadSeqno?.isSecure == false -> DetectorStatus.danger()
+                methods.any { it.oracle == SelinuxOracle.STATUS_MMAP_ABI && it.isSecure == false } -> DetectorStatus.danger()
                 // EN: Please fucking do NOT downgrade this to WARNING. I reproduced the
                 // ordinary-app A/B timing gap (~1 us) with Hide ON/OFF/ON controls and
                 // verified the extra pre-denial parsing path. DANGER means strong evidence

@@ -124,6 +124,17 @@ supercalls and manager inotify behavior do not close this coverage gap. Draft va
 record Android/API, kernel revision/configuration, ABI, enforcing state, hiding setting, raw control
 and candidate errors, child outcome and preload capture age on each stock/modified device.
 
+### Status mmap ABI conformance
+
+- Observable signal: a granted two-page shared mapping, shared mapping at page offset 1, writable private mapping, or mprotect adding write permission to a read-only one-page private baseline on the status node.
+- Producing subsystem: selinuxfs's `sel_mmap_handle_status`, observed through the selinuxpolicy capability's app_zygote carrier.
+- Mechanism: the reviewed upstream handler requires one page at offset 0, rejects `VM_WRITE`, and clears `VM_MAYWRITE`. The private baseline preserves `VM_MAYWRITE` through VFS setup so the final mprotect request can examine the handler's clearing behavior. A shared baseline on an `O_RDONLY` descriptor would lose that flag before the handler and cannot test this constraint.
+- References: ACK [5.10 selinuxfs.c](https://android.googlesource.com/kernel/common/+/a3431a2d02cd16bb212f7839cfa0934ce2a367ff/security/selinux/selinuxfs.c), [6.1 selinuxfs.c](https://android.googlesource.com/kernel/common/+/31addbff5e86095b5ee63a5d6446d7e76000bbc0/security/selinux/selinuxfs.c), and [6.1 mmap.c](https://android.googlesource.com/kernel/common/+/31addbff5e86095b5ee63a5d6446d7e76000bbc0/mm/mmap.c); the capability evidence record pins the mprotect, remapping and SELinux permission sources. Discovery only: [KernelPatch selinux_hide.c](https://github.com/bmax121/KernelPatch/blob/f36f3d1377004871f8c964f7cd3276712eeba943/kernel/patch/common/selinux_hide.c). No code is copied from it.
+- Applicability: where the app_zygote carrier starts and can reach the status node, with device mapping behavior matching the reviewed ACK contract. Sizes and offsets use the runtime page size. Vendor differences require device validation.
+- Visibility limits: unavailable open/baseline mapping is not negative evidence. An incomplete run without a grant is inconclusive; a grant reported before later child failure remains positive evidence. A conformant replacement handler, other hiding mechanisms, and rejections by other kernel or permission checks are not excluded by a negative observation.
+- Result states: ABI violation, no violation observed, unavailable, inconclusive. A violation can coexist with an incomplete request set and a recorded failure reason.
+- Interpretation: a confirmed ABI violation raises the method row and SELinux card to danger, even when later requests are unevaluated. Details name the granted requests and explain any incomplete request set. A completed negative run is labeled "No violation observed"; unavailable and inconclusive rows stay informational. This is evidence of mapping behavior, not proof of a specific modification. No granted mapping is dereferenced.
+
 ## Known gaps
 
 - The policy notes pick their severity by matching the note text; see docs/architecture/follow-ups.md.
