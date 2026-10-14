@@ -66,20 +66,16 @@ internal fun NativeRootMethodEvidence.kernelInterfaceMethods(): List<NativeRootM
     NativeRootMethodResult(
         method = NativeRootMethod.NR_SUPERCALL_PROBE,
         summary = when {
-            snapshot.kernelPatchSideChannel -> "Detected"
-            snapshot.kernelPatchSideChannelAvailable -> "No pre-fix delay"
-            else -> "Unavailable"
+            !snapshot.kernelPatchSideChannelAvailable -> "Unavailable"
+            snapshot.kernelPatchSideChannel -> "Elevated ratio"
+            else -> "Ratio below threshold"
         },
-        outcome = when {
-            snapshot.kernelPatchSideChannel -> NativeRootMethodOutcome.DETECTED
-            snapshot.kernelPatchSideChannelAvailable -> NativeRootMethodOutcome.CLEAN
-            else -> NativeRootMethodOutcome.SUPPORT
-        },
+        outcome = NativeRootMethodOutcome.SUPPORT,
         detail = buildString {
-            append("Times __NR_supercall (syscall 45, the arm64 truncate slot KernelPatch takes over) with a 128-byte key and with an empty key. ")
-            append("KernelPatch older than commit 84169d5d6be12e589ccac81d71dcebb80b22043a copied the key with strncpy_from_user before authorizing it, so the longer key cost measurably more.\n")
-            append("That commit stopped copying before auth, which puts a fixed build back on the same footing as an unmodified kernel. ")
-            append("So a result here that is not \"Detected\" rules out the older leak only, not KernelPatch itself; the superkey probe is what covers current builds.\n")
+            append("Times arm64 syscall 45 with a 128-byte key and an empty key, and reports the full/empty ratio. ")
+            append("KernelPatch commit 84169d5d6be12e589ccac81d71dcebb80b22043a reported ratios of approximately 9.3 before its fix, 1.6 after it, and 1.8 without KernelPatch; an additional reported device measured 1.94.\n")
+            append("The 3.0 threshold is provisional. A ratio cancels common multiplicative scaling, but not additive syscall overhead or differences in path lookup. Cross-device detection accuracy has not been established.\n")
+            append("An elevated ratio is supporting timing evidence only and does not identify APatch or KernelPatch. A lower ratio cannot exclude the older leak or KernelPatch itself. The separate superkey probe retains its own applicability limits.\n")
             append("Test Result: ${snapshot.kernelPatchSideChannelDetail}")
         },
     ),

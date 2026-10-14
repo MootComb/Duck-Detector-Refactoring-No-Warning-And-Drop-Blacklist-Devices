@@ -17,15 +17,16 @@
 
 package com.eltavine.duckdetector.features.update.ui
 
-import com.eltavine.duckdetector.features.update.domain.AvailableNightlyUpdate
-import com.eltavine.duckdetector.features.update.domain.NightlyUpdateApk
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateChecker
-import com.eltavine.duckdetector.features.update.domain.NightlyUpdateCommit
-import com.eltavine.duckdetector.features.update.domain.NightlyUpdateManifest
-import com.eltavine.duckdetector.features.update.domain.UpdateChangelogEntry
+import com.eltavine.duckdetector.features.update.domain.UpdateApkDownloader
+import com.eltavine.duckdetector.features.update.domain.UpdateApkInstaller
 import com.eltavine.duckdetector.features.update.domain.UpdateCheckResult
+import com.eltavine.duckdetector.features.update.domain.UpdateDownloadProgress
+import com.eltavine.duckdetector.features.update.domain.UpdateDownloadResult
+import com.eltavine.duckdetector.features.update.domain.UpdateInstallResult
 import com.eltavine.duckdetector.features.update.presentation.UpdateCheckStatus
 import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadResolution
+import com.eltavine.duckdetector.features.update.presentation.UpdateDownloadState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -44,27 +45,6 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class UpdateViewModelTest {
     private val dispatcher: TestDispatcher = StandardTestDispatcher()
-    private val manifest = NightlyUpdateManifest(
-        schemaVersion = 1,
-        channel = "nightly",
-        branch = "master",
-        versionName = "2026.08.08-${TEST_HEAD_SHA.take(12)}",
-        versionCode = 500,
-        commit = NightlyUpdateCommit(
-            sha = TEST_HEAD_SHA,
-            subject = "feat(update): publish Nightly metadata",
-            body = "Publish metadata after the APK is available.",
-            authorName = "Duck Contributor",
-            authoredAt = "2026-08-08T12:20:00Z",
-        ),
-        builtAtUtc = "2026-08-08T12:30:00Z",
-        apk = NightlyUpdateApk(
-            name = "Duck.Detector-test.apk",
-            downloadUrl = "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/nightly/Duck.Detector-test.apk",
-            sizeBytes = 12_345_678L,
-            sha256 = "c".repeat(64),
-        ),
-    )
 
     @Before
     fun setUp() {
@@ -82,7 +62,7 @@ class UpdateViewModelTest {
         val viewModel = viewModel(
             checker = NightlyUpdateChecker { _, _ ->
                 calls += 1
-                UpdateCheckResult.Current(manifest)
+                UpdateCheckResult.Current(testManifest)
             },
         )
 
@@ -162,14 +142,14 @@ class UpdateViewModelTest {
         val resolution = viewModel.resolveDownload()
 
         assertEquals(
-            UpdateDownloadResolution.Ready(manifest.apk.downloadUrl),
+            UpdateDownloadResolution.Ready(availableUpdate()),
             resolution,
         )
     }
 
     @Test
     fun `download opens through the route of the check that resolves it`() = runTest(dispatcher) {
-        val proxiedUrl = "https://gh-proxy.com/${manifest.apk.downloadUrl}"
+        val proxiedUrl = "https://gh-proxy.com/${testManifest.apk.downloadUrl}"
         var calls = 0
         val viewModel = viewModel(
             checker = NightlyUpdateChecker { _, _ ->
@@ -184,17 +164,17 @@ class UpdateViewModelTest {
 
         val resolution = viewModel.resolveDownload()
 
-        assertEquals(UpdateDownloadResolution.Ready(proxiedUrl), resolution)
+        assertEquals(UpdateDownloadResolution.Ready(availableUpdate(downloadUrl = proxiedUrl)), resolution)
     }
 
     @Test
     fun `download resolution refreshes a superseded Nightly instead of opening its stale URL`() =
         runTest(dispatcher) {
-            val newerManifest = manifest.copy(
+            val newerManifest = testManifest.copy(
                 versionName = "2026.08.09-${NEWER_HEAD_SHA.take(12)}",
                 versionCode = 501,
-                commit = manifest.commit.copy(sha = NEWER_HEAD_SHA),
-                apk = manifest.apk.copy(
+                commit = testManifest.commit.copy(sha = NEWER_HEAD_SHA),
+                apk = testManifest.apk.copy(
                     name = "Duck.Detector-newer.apk",
                     downloadUrl =
                         "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/nightly/Duck.Detector-newer.apk",
@@ -219,39 +199,72 @@ class UpdateViewModelTest {
             assertTrue(viewModel.uiState.value.isDialogVisible)
         }
 
-    private fun viewModel(checker: NightlyUpdateChecker): UpdateViewModel {
-        return UpdateViewModel(
-            repository = checker,
-            currentVersionCode = 400,
-            currentCommitSha = TEST_BASE_SHA,
-            automaticCheckGate = SingleRunUpdateCheckGate(),
+    @Test
+    fun `download verifies the resolved url and exposes a ready apk for install`() = runTest(dispatcher) {
+        val available = availableUpdate()
+        var downloadedUrl: String? = null
+        var installedPath: String? = null
+        val viewModel = viewModel(
+            checker = NightlyUpdateChecker { _, _ -> UpdateCheckResult.Available(available) },
+            downloader = UpdateApkDownloader { apk, url, onProgress ->
+                downloadedUrl = url
+                onProgress(UpdateDownloadProgress(bytesRead = apk.sizeBytes, totalBytes = apk.sizeBytes))
+                UpdateDownloadResult.Ready(apkPath = "/tmp/${apk.name}")
+            },
+            installer = UpdateApkInstaller { path, _ ->
+                installedPath = path
+                UpdateInstallResult.Launched
+            },
         )
+        viewModel.checkAutomatically()
+        advanceUntilIdle()
+
+        viewModel.downloadUpdate()
+        advanceUntilIdle()
+
+        assertEquals(testManifest.apk.downloadUrl, downloadedUrl)
+        assertEquals(
+            UpdateDownloadState.Ready(testManifest, "/tmp/${testManifest.apk.name}"),
+            viewModel.uiState.value.download,
+        )
+        assertTrue(viewModel.uiState.value.isDialogVisible)
+
+        assertEquals(UpdateInstallResult.Launched, viewModel.installDownloaded())
+        assertEquals("/tmp/${testManifest.apk.name}", installedPath)
+        assertFalse(viewModel.uiState.value.isDialogVisible)
     }
 
-    private fun availableUpdate(
-        updateManifest: NightlyUpdateManifest = manifest,
-        downloadUrl: String = updateManifest.apk.downloadUrl,
-    ): AvailableNightlyUpdate {
-        return AvailableNightlyUpdate(
-            manifest = updateManifest,
-            changelog = listOf(
-                UpdateChangelogEntry(
-                    sha = updateManifest.commit.sha,
-                    subject = updateManifest.commit.subject,
-                    authorName = updateManifest.commit.authorName,
-                ),
-            ),
-            remainingCommitCount = 0,
-            downloadUrl = downloadUrl,
-            compareUrl =
-                "https://github.com/eltavine/Duck-Detector-Refactoring/compare/$TEST_BASE_SHA...${updateManifest.commit.sha}",
+    @Test
+    fun `a failed download surfaces a retryable state`() = runTest(dispatcher) {
+        val available = availableUpdate()
+        val viewModel = viewModel(
+            checker = NightlyUpdateChecker { _, _ -> UpdateCheckResult.Available(available) },
+            downloader = UpdateApkDownloader { _, _, _ -> UpdateDownloadResult.Failed },
         )
+        viewModel.checkAutomatically()
+        advanceUntilIdle()
+
+        viewModel.downloadUpdate()
+        advanceUntilIdle()
+
+        assertEquals(UpdateDownloadState.Failed(testManifest), viewModel.uiState.value.download)
+        assertTrue(viewModel.uiState.value.isDialogVisible)
+    }
+
+    @Test
+    fun `installing without a downloaded apk does nothing`() = runTest(dispatcher) {
+        val available = availableUpdate()
+        val viewModel = viewModel(
+            checker = NightlyUpdateChecker { _, _ -> UpdateCheckResult.Available(available) },
+        )
+        viewModel.checkAutomatically()
+        advanceUntilIdle()
+
+        assertEquals(UpdateInstallResult.Failed, viewModel.installDownloaded())
+        assertTrue(viewModel.uiState.value.isDialogVisible)
     }
 
     private companion object {
         private const val NEWER_HEAD_SHA = "cccccccccccccccccccccccccccccccccccccccc"
     }
 }
-
-private const val TEST_HEAD_SHA = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-private const val TEST_BASE_SHA = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"

@@ -89,7 +89,7 @@ internal fun buildSummary(report: NativeRootReport): String {
                 "Read-only ksu_driver hits, direct syscall hits, self-process IOC, root-manager paths, curated runtime residue paths, /data/local/tmp metadata drift, cgroup/process leakage, unexpected root processes, or isolated-process namespace drift indicate active native root infrastructure."
 
             report.hasFindingWarnings ->
-                "Only weaker isolated-process mount drift, cross-process mount view divergence, manager manifest fingerprints, process, cgroup, kernel, property, or metadata residue surfaced. These are review-worthy, but not as strong as direct native probes."
+                "Only weaker isolated-process mount drift, cross-process mount view divergence, manager manifest fingerprints, supporting syscall timing, process, cgroup, kernel, property, or metadata residue surfaced. These are review-worthy, but not as strong as direct native probes."
 
             report.srcuTiming.analysis.verdict == SrcuTimingVerdict.REPEATABLE_DELAY ->
                 "The optional experiment observed a repeatable fsnotify/SRCU timing delay relative to both controls. This is supporting contention evidence; it does not identify a root solution. Other indicators retain their own meaning."
@@ -101,7 +101,7 @@ internal fun buildSummary(report: NativeRootReport): String {
                 "No native root indicator surfaced from available probes, but one or more direct, cgroup, isolated-process, or package-visibility evidence paths had reduced coverage."
 
             else ->
-                "KernelSU read-only supercall, prctl-side probes, KernelPatch side channel, self-process IOC, isolated-process mount drift and cross-process mount view comparison, manager manifest fingerprint, SUSFS side-channel, /data/adb artifacts, curated tmp/system/storage residue paths, /data/local/tmp metadata, root-process audit, cgroup/process leakage, kernel strings, and properties stayed clean."
+                "KernelSU read-only supercall, prctl-side probes, self-process IOC, isolated-process mount drift and cross-process mount view comparison, manager manifest fingerprint, SUSFS side-channel, /data/adb artifacts, curated tmp/system/storage residue paths, /data/local/tmp metadata, root-process audit, cgroup/process leakage, kernel strings, and properties stayed clean. KernelPatch timing remains supporting evidence only."
         }
     }
     if (report.stage != NativeRootStage.READY) {

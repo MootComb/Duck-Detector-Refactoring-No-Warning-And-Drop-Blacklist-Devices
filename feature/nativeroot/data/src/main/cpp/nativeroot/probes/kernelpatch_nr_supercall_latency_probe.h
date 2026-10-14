@@ -22,7 +22,7 @@
 
 namespace duckdetector::nativeroot {
 
-    // Set in ProbeResult::aux_flags only when both latencies were measured, so
+    // Set in ProbeResult::aux_flags only when both latencies and their ratio are finite and positive, so
     // a run that never produced a measurement is not read as "no delay".
     constexpr long kLatencyAuxMeasured = 1L << 0;
 

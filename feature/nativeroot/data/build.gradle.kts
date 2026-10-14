@@ -41,4 +41,10 @@ val srcuCloseHostTest by tasks.registering(Exec::class) {
     commandLine("python3", layout.projectDirectory.file("src/test/native/test_srcu_close_probe.py").asFile)
 }
 
-tasks.named("unitTest") { dependsOn(srcuCloseHostTest) }
+val kernelPatchLatencyHostTest = tasks.register<Exec>("kernelPatchLatencyHostTest") {
+    group = "verification"
+    description = "Verifies latency classification, invalid samples and evidence limits on the build host."
+    commandLine("python3", layout.projectDirectory.file("src/test/native/test_kernelpatch_latency_evidence.py").asFile)
+}
+
+tasks.named("unitTest") { dependsOn(srcuCloseHostTest, kernelPatchLatencyHostTest) }

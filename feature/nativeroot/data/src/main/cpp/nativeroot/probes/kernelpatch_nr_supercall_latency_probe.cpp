@@ -17,11 +17,11 @@
 
 #include "nativeroot/probes/kernelpatch_nr_supercall_latency_probe.h"
 #include "nativeroot/probes/kernelpatch_supercall_abi.h"
+#include "nativeroot/probes/kernelpatch_latency_evidence.h"
 
 #include "common/seccomp_child.h"
 
 #include <csignal>
-#include <cstdio>
 #include <cstring>
 #include <string>
 #include <cstdint>
@@ -51,31 +51,10 @@ namespace duckdetector::nativeroot {
         constexpr unsigned long kSupercallHello = 0x1000;
 
         // 128 bytes including the terminator, matching the "128 bytes key string" case in
-        // the KernelPatch benchmark this probe is calibrated against. The length is the
-        // signal: a vulnerable build copies the whole key before rejecting it, so shortening
-        // this buffer would shrink the very difference being measured.
+        // the KernelPatch reference benchmark. The length is a
+        // diagnostic input: shortening this buffer would change the measured difference.
+        // The resulting timing alone cannot identify KernelPatch.
         constexpr int kKeyBufferSize = 128;
-
-        // Separates the two populations measured in KernelPatch commit 84169d5d ("patch:
-        // trying fix side channel attack"), which reports averages for the same two
-        // argument shapes this probe uses:
-        //
-        //   vulnerable build   4.281 us vs 0.460 us -> diff 3.82 us
-        //   fixed build        0.943 us vs 0.607 us -> diff 0.34 us
-        //   no KernelPatch     0.792 us vs 0.446 us -> diff 0.35 us
-        //
-        // A clean kernel therefore does show a positive difference: both calls land in
-        // truncate, and the 127-byte path costs a strncpy_from_user plus a path walk that
-        // the empty path skips by failing immediately. That baseline is an order of
-        // magnitude below the vulnerable case, and this constant sits between them.
-        //
-        // Scope, because the commit is what closed the leak: only builds older than
-        // 84169d5d are visible here. That commit stopped copying the key before
-        // authentication, which collapses the fixed build onto the clean baseline, so this
-        // probe cannot distinguish a current KernelPatch from an unmodified kernel and a
-        // difference below this constant is not evidence of a clean kernel. Detection of
-        // current builds rests on run_kernelpatch_superkey_check instead.
-        constexpr double kVulnerableDiffMicros = 3.0;
 
         /**
          * Fills a key buffer that an unpatched kernel cannot resolve to a real file.
@@ -260,39 +239,9 @@ namespace duckdetector::nativeroot {
             result.extra_text = "The latency measurement did not complete.";
             return result;
         }
-        result.aux_flags |= kLatencyAuxMeasured;
-
-        const double diff = latencies.full_latency - latencies.empty_latency;
-
-        char detail[256];
-        snprintf(
-                detail,
-                sizeof(detail),
-                "Key path: %.4f us, empty key: %.4f us, diff: %.4f us, same-core: %s",
-                latencies.full_latency,
-                latencies.empty_latency,
-                diff,
-                latencies.pinned ? "yes" : "no"
+        return classify_kernelpatch_latencies(
+                latencies.full_latency, latencies.empty_latency, latencies.pinned
         );
-
-        result.extra_text = detail;
-
-        if (diff > kVulnerableDiffMicros) {
-            result.flags.apatch = true;
-            result.hit_count = 1;
-
-            result.findings.push_back(
-                    Finding{
-                            .group = "SYSCALL",
-                            .label = "KernelPatch supercall key-length delay",
-                            .value = "Detected (pre-84169d5d build)",
-                            .detail = detail,
-                            .severity = Severity::kDanger,
-                    }
-            );
-        }
-
-        return result;
     }
 
 #else

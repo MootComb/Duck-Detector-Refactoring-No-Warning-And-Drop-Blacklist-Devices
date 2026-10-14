@@ -41,11 +41,34 @@ class NativeRootMethodRowsTest {
     }
 
     @Test
-    fun `a measured run without the pre-fix delay is clean`() {
+    fun `a measured ratio below threshold remains supporting evidence`() {
         val row = methodRow(NativeRootNativeSnapshot(available = true, kernelPatchSideChannelAvailable = true), LATENCY_ROW)
 
-        assertEquals("No pre-fix delay", row.summary)
-        assertEquals(NativeRootMethodOutcome.CLEAN, row.outcome)
+        assertEquals("Ratio below threshold", row.summary)
+        assertEquals(NativeRootMethodOutcome.SUPPORT, row.outcome)
+    }
+
+    @Test
+    fun `an elevated ratio is supporting evidence without root attribution`() {
+        val row = methodRow(
+            NativeRootNativeSnapshot(
+                available = true,
+                kernelPatchSideChannel = true,
+                kernelPatchSideChannelAvailable = true,
+            ),
+            LATENCY_ROW,
+        )
+        assertEquals("Elevated ratio", row.summary)
+        assertEquals(NativeRootMethodOutcome.SUPPORT, row.outcome)
+    }
+
+    @Test
+    fun `an unavailable ratio takes precedence over an elevated flag`() {
+        val row = methodRow(
+            NativeRootNativeSnapshot(kernelPatchSideChannel = true), LATENCY_ROW,
+        )
+        assertEquals("Unavailable", row.summary)
+        assertEquals(NativeRootMethodOutcome.SUPPORT, row.outcome)
     }
 
     @Test

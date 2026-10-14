@@ -7,6 +7,7 @@ duckdetector_native_unit(duckdetector_nativeroot
     probes/srcu_close_probe.cpp
     probes/prctl_probe.cpp
     probes/kernelpatch_nr_supercall_latency_probe.cpp
+    probes/kernelpatch_latency_evidence.cpp
     probes/kernelpatch_superkey_probe.cpp
     probes/devpts_abnormal_permission_probe.cpp
     probes/permission_boundary_link.cpp

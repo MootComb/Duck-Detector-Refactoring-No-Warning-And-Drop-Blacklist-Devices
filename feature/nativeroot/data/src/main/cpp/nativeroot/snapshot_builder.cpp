@@ -75,7 +75,8 @@ namespace duckdetector::nativeroot {
                                      ? prctl_probe.numeric_value
                                      : ksu_supercall_probe.numeric_value;
         snapshot.prctl_probe_hit = prctl_probe.flags.kernel_su;
-        snapshot.kernelpatch_side_channel_detected = kernelpatch_supercall_latency_probe.flags.apatch;
+        // The legacy side-channel field records an elevated ratio, not APatch attribution.
+        snapshot.kernelpatch_side_channel_detected = kernelpatch_supercall_latency_probe.hit_count > 0;
         snapshot.kernelpatch_side_channel_available =
                 (kernelpatch_supercall_latency_probe.aux_flags & kLatencyAuxMeasured) != 0;
         snapshot.kernelpatch_side_channel_detail = kernelpatch_supercall_latency_probe.extra_text;

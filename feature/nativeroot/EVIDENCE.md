@@ -8,14 +8,14 @@ The Native Root detector asks whether kernel-level root solutions (KernelSU and 
 
 ### KernelPatch supercall probes
 
-- Observable signal: whether syscall 45 reads its first argument before the truncate body rejects a negative length (superkey residency), and the timing gap between a long and an empty key (pre-84169d5d builds).
+- Observable signal: whether syscall 45 reads its first argument before the truncate body rejects a negative length (superkey residency), and the full/empty latency ratio for a long and an empty key (experimental timing evidence).
 - Producing subsystem: the arm64 kernel syscall table, which KernelPatch patches.
 - Mechanism: a stock kernel rejects the negative length in do_sys_truncate before deriving a user pointer, so an untouched page stays non-resident; KernelPatch's handler reads arg0 first and faults it in.
-- References: kernel/common fs/open.c (do_sys_truncate rejects a negative length before any path lookup). Discovery only for KernelPatch's handler order, which follows the probe authors' reading of KernelPatch.
+- References: [ACK android15-6.6 fs/open.c](https://android.googlesource.com/kernel/common/+/refs/heads/android15-6.6/fs/open.c) (do_sys_truncate rejects a negative length before any path lookup); [fs/namei.c](https://android.googlesource.com/kernel/common/+/refs/heads/android15-6.6/fs/namei.c) (an empty path fails in getname_flags, while the full path proceeds to lookup); [KernelPatch 84169d5d](https://github.com/bmax121/KernelPatch/commit/84169d5d6be12e589ccac81d71dcebb80b22043a) (handler change and three reference averages).
 - Applicability: arm64 processes only; the negative superkey result is trusted only on kernels up to 6.6, where KernelPatch's read faults the page.
 - Visibility limits: seccomp can block syscall 45 in the child; other ABIs use another syscall numbering and report the probes as not run.
-- Result states: detected, clean (arm64, measured), unavailable (other ABI, blocked, unmeasured, unusable run).
-- Interpretation: a residency hit is conclusive on any version; everything short of a measured run is Unavailable.
+- Result states: residency detected, residency clean within its supported scope, unavailable; timing unavailable (other ABI, blocked, unmeasured, non-positive or non-finite samples/ratio), timing ratio below threshold, elevated timing ratio.
+- Interpretation: the separate residency probe retains its version and control requirements. Timing ratios above the provisional 3.0 threshold produce only a WARNING, with no root-family flag; lower ratios remain SUPPORT and cannot exclude the older leak or KernelPatch. Ratios cancel common multiplicative scaling, but not additive syscall overhead or differing path-lookup costs. The three upstream averages and the reported additional device (7.1569/3.6943 us, ratio 1.94) are reference samples, not population bounds; cross-device positive/negative calibration remains unperformed.
 
 ### Netlink permission boundary
 
