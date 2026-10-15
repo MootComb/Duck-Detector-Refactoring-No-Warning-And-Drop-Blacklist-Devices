@@ -39,6 +39,12 @@ class SettingsItemShapesTest {
         assertCorners(segmentShape(0, 1, inner, outer), top = outer, bottom = outer)
     }
 
+    @Test
+    fun twoRowsShareOnlyTheOuterGroupCorners() {
+        assertCorners(segmentShape(0, 2, inner, outer), top = outer, bottom = inner)
+        assertCorners(segmentShape(1, 2, inner, outer), top = inner, bottom = outer)
+    }
+
     private fun assertCorners(shape: CornerBasedShape, top: CornerSize, bottom: CornerSize) {
         assertEquals(top, shape.topStart)
         assertEquals(top, shape.topEnd)

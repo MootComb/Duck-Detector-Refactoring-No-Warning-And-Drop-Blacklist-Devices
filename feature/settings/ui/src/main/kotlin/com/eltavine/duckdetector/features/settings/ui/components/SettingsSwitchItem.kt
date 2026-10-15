@@ -17,12 +17,21 @@
 
 package com.eltavine.duckdetector.features.settings.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.github.xiaotong6666.uihelper.adaptive.NativeSettingsToggleItem
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
+import com.eltavine.duckdetector.core.ui.components.WrapSafeText
 
 @Composable
 internal fun SettingsSwitchItem(
@@ -32,21 +41,35 @@ internal fun SettingsSwitchItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    index: Int = 0,
+    count: Int = 1,
 ) {
-    val shapes = settingsItemShapes(index = 0, count = 1)
-    Column(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        SettingsGroup {
-            NativeSettingsToggleItem(
+    SettingsItem(
+        headline = headline,
+        shapes = settingsItemShapes(index = index, count = count),
+        modifier = modifier.semantics {
+            role = Role.Switch
+            toggleableState = if (checked) ToggleableState.On else ToggleableState.Off
+        },
+        onClick = { onCheckedChange(!checked) },
+        leadingContent = { SettingsIconTile(icon = icon) },
+        supportingContent = { WrapSafeText(text = summary) },
+        trailingContent = {
+            Switch(
                 checked = checked,
-                title = headline,
-                description = summary,
-                icon = icon,
-                onCheckedChange = onCheckedChange,
-                materialShapes = shapes,
-                materialColors = settingsItemColors(),
+                onCheckedChange = null,
+                thumbContent = if (checked) {
+                    {
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                },
             )
-        }
-    }
+        },
+    )
 }

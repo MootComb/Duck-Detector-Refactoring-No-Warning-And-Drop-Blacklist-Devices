@@ -26,6 +26,8 @@ import com.eltavine.duckdetector.features.settings.ui.ConsentToggle
 internal fun ConsentSettingItem(
     toggle: ConsentToggle,
     modifier: Modifier = Modifier,
+    index: Int = 0,
+    count: Int = 1,
 ) {
     SettingsSwitchItem(
         headline = stringResource(toggle.setting.title),
@@ -34,5 +36,7 @@ internal fun ConsentSettingItem(
         checked = toggle.checked,
         onCheckedChange = toggle.onCheckedChange,
         modifier = modifier,
+        index = index,
+        count = count,
     )
 }

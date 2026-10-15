@@ -149,18 +149,28 @@ private fun SettingsPage(
 
                 if (consentToggles.isNotEmpty()) {
                     SettingsSection(title = stringResource(R.string.settings_section_detection)) {
-                        consentToggles.forEach { toggle -> ConsentSettingItem(toggle = toggle) }
+                        SettingsGroup {
+                            consentToggles.forEachIndexed { index, toggle ->
+                                ConsentSettingItem(
+                                    toggle = toggle,
+                                    index = index,
+                                    count = consentToggles.size,
+                                )
+                            }
+                        }
                     }
                 }
 
                 SettingsSection(title = stringResource(R.string.settings_section_network)) {
-                    SettingsSwitchItem(
-                        headline = stringResource(R.string.github_acceleration_title),
-                        summary = stringResource(R.string.github_acceleration_summary),
-                        icon = Icons.Rounded.Speed,
-                        checked = uiState.gitHubAccelerationEnabled,
-                        onCheckedChange = onGitHubAccelerationChange,
-                    )
+                    SettingsGroup {
+                        SettingsSwitchItem(
+                            headline = stringResource(R.string.github_acceleration_title),
+                            summary = stringResource(R.string.github_acceleration_summary),
+                            icon = Icons.Rounded.Speed,
+                            checked = uiState.gitHubAccelerationEnabled,
+                            onCheckedChange = onGitHubAccelerationChange,
+                        )
+                    }
                 }
 
                 AboutSection(
