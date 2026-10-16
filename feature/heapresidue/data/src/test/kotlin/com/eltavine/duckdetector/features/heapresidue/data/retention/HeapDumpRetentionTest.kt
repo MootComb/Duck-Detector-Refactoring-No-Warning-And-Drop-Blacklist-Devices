@@ -22,6 +22,10 @@ import java.nio.file.Files
 import org.junit.Assert.*
 import org.junit.Test
 
+/**
+ * The production budgets are far larger than a unit test may allocate, so these cases inject small
+ * limits. The cap, eviction and teardown logic under test is identical for any limit.
+ */
 class HeapDumpRetentionTest {
     @Test fun disabledStoreDoesNotCreateDirectory() {
         val root = Files.createTempDirectory("heap-retention").toFile()
@@ -59,8 +63,9 @@ class HeapDumpRetentionTest {
     @Test fun oversizedDumpIsNotRetainedButInputIsFullyRead() {
         val directory = Files.createTempDirectory("heap-retention").toFile()
         try {
-            val bytes = ByteArray(32 * 1024 * 1024 + 1)
-            val retention = HeapDumpRetention(directory, true)
+            val capacity = 4096L
+            val bytes = ByteArray(capacity.toInt() + 1)
+            val retention = HeapDumpRetention(directory, true, capacity = capacity)
             val wrapped = retention.wrap(bytes.inputStream())
             val buffer = ByteArray(8192)
             var count = 0L
@@ -70,19 +75,52 @@ class HeapDumpRetentionTest {
             assertTrue(directory.listFiles()!!.isEmpty())
         } finally { directory.deleteRecursively() }
     }
+    @Test fun exactlyCapacityIsRetained() {
+        val directory = Files.createTempDirectory("heap-retention").toFile()
+        try {
+            val capacity = 4096L
+            val retention = HeapDumpRetention(directory, true, capacity = capacity)
+            retention.wrap(ByteArray(capacity.toInt()).inputStream()).readBytes()
+            assertEquals(HeapResidueRetention.SAVED, retention.finish(true))
+            assertEquals(listOf("hprof"), directory.listFiles()!!.map { it.extension })
+        } finally { directory.deleteRecursively() }
+    }
     @Test fun reservesByteBudgetAndRemovesCrashSpoolsBeforeWriting() {
         val directory = Files.createTempDirectory("heap-retention").toFile()
         try {
+            val capacity = 4096L
+            val budget = capacity * 2
             val old = directory.resolve("old.hprof")
-            java.io.RandomAccessFile(old, "rw").use { it.setLength(33L * 1024 * 1024) }
+            java.io.RandomAccessFile(old, "rw").use { it.setLength(capacity + 1) }
             directory.resolve("crash.part").writeBytes(byteArrayOf(1))
-            val retention = HeapDumpRetention(directory, true)
+            val retention = HeapDumpRetention(directory, true, capacity = capacity, directoryBudget = budget)
             assertFalse(old.exists())
             assertFalse(directory.resolve("crash.part").exists())
             retention.wrap(byteArrayOf(1, 2).inputStream()).readBytes()
             assertEquals(HeapResidueRetention.SAVED, retention.finish(true))
-            assertTrue(directory.listFiles()!!.sumOf { it.length() } <= 64L * 1024 * 1024)
+            assertTrue(directory.listFiles()!!.sumOf { it.length() } + capacity <= budget)
         } finally { directory.deleteRecursively() }
     }
-
+    @Test fun evictsOldestUntilRoomForFullSpool() {
+        val directory = Files.createTempDirectory("heap-retention").toFile()
+        try {
+            val capacity = 4096L
+            val budget = capacity * 2
+            val oldest = directory.resolve("oldest.hprof").apply {
+                java.io.RandomAccessFile(this, "rw").use { it.setLength(3000L) }
+                setLastModified(1_000L)
+            }
+            val newer = directory.resolve("newer.hprof").apply {
+                java.io.RandomAccessFile(this, "rw").use { it.setLength(3000L) }
+                setLastModified(2_000L)
+            }
+            val retention = HeapDumpRetention(directory, true, capacity = capacity, directoryBudget = budget)
+            assertFalse(oldest.exists())
+            assertTrue(newer.exists())
+            retention.wrap(byteArrayOf(1).inputStream()).readBytes()
+            assertEquals(HeapResidueRetention.SAVED, retention.finish(true))
+            assertEquals(2, directory.listFiles()!!.size)
+            assertTrue(directory.listFiles()!!.sumOf { it.length() } + capacity <= budget)
+        } finally { directory.deleteRecursively() }
+    }
 }

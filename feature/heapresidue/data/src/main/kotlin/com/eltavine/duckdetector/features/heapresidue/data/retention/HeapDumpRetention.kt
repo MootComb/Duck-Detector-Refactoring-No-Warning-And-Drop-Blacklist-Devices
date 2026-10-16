@@ -17,14 +17,26 @@
 
 package com.eltavine.duckdetector.features.heapresidue.data.retention
 
+import com.eltavine.duckdetector.features.heapresidue.data.HeapDumpBudgets
 import com.eltavine.duckdetector.features.heapresidue.domain.HeapResidueRetention
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
-/** A local debug-only tee. Storage failures disable the tee without stopping the evidence stream. */
-internal class HeapDumpRetention(directory: File, enabled: Boolean) {
-    private val maximum = 32L * 1024 * 1024
+/**
+ * A local debug-only tee. Storage failures disable the tee without stopping the evidence stream.
+ *
+ * [capacity] tracks the parser's byte budget: a dump the parser accepts must stay retainable, or a
+ * completed scan reports evidence it has already deleted. Tests inject small limits, production
+ * takes them from [HeapDumpBudgets].
+ */
+internal class HeapDumpRetention(
+    directory: File,
+    enabled: Boolean,
+    private val capacity: Long = HeapDumpBudgets.SPOOL_CAPACITY_BYTES,
+    private val retainedCount: Int = HeapDumpBudgets.RETAINED_DUMP_COUNT,
+    private val directoryBudget: Long = HeapDumpBudgets.DIRECTORY_BUDGET_BYTES,
+) {
     private var file: File? = null
     private var output: OutputStream? = null
     private var size = 0L
@@ -38,8 +50,11 @@ internal class HeapDumpRetention(directory: File, enabled: Boolean) {
                 check(directory.mkdirs() || directory.isDirectory)
                 val files = directory.listFiles().orEmpty().filter { it.isFile }.sortedBy { it.lastModified() }.toMutableList()
                 files.filter { it.extension == "part" }.forEach { check(it.delete()); files.remove(it) }
-                // Reserve a full per-dump budget before writing, including stale crash leftovers.
-                while (files.size >= 2 || files.sumOf { it.length() } > maximum) check(files.removeAt(0).delete())
+                // Reserve room for a full new spool, not merely below the per-spool cap, and leave
+                // retainedCount - 1 old dumps so this capture completes the retained set.
+                fun needsEviction() =
+                    files.size >= retainedCount || files.sumOf { it.length() } + capacity > directoryBudget
+                while (files.isNotEmpty() && needsEviction()) check(files.removeAt(0).delete())
                 file = File.createTempFile("capture-", ".part", directory)
                 output = file!!.outputStream().buffered(64 * 1024)
                 status = HeapResidueRetention.SAVED
@@ -53,7 +68,7 @@ internal class HeapDumpRetention(directory: File, enabled: Boolean) {
         override fun read(bytes: ByteArray, offset: Int, length: Int): Int {
             val count = source.read(bytes, offset, length)
             if (count > 0 && output != null) {
-                if (count > maximum - size) abort(HeapResidueRetention.TOO_LARGE)
+                if (count > capacity - size) abort(HeapResidueRetention.TOO_LARGE)
                 else try { output!!.write(bytes, offset, count); size += count } catch (_: Exception) { abort(HeapResidueRetention.FAILED) }
             }
             return count

@@ -17,6 +17,7 @@
 
 package com.eltavine.duckdetector.features.heapresidue.data.hprof
 
+import com.eltavine.duckdetector.features.heapresidue.data.HeapDumpBudgets
 import com.eltavine.duckdetector.features.heapresidue.domain.HeapResidueSignal
 import java.io.InputStream
 
@@ -28,11 +29,12 @@ internal data class HprofScan(val signals: List<HeapResidueSignal>, val candidat
  * monotonic-clock record after the header, are skipped by length.
  *
  * The dump includes boot-image and zygote-space objects, and parsing memory does not grow with
- * it, so the byte budget is generous; the capture deadline bounds the time spent.
+ * it, so the byte budget is generous; the capture deadline bounds the time spent. The default is
+ * shared with the retention tee, which may not drop a dump this parser accepted.
  */
 internal class ArtHprofScanner(
     private val targets: Set<String>,
-    private val maxBytes: Long = 256L * 1024 * 1024,
+    private val maxBytes: Long = HeapDumpBudgets.PARSE_BUDGET_BYTES,
     private val host: String? = null,
 ) {
     fun scan(source: InputStream): HprofScan {

@@ -95,7 +95,7 @@ class HeapResidueCardModelMapper {
                 HeapResidueRetention.SAVED -> "Saved locally"
                 HeapResidueRetention.TOO_LARGE -> "Size limit exceeded"
                 HeapResidueRetention.FAILED -> "Retention failed"
-            }, status, "Debuggable builds only; at most two dumps and 64 MiB in no-backup storage. Raw heaps are never included in reports."))
+            }, status, "Debuggable builds only; recent dumps are kept in app-private no-backup storage under a fixed count and size budget. Raw heaps are never included in reports."))
             report.probeFailure?.let { failure -> add(HeapResidueDetailRowModel("Unavailable stage", when (failure) {
                 HeapResidueProbeFailure.BINDING -> "Service binding"
                 HeapResidueProbeFailure.HIDDEN_API -> "Hidden dump API"

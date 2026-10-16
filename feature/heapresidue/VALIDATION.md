@@ -67,11 +67,13 @@ aggregate counts, policy-target matches and diagnostics.
    retention failure does not erase otherwise valid evidence. Make another process of the package
    fail to start while this binding is pending; verify one rebind with a new instance, and that a
    second death yields a binding-unavailable card rather than a stuck or cancelled scan.
-   Record real dump sizes against the 256 MiB parse budget and the 32 MiB retention cap.
+   Record real dump sizes and confirm each observed dump falls within the spool capacity, so the
+   snapshot is actually retained rather than merely within the parse budget.
 8. Compare debuggable and release hosts, including an SDK host with custom Application/providers.
    Release scans must create no raw files; debug files must stay in no-backup private storage and
-   be limited to two/64 MiB. Verify merged manifest has isolatedProcess=true, exported=false and
-   no app-zygote flag. Raw dumps must never enter an export/share/upload path.
+   be limited to the retained dump count and the directory budget. Verify merged manifest has
+   isolatedProcess=true, exported=false and no app-zygote flag. Raw dumps must never enter an
+   export/share/upload path.
 
 ## Open research
 

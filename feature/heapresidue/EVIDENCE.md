@@ -114,8 +114,10 @@ Primary examples inspected during this change:
 ## Local retention
 
 Only FLAG_DEBUGGABLE hosts enable the tee. Private `noBackupFilesDir/heap-residue` is excluded from
-[Android Auto Backup](https://developer.android.com/identity/data/autobackup#Files). The store reserves room before writing, retains at most two completed dumps
-and at most 64 MiB including the active spool, and caps each spool at 32 MiB. Captures are serialized
+[Android Auto Backup](https://developer.android.com/identity/data/autobackup#Files). The store reserves
+a full spool of room before writing, retains at most two completed dumps, and caps each spool at the
+parser's byte budget: a smaller spool deleted snapshots the parser had already accepted and reported.
+Captures are serialized
 across this feature's SDK sessions. Crash leftovers are removed on the next debug capture. Exceeding
 the spool budget or a storage error deletes the spool and continues detection; a typed retention
 status is reported separately. Failed/cancelled captures are deleted. Raw files are never attached
