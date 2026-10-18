@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   publish-release:
-    if: github.event_name != 'push' || github.ref_name != 'nightly'
+    if: github.event_name != 'push' || github.ref_name != 'update'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: Telegram
@@ -88,6 +88,11 @@ jobs:
 
           if ! git rev-parse -q --verify "refs/tags/${tag_name}" >/dev/null; then
             echo "Tag ${tag_name} does not exist in this repository." >&2
+            exit 1
+          fi
+
+          if [ "${tag_name}" = "update" ]; then
+            echo "The update tag is reserved for the mutable update channel in build.yml." >&2
             exit 1
           fi
 
@@ -460,11 +465,23 @@ jobs:
           body_path: github-release-note.md
           prerelease: ${{ steps.release_meta.outputs.prerelease }}
           make_latest: ${{ steps.release_meta.outputs.make_latest }}
-          overwrite_files: true
+          overwrite_files: false
           files: |
             ${{ steps.metadata.outputs.apk_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify release immutability
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release_target.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          if [ "$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq '.immutable')" != true ]; then
+            echo "Published releases must be immutable. Enable repository release immutability." >&2
+            exit 1
+          fi
 
       - name: Clean up signing material
         if: always()

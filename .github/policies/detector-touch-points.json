@@ -30,6 +30,16 @@
       "path": "samples/sdk-consumer/src/main/kotlin/com/eltavine/duckdetector/sample/ScanActivity.kt",
       "detectors": ["su"],
       "reason": "Shows a consumer using one detector's typed object through the SDK."
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "detectors": ["rootmanagers"],
+      "reason": "The composition root signs and packages the feature-owned installer-canary manifest with the host application key; host instrumentation needs the feature data and domain test dependencies."
+    },
+    {
+      "path": "app/src/androidTest/java/com/eltavine/duckdetector/InstallerCanaryRuntimeTest.kt",
+      "detectors": ["rootmanagers"],
+      "reason": "Exercises the signed canary against the actual installed application, whose application ID, signing key, asset and version are required for self-update semantics."
     }
   ]
 }

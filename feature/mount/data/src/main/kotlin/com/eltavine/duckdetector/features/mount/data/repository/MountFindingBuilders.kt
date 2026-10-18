@@ -66,12 +66,8 @@ internal fun MountRepository.buildFindings(
                     label = "Path coverage",
                     value = "${coveragePercent(snapshot)}%",
                     group = MountFindingGroup.CONSISTENCY,
-                    severity = if (snapshot.permissionDenied * 2 >= snapshot.permissionTotal) {
-                        MountFindingSeverity.WARNING
-                    } else {
-                        MountFindingSeverity.INFO
-                    },
-                    detail = "Accessible checks: ${snapshot.permissionAccessible}/${snapshot.permissionTotal}. Permission-denied checks: ${snapshot.permissionDenied}.",
+                    severity = MountFindingSeverity.INFO,
+                    detail = "Accessible checks: ${snapshot.permissionAccessible}/${snapshot.permissionTotal}. Permission-denied checks: ${snapshot.permissionDenied}. Restricted visibility is not evidence of root.",
                 ),
             )
         }
@@ -114,10 +110,10 @@ internal fun MountRepository.buildZygoteNextFindings(
             add(
                 MountFinding(
                     id = "zygote_next_namespace_anomaly",
-                    label = "Zygote next namespace anomaly",
-                    value = zygoteNext.namespaceAssessment.name,
+                    label = "Zygote next namespace observation",
+                    value = "Coverage unverified",
                     group = MountFindingGroup.CONSISTENCY,
-                    severity = MountFindingSeverity.WARNING,
+                    severity = MountFindingSeverity.INFO,
                     detail = zygoteNext.namespaceAssessmentDetail,
                 ),
             )

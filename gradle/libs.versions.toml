@@ -27,6 +27,7 @@ dependencyAnalysis = "3.19.2"
 poko = "0.23.2"
 
 [libraries]
+android-apksig = { module = "com.android.tools.build:apksig", version.ref = "agp" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 json = { module = "org.json:json", version.ref = "json" }

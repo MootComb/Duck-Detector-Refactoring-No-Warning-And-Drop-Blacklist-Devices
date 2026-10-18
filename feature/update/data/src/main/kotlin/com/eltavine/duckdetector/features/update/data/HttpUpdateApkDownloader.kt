@@ -41,10 +41,8 @@ import kotlinx.coroutines.withContext
 internal class HttpUpdateApkDownloader(
     private val downloadDirectory: File,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val trustedApk: () -> NightlyUpdateApk = {
-        UpdateManifestParser().parse(
-            HttpUrlConnectionUpdateClient().get(UpdateRepository.MANIFEST_URL, "application/json"),
-        ).apk
+    private val trustedApk: (NightlyUpdateApk) -> NightlyUpdateApk = { apk ->
+        NightlyManifestSource(HttpUrlConnectionUpdateClient()).forApk(apk)
     },
     private val openConnection: (URL) -> HttpURLConnection = {
         it.openConnection() as HttpURLConnection
@@ -62,7 +60,7 @@ internal class HttpUpdateApkDownloader(
             require(apk.sizeBytes in 1..MAX_UPDATE_APK_BYTES)
             require(Regex("[0-9a-fA-F]{64}").matches(apk.sha256))
             coroutineContext.ensureActive()
-            if (trustedApk() != apk) {
+            if (trustedApk(apk) != apk) {
                 return@withContext UpdateDownloadResult.Failed
             }
             coroutineContext.ensureActive()

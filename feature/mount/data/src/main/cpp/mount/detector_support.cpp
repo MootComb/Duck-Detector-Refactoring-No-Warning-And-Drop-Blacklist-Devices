@@ -16,6 +16,7 @@
  */
 
 #include "mount/detector_core.h"
+#include "common/mountinfo_field.h"
 #include "mount/detector_internal.h"
 #include <android/log.h>
 #include <fcntl.h>
@@ -119,18 +120,19 @@ namespace duckdetector::mount::detail {
         }
 
         std::string content;
-        content.resize(maxSize);
-        const ssize_t bytesRead = syscall_read_fd(fd, content.data(), maxSize - 1);
+        std::array<char, 4096> buffer{};
+        while (true) {
+            const ssize_t count = syscall_read_fd(fd, buffer.data(), buffer.size());
+            if (count < 0 && errno == EINTR) continue;
+            if (count < 0 || (count > 0 && content.size() + static_cast<size_t>(count) > maxSize)) {
+                syscall_close_fd(fd);
+                return "";
+            }
+            if (count == 0) break;
+            content.append(buffer.data(), static_cast<size_t>(count));
+        }
         syscall_close_fd(fd);
-
-        if (bytesRead <= 0) {
-            return "";
-        }
-
-        content.resize(static_cast<size_t>(bytesRead));
-        if (readable != nullptr) {
-            *readable = true;
-        }
+        if (readable != nullptr) *readable = !content.empty();
         return content;
     }
 
@@ -204,7 +206,10 @@ namespace duckdetector::mount::detail {
                    >> entry.options)) {
             return false;
         }
-        if (std::sscanf(majorMinor.c_str(), "%u:%u", &entry.major, &entry.minor) != 2) {
+        const auto colon = majorMinor.find(':');
+        if (entry.id <= 0 || entry.parentId < 0 || colon == std::string::npos ||
+            !common::parse_mountinfo_number(majorMinor.substr(0, colon), entry.major) ||
+            !common::parse_mountinfo_number(majorMinor.substr(colon + 1), entry.minor)) {
             return false;
         }
 
@@ -232,13 +237,6 @@ namespace duckdetector::mount::detail {
                 entries.push_back(entry);
             }
         }
-        std::sort(
-                entries.begin(),
-                entries.end(),
-                [](const MountInfoEntry &left, const MountInfoEntry &right) {
-                    return left.id < right.id;
-                }
-        );
         return entries;
     }
 

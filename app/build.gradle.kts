@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import com.eltavine.duckdetector.buildlogic.installer.registerInstallerCanaryAssets
 import com.eltavine.duckdetector.buildlogic.detectorModules
 import com.eltavine.duckdetector.buildlogic.generateDetectorCards
 
@@ -30,6 +31,11 @@ android {
         applicationId = "com.eltavine.duckdetector"
     }
 }
+
+registerInstallerCanaryAssets(
+    rootProject.file("feature/rootmanagers/data/src/canary/AndroidManifest.xml"),
+    "rootmanagers/installer-canary.apk",
+)
 
 // Every detector's dashboard card, discovered like the ui modules the application depends on.
 generateDetectorCards(packageName = "com.eltavine.duckdetector.ui")
@@ -74,6 +80,8 @@ dependencies {
     testImplementation(libs.bundles.test.unit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(project(":core:report"))
+    androidTestImplementation(project(":feature:rootmanagers:data"))
+    androidTestImplementation(project(":feature:rootmanagers:domain"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.runner)
     debugImplementation(libs.androidx.ui.tooling)

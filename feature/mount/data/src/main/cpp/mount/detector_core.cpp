@@ -104,6 +104,7 @@ namespace duckdetector::mount {
         out << "MOUNTINFO_ENTRY_COUNT=" << snapshot.mountInfoEntryCount << '\n';
         out << "MAP_LINE_COUNT=" << snapshot.mapLineCount << '\n';
         out << "BUSYBOX=" << flag(snapshot.busyboxDetected) << '\n';
+        out << "ROOT_MOUNT_ARTIFACT=" << flag(snapshot.rootMountArtifactDetected) << '\n';
         out << "MAGISK_MOUNT=" << flag(snapshot.magiskMountDetected) << '\n';
         out << "ZYGISK_CACHE=" << flag(snapshot.zygiskCacheDetected) << '\n';
         out << "SYSTEM_RW=" << flag(snapshot.systemRwDetected) << '\n';

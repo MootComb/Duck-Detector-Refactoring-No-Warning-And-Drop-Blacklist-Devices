@@ -156,7 +156,7 @@ class UpdateRepository internal constructor(
 
     companion object {
         const val MANIFEST_URL =
-            "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/nightly/update.json"
+            "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/update/update.json"
 
         private const val GITHUB_API_REPOSITORY =
             "https://api.github.com/repos/eltavine/Duck-Detector-Refactoring"

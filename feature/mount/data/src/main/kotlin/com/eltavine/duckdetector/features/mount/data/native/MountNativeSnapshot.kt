@@ -73,4 +73,5 @@ data class MountNativeSnapshot(
      * found nothing" from "the probe never ran", so the reason is carried here.
      */
     val collection: NativeCollectionStatus = NativeCollectionStatus.Collected,
+    val rootMountArtifactDetected: Boolean = false,
 )

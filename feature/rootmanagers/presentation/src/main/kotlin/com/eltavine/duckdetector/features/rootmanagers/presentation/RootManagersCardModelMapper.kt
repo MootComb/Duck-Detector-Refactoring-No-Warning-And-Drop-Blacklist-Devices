@@ -55,6 +55,7 @@ class RootManagersCardModelMapper {
         RootManagersOutcome.CONCEALED_MANAGER -> "Root manager hiding its icon"
         RootManagersOutcome.MANAGER_FOUND -> "Root manager apps found"
         RootManagersOutcome.WEAK_MATCH -> "Weak root manager match"
+        RootManagersOutcome.PERMISSION_ANCHOR -> "Candidate permission owner observed"
         RootManagersOutcome.ENUMERATION_UNAVAILABLE -> "Launcher enumeration unavailable"
         RootManagersOutcome.PROFILES_NOT_ENUMERATED -> "Profiles not enumerated"
         RootManagersOutcome.PARTIAL -> "Partially evaluated"
@@ -76,6 +77,10 @@ class RootManagersCardModelMapper {
             "Identified ${report.entries.size} root manager app(s) across ${report.profilesSearched} profile(s), " +
                 "${report.entries.count { it.matchedCertificate != null }} by a family kernel's manager key. " +
                 PRESENCE_NOT_ROOT
+
+        RootManagersOutcome.PERMISSION_ANCHOR ->
+            "${report.installerCanary.ownerPackageName} declares the candidate KernelSU permission. " +
+                "This is a permission-name anchor; manager identity, profile and root access are not established by it."
 
         RootManagersOutcome.WEAK_MATCH ->
             "Only weak anchors matched, so these apps are informational, never warnings."

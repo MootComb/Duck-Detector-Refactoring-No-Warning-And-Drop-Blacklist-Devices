@@ -95,6 +95,7 @@ open class MountNativeBridge(
 
             "MAP_LINE_COUNT" -> copy(mapLineCount = value.toIntOrNull() ?: mapLineCount)
             "BUSYBOX" -> copy(busyboxDetected = value.asBool())
+            "ROOT_MOUNT_ARTIFACT" -> copy(rootMountArtifactDetected = value.asBool())
             "MAGISK_MOUNT" -> copy(magiskMountDetected = value.asBool())
             "ZYGISK_CACHE" -> copy(zygiskCacheDetected = value.asBool())
             "SYSTEM_RW" -> copy(systemRwDetected = value.asBool())

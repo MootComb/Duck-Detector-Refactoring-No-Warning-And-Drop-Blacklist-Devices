@@ -49,6 +49,7 @@ namespace duckdetector::mount {
 
         bool busyboxDetected = false;
         bool magiskMountDetected = false;
+        bool rootMountArtifactDetected = false;
         bool zygiskCacheDetected = false;
         bool systemRwDetected = false;
         bool overlayMountDetected = false;

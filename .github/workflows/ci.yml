@@ -62,6 +62,8 @@ jobs:
           python3 .github/scripts/test-text-protocols.py
           python3 .github/scripts/test-android-toolchain-updates.py
           python3 .github/scripts/test-android-toolchain-publication.py
+          python3 .github/scripts/test-nightly-release.py
+          python3 .github/scripts/test-nightly-channel.py
           python3 scripts/test_new_detector.py
 
       - name: Test SELinux native parsing and experiment control flow
@@ -70,6 +72,18 @@ jobs:
           python3 capability/selinuxpolicy/data/src/test/python/test_proc_attr_native.py
           python3 capability/selinuxpolicy/data/src/test/python/test_avc_lookup_native.py
           python3 capability/selinuxpolicy/data/src/test/python/test_status_abi_native.py
+
+      - name: Test native observation policies and feature probes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 core/native/src/test/python/test_mount_id_observation.py
+          for suite in feature/*/data/src/test/python; do
+            # Device-driven scripts need their own runner; discover only host suites here.
+            compgen -G "${suite}/test_*_host_native.py" > /dev/null || continue
+            python3 -m unittest discover -s "$suite" -p 'test_*_host_native.py'
+          done
 
       # Research tools pin the upstream inputs behind a detector's evidence record. Their
       # self-tests are offline; the network audit stays an explicit manual step.

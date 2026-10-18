@@ -219,7 +219,7 @@ class HttpUpdateApkDownloaderTest {
 
     private fun downloader(
         apk: NightlyUpdateApk,
-        trustedApk: () -> NightlyUpdateApk = { apk },
+        trustedApk: (NightlyUpdateApk) -> NightlyUpdateApk = { apk },
         nanoTime: () -> Long = System::nanoTime,
     ) = HttpUpdateApkDownloader(
         downloadDirectory,

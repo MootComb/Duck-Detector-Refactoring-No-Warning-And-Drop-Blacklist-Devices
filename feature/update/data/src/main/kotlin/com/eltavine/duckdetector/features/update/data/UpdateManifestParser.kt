@@ -21,7 +21,6 @@ import com.eltavine.duckdetector.features.update.domain.MAX_UPDATE_APK_BYTES
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateApk
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateCommit
 import com.eltavine.duckdetector.features.update.domain.NightlyUpdateManifest
-import java.net.URI
 import java.time.Instant
 import org.json.JSONObject
 
@@ -69,7 +68,8 @@ class UpdateManifestParser {
             throw UpdateManifestValidationException("Nightly update asset name is invalid.")
         }
         val downloadUrl = apkJson.requireNonBlankString("downloadUrl")
-        validateDownloadUrl(downloadUrl, apkName)
+        val builtAtUtc = root.requireIsoInstant("builtAtUtc")
+        validateRelease(downloadUrl, apkName, commitSha, builtAtUtc, root.optionalString("releaseTag"))
         val sizeBytes = apkJson.requirePositiveLong("sizeBytes")
         if (sizeBytes > MAX_UPDATE_APK_BYTES) {
             throw UpdateManifestValidationException("APK size exceeds the download limit.")
@@ -86,38 +86,50 @@ class UpdateManifestParser {
             versionName = root.requireNonBlankString("versionName"),
             versionCode = root.requirePositiveInt("versionCode"),
             commit = commit,
-            builtAtUtc = root.requireIsoInstant("builtAtUtc"),
-            apk = NightlyUpdateApk(
-                name = apkName,
-                downloadUrl = downloadUrl,
-                sizeBytes = sizeBytes,
-                sha256 = sha256,
+            builtAtUtc = builtAtUtc,
+            apk = preferArchive(
+                root,
+                NightlyUpdateApk(apkName, downloadUrl, sizeBytes, sha256),
+                commitSha,
+                builtAtUtc,
             ),
         )
     }
 
-    private fun validateDownloadUrl(rawUrl: String, apkName: String) {
-        val uri = runCatching { URI(rawUrl) }
-            .getOrElse { throw UpdateManifestValidationException("APK download URL is invalid.") }
-        if (uri.scheme != "https" ||
-            !uri.host.equals(EXPECTED_DOWNLOAD_HOST, ignoreCase = true) ||
-            uri.rawUserInfo != null ||
-            uri.port != -1
+    private fun validateRelease(url: String, name: String, sha: String, timestamp: String, declaredTag: String = ""): String {
+        try {
+            val tag = NightlyReleasePaths.tagFor(url, name)
+            NightlyReleasePaths.validateBuild(tag, sha, timestamp)
+            require(declaredTag.isEmpty() || declaredTag == tag) { "Release tag differs from APK URL" }
+            return tag
+        } catch (failure: Exception) {
+            throw UpdateManifestValidationException(failure.message ?: "Invalid Nightly release URL")
+        }
+    }
+
+    private fun preferArchive(root: JSONObject, alias: NightlyUpdateApk, sha: String, timestamp: String): NightlyUpdateApk {
+        if (!root.has("archive")) return alias
+        val archive = root.requireObject("archive")
+        val tag = archive.requireNonBlankString("tag")
+        if (!NightlyReleasePaths.isVersionedTag(tag)) {
+            throw UpdateManifestValidationException("Archive must use a per-build Nightly tag")
+        }
+        val apk = archive.requireObject("apk")
+        val name = apk.requireNonBlankString("name")
+        val url = apk.requireNonBlankString("downloadUrl")
+        validateRelease(url, name, sha, timestamp, tag)
+        if (name != alias.name || apk.requirePositiveLong("sizeBytes") != alias.sizeBytes ||
+            apk.requireNonBlankString("sha256").lowercase() != alias.sha256
         ) {
-            throw UpdateManifestValidationException("APK download URL must use the official GitHub host.")
+            throw UpdateManifestValidationException("Archived APK metadata differs from the channel APK")
         }
-        if (uri.path != "$EXPECTED_DOWNLOAD_PATH_PREFIX$apkName") {
-            throw UpdateManifestValidationException("APK download URL is outside the Nightly release.")
-        }
+        return alias.copy(downloadUrl = url)
     }
 
     private companion object {
         private const val SUPPORTED_SCHEMA_VERSION = 1
         private const val EXPECTED_CHANNEL = "nightly"
         private val EXPECTED_BRANCHES = setOf("main", "master")
-        private const val EXPECTED_DOWNLOAD_HOST = "github.com"
-        private const val EXPECTED_DOWNLOAD_PATH_PREFIX =
-            "/eltavine/Duck-Detector-Refactoring/releases/download/nightly/"
         private const val MAX_ASSET_NAME_LENGTH = 255
         private val FULL_SHA_REGEX = Regex("^[0-9a-f]{40}$")
         private val SHA256_REGEX = Regex("^[0-9a-f]{64}$")

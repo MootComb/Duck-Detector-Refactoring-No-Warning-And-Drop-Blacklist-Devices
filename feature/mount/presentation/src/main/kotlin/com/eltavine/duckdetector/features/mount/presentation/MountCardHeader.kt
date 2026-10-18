@@ -142,7 +142,6 @@ internal fun buildHeaderFacts(report: MountReport): List<MountHeaderFactModel> {
                 value = "${coveragePercent(report)}%",
                 status = when {
                     report.permissionDenied == 0 -> DetectorStatus.allClear()
-                    report.permissionDenied * 2 >= report.permissionTotal && report.permissionTotal > 0 -> DetectorStatus.warning()
                     else -> DetectorStatus.info(InfoKind.SUPPORT)
                 },
             ),

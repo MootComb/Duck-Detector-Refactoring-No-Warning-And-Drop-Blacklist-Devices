@@ -44,7 +44,7 @@ class UpdateRepositoryTest {
 
         assertTrue(same is UpdateCheckResult.Current)
         assertTrue(lower is UpdateCheckResult.Current)
-        assertEquals(listOf(UpdateRepository.MANIFEST_URL, UpdateRepository.MANIFEST_URL), urls)
+        assertEquals(List(2) { "https://github.com/eltavine/Duck-Detector-Refactoring/releases/download/update/update.json" }, urls)
     }
 
     @Test

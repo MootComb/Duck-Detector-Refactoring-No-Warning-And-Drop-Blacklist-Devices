@@ -225,6 +225,24 @@ class MountCardModelMapperTest {
         )
     }
 
+    @Test
+    fun `mount id observation and restricted coverage stay informational throughout card`() {
+        val model = mapper.map(report(
+            findings = listOf(MountFinding(
+                id = "early_preload_mount_id_loophole", label = "Mount ID discontinuity",
+                value = "Startup preload", group = MountFindingGroup.CONSISTENCY,
+                severity = MountFindingSeverity.INFO, origin = MountFindingOrigin.STARTUP_PRELOAD,
+            )),
+            earlyPreloadAvailable = true, earlyPreloadDetected = true, earlyPreloadFindingCount = 1,
+        ).copy(permissionDenied = 4, permissionAccessible = 0))
+
+        assertEquals(DetectorStatus.allClear(), model.status)
+        assertEquals("Observation", model.scanRows.single { it.label == "Startup preload" }.value)
+        assertEquals(DetectorStatus.info(com.eltavine.duckdetector.core.evidence.InfoKind.SUPPORT),
+            model.headerFacts.single { it.fact == MountHeaderFact.COVERAGE }.status)
+        assertTrue(model.consistencyRows.any { it.label == "Mount ID discontinuity" })
+    }
+
     private fun report(
         stage: MountStage = MountStage.READY,
         findings: List<MountFinding>,

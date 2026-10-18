@@ -37,6 +37,7 @@ class MountNativeBridgeTest {
             MOUNTS_READABLE=1
             MOUNTINFO_READABLE=1
             MAPS_READABLE=0
+            ROOT_MOUNT_ARTIFACT=1
             STATX_SUPPORTED=true
             PERMISSION_TOTAL=12
             PERMISSION_DENIED=3
@@ -48,6 +49,8 @@ class MountNativeBridgeTest {
         assertTrue(snapshot.available)
         assertTrue(snapshot.mountsReadable)
         assertFalse(snapshot.mapsReadable)
+        assertTrue(snapshot.rootMountArtifactDetected)
+        assertFalse(snapshot.magiskMountDetected)
         assertTrue(snapshot.statxSupported)
         assertEquals(12, snapshot.permissionTotal)
         assertEquals(3, snapshot.permissionDenied)
