@@ -4,7 +4,7 @@ Status: reviewed
 
 HMA behavior checks, including the seccomp getpriority probe, have the coverage and limitations described below.
 
-The Dangerous Apps detector asks whether root managers, hooking frameworks and similar tools are installed, including when package visibility filtering or hiding modules keep them out of PackageManager.
+The Dangerous Apps detector asks whether root managers, hooking frameworks and similar tools are installed, including when package visibility filtering or hiding modules keep them out of PackageManager. It separately reports monitored package names present in this boot's package change history, without treating that history as current installation evidence.
 
 ## Signals
 
@@ -18,6 +18,83 @@ The Dangerous Apps detector asks whether root managers, hooking frameworks and s
 - Visibility limits: restricted visibility is reported; hidden-from-PackageManager findings are only computed under full visibility.
 - Result states: detected, hidden from PackageManager, restricted, clean.
 - Interpretation: an installed target is a finding at its category's severity; hiding from PackageManager is stronger.
+
+### Package changes since boot
+
+- Observable signal: exact monitored package names returned by `PackageManager.getChangedPackages(0)`,
+  with the returned sequence number when present. Only catalog matches are retained; unrelated
+  names in the platform response are discarded.
+- Producing subsystem: the current Android user's PackageManager change tracker and its
+  package-visibility filtering, reached through the public `ApplicationPackageManager` wrapper.
+- Mechanism: PackageManager records package additions, updates and removals. Every scan queries
+  from sequence zero, without persisting a cursor or results across scans or reboots. The tracker
+  coalesces repeated changes for a package; this is not an ordered event log. The API exposes no
+  event kind, event timestamp, signing certificate or proof of current installation.
+- References: Android [getChangedPackages](https://developer.android.com/reference/android/content/pm/PackageManager#getChangedPackages(int))
+  and [ChangedPackages](https://developer.android.com/reference/android/content/pm/ChangedPackages);
+  AOSP Android 12 [PackageManagerService.getChangedPackages](https://android.googlesource.com/platform/frameworks/base/+/android-12.0.0_r1/services/core/java/com/android/server/pm/PackageManagerService.java),
+  Android 14 [PackageManagerService](https://android.googlesource.com/platform/frameworks/base/+/android-14.0.0_r1/services/core/java/com/android/server/pm/PackageManagerService.java),
+  Android 16 [PackageManagerService](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/services/core/java/com/android/server/pm/PackageManagerService.java),
+  [ComputerEngine.shouldFilterApplication](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/services/core/java/com/android/server/pm/ComputerEngine.java),
+  [ChangedPackagesTracker](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/services/core/java/com/android/server/pm/ChangedPackagesTracker.java)
+  and [ApplicationPackageManager](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/core/java/android/app/ApplicationPackageManager.java).
+- Applicability: public API since API 26, below this project's minimum API 29, on every supported
+  ABI. Records and sequence numbers reset on boot. The query uses the caller's user and grants no
+  cross-user access. No native code, hidden APIs, added permissions or global hooks are required.
+- Visibility limits: the checked Android 12–16 release implementations filter against current
+  package state. In Android 16, an ordinary non-instant, non-SDK-sandbox caller can retain a change
+  whose package state is null, because this path passes `filterUninstall=false`. Thus a completely
+  removed package can remain visible after installation-time filtering hid it. Removal from only
+  one user, retained package data, OEM changes and hiding-module versions need not behave alike.
+  This behavior is explanatory, not a required detection invariant. A null or empty response means
+  no visible target changes, never that a package was never installed; hiding can also filter the API.
+- Result states: not collected, available with or without catalog matches, permission denied,
+  query unavailable, invalid response. A non-null response must advance beyond sequence zero and
+  contain no null or blank package names. Empty filtered responses retain a valid returned sequence.
+  Cancellation propagates instead of becoming a negative finding.
+- Interpretation: matches are informational history evidence with current installation, running
+  state and concealment unconfirmed. Normal uninstallation produces the same evidence. History
+  has its own card section and export block; it never changes installed hits, hidden counts,
+  HMA corroboration inputs or current-package detection methods. An incomplete query prevents an
+  otherwise all-clear result. Stronger existing findings keep their original severity.
+
+Detection-vector credit: [FldBudin](https://github.com/FldBudin) and
+[aviraxp](https://github.com/aviraxp). The attribution concerns this vector, without assigning
+priority over independent discoveries or importing third-party implementation code.
+
+Verification includes eight JVM probe regressions and seven presentation/status/export regressions:
+exact catalog matching and deduplication; filtered empty and null responses; sequence reset between
+scans; permission, service and malformed-response failures; cancellation; independent history versus
+installed/hidden counts and severity; and retention of inventory/behavior limitations.
+
+The owning data module's `PackageChangeHistoryRuntimeTest` exercises the real public API twice per
+invocation. Android 16 / API 36 arm64 emulator observations use fingerprint
+`google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys`, security patch
+`2025-07-05`. A code-free APK fixture uses the monitored name `com.tsng.hidemyapplist`; it contains
+no HMA implementation. The test host declares neither `QUERY_ALL_PACKAGES` nor a query for the
+fixture. Before installation the target was absent from both queries. After installation it remained
+invisible to both package-info and change-history queries. Complete normal removal made its change
+record visible while package-info still could not resolve it. Both queries in each invocation agreed.
+After reboot, both queries returned no target match and no sequence number, so the removed fixture's
+previous-boot evidence was not retained. All four lifecycle stages passed their runtime assertions.
+This validates stock package-visibility/removal behavior, without establishing the behavior of any
+HMA release, retained-data removal, multi-user removal, OEM firmware or physical device.
+
+To repeat the fixture lifecycle test, build `:feature:dangerousapps:data:assembleDebugAndroidTest`,
+install its APK, and install/remove a disposable APK with that monitored package name. Invoke:
+
+```sh
+adb shell am instrument -w -r \
+  -e class com.eltavine.duckdetector.features.dangerousapps.data.probes.PackageChangeHistoryRuntimeTest \
+  -e historyPackage com.tsng.hidemyapplist \
+  -e expectHistoryMatch true -e expectPackageVisible false \
+  com.eltavine.duckdetector.features.dangerousapps.data.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+Use `expectHistoryMatch false` before installation and while the fixture is installed under restricted
+visibility. After complete removal, use `true`; after reboot use `false`. These expectations describe
+the tested stock API 36 host, not a requirement for all supported systems. A host that explicitly
+queries the target or has broad visibility can also observe its installation-time change.
 
 ### Filesystem and provider methods
 
@@ -243,6 +320,91 @@ filter stack, not an implementation of the concealment countermeasures named in 
   suppression, or a specifically attributed getpriority TRAP. A completed clean label also requires
   the caller notification control. Incomplete or refused checks prevent an all-clear conclusion.
 
+### Experimental UID permission visibility
+
+- Observable signal: a current-user ordinary application UID repeatedly holds a selected non-instant
+  permission while fresh package-service queries expose no package association, with successful
+  caller association, caller INTERNET state and empty-permission denial controls before and after.
+- Producing subsystem: PermissionService UID permission state and ComputerEngine package visibility.
+- Mechanism: Android 15/16 select AccessCheckingService's PermissionService. Its checkUidPermission
+  obtains the installed package with getPackage(uid), whose internal lookup uses SYSTEM_UID, then
+  reads permission state without the legacy caller filter. getPackagesForUid instead filters using
+  the actual caller. The feature-owned IPackageManager proxy avoids both Java clients' caches and
+  uses generated method signatures rather than hard-coded transaction numbers. It does not change
+  process-global hidden-API exemptions or cache settings. RECEIVE_BOOT_COMPLETED, ACCESS_WIFI_STATE
+  and REORDER_TASKS lack the instant protection flag in both reviewed manifests; active platform
+  definitions are checked again. PermissionService denies these permissions to instant apps.
+- References: Android [Context.checkPermission](https://developer.android.com/reference/android/content/Context)
+  and [package visibility](https://developer.android.com/training/package-visibility/declaring);
+  AOSP Android 15 [PermissionManager](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/core/java/android/permission/PermissionManager.java)
+  / [PermissionManagerService](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/services/core/java/com/android/server/pm/permission/PermissionManagerService.java)
+  / [PermissionService](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/services/permission/java/com/android/server/permission/access/permission/PermissionService.kt);
+  Android 16 [PermissionService](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/services/permission/java/com/android/server/permission/access/permission/PermissionService.kt),
+  [ComputerEngine](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/services/core/java/com/android/server/pm/ComputerEngine.java),
+  [permission definitions](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/core/res/AndroidManifest.xml),
+  [AIDL](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/core/java/android/content/pm/IPackageManager.aidl)
+  and [client cache](https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r1/core/java/android/app/ApplicationPackageManager.java).
+  The same path was checked at Android 16 security pin e96ce2b091188de3bf9cf6385e50a4559839d921.
+  HMA-OSS [1fe86ce2 PmsHookTargetBase](https://github.com/frknkrc44/HMA-OSS/blob/1fe86ce2b4a6f21197e6e92d15e054d609b7d77c/zygote/src/main/java/org/frknkrc44/hma_oss/zygote/hook/PmsHookTargetBase.kt)
+  skips SYSTEM_UID; [PmsHookTarget33](https://github.com/frknkrc44/HMA-OSS/blob/1fe86ce2b4a6f21197e6e92d15e054d609b7d77c/zygote/src/main/java/org/frknkrc44/hma_oss/zygote/hook/PmsHookTarget33.kt)
+  hooks the caller-filtered AppsFilter entry. This is a conditional mechanism reference, not an
+  observed HMA-positive result. Android 13/14 r1 still select PermissionManagerServiceImpl and do
+  not establish this same observation model; later releases remain unsupported pending review.
+- Applicability: API 35–36, ordinary caller UID, this Android user's app IDs 10000–19999, full normal
+  package visibility and reviewed non-instant permission definitions. No target process, target
+  package name or requested probe permission is required. There is a 1 s collection budget and a
+  16-candidate verification bound. Synchronous Binder calls cannot be interrupted by that budget;
+  cancellation is checked between calls and propagated through reflection wrappers.
+- Visibility limits: ordinary visibility filtering reproduces the discrepancy without a module.
+  INTERNET, ACCESS_NETWORK_STATE, WAKE_LOCK and VIBRATE allow instant apps and cannot qualify a hit.
+  An unmodified instant app can hold INTERNET while remaining hidden even to QUERY_ALL_PACKAGES.
+  Shared UID siblings can expose an association and suppress evidence. Packages holding none of the
+  selected permissions are outside positive coverage. OEM policy, installation races, stale server
+  state or other hooks remain alternative explanations; changing observations are inconclusive.
+- Result states: consistent in evaluated scope, experimental discrepancy, partial, permission limited,
+  unavailable, unsupported and inconclusive. Failed final controls discard all foreign UID claims.
+  Per-UID permission names, evaluated prefix and verification limits remain visible in the report.
+- Interpretation: experimental discrepancies are informational and never add a named package,
+  increase hidden counts or establish HMA/KernelSU identity. A negative cannot exclude hiding.
+  Task/permission UID intersections are annotated without changing severity or counting their shared
+  package-association dependency as independent evidence. The original HH timing classifier is not
+  implemented: the new permission path lacks its caller-filtered branch, and no timing ordering or
+  thresholds have been measured for the old implementation.
+
+### Fresh UID association verification
+
+The task-visibility comparison now uses the same feature-owned uncached package-service reader.
+Repeated public getPackagesForUid calls can reuse a cached empty result and cannot by themselves
+establish fresh service observations. Caller controls and foreign UID rechecks all reach the service;
+query failures remain inconclusive and cancellation escapes. The kernel task contract and original
+warning-level interpretation are retained. Instant-app visibility and OEM policy are explicit
+alternative explanations. No global cache invalidation is used.
+
+### UID permission validation matrix
+
+An API 36 Google ARM64 emulator with SELinux Enforcing ran ordinary application UID observers;
+no shell permission identity was adopted. Build fingerprint:
+`google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys`.
+Fixtures had no code or components, so their permission observations did not require a running task.
+
+| Fixture / observer | INTERNET | BOOT / WIFI | Package association | Expected interpretation |
+| --- | --- | --- | --- | --- |
+| Normal fixture / QUERY_ALL_PACKAGES | granted | granted / granted | present | consistent |
+| Normal fixture / restricted | granted | granted / granted | absent | visibility limited; not hiding evidence |
+| Instant fixture / QUERY_ALL_PACKAGES | granted | denied / denied | absent | excluded by non-instant permission rule |
+| No-permission fixture / QUERY_ALL_PACKAGES | denied | denied / denied | present | absence of a grant does not exclude installation |
+| Unassigned test UID / QUERY_ALL_PACKAGES | denied | denied / denied | absent | negative only for this fixture |
+
+The initial INTERNET scan covered 10,000 app IDs: full visibility found 59 granted UIDs and zero
+missing associations; restricted visibility found 36 missing associations. After installing the
+instant fixture, full visibility found one INTERNET-only discrepancy and zero also granted BOOT or
+WIFI. Restricted visibility still found 31 also-granted BOOT/WIFI discrepancies within its
+INTERNET-granted subset. Both the full-visibility gate and non-instant permission gate are necessary.
+These observations used public APIs to establish platform behavior; the shipped Binder adapter's
+runtime validation is recorded separately below. Public Context.checkPermission documents a positive
+PID, so the research harness's implementation-verified -1 PID is not used by the shipped UID-only
+adapter. HMA-positive and OEM-device validation remain open; the result stays informational.
+
 ### Validation coverage
 
 Unit tests cover repeated permission controls, public-wrapper NameNotFoundException conversion,
@@ -419,3 +581,20 @@ Review verification passed: 58 HMA JVM regressions, the full unit/app/lint/SDK A
 above, the standalone SDK consumer and all repository guards. Debug and Release native builds
 cover arm64-v8a, armeabi-v7a, x86 and x86_64. Native status claims require their supporting errno or
 signal, and complete payloads cannot carry collection errors or impossible suppression endpoints.
+
+### Shipped UID adapter runtime validation (2026-10-18)
+
+The Debug APK and its existing DetectorRuntimeSmokeTest ran two complete Dangerous Apps scans
+on the API 36 emulator described above, with ordinary non-running fixtures and an instant fixture
+installed. Both scans passed the new probe's caller controls and reported zero experimental
+permission/association discrepancies. The 1 s budget covered prefixes of 2,877 and 2,263 app IDs,
+respectively, and both correctly reported PARTIAL rather than a full-space negative. Both prefixes
+included the installed fixture UIDs. The task comparison scanned all 10,000 app IDs, saw 46 running
+UIDs and zero repeatedly missing associations; all fresh package-query controls passed. This
+validates generated proxy resolution, argument order, result decoding, partial coverage and
+integration/export on this stock emulator. It does not validate HMA-positive behavior or OEM devices.
+
+JVM regressions cover fresh changing associations, shared UID vetoes, INTERNET-only exclusion,
+permission changes, failed final controls, missing private methods, permission denial, malformed
+Binder values, nested reflection-wrapped cancellation, zero coverage, candidate caps, secondary
+users, invalid/out-of-prefix evidence, informational presentation and correlation without escalation.

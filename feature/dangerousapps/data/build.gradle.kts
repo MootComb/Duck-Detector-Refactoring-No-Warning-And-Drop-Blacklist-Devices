@@ -32,4 +32,6 @@ dependencies {
     api(project(":feature:dangerousapps:domain"))
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.hiddenapibypass)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 }

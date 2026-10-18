@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.features.dangerousapps.domain.HmaBehaviorCheck
 import com.eltavine.duckdetector.features.dangerousapps.domain.HmaBehaviorPolicy
 import com.eltavine.duckdetector.features.dangerousapps.domain.HmaCheckKind
 import com.eltavine.duckdetector.features.dangerousapps.domain.HmaCheckState
+import com.eltavine.duckdetector.features.dangerousapps.domain.HmaUidEvidenceCorrelation
 
 class HmaBehaviorProbe(context: Context) {
     private val context = context.applicationContext
@@ -49,15 +50,18 @@ class HmaBehaviorProbe(context: Context) {
         // Permission anomalies prioritize the callback budget without being counted as independent evidence.
         val callbackTargets = HmaBehaviorPolicy.targetOrder(ordered,
             corroboratedPackages + exceptionResults.flatMap { it.packages }).take(MAX_CALLBACK_TARGETS)
+        val uidCalls = HmaPackageManagerBinder()
         val results = exceptionResults + HmaBroadcastResultProbe(context, platform).run(callbackTargets) +
-            HmaUidVisibilityProbe(context).run(visibility) + HmaSeccompUidProbe().run()
-        return results.map { result ->
+            HmaUidVisibilityProbe(context, calls = uidCalls).run(visibility) +
+            HmaUidPermissionProbe(context, uidCalls).run(visibility) + HmaSeccompUidProbe().run()
+        return HmaUidEvidenceCorrelation.annotate(results).map { result ->
             val evaluated = when (result.kind) {
                 HmaCheckKind.BROADCAST_RESULT_TO, HmaCheckKind.BROADCAST_RESULT_COMPLETION -> callbackTargets.size
                 else -> selected.size
             }
             if (result.kind == HmaCheckKind.UID_TASK_VISIBILITY ||
-                result.kind == HmaCheckKind.SECCOMP_UID_FILTER) result else result.copy(
+                result.kind == HmaCheckKind.SECCOMP_UID_FILTER ||
+                result.kind == HmaCheckKind.UID_PERMISSION_VISIBILITY) result else result.copy(
                 state = if (ordered.size > evaluated && result.state == HmaCheckState.CONSISTENT)
                     HmaCheckState.PARTIAL else result.state,
                 detail = "${result.detail} Target scope: $evaluated/${ordered.size}; API ${Build.VERSION.SDK_INT}.",

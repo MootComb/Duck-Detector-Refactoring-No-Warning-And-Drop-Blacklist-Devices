@@ -25,6 +25,7 @@ enum class HmaCheckKind(val label: String) {
     APPLICATION_INFO_EXCEPTION("getApplicationInfo exception"),
     UID_TASK_VISIBILITY("getpriority UID visibility"),
     SECCOMP_UID_FILTER("Seccomp getpriority interference"),
+    UID_PERMISSION_VISIBILITY("UID permission visibility (experimental)"),
 }
 
 enum class HmaCheckState(val label: String) {
@@ -36,6 +37,7 @@ enum class HmaCheckState(val label: String) {
     UNSUPPORTED("Unsupported"),
     PERMISSION_LIMITED("Permission limited"),
     PARTIAL("Partially evaluated"),
+    EXPERIMENTAL_ANOMALY("Experimental UID discrepancy observed"),
 }
 
 data class HmaBehaviorCheck(
@@ -44,6 +46,7 @@ data class HmaBehaviorCheck(
     val detail: String,
     val packages: List<String> = emptyList(),
     val uids: List<Int> = emptyList(),
+    val uidPermissionEvidence: List<HmaUidPermissionEvidence> = emptyList(),
 )
 
 enum class HmaCallOutcome { SECURITY_EXCEPTION, RETURNED, NAME_NOT_FOUND, FAILED, UNAVAILABLE }

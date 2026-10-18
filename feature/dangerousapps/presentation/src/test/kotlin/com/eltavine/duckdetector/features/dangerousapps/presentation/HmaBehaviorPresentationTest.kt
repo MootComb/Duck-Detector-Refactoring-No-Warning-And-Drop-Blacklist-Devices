@@ -78,4 +78,15 @@ class HmaBehaviorPresentationTest {
         assertEquals("Behavior checks incomplete", model.verdict)
         assertEquals(null, model.hmaAlert)
     }
+    @Test fun `experimental UID permission findings stay informational without a hidden package`() {
+        val check = HmaBehaviorCheck(HmaCheckKind.UID_PERMISSION_VISIBILITY,
+            HmaCheckState.EXPERIMENTAL_ANOMALY, "UID 10043: android.permission.RECEIVE_BOOT_COMPLETED", uids = listOf(10043))
+        val result = report(check)
+        val model = DangerousAppsCardModelMapper().map(result)
+        assertEquals(DetectionSeverity.INFO, model.status.severity)
+        assertEquals(null, model.hmaAlert)
+        assertEquals(0, result.hiddenCount)
+        assertEquals("Experimental UID discrepancy observed", model.verdict)
+        assertTrue(model.context.any { it.value.contains("RECEIVE_BOOT_COMPLETED") })
+    }
 }

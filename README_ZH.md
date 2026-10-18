@@ -64,6 +64,8 @@ DuckDetector 在 Android 设备上采集并关联与安全相关的证据，用�
 
 Dangerous Apps 还根据 frknkrc44 提供的报告，检查广播与包查询的对照行为、内核 UID 任务可见性，以及 seccomp 用户通知过滤器对 getpriority 查询的拦截。异常与回调语义差异只作为辅助警告。重复回调超时须通过穿插的自身包名对照，仅作为低置信度时间异常；可见性受限与扫描不完整分别保留覆盖状态。版本限制与来源说明见 [HMA 行为检测证据](./feature/dangerousapps/EVIDENCE.md#hma-behavior-checks)。
 
+Android 15/16 还会以信息级展示实验性的非即时应用 UID 权限与包关联一致性检查，无需目标进程正在运行，也不据此识别隐藏模块；UID 包关联复核绕过 Java 客户端缓存。
+
 其中，`Play Integrity Fix` 检测的是与完整性伪装修改相关的本地迹象，并不会返回 Google Play Integrity API 的官方判定。TEE 模块检查 Android KeyStore 与设备证明证据，包括证书链、安全级别、吊销数据，以及设备支持时的部分 KeyMint、StrongBox 和 Soter 行为。
 
 SELinux 检测还保留了 app-zygote 阶段的 SID 表查询与注册对照实验。重复差异只作为辅助警告；同步注册的策略隐藏可能不留下差异。特权上下文写入在一次性子进程中执行，并加入畸形与合法载荷控制；上下文识别和普通 app 计时只作为辅助警告，app-zygote AVC 查找计数画像仅作信息展示，阴性观察不能排除隐藏策略。访问失败和不完整实验分别显示覆盖状态。源码依据与真机验证缺口见 [SELinux 证据记录](./feature/selinux/EVIDENCE.md)。

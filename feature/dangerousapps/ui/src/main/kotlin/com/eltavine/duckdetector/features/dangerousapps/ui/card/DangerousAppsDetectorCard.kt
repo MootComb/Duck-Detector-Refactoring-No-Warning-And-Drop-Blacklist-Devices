@@ -102,6 +102,16 @@ internal fun DangerousAppsDetectorCard(
                     DangerousAppsPackageSection(model = model)
                 }
             }
+            model.packageHistory?.let { history ->
+                item {
+                    DetectorSectionFrame(
+                        title = stringResource(R.string.dangerousapps_section_package_history),
+                        icon = Icons.Rounded.Search,
+                    ) {
+                        DangerousAppsPackageHistorySection(history = history)
+                    }
+                }
+            }
             item {
                 DetectorSectionFrame(
                     title = stringResource(R.string.dangerousapps_section_context),

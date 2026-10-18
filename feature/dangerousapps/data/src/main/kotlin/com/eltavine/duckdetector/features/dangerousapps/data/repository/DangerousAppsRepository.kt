@@ -24,6 +24,7 @@ import com.eltavine.duckdetector.capability.packageinventory.domain.InstalledPac
 import com.eltavine.duckdetector.core.detector.DetectorScanner
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.CreatePackageContextZipProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.OpenApkFdPackageProbe
+import com.eltavine.duckdetector.features.dangerousapps.data.probes.PackageChangeHistoryProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneDebugfsContextProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.SceneLoopbackProbe
 import com.eltavine.duckdetector.features.dangerousapps.data.probes.hma.HmaBehaviorProbe
@@ -50,6 +51,7 @@ class DangerousAppsRepository(
     private val sceneDebugfsContextProbe: SceneDebugfsContextProbe = SceneDebugfsContextProbe(),
     private val sceneLoopbackProbe: SceneLoopbackProbe = SceneLoopbackProbe(),
     private val hmaBehaviorProbe: HmaBehaviorProbe = HmaBehaviorProbe(context),
+    private val packageChangeHistoryProbe: PackageChangeHistoryProbe = PackageChangeHistoryProbe(context),
 ) : DetectorScanner<DangerousAppsReport> {
     override suspend fun scan(): DangerousAppsReport = withContext(Dispatchers.IO) {
         runCatching { scanInternal() }
@@ -64,6 +66,8 @@ class DangerousAppsRepository(
 
     private suspend fun scanInternal(): DangerousAppsReport {
         val targets = DangerousAppsCatalog.targets
+        // History includes removed packages and must never corroborate current installation or hiding.
+        val packageChangeHistory = packageChangeHistoryProbe.run(targets)
         val detectedApps = linkedMapOf<String, MutableFinding>()
         val issues = mutableListOf<String>()
 
@@ -270,6 +274,7 @@ class DangerousAppsRepository(
             probesRan = buildProbeList(packageVisibility, nativeDataStatRan = nativeDataDirectories != null),
             issues = issues,
             behaviorChecks = behaviorChecks,
+            packageChangeHistory = packageChangeHistory,
         )
     }
 

@@ -56,6 +56,16 @@ fun DangerousAppsCardModel.toDetectorReport(): DetectorReport = DetectorReport(
                 ),
             )
         }
+        packageHistory?.let { history ->
+            add(
+                ReportBlock.Verbatim(
+                    title = "Package Changes Since Boot",
+                    lines = listOf("    ${history.summary}") + history.packages.map { pkg ->
+                        "    • ${pkg.appName} (${pkg.packageName}) [${pkg.category}; current installation unconfirmed]"
+                    },
+                ),
+            )
+        }
         if (context.isNotEmpty()) {
             add(ReportBlock.Verbatim("Context & Inventory", context.map { "    • ${it.label}: ${it.value}" }))
         }

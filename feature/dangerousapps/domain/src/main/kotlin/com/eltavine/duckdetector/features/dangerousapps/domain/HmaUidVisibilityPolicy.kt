@@ -28,6 +28,8 @@ data class HmaUidVisibilityObservation(
     val unassociated: List<Int>,
     val verificationFailed: Boolean,
     val verificationLimitReached: Boolean,
+    val queryFailureState: HmaCheckState? = null,
+    val queryFailureDetail: String = "",
 )
 
 object HmaUidVisibilityPolicy {
@@ -37,9 +39,9 @@ object HmaUidVisibilityPolicy {
         val controlsPassed = callerAssociationBefore && callerAssociationAfter &&
             (!(complete || callerWasQueried) || callerUid in taskUids)
         val state = when {
-            !controlsPassed -> HmaCheckState.INCONCLUSIVE
+            !controlsPassed -> queryFailureState ?: HmaCheckState.INCONCLUSIVE
             unassociated.isNotEmpty() -> HmaCheckState.INCONSISTENT
-            verificationFailed -> HmaCheckState.INCONCLUSIVE
+            verificationFailed -> queryFailureState ?: HmaCheckState.INCONCLUSIVE
             !complete || verificationLimitReached -> HmaCheckState.PARTIAL
             else -> HmaCheckState.CONSISTENT
         }
@@ -48,7 +50,8 @@ object HmaUidVisibilityPolicy {
                 "${unassociated.size} repeatedly lacked a visible package association. " +
                 "First UID=$firstUid; caller queried=$callerWasQueried; controls passed=$controlsPassed; " +
                 "recheck failure=$verificationFailed; recheck limit=$verificationLimitReached. " +
-                "This does not identify a hidden package or HMA.",
+                "Fresh query failure=${queryFailureState?.label ?: "none"}; $queryFailureDetail. " +
+                "Instant-app visibility and OEM policy can also hide associations. This does not identify a hidden package or HMA.",
             uids = if (controlsPassed) unassociated else emptyList())
     }
 }

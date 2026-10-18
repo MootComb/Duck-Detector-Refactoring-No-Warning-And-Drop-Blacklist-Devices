@@ -29,21 +29,28 @@ import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.coroutineContext
 
 internal class HmaUidVisibilityProbe(
-    private val context: Context,
-    private val bridge: HmaUidTaskBridge = HmaUidTaskBridge(),
+    private val self: Int,
+    private val packageName: String,
+    private val scanTasks: (Int, Int) -> UidTaskSnapshot,
+    private val calls: HmaUidPackageCalls,
 ) {
+    constructor(
+        context: Context,
+        bridge: HmaUidTaskBridge = HmaUidTaskBridge(),
+        calls: HmaUidPackageCalls = HmaPackageManagerBinder(),
+    ) : this(Process.myUid(), context.packageName, bridge::scan, calls)
+
     suspend fun run(visibility: DangerousPackageVisibility): HmaBehaviorCheck {
         val kind = HmaCheckKind.UID_TASK_VISIBILITY
         if (visibility != DangerousPackageVisibility.FULL) {
             return HmaBehaviorCheck(kind, HmaCheckState.PERMISSION_LIMITED,
                 "Full package visibility is required to compare UID tasks with package associations.")
         }
-        val self = Process.myUid()
         val base = self / HmaPlatformCalls.PER_USER_RANGE * HmaPlatformCalls.PER_USER_RANGE
         if (self - base !in 10000..19999) {
             return HmaBehaviorCheck(kind, HmaCheckState.UNSUPPORTED, "Caller is outside the ordinary application UID range.")
         }
-        val snapshot = bridge.scan(base + 10000, base + 19999)
+        val snapshot = scanTasks(base + 10000, base + 19999)
         if (snapshot.status !in setOf(HmaUidTaskBridge.COMPLETE, HmaUidTaskBridge.PARTIAL)) {
             return HmaBehaviorCheck(kind, when (snapshot.status) {
                 HmaUidTaskBridge.RESTRICTED -> HmaCheckState.PERMISSION_LIMITED
@@ -51,27 +58,34 @@ internal class HmaUidVisibilityProbe(
                 else -> HmaCheckState.UNAVAILABLE
             }, "Native child status=${snapshot.status}, errno/signal=${snapshot.error}. ${snapshot.failure}")
         }
-        val pm = context.packageManager
         val unassociated = mutableListOf<Int>()
         var associationFailure = false
+        var queryFailure: HmaUidCallFailure? = null
+        fun recordFailure(result: Result<*>) {
+            result.exceptionOrNull()?.let { if (queryFailure == null) queryFailure = HmaUidCallFailure.from(it) }
+        }
         // Verify the association service before and after comparing foreign UIDs.
-        val before = runCatching { context.packageName in pm.getPackagesForUid(self).orEmpty() }.getOrDefault(false)
+        val beforeQuery = freshQuery { packageName in calls.packages(self) }
+        recordFailure(beforeQuery)
+        val before = beforeQuery.getOrDefault(false)
         var candidates = 0
         if (before) for (uid in snapshot.tasks.keys) {
             coroutineContext.ensureActive()
-            val packages = runCatching { pm.getPackagesForUid(uid) }
-            if (packages.isFailure) { associationFailure = true; continue }
+            val packages = freshQuery { calls.packages(uid) }
+            if (packages.isFailure) { recordFailure(packages); associationFailure = true; continue }
             if (!packages.getOrNull().isNullOrEmpty()) continue
             candidates++
             if (candidates > MAX_RECHECKS) break
-            val repeated = bridge.scan(uid, uid)
+            val repeated = scanTasks(uid, uid)
             if (repeated.status != HmaUidTaskBridge.COMPLETE) associationFailure = true
-            val stillUnassociated = runCatching { pm.getPackagesForUid(uid).isNullOrEmpty() }
-            if (stillUnassociated.isFailure) associationFailure = true
+            val stillUnassociated = freshQuery { calls.packages(uid).isEmpty() }
+            if (stillUnassociated.isFailure) { recordFailure(stillUnassociated); associationFailure = true }
             if (repeated.status == HmaUidTaskBridge.COMPLETE && uid in repeated.tasks &&
                 stillUnassociated.getOrNull() == true) unassociated += uid
         }
-        val after = runCatching { context.packageName in pm.getPackagesForUid(self).orEmpty() }.getOrDefault(false)
+        val afterQuery = freshQuery { packageName in calls.packages(self) }
+        recordFailure(afterQuery)
+        val after = afterQuery.getOrDefault(false)
         return HmaUidVisibilityPolicy.evaluate(HmaUidVisibilityObservation(
             complete = snapshot.status == HmaUidTaskBridge.COMPLETE,
             checked = snapshot.checked,
@@ -83,7 +97,18 @@ internal class HmaUidVisibilityProbe(
             unassociated = unassociated,
             verificationFailed = associationFailure,
             verificationLimitReached = candidates > MAX_RECHECKS,
+            queryFailureState = queryFailure?.state,
+            queryFailureDetail = queryFailure?.detail.orEmpty(),
         ))
+    }
+
+    private inline fun <T> freshQuery(block: () -> T): Result<T> = try {
+        Result.success(block())
+    } catch (cause: Exception) {
+        HmaUidCallFailure.from(cause) // Cancellation must escape, never become a missing association.
+        Result.failure(cause)
+    } catch (cause: LinkageError) {
+        Result.failure(cause)
     }
 
     private companion object { const val MAX_RECHECKS = 16 }

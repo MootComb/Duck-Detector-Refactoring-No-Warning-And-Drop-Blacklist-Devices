@@ -142,6 +142,9 @@ Line two 13
 
   Line three  ]
 
+  [Package Changes Since Boot]
+    A long detail line that deliberately exceeds sixty characters in length 29
+
   [Context & Inventory]
     • : left | right 15
     • Value 16:   Padded value 17  
@@ -837,6 +840,14 @@ Line two 18
   [Detected Packages]
     • A long detail line that deliberately exceeds sixty characters in length 22 () [methods: Value 24, key = value 25,   Padded value 26  ]
     • Value 27 (left | right 28) [methods: key = value 29, Unicode ✓ détail 30]
+
+  [Package Changes Since Boot]
+    Value 43
+    • A long detail line that deliberately exceeds sixty characters in length 44 (key = value 45) [key = value 46; current installation unconfirmed]
+    • Unicode ✓ détail 47 (Line one 48
+Line two 48
+
+  Line three  ) [key = value 49; current installation unconfirmed]
 
   [Context & Inventory]
     • key = value 31: key = value 32
@@ -1746,6 +1757,24 @@ Line two 5
       •   Padded value 9   () [methods:    , key = value 12]
       • left | right 13 (left | right 14) [methods: ]
 
+  [Package Changes Since Boot]
+    key = value 30
+    • Line one 31
+Line two 31
+
+  Line three   (Value 32) [Line one 33
+Line two 33
+
+  Line three  ; current installation unconfirmed]
+    • Line one 34
+Line two 34
+
+  Line three   (Unicode ✓ détail 35) [   ; current installation unconfirmed]
+    • Value 37 (Unicode ✓ détail 38) [Line one 39
+Line two 39
+
+  Line three  ; current installation unconfirmed]
+
   [Context & Inventory]
     • Value 15: Unicode ✓ détail 16
     • Unicode ✓ détail 17: left | right 18
@@ -2455,6 +2484,20 @@ Line two 15
 Line two 26
 
   Line three  ]
+
+  [Package Changes Since Boot]
+    A long detail line that deliberately exceeds sixty characters in length 40
+    • Line one 41
+Line two 41
+
+  Line three   (Unicode ✓ détail 42) [; current installation unconfirmed]
+    • Line one 44
+Line two 44
+
+  Line three   (   ) [Line one 46
+Line two 46
+
+  Line three  ; current installation unconfirmed]
 
   [Context & Inventory]
     • left | right 27: Unicode ✓ détail 28

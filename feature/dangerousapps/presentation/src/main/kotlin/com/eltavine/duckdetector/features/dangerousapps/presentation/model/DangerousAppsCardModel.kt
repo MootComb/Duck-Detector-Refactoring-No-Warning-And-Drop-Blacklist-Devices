@@ -32,6 +32,7 @@ data class DangerousAppsCardModel(
     val packageItems: List<DangerousAppsPackageItemModel>,
     val context: List<DangerousAppsContextItemModel>,
     val targetApps: List<DangerousAppsTargetAppModel>,
+    val packageHistory: DangerousAppsPackageHistoryModel? = null,
 ) : DetectorHeadline {
     /** Rendering-only severity for the Packages section. */
     val packageSectionSeverity: DetectionSeverity?
@@ -89,4 +90,9 @@ data class DangerousAppsTargetAppModel(
     val appName: String,
     val packageName: String,
     val category: String,
+)
+
+data class DangerousAppsPackageHistoryModel(
+    val summary: String,
+    val packages: List<DangerousAppsTargetAppModel>,
 )

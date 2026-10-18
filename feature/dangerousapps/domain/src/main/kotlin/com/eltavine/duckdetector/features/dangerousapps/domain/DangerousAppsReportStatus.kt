@@ -41,6 +41,9 @@ fun DangerousAppsReport.toDetectorStatus(): DetectorStatus {
 
             behaviorChecks.any { it.state != HmaCheckState.CONSISTENT } -> DetectorStatus.info(InfoKind.SUPPORT)
 
+            packageChangeHistory.state != PackageChangeHistoryState.AVAILABLE -> DetectorStatus.info(InfoKind.SUPPORT)
+            packageChangeHistory.matchedTargets.isNotEmpty() -> DetectorStatus.info(InfoKind.SUPPORT)
+
             else -> DetectorStatus.allClear()
         }
     }

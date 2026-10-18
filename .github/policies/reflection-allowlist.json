@@ -260,6 +260,13 @@
         "operations"
       ],
       "reason": "Invokes the hidden Context.sendBroadcastAsUser overload for a controlled permission-exception comparison; HiddenApiBypass.invoke adds no process-wide exemption."
+    },
+    {
+      "path": "feature/dangerousapps/data/src/main/kotlin/com/eltavine/duckdetector/features/dangerousapps/data/probes/hma/HmaUidPackageCalls.kt",
+      "uses": [
+        "operations"
+      ],
+      "reason": "Resolves the generated IPackageManager proxy and invokes UID-only permission and association methods without public-client caches. The adapter belongs to the package-visibility checks and does not change global hidden-API exemptions."
     }
   ]
 }
